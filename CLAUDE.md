@@ -1,81 +1,351 @@
-# KOANO — Claude Code Master Context
-## Version 4.0 | Confidential & Proprietary | 2026
+# KOANO — Master Build Context
+## Version 5.0 | Confidential & Proprietary | 2026
 
-> This file is the single source of truth for every build session.
+> This file is the single source of truth for every build session, human or AI.
 > Read it completely before writing a single line of code.
-> Never invent copy, colors, components, or pages not specified here.
-> Never add sections, features, or pages beyond what is defined.
+> Where this document and any older instruction conflict, this document wins.
+> Never invent copy, colors, components, pages, data, or numbers not specified here.
+> Never present data as live when it is not. See Section 06.
+
+---
+
+## 00 — How To Use This Document
+
+This is a build spec, not a pitch deck. It tells any engineer (or Claude Code / Fable 5) exactly what KOANO is, how it is architected, what is already built, what is not, and the rules that must never be broken.
+
+Three things matter more than anything else in this file, and they appear early because they govern everything after them:
+
+1. What KOANO actually is now (Section 01). The product has been repositioned away from consumer market forecasting toward professional and institutional transaction intelligence. Any older framing is dead.
+2. The three architectural principles (Section 02). Provider interfaces, provenance labeling, and slice-verified builds. These are not style preferences. They are what separate a credible product from a demo that collapses under scrutiny.
+3. The current build state (Section 03). An honest inventory so no one rebuilds what exists or assumes something exists when it does not.
 
 ---
 
 ## 01 — What KOANO Is
 
-KOANO is not a real estate data platform. It is a **real estate reasoning engine**.
+KOANO is a real estate reasoning engine that replaces the bureaucratic labor of real estate analysis and transactions for professionals and institutions.
 
-A coordinated system of five specialist AI agents — each owning a distinct domain of real estate intelligence — that ingests raw data from 50+ sources, reasons autonomously, cross-checks conclusions, and delivers a single unified verdict to the user. Every verdict is accompanied by a full, auditable reasoning chain. Every output is a decision, not a dashboard.
+It is not a consumer AVM. It is not a market forecasting toy. It is not a listings site. Its core value is the automation of expensive, tedious, judgment-heavy analytical work that today consumes days or weeks of professional time: comparative market analysis, entitlement and zoning research, pro forma benchmarking, due diligence, portfolio risk monitoring, and regulatory tracking.
 
-**The one-sentence brand promise:**
-> "The same intelligence that helps a REIT make a $50M acquisition also tells a renter in Crown Heights if their building is safe."
+The engine works by dispatching a query to five specialist AI agents, each owning a distinct analytical domain, each drawing on its own data providers. Their structured outputs feed a synthesis agent that produces a single unified verdict with a full, auditable reasoning chain. Every claim in that chain is traceable to its source, and every source is labeled with its provenance (see Section 06).
 
-**Category:** Real estate reasoning engine (a new category — not analytics, not listings, not data).
+**The one-line description:** The intelligence engine that does the analytical work of a real estate team, and shows its work well enough for a professional to act on it.
+
+**Who KOANO serves (in order of value and defensibility):**
+- Developers, CRE brokers, and contractors (Cluster 4) evaluating sites, entitlement risk, and pro forma viability.
+- Institutional investors, REITs, and C-suite (Cluster 5) monitoring portfolios and underwriting acquisitions.
+- Agents, brokers, and mortgage officers (Cluster 2) producing CMAs, neighborhood narratives, and pricing recommendations.
+- Homeowners, landlords, and flippers (Cluster 1) assessing a single property, permit history, and tax appeal opportunities.
 
 **What KOANO is NOT:**
-- ❌ NOT a Zillow / Redfin clone
-- ❌ NOT a data dashboard
-- ❌ NOT a listing platform
-- ❌ NOT another PropTech SaaS with charts
-- ❌ NOT a black box — showing its reasoning is the product
+- NOT a Zillow / Redfin clone.
+- NOT a static data dashboard.
+- NOT a listings platform.
+- NOT a black box. Showing verifiable reasoning is the product.
+- NOT a system that presents guessed or representative data as if it were live and authoritative.
+
+### The strategic posture: premium demo that becomes production
+
+KOANO is being built now, on a near-zero data budget, as a premium demo. The paid data sources that unlock the full professional product (MLS comps, CoStar-tier deal data, national permit aggregation, premium hazard data) are not yet funded. The strategy is deliberate and has integrity:
+
+- Build the real pipes. Every data source sits behind an interface (Section 05).
+- Flow real free data through them wherever it exists (NYC open data, Census, FHFA, FEMA, IRS Opportunity Zones, and similar).
+- Flow honestly-labeled representative data where the source is paid and not yet funded.
+- Architect so that funding a paid source is a one-line configuration change, never a rewrite.
+
+This lets KOANO operate and demo as the real deal today, and become production the moment capital arrives, without re-architecting anything. The integrity line is absolute: representative data is always labeled as such. See Section 06.
 
 ---
 
-## 02 — Tech Stack
+## 02 — The Three Non-Negotiable Architectural Principles
+
+These govern every build decision. Violating any of them turns KOANO from a credible product into a liability.
+
+### Principle 1 — The Provider Interface Pattern
+
+No agent ever calls a data source directly. Every external data source is accessed through a typed interface with a swappable implementation. Today an interface is backed by either a real implementation (free/open sources) or a mock implementation (paid sources not yet funded). Swapping mock to real must be a single configuration change in one registry file, never a change to agent logic, synthesis logic, or UI. See Section 05 for the full pattern.
+
+### Principle 2 — Honest Provenance Labeling
+
+Every data point carries a provenance tag: `live`, `representative`, or `modeled`. The UI visibly badges anything that is not `live`. A verdict's overall provenance is the weakest of its inputs. Representative data is never presented as live. This is an integrity requirement and a legal safeguard, not a design choice. See Section 06.
+
+### Principle 3 — Slice-Verified Builds
+
+Build one vertical path through the entire stack (data provider to agent to synthesis to API to verdict) and verify it works on real data before replicating it. When building multiple agents or clusters, build them one at a time with a test after each, never all at once untested. A flaw caught at agent two is trivial. The same flaw propagated to five agents and four clusters is a multi-day debugging disaster.
+
+---
+
+## 03 — Current Build State (Honest Inventory)
+
+**Built and working:**
+- Marketing site: homepage (all sections), and the pages /for/homeowners, /for/agents, /for/developers, /for/institutions, /intelligence, /pricing, /community, /about, /early-access, /data.
+- Design system: Neue Montreal typography, full color palette as CSS variables, Button and SectionNumber components, Nav, Footer.
+- Neural map: /public/neural-map.html. 143 nodes, D3 v7 force layout combined with Three.js r128 rendering. White background, KOANO blue synthesis hub, magenta agents, blue data sources, sage sub-feeds, curved tube connections, auto-rotate, hover and click interaction. Functionally and cosmetically complete.
+
+**Not built (this is the work ahead):**
+- The entire backend. No agents, no synthesis, no provider layer, no API routes exist yet.
+- The Supabase schema (tables not yet created).
+- All four cluster dashboards. None exist.
+- Auth flows (login, signup, onboarding).
+- Stripe billing.
+- Live wiring between frontend and any verdict engine.
+
+**Configured and ready:**
+- Supabase project created; URL and keys in .env.local.
+- Anthropic API key in .env.local.
+- Clerk publishable and secret keys in .env.local.
+- Stripe and Mapbox keys are placeholders, to be added when those features are built.
+
+**Note on the /community page:** the former nonprofit tier (previously "Cluster 0") has been removed from KOANO's product scope. Working with nonprofit housing organizations requires an operating track record KOANO does not yet have. The /community page may remain as a values statement but must not describe a live product tier or promise partnerships that do not exist. Do not build any Cluster 0 functionality.
+
+---
+
+## 04 — Tech Stack
 
 | Layer | Technology | Notes |
 |---|---|---|
-| Framework | Next.js 14 (App Router) | Full-stack, one codebase |
+| Framework | Next.js 14 (App Router) | Full-stack monolith. No separate Python service at this stage. |
 | Styling | Tailwind CSS | Custom CSS variables via globals.css |
-| Animation | Framer Motion | Scroll-driven, hover states, page transitions |
-| 3D / Hero | Spline + Three.js (@react-three/fiber) | Spline for embeds, Three.js for agent viz |
-| Maps | Mapbox GL JS | Interactive signal map, intelligence page |
-| Auth | Clerk | SSO for enterprise (Cluster 5), OAuth for others |
-| Database | Supabase (Postgres) | Row Level Security enforced on all tables |
-| Payments | Stripe | Subscriptions + webhooks |
-| AI / Agents | Anthropic Claude API | Model: claude-sonnet-4-20250514 |
-| Deployment | Vercel | Auto-deploy on push to main |
-| Analytics | PostHog | Product analytics |
-| Marketing analytics | Plausible | Privacy-friendly, no cookie banner needed |
+| Animation | Framer Motion | Scroll-driven entrances, hover states |
+| 3D / Neural map | Three.js r128 + D3 v7 | Combined: D3 force layout, Three.js render. Standalone in /public/neural-map.html |
+| Maps | Mapbox GL JS | For property/site maps in dashboards. Deferred until dashboards. |
+| Auth | Clerk | Email + Google. Protects /dashboard and /api routes. |
+| Database | Supabase (Postgres) | Row Level Security on all tables. |
+| Payments | Stripe | Subscriptions per cluster. Deferred until after core product. |
+| AI runtime | Anthropic Claude API | Agent runtime model: a cost-effective Sonnet-class model (see below). |
+| Deployment | Vercel | Auto-deploy on push to main. |
+| Analytics | PostHog | Deferred until launch prep. |
 
-**Claude API usage pattern:**
-```
-Each KOANO verdict = 5 parallel specialist agent calls + 1 synthesis call
-All agent calls use structured JSON output (never raw prose)
-Synthesis agent receives all 5 structured outputs simultaneously
-System prompts live in /lib/agents/[agent-name].ts
-```
+### Model policy: build vs run
+
+Two different models, two different purposes. Do not confuse them.
+
+- **Building KOANO** (writing the code, in Claude Code): use the most capable available model, currently Fable 5, for long-horizon architectural work. If Fable's safety classifiers route a request to Opus 4.8, that is acceptable; Opus handles this work well.
+- **Running KOANO** (the agent calls the product makes at runtime): use a cost-effective Sonnet-class model. Running the product on a frontier model would make per-verdict economics unworkable, especially at Cluster 1 and 2 price points. Set the runtime model in one place (a config constant) so it can be tuned per-cluster later. Use prompt caching on all system prompts to cut input cost.
+
+Runtime agent calls must always use prompt caching for the system prompt and any static schema or context, so repeated calls only pay for the unique query.
 
 ---
 
-## 03 — Design System
+## 05 — Provider Interface Architecture (The Spine)
 
-### Visual Reference
+This is the most important engineering decision in KOANO. Get it right once and everything else swaps in cleanly.
 
-**Primary reference:** thefoundation.house
-Study this site before building anything. Pay attention to:
-- The lightness and whitespace — almost no dark sections
-- Typography weight and breathing room between elements
-- The soft, coastal, editorial quality of the layout
-- How cards sit on light backgrounds without feeling heavy
+### Structure
 
-KOANO uses this same soft coastal intelligence aesthetic, translated into our baby blue palette instead of their warm tones.
+```
+/lib/providers/
+  types.ts        ← all provider interfaces + the wrapped-result type
+  registry.ts     ← single config mapping each interface to its active impl
+  real/
+    nyc-permits.ts        (live)
+    nyc-zoning.ts         (live)
+    irs-opportunity.ts    (live)
+    census-acs.ts         (live)
+    fhfa-hpi.ts           (live)
+    fema-flood.ts         (live)
+    fbi-ucr.ts            (live)
+    google-trends.ts      (live)
+    first-street-free.ts  (live, free tier)
+  mock/
+    proforma-benchmark.ts (representative)
+    mls-comps.ts          (representative)
+    placer-traffic.ts     (representative)
+    premium-hazard.ts     (representative)
+    costar-deals.ts       (representative)
+```
 
-**KOANO's signature:** Baby blue (`--brand-blue: #A8C4D4`) is KOANO's identity. It appears on section numbers, agent dots, verdict labels, data chips, the center line in the agent flow diagram, and dot connectors. It is the thread that runs through every page.
+### The wrapped result type
+
+Every provider method returns data in this envelope. No exceptions.
+
+```typescript
+interface ProviderResult<T> {
+  data: T;
+  provenance: "live" | "representative" | "modeled";
+  source: string;        // human-readable, e.g. "NYC DOB via NYC Open Data"
+  fetched_at: string;    // ISO timestamp
+  swap_note?: string;    // for mocks: which paid source replaces this, and how
+}
+```
+
+### The registry
+
+A single object maps each interface to its current implementation. Funding a paid source means changing one line here.
+
+```typescript
+// registry.ts
+export const providers = {
+  permits: new NYCPermitProvider(),        // live, free
+  zoning: new NYCZoningProvider(),         // live, free
+  opportunityZone: new IRSOZProvider(),    // live, free
+  proFormaBenchmark: new MockProFormaProvider(),  // representative → swap to CoStar
+  mlsComps: new MockMLSProvider(),         // representative → swap to Trestle/MLS
+  // ...
+};
+```
+
+### Failure discipline
+
+If a live provider call fails at runtime, it must fall back to a clearly-labeled `representative` response, never a silent fabrication and never an unlabeled value. A failed live call that pretends to be live is a Principle 2 violation.
+
+---
+
+## 06 — Provenance System (The Integrity Layer)
+
+This is what makes KOANO trustworthy and legally defensible. It is also what turns the missing paid data from a weakness into a demonstration of rigor.
+
+### The three provenance levels
+
+- `live` — fetched in real time from a real, authoritative source. Example: an actual NYC DOB permit record pulled from NYC Open Data at request time.
+- `representative` — realistic sample data standing in for a paid source not yet funded. Clearly modeled to be plausible, never presented as real. Example: a NYC cap rate benchmark before CoStar is integrated.
+- `modeled` — a value computed or estimated by KOANO's own logic or the LLM, derived from other inputs rather than fetched. Example: a synthesized risk score.
+
+### Rules
+
+1. Every data point in every verdict carries a provenance tag.
+2. The reasoning chain cites which provider each fact came from.
+3. A verdict's overall provenance equals the weakest of its inputs. If any input is `representative`, the whole verdict is flagged as not fully live.
+4. The UI must visibly badge anything not `live`. A small, clear label ("Representative data — becomes live with [source] integration") next to the figure.
+5. Never present representative or modeled data as live. This is the one rule with no exceptions.
+
+### Why this is a feature, not an apology
+
+Sophisticated buyers (developers, REIT analysts, brokers) will test exactly the claims that depend on expensive data, because they know that is where products lie. A KOANO that says "this pro forma benchmark is representative; with a CoStar integration it becomes live" signals domain mastery and honesty. It converts the funding gap into a clear articulation of what capital unlocks. Hiding the gap is how the pitch dies. Labeling it is how the pitch earns trust.
+
+---
+
+## 07 — The Five Agents + Synthesis
+
+Each agent is a module in /lib/agents/. Each depends only on provider interfaces from the registry, never on a data source directly. Each returns output strictly matching the Verdict schema (Section 09), with per-datapoint provenance, and a reasoning chain that cites its providers. Each runtime call uses the cost-effective runtime model with prompt caching.
+
+### Agent data reality (what is live vs representative today)
+
+| Agent | File | Live free sources (today) | Representative until funded |
+|---|---|---|---|
+| Market Timing | market-timing.ts | FHFA House Price Index, Redfin Data Center, Census ACS | MLS comps, paid AVM |
+| Infrastructure Pipeline | infrastructure.ts | NYC DOB permits (NYC Open Data), DOT project data | National permit aggregation (Shovels.ai) |
+| Demand Sentiment | demand-sentiment.ts | Google Trends, Census demographics | Foot traffic (Placer.ai), SafeGraph |
+| Risk & Volatility | risk-volatility.ts | FBI UCR crime, FEMA flood, First Street free tier | Premium hazard (Verisk, CoreLogic) |
+| Regulatory & Policy | regulatory-policy.ts | NYC zoning/PLUTO, IRS Opportunity Zones, SEC EDGAR | Community board sentiment (paid/manual) |
+
+### The synthesis agent
+
+/lib/agents/synthesis.ts receives all five structured agent outputs simultaneously and produces one unified Verdict.
+
+Responsibilities:
+- Consensus handling: multiple agents agreeing raises confidence.
+- Conflict surfacing: disagreements appear in `minority_signals`, never hidden.
+- Provenance rollup: overall verdict provenance equals the weakest input.
+- Reasoning chain assembly: a readable trace showing each agent's conclusion, how conflicts were resolved, and the final verdict, with every fact attributed.
+
+Agents run in parallel via Promise.all. Synthesis runs on their collected outputs.
+
+### Geographic scope at this stage
+
+Live data is deepest for New York City, because NYC publishes permits, zoning (PLUTO), and violations as free open data. Build and demo against real NYC addresses. Addresses outside NYC fall back to representative data for the NYC-specific sources, clearly labeled. Long Island City, Bushwick, and similar actively-developing areas make the strongest live demos.
+
+---
+
+## 08 — The Four Clusters
+
+Same engine, same five agents, four different presentations and depths. All four are in scope. Cluster 3 (due diligence) is reserved for a future roadmap and is not built. There is no Cluster 0.
+
+### Cluster 1 — Property Intelligence (Homeowners, landlords, flippers)
+Price band: 19–49 / month.
+Bureaucratic work replaced: manual comp pull and ARV calculation, permit history lookup, property tax assessment appeal research.
+Default view: single property. AVM with velocity, permit history, neighborhood trajectory, KOANO verdict.
+Neural map: not on default view.
+
+### Cluster 2 — Transaction Intelligence (Agents, brokers, MLOs)
+Price band: 149–299 / month.
+Bureaucratic work replaced: the full CMA process, neighborhood narrative writing, offer-price recommendation, absorption-rate calculation.
+Default view: market velocity dashboard. CMA builder with early-signal overlay, client-ready narrative, pricing recommendation with reasoning.
+Neural map: not on default view.
+Data caveat: MLS comps are the core dependency and are paid and legally gated. Until funded, comps are `representative`. This must be visibly labeled. Do not imply live MLS access.
+
+### Cluster 4 — Development Intelligence (Developers, CRE brokers, contractors)
+Price band: 499–1,499 / month.
+This is the sharpest wedge and the deepest free-data slice. Build this cluster to genuine production depth first.
+Bureaucratic work replaced: zoning research and entitlement risk assessment, community board opposition assessment, pro forma input benchmarking, infrastructure pipeline scan, permit history pull.
+Default view: multi-site comparison. Enter up to three site addresses; all five agents run on each; synthesis ranks by risk-adjusted opportunity; developer receives a structured comparison with full reasoning chain.
+Neural map: available via a "System View" tab (on demand).
+Data reality: zoning, permits, and Opportunity Zone status are `live` for NYC. Pro forma benchmarks are `representative` until CoStar-tier data is funded, and must be labeled.
+
+### Cluster 5 — Portfolio Intelligence (Institutional, C-suite, REITs)
+Price band: 1,499–4,999 / month plus custom.
+Highest value, longest sales cycle, strictest liability. Build the demo faithfully; understand this is an enterprise motion, not a self-serve launch.
+Bureaucratic work replaced: market entry studies (replacing 50–150K consultant reports), monthly portfolio risk reports (replaced by continuous monitoring), the first weeks of deal underwriting, regulatory change monitoring.
+Default view: portfolio command center with a proactive Monday morning briefing.
+Neural map: full-screen, as the hero of the dashboard.
+Data reality and liability: institutional users will not act on unverifiable output. Every figure must be traceable and provenance-tagged. Representative figures must be labeled. This is decision-support, not decision-making; the UI language must reflect that.
+
+### Cluster-to-neural-map summary
+
+| Cluster | Neural map presence |
+|---|---|
+| 1 — Homeowners | Not present |
+| 2 — Agents | Not present |
+| 4 — Developers | System View tab, on demand |
+| 5 — Institutional | Full-screen, default hero of the dashboard |
+
+---
+
+## 09 — Verdict Schema
+
+Every agent and the synthesis agent output this shape. No `any` types. Provenance is mandatory on every fact.
+
+```typescript
+interface DataPoint {
+  label: string;
+  value: string | number;
+  provenance: "live" | "representative" | "modeled";
+  source: string;
+  fetched_at: string;
+}
+
+interface ReasoningStep {
+  agent: string;
+  conclusion: string;
+  evidence: DataPoint[];       // each fact carries its own provenance
+  confidence: number;          // 0–100
+}
+
+interface MinoritySignal {
+  agent: string;
+  dissent: string;
+  evidence: DataPoint[];
+}
+
+interface KoanoVerdict {
+  verdict: "buy" | "sell" | "hold" | "wait" | "pass";
+  confidence: number;                    // 0–100
+  signal_window_months: number;
+  headline: string;
+  reasoning_chain: ReasoningStep[];
+  minority_signals: MinoritySignal[];
+  overall_provenance: "live" | "representative" | "modeled";  // = weakest input
+  risk_score: number;                    // 0–100
+  irr_estimate?: number;                 // Clusters 4 & 5 only
+  generated_at: string;
+}
+```
+
+The `overall_provenance` field is computed as the weakest provenance among all `DataPoint`s in the verdict. If any fact is `representative`, `overall_provenance` is `representative`, and the UI badges the entire verdict accordingly.
+
+---
+
+## 10 — Design System
+
+Unchanged from prior versions and still authoritative. The neural map and marketing site already implement this.
+
+### Visual reference
+Study thefoundation.house before building any UI: lightness, whitespace, editorial typographic restraint. KOANO uses the same soft, precise aesthetic translated into its blue palette.
 
 ### Typography
-
-**Font:** Neue Montreal (Fontshare — free, commercial use permitted)
+Font: Neue Montreal (Fontshare, free, commercial use permitted).
 
 ```html
-<!-- Add to <head> in layout.tsx -->
 <link href="https://api.fontshare.com/v2/css?f[]=neue-montreal@400,500,700&display=swap" rel="stylesheet" />
 ```
 
@@ -86,784 +356,281 @@ fontFamily: {
 }
 ```
 
-| Role | Size | Weight | Use |
-|---|---|---|---|
-| Display / Hero H1 | 64–96px | 700 | Hero headlines only |
-| Section H2 | 40–52px | 700 | Section headers |
-| Sub H3 | 24–32px | 500 | Card titles, sub-sections |
-| Body large | 18px | 400 | Hero subhead, intro paragraphs |
-| Body | 16px | 400 | Standard body copy |
-| UI / labels | 13–14px | 500 | Nav links, card labels, meta |
-| Mono / data | 11–13px | 400–500 | Agent labels, prices, stats, scores |
-| Micro | 10–11px | 500 | Section numbers (01, 02...), tags, chips |
+| Role | Size | Weight |
+|---|---|---|
+| Hero H1 | 64–96px | 700 |
+| Section H2 | 40–52px | 700 |
+| Sub H3 | 24–32px | 500 |
+| Body large | 18px | 400 |
+| Body | 16px | 400 |
+| UI / labels | 13–14px | 500 |
+| Mono / data | 11–13px | 400–500 |
+| Micro (section numbers, tags) | 10–11px | 500 |
 
-**Letter spacing:** Headlines use `letter-spacing: -0.02em`. Mono/data labels use `letter-spacing: 0.08em`.
+Headlines: letter-spacing -0.02em. Mono/data labels: letter-spacing 0.08em.
 
-### Color Palette — Coastal Intelligence
+### Color palette — Coastal Intelligence
 
 ```css
 :root {
-  /* Backgrounds */
   --white: #FFFFFF;
-  --pale-wash: #F0F7FC;      /* light section backgrounds, card hover states */
-  --sky: #D6EBF7;            /* tinted cards, tag backgrounds, borders */
+  --pale-wash: #F0F7FC;
+  --sky: #D6EBF7;
 
-  /* Brand Blue — KOANO's signature color */
-  --brand-blue: #A8C4D4;     /* section numbers, agent dots, verdict labels, data chips, center line, dot connectors */
-  --mid-blue: #5A9BBE;       /* headline accent words, link hover, inline highlights */
-  --deep-navy: #1A4F6E;      /* strong labels, dark text on sky backgrounds */
-  --near-black: #0D2B3E;     /* primary text color on light sections, footer text */
+  --brand-blue: #A8C4D4;   /* KOANO signature: section numbers, synthesis node, chips */
+  --mid-blue: #5A9BBE;     /* accent words, link hover */
+  --deep-navy: #1A4F6E;
+  --near-black: #0D2B3E;   /* primary text on light; never a section background */
 
-  /* Ink (text) */
-  --ink-primary: #0D2B3E;    /* all body text on light backgrounds */
-  --ink-secondary: #3D5A6E;  /* subheads, secondary body */
-  --ink-muted: #5A7A8C;      /* meta text, body on light */
-  --ink-faint: #8AABB8;      /* section numbers on light, placeholder text */
+  --ink-primary: #0D2B3E;
+  --ink-secondary: #3D5A6E;
+  --ink-muted: #5A7A8C;
+  --ink-faint: #8AABB8;
 
-  /* Borders */
-  --border: #D6EBF7;         /* card borders, dividers */
-  --border-light: #E8F3FA;   /* subtle separators */
+  --border: #D6EBF7;
+  --border-light: #E8F3FA;
 
-  /* Functional signals */
-  --signal-positive: #22C55E;   /* buy signals, positive verdicts */
-  --signal-warning: #F59E0B;    /* hold signals, watch signals */
-  --signal-negative: #EF4444;   /* risk flags, sell signals */
-
-  /* Glass cards on light */
-  --glass-light-bg: rgba(255, 255, 255, 0.45);
-  --glass-light-border: rgba(255, 255, 255, 0.65);
-  --glass-light-blur: blur(24px) saturate(180%);
+  --signal-positive: #22C55E;
+  --signal-warning: #F59E0B;
+  --signal-negative: #EF4444;
 }
 ```
 
-### Color Application Rules
-
-| Section type | Background | Primary text | Cards | Accent |
-|---|---|---|---|---|
-| Hero (cinematic) | 3D render video, full bleed | White | Glass light — ONLY valid here, over the render | `--brand-blue` labels |
-| All content sections | `--white` or `--pale-wash` | `--ink-primary` | White, `--sky` border | `--brand-blue` numbers, dots, chips |
-| Footer | `--white` with border-top `--border` | `--ink-primary` | — | `--brand-blue` links |
-| Verdict card | `--white` | `--ink-primary` | Bordered, `--pale-wash` bg | `--brand-blue` label |
-| Signal positive | — | `--signal-positive` | `rgba(34,197,94,0.08)` bg | — |
-| Signal warning | — | `--signal-warning` | `rgba(245,158,11,0.08)` bg | — |
-| Signal negative | — | `--signal-negative` | `rgba(239,68,68,0.08)` bg | — |
-
-**Light-only rule: There are NO dark sections anywhere on the site.**
-- The Promise quote section is light (`--white` background, `--ink-primary` text, quote in `--near-black`)
-- The footer is white with a `--border` top border
-- `--near-black` (`#0D2B3E`) is used for text only — never as a section background
-- 100% of sections use white or pale-wash backgrounds
-
-### Glassmorphic Cards — Usage Rules
+### Neural map palette (as implemented, authoritative)
 
 ```css
-/* Card on light background — ONLY valid when placed over a 3D render or video */
-.glass-card-light {
-  background: rgba(255, 255, 255, 0.45);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.65);
-  border-radius: 20px;
-  box-shadow:
-    0 0 0 0.5px rgba(255, 255, 255, 0.3) inset,
-    0 8px 32px rgba(168, 196, 212, 0.15);
-}
+--nm-synthesis: #A8C4D4;   /* KOANO blue hub */
+--nm-agent:     #E91E8C;   /* magenta specialist agents */
+--nm-source:    #4A90D9;   /* blue data sources */
+--nm-feed:      #9DD1B8;   /* sage sub-feeds */
+/* background: #FFFFFF; matte spheres; curved tube connections */
 ```
-
-**Critical rule:** Glass cards ONLY render their blur effect when placed over a textured background, a 3D render, or a video. On flat `--white` sections, use solid white cards with `border: 1px solid var(--border)` and `border-radius: 20px`. Glass cards are valid ONLY in the hero section (over the 3D render video). Everywhere else: solid white cards.
-
-**Critical rule for 3D renders:** Renders are always positioned as background layers (`position: absolute`, `z-index: 0`). Glass cards sit above them (`z-index: 1`). Never place a render inside a card container.
-
-**21st.dev components:** Glass card components are imported from 21st.dev. Do not generate custom glassmorphism CSS — use the imported component directly.
 
 ### Buttons
+Pill shape only (border-radius 100px). Primary: `--brand-blue` fill, `--near-black` text. Ghost: transparent, `--border` outline. All primary CTAs end with the diagonal arrow.
 
-```css
-/* Primary */
-.btn-primary {
-  background: var(--brand-blue);
-  color: var(--near-black);
-  border: 1px solid var(--brand-blue);
-  border-radius: 100px; /* PILL — non-negotiable */
-  padding: 13px 28px;
-  font-weight: 500;
-  font-size: 14px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-/* Hover: background lightens to --sky */
+### Section numbers
+Format `01`, `02` in mono, 11px, `--brand-blue`, letter-spacing 1.5px, as an eyebrow above section headers.
 
-/* Ghost */
-.btn-ghost {
-  background: transparent;
-  color: var(--ink-muted);
-  border: 1px solid var(--border);
-  border-radius: 100px;
-  padding: 13px 28px;
-  font-weight: 400;
-  font-size: 14px;
-}
-/* Hover: background becomes --pale-wash */
-```
+### Animation (Framer Motion)
+Entrance: fade-up only (y 20 to 0, opacity 0 to 1). Duration 0.5s content, 0.3s UI. Easing [0.16, 1, 0.3, 1]. No spring, no bounce, no scale on entrance. Stagger 0.08s. Scroll trigger useInView threshold 0.15. Hover: opacity shifts only, never scale on static showcase elements.
 
-**All primary CTAs use the diagonal arrow: `↗`**
+### Glass cards
+Glassmorphism only renders over a textured/image/video/3D background. On flat white sections, use solid white cards with a 1px `--border` and 20px radius. Glass components come from 21st.dev; do not hand-roll glassmorphism CSS.
 
-### Section Numbers
-
-Every content section uses a two-digit number as an eyebrow label:
-- Format: `font-family: mono`, `font-size: 11px`, `font-weight: 500`, `color: --brand-blue`, `letter-spacing: 1.5px`
-- Displayed above section headlines
-- Example: `01 — Who it's for`, `02 — How it works`, `03 — Get early access`
-
-### Animation Rules (Framer Motion)
-
-- **Entrance:** fade-up only — `y: 20 → 0`, `opacity: 0 → 1`
-- **Duration:** 0.5s for content blocks, 0.3s for UI elements
-- **Easing:** `[0.16, 1, 0.3, 1]` — expo out, fast in, soft landing. No bounce, no spring, no scale
-- **Stagger:** 0.08s between sibling elements
-- **Scroll trigger:** `useInView`, threshold 0.15
-- **Hover:** opacity shifts only (`0.7 → 1.0`). Never scale or lift on static showcase elements
-- **Reasoning chain expand/collapse:** height animation, 0.35s, ease-out
-- **Agent flow diagram:** cards fade-up in sequence, staggered 0.1s top to bottom
-- **Data ticker:** CSS `animation: scroll linear infinite` — not Framer Motion
-
-### 3D Render / Video Integration
-
-All hero and section visuals are pre-made assets dropped into named slots. Claude Code places them — never generates them.
-
-| File name | Aspect ratio | Placement |
-|---|---|---|
-| `hero-render.mp4` | 16:9 or 16:10 | Hero — full bleed background, `object-fit: cover`, `z-index: 0` |
-| `hero-render-mobile.mp4` | 1:1 | Mobile hero only |
-| `cluster-1-render.webp` | 4:3 | Cluster 1 landing page |
-| `cluster-2-render.webp` | 4:3 | Cluster 2 landing page |
-| `cluster-4-render.webp` | 4:3 | Cluster 4 landing page |
-| `cluster-5-render.webp` | 4:3 | Cluster 5 landing page |
-| `footer-render.webp` | 16:5 | Footer background (optional) |
-
-**Until a render is delivered:** section runs on typography and color alone. Never insert a grey placeholder rectangle. Never use stock photography. Never use Unsplash URLs.
+### Data/render assets
+3D renders and hero videos are pre-made assets dropped into named slots; Claude Code places them, never generates them. Until delivered, sections run on typography and color alone. Never use grey placeholder rectangles, stock photography, or Unsplash URLs.
 
 ---
 
-## 04 — File & Folder Structure
-
-Claude Code must use this exact structure. Never invent alternative locations.
+## 11 — File & Folder Structure
 
 ```
 /app
-  layout.tsx                  ← root layout: font import, Clerk provider, global CSS
-  page.tsx                    ← Homepage
-  /for
-    /homeowners/page.tsx      ← Cluster 1 landing
-    /agents/page.tsx          ← Cluster 2 landing
-    /developers/page.tsx      ← Cluster 4 landing
-    /institutions/page.tsx    ← Cluster 5 landing
+  layout.tsx                    ← ClerkProvider, font, global CSS
+  page.tsx                      ← Homepage
+  /for/{homeowners,agents,developers,institutions}/page.tsx
   /intelligence/page.tsx
   /pricing/page.tsx
-  /community/page.tsx
-  /early-access/page.tsx
-  /contact/page.tsx
+  /community/page.tsx           ← values statement only, no live tier
   /about/page.tsx
-  /blog/page.tsx
-  /api
-    /agents/route.ts          ← all Claude API calls — server-side only
-    /data/[source]/route.ts   ← paid data source calls, cached
-
-/app (app subdomain — app.koano.com)
+  /early-access/page.tsx
+  /data/page.tsx
   /login/page.tsx
   /signup/page.tsx
-  /onboarding/page.tsx
+  /onboarding/page.tsx          ← cluster selection
   /dashboard
-    page.tsx                  ← cluster-aware dashboard root
-    /property/[id]/page.tsx
-    /portfolio/page.tsx
-    /site/[id]/page.tsx
-    /briefing/page.tsx
-    /settings/page.tsx
-    /reasoning/[id]/page.tsx
+    page.tsx                    ← cluster-aware root
+    /site/[id]/page.tsx         ← Cluster 4 site analysis
+    /property/[id]/page.tsx     ← Cluster 1
+    /portfolio/page.tsx         ← Cluster 5
+    /reasoning/[id]/page.tsx    ← full reasoning chain view
+  /api
+    /agents/route.ts            ← Clerk-protected verdict endpoint
 
 /components
-  /ui                         ← design system primitives
-    Button.tsx                ← pill buttons, primary + ghost variants
-    GlassCard.tsx             ← imported from 21st.dev
-    SectionNumber.tsx         ← "01 —" eyebrow label component
-    VerdictCard.tsx           ← buy/sell/hold/wait output card
-    ReasoningChain.tsx        ← expandable full reasoning chain
-    AgentFlowDiagram.tsx      ← the vertical timeline agent map
-    DataTicker.tsx            ← scrolling source name ticker
-  /marketing
-    Nav.tsx
-    Footer.tsx
-    HeroSection.tsx
-    ClustersSection.tsx
-    PromiseSection.tsx
-    AgentsSection.tsx
-    EarlyAccessSection.tsx
-  /dashboard
-    Sidebar.tsx
-    ClusterBadge.tsx
-    PropertyView.tsx
-    PortfolioView.tsx
+  /ui        (Button, SectionNumber, VerdictCard, ReasoningChain, ProvenanceBadge, GlassCard)
+  /marketing (Nav, Footer, HeroSection, ClustersSection, AgentsSection, ...)
+  /dashboard (Sidebar, ClusterBadge, SiteComparison, PortfolioView, ...)
 
 /lib
-  /agents
-    market-timing.ts
-    infrastructure.ts
-    demand-sentiment.ts
-    risk-volatility.ts
-    regulatory-policy.ts
-    synthesis.ts
-  /supabase
-    client.ts
-    server.ts
-  /stripe
-    checkout.ts
+  /providers (types.ts, registry.ts, real/, mock/)
+  /agents    (market-timing, infrastructure, demand-sentiment, risk-volatility, regulatory-policy, synthesis)
+  /supabase  (client.ts, server.ts)
+  /stripe    (checkout.ts)      ← deferred
+
+/supabase
+  schema.sql
 
 /styles
-  globals.css                 ← all CSS variables (full color palette above)
+  globals.css
 
 /public
-  /renders                    ← hero-render.mp4, cluster renders, etc.
+  neural-map.html               ← built, authoritative
+  /renders                      ← pre-made assets
 ```
+
+The `ProvenanceBadge` component in /components/ui is mandatory and used anywhere a non-live figure is displayed.
 
 ---
 
-## 05 — Site Architecture
+## 12 — Site Architecture (Routes)
 
-### Marketing Site (koano.com)
+Marketing (koano.com): /, /for/homeowners, /for/agents, /for/developers, /for/institutions, /intelligence, /pricing, /community, /about, /early-access, /data.
 
-```
-/                           Homepage
-/for/homeowners             Cluster 1 landing page
-/for/agents                 Cluster 2 landing page
-/for/developers             Cluster 4 landing page
-/for/institutions           Cluster 5 landing page
-/intelligence               How it works — Russian doll architecture
-/pricing                    All four tiers
-/community                  Cluster 0 partnership program
-/data                       Data pipeline transparency
-/about                      Founding story, mission, team
-/blog                       KOANO Index, thought leadership
-/early-access               Waitlist / email capture
-/contact                    Enterprise inquiry form
-```
-
-### Application (app.koano.com)
-
-```
-/login
-/signup
-/onboarding                 Cluster selection
-/dashboard                  Context-aware per cluster
-/dashboard/property/[id]
-/dashboard/portfolio
-/dashboard/site/[id]
-/dashboard/briefing
-/dashboard/settings
-/dashboard/reasoning/[id]   Full reasoning chain for a verdict
-```
+Application (app.koano.com or /dashboard): /login, /signup, /onboarding, /dashboard (cluster-aware), /dashboard/site/[id], /dashboard/property/[id], /dashboard/portfolio, /dashboard/reasoning/[id].
 
 ---
 
-## 06 — Homepage Wireframe (locked section order)
+## 13 — Approved Copy (Verbatim)
 
-Build the homepage in this exact section order. Do not reorder, add, or remove sections.
+Global brand name: KOANO (always all caps). Category and tagline: The real estate reasoning engine.
 
-### Section 1 — NAV
-- Background: `--white`, `border-bottom: 1px solid var(--border-light)`
-- On scroll past hero: `backdrop-filter: blur(12px)`, `background: rgba(255,255,255,0.85)`
-- Left: KOANO logo (all caps, 15px, font-weight 500, `--near-black`, letter-spacing 2px)
-- Center: `How it works` · `For homeowners` · `For professionals` · `For institutions` · `Pricing` (13px, `--ink-muted`, no underline, hover: `--ink-primary`)
-- Right: `[Sign in]` (ghost pill) · `[Get early access ↗]` (primary pill)
-- Mobile: hamburger right, full-screen overlay menu
+Homepage hero tag: `Real estate reasoning engine`
 
-### Section 2 — HERO
-- Full viewport height (100vh)
-- `hero-render.mp4` as full-bleed background: `position: absolute`, `inset: 0`, `z-index: 0`, `object-fit: cover`
-- All text and CTAs sit above the render at `z-index: 1`
-- Layout: left-aligned text block, vertically centered in the viewport
-- Content top to bottom:
-  1. Eyebrow tag: `Real estate reasoning engine` — 11px mono, `--brand-blue`, letter-spacing 1.5px
-  2. Headline (2 lines): `Real estate has always had data. / It's never had a brain.` — 64–80px, weight 700, white
-  3. Subhead: `KOANO deploys five specialist AI agents...` — 18px, weight 400, white, opacity 0.85
-  4. CTA row: `[Get early access ↗]` (primary) · `[See how it works]` (ghost, white border variant)
-  5. Stats row: `50+` Data sources · `5` Specialist agents · `6–18mo` Signal advantage — 13px mono, white, separated by `·`
-- Until hero-render.mp4 is delivered: background is `--near-black`, text remains white
-
-### Section 3 — CLUSTERS
-- Background: `--white`
-- Section number: `01` in `--brand-blue`
-- Headline: `The same engine. Four different altitudes.`
-- Four cards in a row (desktop), 2×2 on tablet, 1 column on mobile
-- Card style: white background, `border: 1px solid var(--border)`, `border-radius: 20px`, padding 28px
-- Each card contains: cluster name (H3, `--ink-primary`) · promise copy (body, `--ink-secondary`) · price chip (pill, `--sky` bg, `--brand-blue` text, 11px mono)
-- Card hover: background shifts to `--pale-wash`, no lift, no shadow
-
-### Section 4 — PROMISE
-- Background: `--white`
-- Full-width, centered layout
-- Quote text: `"The same intelligence that helps a REIT make a $50M acquisition also tells a renter in Crown Heights if their building is safe."` — 32–40px, weight 500, `--ink-primary`, centered, max-width 800px, line-height 1.4
-- No background color change. No dark treatment. Typography carries it.
-
-### Section 5 — AGENTS (the Russian doll flow)
-- Background: `--white` with a subtle grid overlay (thin `--border-light` lines, like the screenshot reference)
-- Section number: `02` in `--brand-blue`
-- Headline: `Five agents. One verdict. Every step auditable.`
-- Layout: vertical center line + alternating cards, exactly matching the screenshot structure
-  - Center vertical line: 1px, `--brand-blue`, runs full height of section
-  - Each agent is a dot on the line (outlined circle, `--brand-blue` stroke, white fill, 10px diameter) connected to a card
-  - Cards alternate: odd agents left of line, even agents right of line
-  - Card style: white background, `border: 1px solid var(--border)`, `border-radius: 20px`, padding 24px, max-width 380px
-  - Each card contains:
-    - Section number in `--brand-blue` (01 through 05)
-    - Agent name as H3 (`--ink-primary`)
-    - One-line description of what the agent does (`--ink-secondary`, 15px)
-    - Pill chip at bottom: what this agent outputs — `--sky` background, `--brand-blue` text, 11px mono, uppercase, letter-spacing 0.08em
-  - Five agents in order: Market timing · Infrastructure pipeline · Demand sentiment · Risk & volatility · Regulatory & policy
-  - After agent 05: line continues to a synthesis node (larger dot, filled `--brand-blue`, 14px diameter) labeled `Synthesis agent`
-  - Below synthesis: VERDICT card — centered, not alternating — white card with `border: 1px solid var(--brand-blue)`, contains verdict label, confidence score, signal window, and `View full reasoning chain →` link in `--mid-blue`
-- Entrance animation: cards fade-up in sequence, staggered 0.1s top to bottom
-
-### Section 6 — DATA TICKER
-- Background: `--pale-wash`
-- Label: `50+ data sources powering every verdict` — centered, 13px, `--ink-muted`
-- Scrolling horizontal ticker of data source names: Census · Shovels.ai · Placer.ai · First Street · FBI UCR · ATTOM · AirDNA · Zoneomics · Redfin · FHFA · FEMA · Walk Score · CoStar · Regrid · HouseCanary...
-- Source names: 12px mono, `--ink-faint`, separated by `·`
-- CSS scroll animation, infinite loop, no pause on hover
-
-### Section 7 — EARLY ACCESS CTA
-- Background: `--white`
-- Section number: `03` in `--brand-blue`
-- Headline: [COPY TBD — early access section headline]
-- Subhead: [COPY TBD — one line on what early access means]
-- Email input field + `[Join waitlist ↗]` primary button
-- Input style: `border: 1px solid var(--border)`, `border-radius: 100px`, padding 13px 20px, 16px, `--ink-primary`
-
-### Section 8 — FOOTER
-- Background: `--white`
-- `border-top: 1px solid var(--border)`
-- Left: KOANO logo + `© 2026 KOANO Inc. All rights reserved.` in `--ink-faint`
-- Right: two columns of links in `--ink-muted`, hover: `--brand-blue`
-  - Column 1: How it works · Pricing · Community · Data
-  - Column 2: For homeowners · For agents · For developers · For institutions
-
----
-
-## 07 — Navigation (App)
-
-Left sidebar (240px wide, `--pale-wash` background, `border-right: 1px solid var(--border)`):
-- KOANO logo top
-- Cluster badge showing current cluster with switch option
-- Navigation items contextual to cluster (see Section 08)
-- User avatar + account at bottom
-
----
-
-## 08 — Cluster Architecture
-
-### The four product clusters
-
-KOANO serves four clusters. The same codebase, the same intelligence engine. Context-aware rendering means the platform looks and behaves differently per cluster. Every component that renders cluster-specific content must check `user.cluster` before rendering.
-
-| Cluster | Users | Price | Cluster ID |
-|---|---|---|---|
-| 1 — Property intelligence | Homeowners, landlords, house flippers | $19–49/mo | `cluster_1` |
-| 2 — Transaction intelligence | Agents, brokers, mortgage officers | $149–299/mo | `cluster_2` |
-| 4 — Development intelligence | CRE brokers, developers, contractors | $499–1,499/mo | `cluster_4` |
-| 5 — Portfolio intelligence | CEOs, CFOs, CIOs, REITs, PE firms | $1,499–4,999/mo | `cluster_5` |
-
-*(Cluster 3 — Due diligence — is reserved for future roadmap. Do not build it.)*
-
-### Cluster selection (onboarding)
-
-After signup, user reaches `/onboarding`. Four large cards — user picks one. Stored in `user.cluster` in Supabase.
-
-```
-Headline: [COPY TBD — welcome / who are you screen headline]
-Subhead: [COPY TBD — one line explaining they can change later]
-
-Card 1: "Property intelligence" — For homeowners, landlords, and investors.
-Card 2: "Transaction intelligence" — For agents, brokers, and mortgage officers.
-Card 3: "Development intelligence" — For developers, CRE brokers, and contractors.
-Card 4: "Portfolio intelligence" — For institutional investors, REITs, and C-suite executives.
-```
-
-### Cluster 1 — Property Intelligence dashboard
-**Sidebar nav:** My property · Neighborhood signals · Forecasts · Alerts · Ask KOANO
-
-**Primary view:** Single property dashboard
-- AVM with velocity indicator (accelerating / decelerating)
-- Equity position and 12-month projection with confidence interval
-- Neighborhood signal feed — permits, zoning, infrastructure within 2 miles
-- KOANO verdict: Hold / prepare to sell / sell now with timing window
-- Scenario modeling: "What if [infrastructure project] completes?"
-- Alert feed: push notifications for significant nearby signals
-
-**Landlord / flipper additions ($49/mo):**
-- Cap rate and NOI calculations
-- ARV modeling with rehab cost benchmarks by zip
-- Vacancy rate trends and rent momentum
-- Cash-on-cash return projections
-
-### Cluster 2 — Transaction Intelligence dashboard
-**Sidebar nav:** Market dashboard · Client tools · Lead generation · Reports · Ask KOANO
-
-**Primary view:** Multi-market velocity dashboard
-- Velocity heatmap — fastest-changing neighborhoods
-- Absorption rate by micro-market
-- DOM trends — where days-on-market is compressing
-- Price reduction pattern detection
-
-**Client tools:**
-- CMA builder with KOANO early-signal overlay
-- Pricing recommendation engine
-- Client-ready PDF report generator
-- Neighborhood narrative generator (AI-written)
-
-### Cluster 4 — Development Intelligence dashboard
-**Sidebar nav:** Site comparison · Pro forma · Entitlement risk · Pipeline intelligence · Ask KOANO
-
-**Primary view:** Multi-site comparison engine
-- KOANO composite score ranked by risk-adjusted opportunity
-- Zoning and entitlement risk breakdown per site
-- BSA approval rate history by submarket
-- Community board sentiment — predicted opposition level
-- Permitting timeline benchmark by jurisdiction
-
-**Pro forma intelligence:**
-- Land cost benchmarks by micro-market and zoning class
-- Construction cost per SF benchmarks
-- Absorption projection
-- Exit cap rate estimate
-- IRR projection with sensitivity table
-
-### Cluster 5 — Portfolio Intelligence dashboard
-**Sidebar nav:** Portfolio overview · Morning briefing · Deal pipeline · Risk monitor · API · Ask KOANO
-
-**Primary view:** Portfolio command center
-- Real-time NAV tracking across entire portfolio
-- FFO and NOI monitoring by asset, market, asset class
-- Portfolio risk score
-- Hold / sell / reposition analysis per asset
-
-**Monday morning briefing:**
-- What changed overnight in the portfolio
-- What is at risk and why
-- What opportunities are emerging
-- Regulatory changes affecting held assets
-
-**Enterprise security (Cluster 5 only):**
-- Fully isolated data environment
-- SOC 2 Type II compliant
-- Role-based access controls with SSO
-- Complete audit log
-- Air-gapped portfolio data — cannot train KOANO's models
-
----
-
-## 09 — Intelligence Architecture
-
-### The five specialist agents
-
-| Agent | File | Key inputs | Key outputs |
-|---|---|---|---|
-| Market timing | `market-timing.ts` | Pricing velocity, DOM trends, absorption rates | timing verdict, confidence score, signal window |
-| Infrastructure pipeline | `infrastructure.ts` | DOT data, permits (Shovels.ai), zoning variances, municipal bonds | infrastructure impact score, price effect, timeline |
-| Demand sentiment | `demand-sentiment.ts` | Foot traffic (Placer.ai), search trends, review velocity | demand momentum score, gentrification stage (1–7) |
-| Risk & volatility | `risk-volatility.ts` | Climate risk (First Street), crime (FBI UCR), STR saturation | risk score (1–100), risk breakdown, risk-adjusted return |
-| Regulatory & policy | `regulatory-policy.ts` | Zoning (Zoneomics), city council decisions, FEMA, opportunity zones | regulatory risk score, entitlement timeline |
-
-### The synthesis agent
-
-```typescript
-// /lib/agents/synthesis.ts
-// Receives all 5 structured outputs simultaneously
-// Returns: unified verdict + confidence + reasoning chain + minority signals
-```
-
-**Arbitration logic:**
-1. Consensus amplification — 4+ agents agreeing raises confidence exponentially
-2. Conflict surfacing — disagreements appear in `minority_signals`, never hidden
-3. Domain weighting — query type adjusts agent weights
-4. Recency bias — more recent signals weighted higher
-
-### Verdict output schema
-
-```typescript
-interface KoanoVerdict {
-  verdict: 'buy' | 'sell' | 'hold' | 'wait' | 'drop';
-  confidence: number;           // 0–100
-  signal_window_months: number;
-  headline: string;
-  reasoning_chain: ReasoningStep[];
-  minority_signals: MinoritySignal[];
-  top_data_sources: string[];
-  irr_estimate?: number;        // Clusters 4 & 5 only
-  risk_score: number;           // 0–100
-  generated_at: string;
-}
-```
-
-### Rendering the reasoning chain
-
-Every verdict card:
-1. Headline verdict — always visible
-2. Confidence score + signal window — always visible
-3. `View full reasoning chain →` — collapsed by default, expands on click
-4. Inside: each agent's conclusion → synthesis arbitration → final verdict
-5. Minority signals: `What KOANO's agents disagreed on` — shown when present
-
-**This transparency is not optional. It is KOANO's primary trust-building mechanism.**
-
----
-
-## 10 — Approved Copy (verbatim — do not alter)
-
-### Global
-- **Brand name:** KOANO (always all caps)
-- **Category:** The real estate reasoning engine
-- **Tagline:** The real estate reasoning engine
-
-### Homepage
-**Hero tag:** `Real estate reasoning engine`
-
-**Hero headline:**
+Hero headline:
 ```
 Real estate has always had data.
 It's never had a brain.
 ```
 
-**Hero subhead:**
+Hero subhead:
 ```
-KOANO deploys five specialist AI agents that ingest 50+ data sources,
-reason autonomously, and deliver a single verdict — with every step
-of the thinking visible and auditable.
-```
-
-**Hero CTAs:** `Get early access ↗` (primary) · `See how it works` (ghost)
-
-**Hero stats:** `50+` Data sources · `5` Specialist agents · `6–18mo` Signal advantage
-
-**Clusters section header:** `The same engine. Four different altitudes.`
-
-**Cluster 1 card:** Property intelligence · `Know what's happening to your property's value before your neighbors do — and know what to do about it.` · From $19 / month
-
-**Cluster 2 card:** Transaction intelligence · `Find opportunities before they hit the MLS. Make data-backed recommendations that close deals.` · From $149 / month
-
-**Cluster 4 card:** Development intelligence · `Find your best site. Model your deal. Understand your entitlement risk. Before anyone else does.` · From $499 / month
-
-**Cluster 5 card:** Portfolio intelligence · `Monitor everything. Miss nothing. Make billion-dollar decisions with the intelligence infrastructure that was previously only available to the world's largest financial institutions.` · From $1,499 / month
-
-**Promise section quote:**
-```
-"The same intelligence that helps a REIT make a $50M acquisition
-also tells a renter in Crown Heights if their building is safe."
+KOANO deploys five specialist AI agents that ingest dozens of data sources,
+reason autonomously, and deliver a single verdict, with every step of the
+thinking visible and auditable.
 ```
 
-**Agent section header:** `Five agents. One verdict. Every step auditable.`
+Hero CTAs: `Get early access` (primary) and `See how it works` (ghost).
 
-**Data ticker label:** `50+ data sources powering every verdict`
+Clusters section header: `The same engine. Four different altitudes.`
 
-**Footer copyright:** `© 2026 KOANO Inc. All rights reserved.`
+Cluster cards (verbatim):
+- Property intelligence — `Know what's happening to your property's value before your neighbors do, and know what to do about it.` From 19 / month.
+- Transaction intelligence — `Find opportunities before they hit the MLS. Make data-backed recommendations that close deals.` From 149 / month.
+- Development intelligence — `Find your best site. Model your deal. Understand your entitlement risk. Before anyone else does.` From 499 / month.
+- Portfolio intelligence — `Monitor everything. Miss nothing. Make institutional decisions with intelligence infrastructure that was previously available only to the world's largest firms.` From 1,499 / month.
 
-### Pricing (locked)
+Agents section header: `Five agents. One verdict. Every step auditable.`
 
-| Cluster | Monthly range |
-|---|---|
-| Property intelligence | $19–$49 /month |
-| Transaction intelligence | $149–$299 /month |
-| Development intelligence | $499–$1,499 /month |
-| Portfolio intelligence | $1,499–$4,999 /month + custom |
+Footer copyright: `© 2026 KOANO Inc. All rights reserved.`
 
-### Community page (locked)
-
-```
-KOANO is not positioned as a tool for gentrification. The same engine
-that serves institutional investors is made available — free of charge,
-through nonprofit partnerships — to tenant advocacy organizations and
-community groups. This is not charity. It is the founding principle
-that separates KOANO from every other proptech company in existence.
-
-KOANO partners with organizations like IMPACCT Brooklyn (serving
-Central Brooklyn since 1964) to provide community data feeds: building
-violation histories, landlord harassment records, displacement risk
-indicators, and affordable housing lottery availability. These partners
-receive a curated read-only intelligence feed at no cost.
-
-Cluster 0 is KOANO's conscience. It earns its weight in trust, press,
-nonprofit partnerships, and moral authority — not in revenue.
-```
+Copy placeholders (render as italic `--ink-faint` inside a `--pale-wash` dashed-border container; never invent copy to fill them): cluster landing H1s, /intelligence headline, /pricing framing, /about founding story, onboarding welcome copy, dashboard empty states, /early-access headline and subhead.
 
 ---
 
-## 11 — Copy Placeholders
+## 14 — Data Sources
 
-Render these visibly as italic `--ink-faint` text inside a `--pale-wash` dashed-border container. Never invent copy to fill them.
+### Live free sources (real, in use today)
+Census ACS, BLS, FHFA House Price Index, Redfin Data Center, Freddie Mac, FBI UCR, FEMA / OpenFEMA, NOAA, EPA, IRS Opportunity Zones, HUD USER, SEC EDGAR, First Street (free tier), Google Trends, OpenStreetMap, NYC Open Data (DOB permits, PLUTO zoning, violations, 311), LA GeoHub, Chicago Data Portal, Municipode.
 
-```
-[COPY TBD — cluster landing page H1: Cluster 1]
-[COPY TBD — cluster landing page H1: Cluster 2]
-[COPY TBD — cluster landing page H1: Cluster 4]
-[COPY TBD — cluster landing page H1: Cluster 5]
-[COPY TBD — /intelligence page headline]
-[COPY TBD — /pricing page headline and framing]
-[COPY TBD — /about page: founding story and team]
-[COPY TBD — /community page: partner CTA]
-[COPY TBD — onboarding cluster selection: welcome headline]
-[COPY TBD — onboarding cluster selection: subhead]
-[COPY TBD — dashboard empty state: Cluster 1 first use]
-[COPY TBD — dashboard empty state: Cluster 2 first use]
-[COPY TBD — dashboard empty state: Cluster 4 first use]
-[COPY TBD — dashboard empty state: Cluster 5 first use]
-[COPY TBD — pricing FAQ answers]
-[COPY TBD — testimonials / social proof]
-[COPY TBD — early access section headline]
-[COPY TBD — early access section subhead]
-[COPY TBD — blog / KOANO Index content]
-```
+### Paid sources (mocked as `representative` until funded)
+ATTOM, Shovels.ai (national permit aggregation), Placer.ai, SafeGraph, CoStar / LoopNet, Reonomy, HouseCanary, CoreLogic, MLS via Trestle, MSCI Real Capital Analytics, Verisk, premium hazard feeds, Walk Score (paid tier), AirDNA.
+
+Each paid source has a corresponding mock provider with a `swap_note` documenting the exact one-line change that turns it live once funded.
+
+### NYC-first rationale
+NYC publishes permits, zoning, and violations as free open data, so the Infrastructure and Regulatory agents can run genuinely live for NYC addresses today. This is the single most credible live demo available on a zero budget: deep on one city rather than shallow everywhere.
 
 ---
 
-## 12 — Non-Negotiable Rules
+## 15 — Build Sequence
 
-### Visual
-- ❌ NO dark section backgrounds. Ever. All sections are white or pale-wash.
-- ❌ NO grey placeholder boxes. Typography carries sections until renders arrive.
-- ❌ NO stock photography. No Unsplash URLs.
-- ❌ NO boxed images. Renders are full-bleed backgrounds or floating elements.
-- ❌ NO purple. Blues, navies, whites only.
-- ❌ NO Inter or Roboto. Neue Montreal only.
-- ❌ NO generic SaaS dashboard aesthetic.
-- ❌ NO gradients except subtle pale-wash → white section transitions (max 5% opacity shift).
-- ❌ NO drop shadows except those defined in the glass card spec.
-- ❌ NO glass cards on flat white backgrounds — glass is hero-only.
+Reflects what is done and the order for what remains. Each step is verified before the next (Principle 3).
 
-### Copy
-- ❌ NEVER invent headlines, taglines, or positioning language.
-- ❌ NEVER fill a [COPY TBD] placeholder with invented text.
-- ❌ NEVER add sections not in this document.
-- ❌ NEVER alter approved copy in Section 10. Use it verbatim.
+**Done:** Design system, marketing site, neural map.
 
-### Interactive
-- ❌ If an element has hover effects or cursor:pointer, it MUST link somewhere real.
-- ❌ Static showcase elements: no hover lift, no pointer cursor.
-- ❌ Any demo data must be labeled "Demo" visibly in the UI.
+**Phase A — Backend spine (current focus).** Provider architecture (types, registry). Real NYC providers (permits, zoning, Opportunity Zones) plus Census/FHFA/FEMA/FBI/Trends. Mock providers for paid sources with swap notes. Build all five agents one at a time, testing each: Regulatory & Policy (live), Infrastructure (live), then Demand, Risk, Market Timing (mixed live/representative). Synthesis across all five. Clerk-protected /api/agents route. Supabase schema with RLS. Verify: a real NYC address returns a valid, provenance-tagged verdict, with live agents genuinely live.
+
+**Phase B — Cluster 4 dashboard (deepest slice).** Site comparison UI consuming real verdicts. ProvenanceBadge everywhere. System View tab embedding the neural map. This is the pitch centerpiece.
+
+**Phase C — Remaining dashboards.** Cluster 1, 2, 5 dashboards on the proven verdict engine. Cluster 5 gets the full-screen neural map and Monday briefing. Cluster 2 clearly labels representative MLS comps.
+
+**Phase D — Auth and onboarding polish.** Login, signup, cluster selection wired to Supabase profile.
+
+**Phase E — Marketing polish and deploy.** Visual pass, 3D render drop-in, embed neural map into /intelligence, deploy to Vercel. (Marketing deploy can happen anytime in parallel; it blocks nothing.)
+
+**Deferred until capital:** Stripe billing, paid source integrations (swap mocks to real), PostHog, SOC 2, enterprise SSO for Cluster 5.
+
+---
+
+## 16 — Non-Negotiable Rules
+
+### Data integrity
+- Never present `representative` or `modeled` data as `live`.
+- Every data point carries provenance. Every non-live figure is badged in the UI.
+- A verdict's overall provenance equals its weakest input.
+- Agents never call data sources directly; only through provider interfaces.
+- A failed live call falls back to labeled `representative`, never a silent fake.
 
 ### Architecture
-- ❌ NEVER render Cluster 5 portfolio data in Cluster 1–4 contexts.
-- ❌ NEVER build Cluster 3 — future roadmap only.
-- ❌ NEVER use `any` TypeScript type for verdict or agent output schemas.
-- ❌ NEVER store Claude API keys client-side. All AI calls via Next.js API routes.
+- Swapping a mock provider to real is a one-line registry change. If a change requires touching agent or UI code, the abstraction is wrong; fix the abstraction.
+- No `any` TypeScript types on verdict, agent, or provider shapes.
+- All Claude API calls are server-side only. Keys never reach the client.
+- Runtime agent calls always use prompt caching on the system prompt.
+- Build and verify one slice before replicating.
+
+### Visual
+- No dark section backgrounds anywhere. All sections white or pale-wash.
+- `--near-black` is a text color, never a section background.
+- No grey placeholder boxes, no stock photography, no Unsplash.
+- Neue Montreal only. No Inter, Roboto, or system fonts as primary.
+- Pill buttons only. Primary CTAs end with the diagonal arrow.
+- Glass cards only over textured backgrounds; solid white cards on flat sections.
+
+### Copy and scope
+- Never invent headlines, taglines, or positioning language.
+- Never fill a copy placeholder with invented text.
+- Never build Cluster 0 (removed) or Cluster 3 (reserved).
+- Do not describe nonprofit partnerships as live on the /community page.
+
+### Product truth
+- KOANO is decision-support that shows its work, not an oracle. UI language reflects this, especially for Clusters 4 and 5.
+- Any demo data is visibly labeled as demo/representative.
 
 ---
 
-## 13 — Build Sequence
+## 17 — Security
 
-### Phase 1 — Foundation (Week 1–2)
-1. Initialize Next.js 14 with Tailwind, Framer Motion, Clerk
-2. Set up Supabase schema: `users`, `properties`, `verdicts`, `clusters`, `alerts`
-3. Add Neue Montreal font via Fontshare
-4. Build global design system: CSS variables, Button, GlassCard (from 21st.dev), SectionNumber, Nav, Footer
-5. Deploy to Vercel, connect domain, confirm SSL
-6. Set up Stripe products for all four clusters
-
-### Phase 2 — Marketing site (Week 3–4)
-1. Homepage — all 8 sections in the exact order specified in Section 06
-2. `/pricing` with Stripe checkout
-3. `/early-access` waitlist with Supabase email capture
-4. `/community` page
-
-### Phase 3 — Cluster landing pages (Week 5)
-1. `/for/homeowners`
-2. `/for/agents`
-3. `/for/developers`
-4. `/for/institutions`
-
-### Phase 4 — Intelligence + 3D (Week 6)
-1. `/intelligence` page with scroll-driven agent architecture animation
-2. Spline 3D city map hero embed
-3. Three.js agent network visualization
-4. Mapbox interactive signal map (style: `mapbox://styles/mapbox/light-v11`, signal dots in `--signal-positive/warning/negative`, default center NYC `-74.006, 40.7128`, zoom 12)
-
-### Phase 5 — App MVP: Cluster 1 (Week 7–8)
-1. Clerk auth (login, signup)
-2. Onboarding cluster selection screen
-3. Cluster 1 dashboard
-4. First KOANO verdict (Market Timing + Infrastructure agents)
-5. ReasoningChain UI component
-6. Push alerts via Supabase Realtime
-
-### Phase 6 — App expansion + launch prep (Week 9–10)
-1. Cluster 2 dashboard
-2. Cluster 4 site comparison interface
-3. Cluster 5 portfolio command center (stub)
-4. PostHog analytics
-5. Lighthouse target: 90+
-6. Beta user onboarding
+- Row Level Security on every Supabase table, scoped to auth.uid().
+- All Claude API calls server-side (Next.js API routes / server components).
+- API keys in environment variables only; .env.local is gitignored.
+- Clerk protects /dashboard and /api routes via middleware.ts.
+- Stripe webhook signature verification (when Stripe is added).
+- Verdicts table is immutable (append-only); it is the audit trail and a product promise.
+- Cluster 5 data isolation and SOC 2 are deferred but must not be contradicted by architecture now: never design in a way that would make per-tenant isolation impossible later.
 
 ---
 
-## 14 — Data Pipeline
-
-### Free sources (GitHub Actions cron → Supabase)
-US Census ACS · BLS · Redfin Data Center · Freddie Mac · FHFA · FBI UCR · EPA/FEMA · NOAA · IRS Opportunity Zones · HUD USER · SEC EDGAR · World Bank · OECD · OpenStreetMap · USGS · NYC Open Data · LA GeoHub · Chicago Data Portal · OpenFEMA · Google Trends · Reddit API · Municipode · HUD Fair Housing · CDC PLACES · MSRB EMMA
-
-### Paid sources (on-demand, cached 24h)
-ATTOM · Shovels.ai · Zoneomics · First Street Foundation · Placer.ai · SafeGraph · Walk Score · Yelp Fusion · Google Places · AirDNA · BatchData · SpotCrime · GreatSchools · Regrid · Mapbox · HouseCanary · CoreLogic/Trestle · Reonomy · CoStar/LoopNet · MSCI Real Capital Analytics (Cluster 5, Phase 4)
-
-### MVP minimum (Phase 5)
-ATTOM · Shovels.ai · First Street Foundation (free tier) · US Census API · Redfin Data Center · OpenStreetMap · City Open Data portals · Claude API · Mapbox (free tier)
-
----
-
-## 15 — Security
-
-### All clusters
-- Row Level Security on all Supabase tables
-- All Claude API calls server-side only (Next.js API routes)
-- API keys in environment variables only
-- Stripe webhook signature verification
-
-### Cluster 5 only
-- Isolated Supabase schema per enterprise client
-- Cluster 5 data never appears in Cluster 1–4 query contexts
-- Air-gapped data — cannot train KOANO's models
-- SOC 2 Type II (Phase 3 of business roadmap)
-- Role-based access with SSO (Clerk Enterprise)
-- Full audit log: every query, verdict, API call
-- Multi-year contract billing via Stripe custom pricing
-
----
-
-## 16 — Environment Variables
+## 18 — Environment Variables
 
 ```bash
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
-CLERK_SECRET_KEY=
+# Supabase
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
+
+# Anthropic (runtime agent calls)
 ANTHROPIC_API_KEY=
+
+# Clerk (auth)
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
+CLERK_SECRET_KEY=
+
+# Stripe (deferred)
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
 STRIPE_SECRET_KEY=
 STRIPE_WEBHOOK_SECRET=
+
+# Mapbox (deferred, dashboards)
 NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=
-ATTOM_API_KEY=
-SHOVELS_API_KEY=
-FIRST_STREET_API_KEY=
-PLACER_API_KEY=
-WALKSCORE_API_KEY=
-YELP_API_KEY=
-GOOGLE_PLACES_API_KEY=
-AIRDNA_API_KEY=
-NEXT_PUBLIC_POSTHOG_KEY=
-NEXT_PUBLIC_POSTHOG_HOST=
-NEXT_PUBLIC_APP_URL=https://app.koano.com
-NEXT_PUBLIC_MARKETING_URL=https://koano.com
+
+# App URLs
+NEXT_PUBLIC_APP_URL=
+NEXT_PUBLIC_MARKETING_URL=
 ```
 
 ---
 
-*KOANO CLAUDE.md v4.0 | Confidential & Proprietary | 2026*
-*All rights reserved. Do not share outside the KOANO development team.*
+*KOANO CLAUDE.md v5.0 | Confidential & Proprietary | 2026*
+*The premium demo is built honestly today so that capital turns it into production tomorrow, without a rewrite and without a lie.*
