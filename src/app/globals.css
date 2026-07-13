@@ -322,6 +322,19 @@ body {
 }
 
 /* ============================================
+   Pipeline progress pulse — opacity only (Section 10 animation rules)
+   ============================================ */
+
+@keyframes koano-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.koano-pulse {
+  animation: koano-pulse 1.6s ease-in-out infinite;
+}
+
+/* ============================================
    Scrollbar Styling
    ============================================ */
 
