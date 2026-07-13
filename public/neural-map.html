@@ -1,730 +1,371 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>KOANO — Agent Network</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { overflow: hidden; background: #1B3A6B; font-family: 'Neue Montreal', system-ui, sans-serif; }
-  canvas { display: block; }
-  #bg-canvas {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
-  }
-  #star-canvas {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
-    pointer-events: none;
-  }
-  #three-canvas {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2;
-  }
-  #error-display {
-    position: fixed; top: 10px; left: 10px; right: 10px;
-    background: rgba(239,68,68,0.95); color: white;
-    font-family: 'DM Mono', monospace; font-size: 12px;
-    padding: 12px 16px; border-radius: 8px; z-index: 100;
-    display: none; white-space: pre-wrap; max-height: 200px; overflow-y: auto;
-  }
-  #tooltip {
-    position: fixed; pointer-events: none;
-    background: rgba(10,22,40,0.9); border: 1px solid rgba(233,30,140,0.3);
-    border-radius: 12px; padding: 10px 14px; max-width: 240px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.4); opacity: 0;
-    transition: opacity 0.15s ease; z-index: 10;
-  }
-  #tooltip .name { font-size: 13px; font-weight: 500; color: #FFFFFF; line-height: 1.3; }
-  #tooltip .desc {
-    font-family: 'DM Mono', monospace; font-size: 11px; color: #A8D8EA;
-    letter-spacing: 0.04em; line-height: 1.4; margin-top: 4px;
-  }
-  #legend {
-    position: fixed; bottom: 16px; left: 16px;
-    display: flex; flex-direction: column; gap: 6px; pointer-events: none; z-index: 5;
-  }
-  .legend-item { display: flex; align-items: center; gap: 8px; }
-  .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .legend-label {
-    font-family: 'DM Mono', monospace; font-size: 10px; color: rgba(168,216,234,0.7);
-    letter-spacing: 0.06em; text-transform: uppercase;
-  }
+*{margin:0;padding:0;box-sizing:border-box}
+body{overflow:hidden;background:#fff;font-family:'Neue Montreal',system-ui,-apple-system,sans-serif}
+canvas{display:block}
+.node-label{position:absolute;padding:4px 8px;border-radius:6px;font-weight:500;color:#0D2B3E;background:rgba(255,255,255,0.94);box-shadow:0 1px 6px rgba(0,0,0,0.07);pointer-events:none;white-space:nowrap;transition:opacity .15s;line-height:1}
+.node-label.t-synthesis{font-size:12px;font-weight:700}
+.node-label.t-agent{font-size:11px}
+.node-label.t-source{font-size:10px;color:#1A4F6E}
+.node-label.t-feed{font-size:9px;color:#5A7A8C}
+.node-label.hidden{opacity:0}
+#tooltip{position:fixed;pointer-events:none;background:#fff;border:1px solid #E2EEF5;border-radius:12px;padding:12px 16px;max-width:240px;box-shadow:0 4px 20px rgba(0,0,0,0.08);opacity:0;transition:opacity .15s;z-index:30;font-size:13px;color:#0D2B3E;line-height:1.4}
+#tooltip .tt-name{font-weight:700;margin-bottom:3px}
+#tooltip .tt-type{font-size:10px;color:#5A7A8C;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+#tooltip .tt-desc{font-size:12px;color:#5A7A8C;margin-bottom:5px}
+#tooltip .tt-conn{font-size:11px;color:#6BB89E}
+#panel{position:fixed;bottom:80px;left:16px;width:280px;background:#fff;border:1px solid #E2EEF5;border-radius:16px;padding:20px;box-shadow:0 8px 32px rgba(0,0,0,0.1);z-index:25;transform:translateX(-320px);transition:transform .2s}
+#panel.visible{transform:translateX(0)}
+#panel .p-close{position:absolute;top:12px;right:14px;background:none;border:none;cursor:pointer;font-size:18px;color:#5A7A8C}
+#panel .p-name{font-size:16px;font-weight:700;color:#0D2B3E;margin-bottom:4px}
+#panel .p-type{font-size:10px;color:#5A7A8C;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+#panel .p-desc{font-size:13px;color:#5A7A8C;line-height:1.5;margin-bottom:10px}
+#panel .p-conns{font-size:11px;color:#6BB89E;line-height:1.6}
+#legend{position:fixed;bottom:16px;left:16px;background:#fff;border-radius:12px;padding:12px 16px;box-shadow:0 2px 12px rgba(0,0,0,0.06);z-index:20;font-size:11px;color:#0D2B3E;display:flex;flex-direction:column;gap:6px}
+.li{display:flex;align-items:center;gap:8px}
+.ld{width:8px;height:8px;border-radius:50%}
 </style>
-<link href="https://api.fontshare.com/v2/css?f[]=neue-montreal@400,500,700&display=swap" rel="stylesheet" />
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link href="https://api.fontshare.com/v2/css?f[]=neue-montreal@400,500,700&display=swap" rel="stylesheet"/>
 </head>
 <body>
-
-<canvas id="bg-canvas"></canvas>
-<canvas id="star-canvas"></canvas>
-<div id="error-display"></div>
-<div id="tooltip"><div class="name"></div><div class="desc"></div></div>
-
+<div id="tooltip"><div class="tt-name"></div><div class="tt-type"></div><div class="tt-desc"></div><div class="tt-conn"></div></div>
+<div id="panel"><button class="p-close" onclick="closePanel()">&times;</button><div class="p-name"></div><div class="p-type"></div><div class="p-desc"></div><div class="p-conns"></div></div>
 <div id="legend">
-  <div class="legend-item">
-    <div class="legend-dot" style="background:linear-gradient(135deg,#FFD700,#FF4500)"></div>
-    <span class="legend-label">Synthesis agent</span>
-  </div>
-  <div class="legend-item">
-    <div class="legend-dot" style="background:#E91E8C"></div>
-    <span class="legend-label">Specialist agents (5)</span>
-  </div>
-  <div class="legend-item">
-    <div class="legend-dot" style="background:#A8D8EA"></div>
-    <span class="legend-label">Data sources (50+)</span>
-  </div>
+<div class="li"><div class="ld" style="background:#A8C4D4"></div>Synthesis Agent</div>
+<div class="li"><div class="ld" style="background:#E91E8C"></div>Specialist Agents</div>
+<div class="li"><div class="ld" style="background:#4A90D9"></div>Data Sources (60+)</div>
+<div class="li"><div class="ld" style="background:#9DD1B8"></div>Sub-feeds (77+)</div>
 </div>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
-window.onerror = function(msg, src, line) {
-  var el = document.getElementById('error-display');
-  el.style.display = 'block';
-  el.textContent += 'ERROR: ' + msg + ' (line ' + line + ')\n';
-};
-window.addEventListener('unhandledrejection', function(e) {
-  var el = document.getElementById('error-display');
-  el.style.display = 'block';
-  el.textContent += 'REJECTED: ' + (e.reason && e.reason.message || e.reason) + '\n';
-});
-</script>
-
-<script>
-// ==================== 2D BACKGROUND (gradient + nebulae only) ====================
-(function() {
-  var c = document.getElementById('bg-canvas');
-  var ctx = c.getContext('2d');
-
-  function drawBG() {
-    c.width = innerWidth;
-    c.height = innerHeight;
-    var h = c.height;
-
-    var grad = ctx.createLinearGradient(0, 0, 0, h);
-    grad.addColorStop(0, '#1B3A6B');
-    grad.addColorStop(0.30, '#2E5F9E');
-    grad.addColorStop(0.60, '#6B3A2A');
-    grad.addColorStop(0.82, '#C4621A');
-    grad.addColorStop(1, '#8B3200');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, c.width, h);
-
-    var nebulae = [
-      { x: 0.15, y: 0.22, rx: 350, ry: 200, color: 'rgba(80,140,255,0.03)' },
-      { x: 0.78, y: 0.15, rx: 280, ry: 180, color: 'rgba(100,160,255,0.025)' },
-      { x: 0.55, y: 0.72, rx: 400, ry: 220, color: 'rgba(255,140,60,0.03)' },
-      { x: 0.22, y: 0.82, rx: 300, ry: 160, color: 'rgba(255,120,40,0.025)' },
-    ];
-    nebulae.forEach(function(n) {
-      ctx.save();
-      ctx.translate(c.width * n.x, h * n.y);
-      ctx.scale(n.rx / 100, n.ry / 100);
-      var g = ctx.createRadialGradient(0, 0, 0, 0, 0, 100);
-      g.addColorStop(0, n.color);
-      g.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = g;
-      ctx.fillRect(-100, -100, 200, 200);
-      ctx.restore();
-    });
-  }
-
-  drawBG();
-  window.addEventListener('resize', drawBG);
-})();
-
-// ==================== PARALLAX STAR LAYERS ====================
-var _starLayers = [];
-var _starCanvas = document.getElementById('star-canvas');
-var _starCtx = _starCanvas.getContext('2d');
-var _starOffsetX = 0, _starOffsetY = 0;
-
-(function() {
-  function genLayer(count, minR, maxR, minA, maxA) {
-    var stars = [];
-    for (var i = 0; i < count; i++) {
-      stars.push({
-        x: Math.random(), y: Math.random(),
-        r: minR + Math.random() * (maxR - minR),
-        a: minA + Math.random() * (maxA - minA),
-      });
-    }
-    return stars;
-  }
-
-  _starLayers = [
-    { stars: genLayer(600, 0.3, 0.8, 0.4, 0.7), speed: 0.1 },
-    { stars: genLayer(300, 0.8, 1.4, 0.6, 0.9), speed: 0.3 },
-    { stars: genLayer(100, 1.2, 2.0, 0.8, 1.0), speed: 0.6 },
-  ];
-})();
-
-function drawStars(ox, oy) {
-  var w = innerWidth, h = innerHeight;
-  _starCanvas.width = w;
-  _starCanvas.height = h;
-  _starCtx.clearRect(0, 0, w, h);
-
-  for (var l = 0; l < _starLayers.length; l++) {
-    var layer = _starLayers[l];
-    var dx = ox * layer.speed;
-    var dy = oy * layer.speed;
-    var stars = layer.stars;
-    for (var i = 0; i < stars.length; i++) {
-      var s = stars[i];
-      var sx = ((s.x * w + dx) % w + w) % w;
-      var sy = ((s.y * h + dy) % h + h) % h;
-      _starCtx.beginPath();
-      _starCtx.arc(sx, sy, s.r, 0, Math.PI * 2);
-      _starCtx.fillStyle = 'rgba(255,255,255,' + s.a + ')';
-      _starCtx.fill();
-    }
-  }
-}
-drawStars(0, 0);
-window.addEventListener('resize', function() { drawStars(_starOffsetX, _starOffsetY); });
-</script>
-
-<script type="importmap">
-{ "imports": { "three": "https://unpkg.com/three@0.128.0/build/three.module.js" } }
-</script>
-
-<script type="module">
-import * as THREE from 'three';
-
-// ==================== DATA ====================
-
-var AGENTS = [
-  {
-    name: 'Market timing',
-    desc: 'Pricing velocity, DOM trends, absorption rates',
-    sizeMult: 1.0,
-    leaves: ['US Census ACS','Redfin Data Center','FHFA','Freddie Mac','BLS','ATTOM','HouseCanary','Google Trends','Zillow API','CoreLogic']
-  },
-  {
-    name: 'Infrastructure',
-    desc: 'DOT data, permits, zoning variances, municipal bonds',
-    sizeMult: 1.1,
-    leaves: ['Shovels.ai','DOT Data','Zoneomics','MSRB EMMA','NYC Open Data','LA GeoHub','Chicago Data Portal','OpenStreetMap','Regrid','Municipode']
-  },
-  {
-    name: 'Demand sentiment',
-    desc: 'Foot traffic, search trends, review velocity',
-    sizeMult: 0.9,
-    leaves: ['Placer.ai','Walk Score','Yelp Fusion','Google Places','SafeGraph','Reddit API','AirDNA','GreatSchools','Yelp','BatchData']
-  },
-  {
-    name: 'Risk & volatility',
-    desc: 'Climate risk, crime data, STR saturation',
-    sizeMult: 1.05,
-    leaves: ['First Street','FBI UCR','FEMA','AirDNA','SpotCrime','NOAA','EPA','CDC PLACES','OpenFEMA','USGS']
-  },
-  {
-    name: 'Regulatory & policy',
-    desc: 'Zoning, city council decisions, opportunity zones',
-    sizeMult: 0.85,
-    leaves: ['Zoneomics','HUD USER','IRS Opp Zones','Municipode','HUD Fair Housing','SEC EDGAR','World Bank','OECD','Reonomy','CoStar']
-  }
+(function(){
+var nodes=[
+{id:"synthesis",label:"Synthesis Agent",type:"synthesis",r:10,desc:"Receives all 5 agent outputs simultaneously and issues a unified verdict with full reasoning chain."},
+{id:"a1",label:"Market timing",type:"agent",r:6,desc:"Analyzes pricing velocity, DOM trends, and absorption rates to determine optimal timing."},
+{id:"a2",label:"Infrastructure",type:"agent",r:6,desc:"Tracks permitted projects, infrastructure bonds, and zoning changes for price-moving signals."},
+{id:"a3",label:"Demand sentiment",type:"agent",r:6,desc:"Measures foot traffic, search interest, and review velocity to detect demand shifts."},
+{id:"a4",label:"Risk & volatility",type:"agent",r:6,desc:"Aggregates climate, crime, and STR saturation into a comprehensive risk score."},
+{id:"a5",label:"Regulatory & policy",type:"agent",r:6,desc:"Monitors zoning, city council decisions, and opportunity zone designations."},
+{id:"s1",label:"Census ACS",type:"source",agent:"a1",r:2.5},{id:"s2",label:"Redfin",type:"source",agent:"a1",r:2.5},{id:"s3",label:"FHFA",type:"source",agent:"a1",r:2.5},{id:"s4",label:"Freddie Mac",type:"source",agent:"a1",r:2.5},{id:"s5",label:"BLS",type:"source",agent:"a1",r:2.5},{id:"s6",label:"HUD USER",type:"source",agent:"a1",r:2.5},{id:"s7",label:"ATTOM",type:"source",agent:"a1",r:2.5},{id:"s8",label:"HouseCanary",type:"source",agent:"a1",r:2.5},{id:"s9",label:"BatchData",type:"source",agent:"a1",r:2.5},{id:"s10",label:"CoreLogic",type:"source",agent:"a1",r:2.5},{id:"s11",label:"Zillow Research",type:"source",agent:"a1",r:2.5},{id:"s12",label:"Case-Shiller",type:"source",agent:"a1",r:2.5},
+{id:"s13",label:"Shovels.ai",type:"source",agent:"a2",r:2.5},{id:"s14",label:"DOT Data",type:"source",agent:"a2",r:2.5},{id:"s15",label:"Zoneomics",type:"source",agent:"a2",r:2.5},{id:"s16",label:"MSRB EMMA",type:"source",agent:"a2",r:2.5},{id:"s17",label:"Regrid",type:"source",agent:"a2",r:2.5},{id:"s18",label:"NYC Open Data",type:"source",agent:"a2",r:2.5},{id:"s19",label:"LA GeoHub",type:"source",agent:"a2",r:2.5},{id:"s20",label:"Chicago Data Portal",type:"source",agent:"a2",r:2.5},{id:"s21",label:"OpenStreetMap",type:"source",agent:"a2",r:2.5},{id:"s22",label:"PermitData.io",type:"source",agent:"a2",r:2.5},{id:"s23",label:"CoStar",type:"source",agent:"a2",r:2.5},{id:"s24",label:"Reonomy",type:"source",agent:"a2",r:2.5},
+{id:"s25",label:"Placer.ai",type:"source",agent:"a3",r:2.5},{id:"s26",label:"Walk Score",type:"source",agent:"a3",r:2.5},{id:"s27",label:"Yelp Fusion",type:"source",agent:"a3",r:2.5},{id:"s28",label:"Google Places",type:"source",agent:"a3",r:2.5},{id:"s29",label:"SafeGraph",type:"source",agent:"a3",r:2.5},{id:"s30",label:"Reddit API",type:"source",agent:"a3",r:2.5},{id:"s31",label:"Google Trends",type:"source",agent:"a3",r:2.5},{id:"s32",label:"AirDNA",type:"source",agent:"a3",r:2.5},{id:"s33",label:"Streetlight Data",type:"source",agent:"a3",r:2.5},{id:"s34",label:"Axios Local",type:"source",agent:"a3",r:2.5},{id:"s35",label:"Nextdoor API",type:"source",agent:"a3",r:2.5},{id:"s36",label:"Meta Ad Data",type:"source",agent:"a3",r:2.5},
+{id:"s37",label:"First Street",type:"source",agent:"a4",r:2.5},{id:"s38",label:"FBI UCR",type:"source",agent:"a4",r:2.5},{id:"s39",label:"OpenFEMA",type:"source",agent:"a4",r:2.5},{id:"s40",label:"NOAA",type:"source",agent:"a4",r:2.5},{id:"s41",label:"EPA",type:"source",agent:"a4",r:2.5},{id:"s42",label:"CDC PLACES",type:"source",agent:"a4",r:2.5},{id:"s43",label:"SpotCrime",type:"source",agent:"a4",r:2.5},{id:"s44",label:"FEMA Flood Maps",type:"source",agent:"a4",r:2.5},{id:"s45",label:"ClimateCheck",type:"source",agent:"a4",r:2.5},{id:"s46",label:"Verisk",type:"source",agent:"a4",r:2.5},{id:"s47",label:"LexisNexis Risk",type:"source",agent:"a4",r:2.5},{id:"s48",label:"CoreLogic Hazard",type:"source",agent:"a4",r:2.5},
+{id:"s49",label:"HUD Fair Housing",type:"source",agent:"a5",r:2.5},{id:"s50",label:"IRS Opp Zones",type:"source",agent:"a5",r:2.5},{id:"s51",label:"Municipode",type:"source",agent:"a5",r:2.5},{id:"s52",label:"SEC EDGAR",type:"source",agent:"a5",r:2.5},{id:"s53",label:"MSRB",type:"source",agent:"a5",r:2.5},{id:"s54",label:"GreatSchools",type:"source",agent:"a5",r:2.5},{id:"s55",label:"World Bank",type:"source",agent:"a5",r:2.5},{id:"s56",label:"Census Tiger",type:"source",agent:"a5",r:2.5},{id:"s57",label:"City-Data.com",type:"source",agent:"a5",r:2.5},{id:"s58",label:"Legiscan",type:"source",agent:"a5",r:2.5},{id:"s59",label:"OpenSecrets",type:"source",agent:"a5",r:2.5},{id:"s60",label:"PolicyMap",type:"source",agent:"a5",r:2.5},
+{id:"f1",label:"ACS 5-Year Estimates",type:"feed",source:"s1",r:1.5},{id:"f2",label:"Population Demographics",type:"feed",source:"s1",r:1.5},{id:"f3",label:"Housing Characteristics",type:"feed",source:"s1",r:1.5},{id:"f4",label:"Income & Poverty Data",type:"feed",source:"s1",r:1.5},
+{id:"f5",label:"Listing Price Data",type:"feed",source:"s2",r:1.5},{id:"f6",label:"Days on Market",type:"feed",source:"s2",r:1.5},{id:"f7",label:"Price Reductions",type:"feed",source:"s2",r:1.5},
+{id:"f8",label:"House Price Index",type:"feed",source:"s3",r:1.5},{id:"f9",label:"Mortgage Rate Data",type:"feed",source:"s3",r:1.5},{id:"f10",label:"Conforming Loan Limits",type:"feed",source:"s3",r:1.5},
+{id:"f11",label:"Permit Filings",type:"feed",source:"s13",r:1.5},{id:"f12",label:"Contractor Activity",type:"feed",source:"s13",r:1.5},{id:"f13",label:"Project Valuations",type:"feed",source:"s13",r:1.5},{id:"f14",label:"Permit Timelines",type:"feed",source:"s13",r:1.5},
+{id:"f15",label:"Road Projects",type:"feed",source:"s14",r:1.5},{id:"f16",label:"Transit Investment",type:"feed",source:"s14",r:1.5},{id:"f17",label:"Traffic Counts",type:"feed",source:"s14",r:1.5},
+{id:"f18",label:"Zoning Classifications",type:"feed",source:"s15",r:1.5},{id:"f19",label:"Variance Requests",type:"feed",source:"s15",r:1.5},{id:"f20",label:"Upzoning Events",type:"feed",source:"s15",r:1.5},
+{id:"f21",label:"Foot Traffic Counts",type:"feed",source:"s25",r:1.5},{id:"f22",label:"Visit Duration",type:"feed",source:"s25",r:1.5},{id:"f23",label:"Trade Area Analysis",type:"feed",source:"s25",r:1.5},{id:"f24",label:"Demographics Profile",type:"feed",source:"s25",r:1.5},
+{id:"f25",label:"POI Visits",type:"feed",source:"s29",r:1.5},{id:"f26",label:"Neighborhood Patterns",type:"feed",source:"s29",r:1.5},{id:"f27",label:"Mobility Trends",type:"feed",source:"s29",r:1.5},
+{id:"f28",label:"STR Occupancy Rates",type:"feed",source:"s32",r:1.5},{id:"f29",label:"ADR by Neighborhood",type:"feed",source:"s32",r:1.5},{id:"f30",label:"RevPAR Trends",type:"feed",source:"s32",r:1.5},
+{id:"f31",label:"Flood Factor Score",type:"feed",source:"s37",r:1.5},{id:"f32",label:"Fire Factor Score",type:"feed",source:"s37",r:1.5},{id:"f33",label:"Heat Factor Score",type:"feed",source:"s37",r:1.5},{id:"f34",label:"Wind Factor Score",type:"feed",source:"s37",r:1.5},
+{id:"f35",label:"Storm Event Data",type:"feed",source:"s40",r:1.5},{id:"f36",label:"Sea Level Projections",type:"feed",source:"s40",r:1.5},{id:"f37",label:"Temperature Anomalies",type:"feed",source:"s40",r:1.5},
+{id:"f38",label:"Violent Crime Rates",type:"feed",source:"s38",r:1.5},{id:"f39",label:"Property Crime Index",type:"feed",source:"s38",r:1.5},{id:"f40",label:"Crime Trend Data",type:"feed",source:"s38",r:1.5},
+{id:"f41",label:"Superfund Sites",type:"feed",source:"s41",r:1.5},{id:"f42",label:"Air Quality Index",type:"feed",source:"s41",r:1.5},{id:"f43",label:"Brownfield Locations",type:"feed",source:"s41",r:1.5},
+{id:"f44",label:"OZ Tract Boundaries",type:"feed",source:"s50",r:1.5},{id:"f45",label:"Tax Incentive Data",type:"feed",source:"s50",r:1.5},{id:"f46",label:"Investment Activity",type:"feed",source:"s50",r:1.5},
+{id:"f47",label:"REIT Filings",type:"feed",source:"s52",r:1.5},{id:"f48",label:"10-K Real Estate",type:"feed",source:"s52",r:1.5},{id:"f49",label:"Institutional Holdings",type:"feed",source:"s52",r:1.5},
+{id:"f50",label:"School Ratings",type:"feed",source:"s54",r:1.5},{id:"f51",label:"District Boundaries",type:"feed",source:"s54",r:1.5},{id:"f52",label:"Test Score Trends",type:"feed",source:"s54",r:1.5},
+{id:"f53",label:"Walkability Score",type:"feed",source:"s26",r:1.5},{id:"f54",label:"Transit Score",type:"feed",source:"s26",r:1.5},{id:"f55",label:"Bike Score",type:"feed",source:"s26",r:1.5},
+{id:"f56",label:"Unemployment Rate",type:"feed",source:"s5",r:1.5},{id:"f57",label:"Job Growth by Sector",type:"feed",source:"s5",r:1.5},{id:"f58",label:"Wage Growth Data",type:"feed",source:"s5",r:1.5},
+{id:"f59",label:"AVM Valuations",type:"feed",source:"s7",r:1.5},{id:"f60",label:"Foreclosure Data",type:"feed",source:"s7",r:1.5},{id:"f61",label:"Tax Assessment Data",type:"feed",source:"s7",r:1.5},{id:"f62",label:"Sales Comparables",type:"feed",source:"s7",r:1.5},
+{id:"f63",label:"Building Violations",type:"feed",source:"s18",r:1.5},{id:"f64",label:"311 Complaints",type:"feed",source:"s18",r:1.5},{id:"f65",label:"Landmark Designations",type:"feed",source:"s18",r:1.5},
+{id:"f66",label:"Muni Bond Issuances",type:"feed",source:"s16",r:1.5},{id:"f67",label:"Infrastructure Bonds",type:"feed",source:"s16",r:1.5},{id:"f68",label:"Disclosure Documents",type:"feed",source:"s16",r:1.5},
+{id:"f69",label:"Commercial Listings",type:"feed",source:"s23",r:1.5},{id:"f70",label:"Vacancy Rates",type:"feed",source:"s23",r:1.5},{id:"f71",label:"Cap Rate Comps",type:"feed",source:"s23",r:1.5},
+{id:"f72",label:"Search Volume",type:"feed",source:"s31",r:1.5},{id:"f73",label:"Query Trends",type:"feed",source:"s31",r:1.5},{id:"f74",label:"Migration Signals",type:"feed",source:"s31",r:1.5},
+{id:"f75",label:"Primary Mortgage Survey",type:"feed",source:"s4",r:1.5},{id:"f76",label:"Affordability Index",type:"feed",source:"s4",r:1.5},{id:"f77",label:"Delinquency Rates",type:"feed",source:"s4",r:1.5}
 ];
 
-// ==================== ORBIT CONTROLS ====================
+var links=[
+{source:"a1",target:"synthesis",type:"agent-synthesis"},{source:"a2",target:"synthesis",type:"agent-synthesis"},{source:"a3",target:"synthesis",type:"agent-synthesis"},{source:"a4",target:"synthesis",type:"agent-synthesis"},{source:"a5",target:"synthesis",type:"agent-synthesis"},
+{source:"a1",target:"a2",type:"agent-agent"},{source:"a1",target:"a3",type:"agent-agent"},{source:"a1",target:"a4",type:"agent-agent"},{source:"a1",target:"a5",type:"agent-agent"},{source:"a2",target:"a3",type:"agent-agent"},{source:"a2",target:"a4",type:"agent-agent"},{source:"a2",target:"a5",type:"agent-agent"},{source:"a3",target:"a4",type:"agent-agent"},{source:"a3",target:"a5",type:"agent-agent"},{source:"a4",target:"a5",type:"agent-agent"},
+{source:"s1",target:"a1",type:"source-agent"},{source:"s2",target:"a1",type:"source-agent"},{source:"s3",target:"a1",type:"source-agent"},{source:"s4",target:"a1",type:"source-agent"},{source:"s5",target:"a1",type:"source-agent"},{source:"s6",target:"a1",type:"source-agent"},{source:"s7",target:"a1",type:"source-agent"},{source:"s8",target:"a1",type:"source-agent"},{source:"s9",target:"a1",type:"source-agent"},{source:"s10",target:"a1",type:"source-agent"},{source:"s11",target:"a1",type:"source-agent"},{source:"s12",target:"a1",type:"source-agent"},
+{source:"s13",target:"a2",type:"source-agent"},{source:"s14",target:"a2",type:"source-agent"},{source:"s15",target:"a2",type:"source-agent"},{source:"s16",target:"a2",type:"source-agent"},{source:"s17",target:"a2",type:"source-agent"},{source:"s18",target:"a2",type:"source-agent"},{source:"s19",target:"a2",type:"source-agent"},{source:"s20",target:"a2",type:"source-agent"},{source:"s21",target:"a2",type:"source-agent"},{source:"s22",target:"a2",type:"source-agent"},{source:"s23",target:"a2",type:"source-agent"},{source:"s24",target:"a2",type:"source-agent"},
+{source:"s25",target:"a3",type:"source-agent"},{source:"s26",target:"a3",type:"source-agent"},{source:"s27",target:"a3",type:"source-agent"},{source:"s28",target:"a3",type:"source-agent"},{source:"s29",target:"a3",type:"source-agent"},{source:"s30",target:"a3",type:"source-agent"},{source:"s31",target:"a3",type:"source-agent"},{source:"s32",target:"a3",type:"source-agent"},{source:"s33",target:"a3",type:"source-agent"},{source:"s34",target:"a3",type:"source-agent"},{source:"s35",target:"a3",type:"source-agent"},{source:"s36",target:"a3",type:"source-agent"},
+{source:"s37",target:"a4",type:"source-agent"},{source:"s38",target:"a4",type:"source-agent"},{source:"s39",target:"a4",type:"source-agent"},{source:"s40",target:"a4",type:"source-agent"},{source:"s41",target:"a4",type:"source-agent"},{source:"s42",target:"a4",type:"source-agent"},{source:"s43",target:"a4",type:"source-agent"},{source:"s44",target:"a4",type:"source-agent"},{source:"s45",target:"a4",type:"source-agent"},{source:"s46",target:"a4",type:"source-agent"},{source:"s47",target:"a4",type:"source-agent"},{source:"s48",target:"a4",type:"source-agent"},
+{source:"s49",target:"a5",type:"source-agent"},{source:"s50",target:"a5",type:"source-agent"},{source:"s51",target:"a5",type:"source-agent"},{source:"s52",target:"a5",type:"source-agent"},{source:"s53",target:"a5",type:"source-agent"},{source:"s54",target:"a5",type:"source-agent"},{source:"s55",target:"a5",type:"source-agent"},{source:"s56",target:"a5",type:"source-agent"},{source:"s57",target:"a5",type:"source-agent"},{source:"s58",target:"a5",type:"source-agent"},{source:"s59",target:"a5",type:"source-agent"},{source:"s60",target:"a5",type:"source-agent"},
+{source:"f1",target:"s1",type:"feed-source"},{source:"f2",target:"s1",type:"feed-source"},{source:"f3",target:"s1",type:"feed-source"},{source:"f4",target:"s1",type:"feed-source"},{source:"f5",target:"s2",type:"feed-source"},{source:"f6",target:"s2",type:"feed-source"},{source:"f7",target:"s2",type:"feed-source"},{source:"f8",target:"s3",type:"feed-source"},{source:"f9",target:"s3",type:"feed-source"},{source:"f10",target:"s3",type:"feed-source"},{source:"f11",target:"s13",type:"feed-source"},{source:"f12",target:"s13",type:"feed-source"},{source:"f13",target:"s13",type:"feed-source"},{source:"f14",target:"s13",type:"feed-source"},{source:"f15",target:"s14",type:"feed-source"},{source:"f16",target:"s14",type:"feed-source"},{source:"f17",target:"s14",type:"feed-source"},{source:"f18",target:"s15",type:"feed-source"},{source:"f19",target:"s15",type:"feed-source"},{source:"f20",target:"s15",type:"feed-source"},{source:"f21",target:"s25",type:"feed-source"},{source:"f22",target:"s25",type:"feed-source"},{source:"f23",target:"s25",type:"feed-source"},{source:"f24",target:"s25",type:"feed-source"},{source:"f25",target:"s29",type:"feed-source"},{source:"f26",target:"s29",type:"feed-source"},{source:"f27",target:"s29",type:"feed-source"},{source:"f28",target:"s32",type:"feed-source"},{source:"f29",target:"s32",type:"feed-source"},{source:"f30",target:"s32",type:"feed-source"},{source:"f31",target:"s37",type:"feed-source"},{source:"f32",target:"s37",type:"feed-source"},{source:"f33",target:"s37",type:"feed-source"},{source:"f34",target:"s37",type:"feed-source"},{source:"f35",target:"s40",type:"feed-source"},{source:"f36",target:"s40",type:"feed-source"},{source:"f37",target:"s40",type:"feed-source"},{source:"f38",target:"s38",type:"feed-source"},{source:"f39",target:"s38",type:"feed-source"},{source:"f40",target:"s38",type:"feed-source"},{source:"f41",target:"s41",type:"feed-source"},{source:"f42",target:"s41",type:"feed-source"},{source:"f43",target:"s41",type:"feed-source"},{source:"f44",target:"s50",type:"feed-source"},{source:"f45",target:"s50",type:"feed-source"},{source:"f46",target:"s50",type:"feed-source"},{source:"f47",target:"s52",type:"feed-source"},{source:"f48",target:"s52",type:"feed-source"},{source:"f49",target:"s52",type:"feed-source"},{source:"f50",target:"s54",type:"feed-source"},{source:"f51",target:"s54",type:"feed-source"},{source:"f52",target:"s54",type:"feed-source"},{source:"f53",target:"s26",type:"feed-source"},{source:"f54",target:"s26",type:"feed-source"},{source:"f55",target:"s26",type:"feed-source"},{source:"f56",target:"s5",type:"feed-source"},{source:"f57",target:"s5",type:"feed-source"},{source:"f58",target:"s5",type:"feed-source"},{source:"f59",target:"s7",type:"feed-source"},{source:"f60",target:"s7",type:"feed-source"},{source:"f61",target:"s7",type:"feed-source"},{source:"f62",target:"s7",type:"feed-source"},{source:"f63",target:"s18",type:"feed-source"},{source:"f64",target:"s18",type:"feed-source"},{source:"f65",target:"s18",type:"feed-source"},{source:"f66",target:"s16",type:"feed-source"},{source:"f67",target:"s16",type:"feed-source"},{source:"f68",target:"s16",type:"feed-source"},{source:"f69",target:"s23",type:"feed-source"},{source:"f70",target:"s23",type:"feed-source"},{source:"f71",target:"s23",type:"feed-source"},{source:"f72",target:"s31",type:"feed-source"},{source:"f73",target:"s31",type:"feed-source"},{source:"f74",target:"s31",type:"feed-source"},{source:"f75",target:"s4",type:"feed-source"},{source:"f76",target:"s4",type:"feed-source"},{source:"f77",target:"s4",type:"feed-source"},
+{source:"s1",target:"s13",type:"cross"},{source:"s3",target:"s49",type:"cross"},{source:"s7",target:"s37",type:"cross"},{source:"s13",target:"s37",type:"cross"},{source:"s15",target:"s50",type:"cross"},{source:"s25",target:"s38",type:"cross"},{source:"s29",target:"s41",type:"cross"},{source:"s2",target:"s26",type:"cross"},{source:"s8",target:"s45",type:"cross"},{source:"s17",target:"s56",type:"cross"},{source:"s32",target:"s33",type:"cross"},{source:"s40",target:"s44",type:"cross"},{source:"s5",target:"s49",type:"cross"},{source:"s11",target:"s25",type:"cross"},{source:"s22",target:"s46",type:"cross"},{source:"s1",target:"s37",type:"cross"},{source:"s4",target:"s6",type:"cross"},{source:"s7",target:"s8",type:"cross"},{source:"s14",target:"s16",type:"cross"},{source:"s18",target:"s51",type:"cross"},{source:"s23",target:"s52",type:"cross"},{source:"s28",target:"s27",type:"cross"},{source:"s31",target:"s30",type:"cross"},{source:"s38",target:"s42",type:"cross"},{source:"s41",target:"s44",type:"cross"}
+];
 
-class OrbitControls {
-  constructor(obj, dom) {
-    this.object = obj; this.domElement = dom; this.enabled = true;
-    this.target = new THREE.Vector3();
-    this.minDistance = 3; this.maxDistance = 22;
-    this.autoRotate = true; this.autoRotateSpeed = 0.3;
-    this.rotateSpeed = 0.8; this.zoomSpeed = 1.0;
-    this.minPolarAngle = Math.PI * 0.1; this.maxPolarAngle = Math.PI * 0.85;
-    this._idleTimer = null; this._userInteracting = false;
-    this.thetaAccum = 0; this.phiAccum = 0;
+// ===== D3 FORCE LAYOUT =====
+var nodeMap={};nodes.forEach(function(n){nodeMap[n.id]=n});
+var sim=d3.forceSimulation(nodes)
+.force("link",d3.forceLink(links).id(function(d){return d.id}).distance(function(d){
+  if(d.type==="agent-synthesis")return 50;if(d.type==="agent-agent")return 90;
+  if(d.type==="source-agent")return 35;if(d.type==="feed-source")return 18;
+  if(d.type==="cross")return 45;return 30;
+}).strength(function(d){
+  if(d.type==="agent-synthesis")return 0.9;if(d.type==="agent-agent")return 0.2;
+  if(d.type==="source-agent")return 0.7;if(d.type==="feed-source")return 0.8;
+  if(d.type==="cross")return 0.05;return 0.5;
+}))
+.force("charge",d3.forceManyBody().strength(function(d){
+  if(d.type==="synthesis")return -600;if(d.type==="agent")return -250;
+  if(d.type==="source")return -60;if(d.type==="feed")return -15;return -30;
+}))
+.force("center",d3.forceCenter(0,0))
+.force("collision",d3.forceCollide().radius(function(d){return d.r+1}))
+.stop();
+for(var i=0;i<600;i++)sim.tick();
 
-    var scope = this, STATE = { NONE: -1, ROTATE: 0, TR: 3, TZ: 4 };
-    var state = STATE.NONE;
-    var spherical = new THREE.Spherical(), sphericalDelta = new THREE.Spherical();
-    var scl = 1, rs = new THREE.Vector2(), re = new THREE.Vector2(), rd = new THREE.Vector2();
-    var offset = new THREE.Vector3();
-    var quat = new THREE.Quaternion().setFromUnitVectors(obj.up, new THREE.Vector3(0,1,0));
-    var quatI = quat.clone().invert();
+// Map to 3D
+nodes.forEach(function(n){
+  var z=0;
+  if(n.type==='agent')z=(Math.random()-0.5)*30;
+  else if(n.type==='source')z=(Math.random()-0.5)*70;
+  else if(n.type==='feed')z=(Math.random()-0.5)*100;
+  n.pos=new THREE.Vector3(n.x*0.8,n.y*0.8,z);
+});
 
-    function resumeAutoRotate() {
-      scope._userInteracting = false;
-      scope.autoRotate = true;
-    }
-    function pauseAutoRotate() {
-      scope._userInteracting = true;
-      scope.autoRotate = false;
-      clearTimeout(scope._idleTimer);
-      scope._idleTimer = setTimeout(resumeAutoRotate, 3000);
-    }
-
-    this.update = function() {
-      var pos = scope.object.position;
-      offset.copy(pos).sub(scope.target).applyQuaternion(quat);
-      spherical.setFromVector3(offset);
-      var autoD = 0;
-      if (scope.autoRotate && state === STATE.NONE) {
-        autoD = (2*Math.PI/60/60) * scope.autoRotateSpeed;
-        spherical.theta -= autoD;
-      }
-      scope.thetaAccum += sphericalDelta.theta + autoD;
-      scope.phiAccum += sphericalDelta.phi;
-      spherical.theta += sphericalDelta.theta;
-      spherical.phi += sphericalDelta.phi;
-      spherical.phi = Math.max(scope.minPolarAngle, Math.min(scope.maxPolarAngle, spherical.phi));
-      spherical.radius *= scl;
-      spherical.radius = Math.max(scope.minDistance, Math.min(scope.maxDistance, spherical.radius));
-      spherical.makeSafe();
-      offset.setFromSpherical(spherical).applyQuaternion(quatI);
-      pos.copy(scope.target).add(offset);
-      scope.object.lookAt(scope.target);
-      sphericalDelta.set(0,0,0); scl = 1;
-    };
-
-    function onMD(e) {
-      if (!scope.enabled || e.button !== 0) return;
-      e.preventDefault(); state = STATE.ROTATE;
-      rs.set(e.clientX, e.clientY); pauseAutoRotate();
-      document.addEventListener('mousemove', onMM);
-      document.addEventListener('mouseup', onMU);
-    }
-    function onMM(e) {
-      if (state !== STATE.ROTATE) return;
-      re.set(e.clientX, e.clientY); rd.subVectors(re, rs);
-      sphericalDelta.theta -= (2*Math.PI*rd.x/dom.clientHeight)*scope.rotateSpeed;
-      sphericalDelta.phi -= (2*Math.PI*rd.y/dom.clientHeight)*scope.rotateSpeed;
-      rs.copy(re);
-    }
-    function onMU() {
-      state = STATE.NONE;
-      document.removeEventListener('mousemove', onMM);
-      document.removeEventListener('mouseup', onMU);
-    }
-    function onWh(e) {
-      if (!scope.enabled) return;
-      e.preventDefault(); pauseAutoRotate();
-      scl *= Math.pow(0.95, e.deltaY > 0 ? scope.zoomSpeed : -scope.zoomSpeed);
-    }
-    var tpd = 0, trs = new THREE.Vector2();
-    function onTS(e) {
-      if (!scope.enabled) return; e.preventDefault(); pauseAutoRotate();
-      if (e.touches.length === 1) { state = STATE.TR; trs.set(e.touches[0].pageX, e.touches[0].pageY); }
-      else if (e.touches.length === 2) {
-        state = STATE.TZ;
-        var dx = e.touches[0].pageX-e.touches[1].pageX, dy = e.touches[0].pageY-e.touches[1].pageY;
-        tpd = Math.sqrt(dx*dx+dy*dy);
-      }
-    }
-    function onTM(e) {
-      if (!scope.enabled) return; e.preventDefault();
-      if (state === STATE.TR && e.touches.length === 1) {
-        rd.set(e.touches[0].pageX-trs.x, e.touches[0].pageY-trs.y);
-        sphericalDelta.theta -= (2*Math.PI*rd.x/dom.clientHeight)*scope.rotateSpeed;
-        sphericalDelta.phi -= (2*Math.PI*rd.y/dom.clientHeight)*scope.rotateSpeed;
-        trs.set(e.touches[0].pageX, e.touches[0].pageY);
-      } else if (state === STATE.TZ && e.touches.length === 2) {
-        var dx = e.touches[0].pageX-e.touches[1].pageX, dy = e.touches[0].pageY-e.touches[1].pageY;
-        var d = Math.sqrt(dx*dx+dy*dy);
-        scl *= d > tpd ? 1/Math.pow(0.95,scope.zoomSpeed) : Math.pow(0.95,scope.zoomSpeed);
-        tpd = d;
-      }
-    }
-    function onTE() { state = STATE.NONE; }
-    dom.addEventListener('mousedown', onMD);
-    dom.addEventListener('wheel', onWh, {passive:false});
-    dom.addEventListener('touchstart', onTS, {passive:false});
-    dom.addEventListener('touchmove', onTM, {passive:false});
-    dom.addEventListener('touchend', onTE);
-    dom.addEventListener('contextmenu', function(e){e.preventDefault();});
-    this.update();
-  }
-}
-
-// ==================== SCENE ====================
-
-var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, 0.1, 200);
-camera.position.set(0, 2.5, 11);
-camera.lookAt(0, 0, 0);
-
-var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-renderer.setSize(innerWidth, innerHeight);
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-renderer.setClearColor(0x000000, 0);
-renderer.domElement.id = 'three-canvas';
+// ===== THREE.JS SCENE =====
+var scene=new THREE.Scene();
+scene.background=new THREE.Color(0xffffff);
+var camera=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,0.1,2000);
+camera.position.set(0,0,300);
+var renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth,innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 document.body.appendChild(renderer.domElement);
 
-var controls = new OrbitControls(camera, renderer.domElement);
+var controls=new THREE.OrbitControls(camera,renderer.domElement);
+controls.autoRotate=true;controls.autoRotateSpeed=0.5;
+controls.enableDamping=true;controls.dampingFactor=0.05;
+controls.enableZoom=true;controls.enablePan=false;
+controls.minDistance=80;controls.maxDistance=500;
 
-// Lighting — warm from below (sunset), cool from above (sky)
-scene.add(new THREE.AmbientLight(0x2A3A5A, 0.4));
-var warmLight = new THREE.PointLight(0xFF8C00, 0.8, 40);
-warmLight.position.set(0, -6, 0);
-scene.add(warmLight);
-var coolLight = new THREE.PointLight(0x4169E1, 0.6, 40);
-coolLight.position.set(0, 8, 2);
-scene.add(coolLight);
-var keyLight = new THREE.DirectionalLight(0xFFFFFF, 0.5);
-keyLight.position.set(3, 5, 5);
-scene.add(keyLight);
+// Lighting — matte
+scene.add(new THREE.AmbientLight(0xffffff,1.0));
+var dir=new THREE.DirectionalLight(0xffffff,0.3);
+dir.position.set(1,1,1);scene.add(dir);
 
-var pivot = new THREE.Group();
-scene.add(pivot);
+// ===== SPHERES =====
+var meshes={};
+var allMeshes=[];
+nodes.forEach(function(n){
+  var geo,mat,segs;
+  if(n.type==='synthesis'){segs=32;geo=new THREE.SphereGeometry(10,segs,segs);mat=new THREE.MeshLambertMaterial({color:0xA8C4D4})}
+  else if(n.type==='agent'){segs=32;geo=new THREE.SphereGeometry(6,segs,segs);mat=new THREE.MeshLambertMaterial({color:0xE91E8C})}
+  else if(n.type==='source'){segs=16;geo=new THREE.SphereGeometry(2.95,segs,segs);mat=new THREE.MeshLambertMaterial({color:0x4A90D9})}
+  else{segs=8;geo=new THREE.SphereGeometry(1.77,segs,segs);mat=new THREE.MeshLambertMaterial({color:0x9DD1B8})}
+  var mesh=new THREE.Mesh(geo,mat);
+  mesh.position.copy(n.pos);
+  mesh.userData=n;
+  scene.add(mesh);
+  meshes[n.id]=mesh;n.mesh=mesh;n.mat=mat;
+  allMeshes.push(mesh);
+});
 
-// ==================== NODE FACTORY ====================
-
-function makeSphere(radius, color, emissive, emissiveI) {
-  return new THREE.Mesh(
-    new THREE.SphereGeometry(radius, 48, 48),
-    new THREE.MeshPhongMaterial({
-      color: color, emissive: emissive, emissiveIntensity: emissiveI,
-      shininess: 60, specular: 0x222222,
-      transparent: true, opacity: 0.95,
-    })
-  );
-}
-
-function addHalo(parent, radius, color, opacity) {
-  var m = new THREE.Mesh(
-    new THREE.SphereGeometry(radius, 24, 24),
-    new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: opacity, depthWrite: false, side: THREE.BackSide })
-  );
-  parent.add(m);
-  return m;
-}
-
-// ==================== LABELS ====================
-
-function makeLabel(text, yOffset, style) {
-  var canvas = document.createElement('canvas');
-  var ctx = canvas.getContext('2d');
-  canvas.width = 512; canvas.height = 80;
-
-  var fontSize = style === 'hub' ? 46 : style === 'agent' ? 38 : 30;
-  var weight = style === 'hub' ? '700' : '500';
-  ctx.font = weight + ' ' + fontSize + 'px "Neue Montreal", system-ui, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-
-  ctx.shadowColor = style === 'hub' ? 'rgba(255,215,0,0.8)' : style === 'agent' ? 'rgba(233,30,140,0.6)' : 'rgba(168,216,234,0.4)';
-  ctx.shadowBlur = style === 'hub' ? 14 : 8;
-  ctx.fillStyle = style === 'leaf' ? '#A8D8EA' : '#FFFFFF';
-  ctx.fillText(text, canvas.width/2, canvas.height/2);
-  ctx.shadowBlur = 0;
-  ctx.fillText(text, canvas.width/2, canvas.height/2);
-
-  var tex = new THREE.CanvasTexture(canvas);
-  tex.minFilter = THREE.LinearFilter;
-  var sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
-  var w = style === 'leaf' ? 1.5 : style === 'hub' ? 2.4 : 2.0;
-  var h = style === 'leaf' ? 0.23 : 0.32;
-  sprite.scale.set(w, h, 1);
-  sprite.position.y = yOffset;
-  sprite.userData.labelStyle = style;
+// Halos
+function makeHaloSprite(color,size,opacity){
+  var c=document.createElement('canvas');c.width=128;c.height=128;
+  var ctx=c.getContext('2d');
+  var g=ctx.createRadialGradient(64,64,0,64,64,64);
+  var r=(color>>16)&255,gv=(color>>8)&255,b=color&255;
+  g.addColorStop(0,'rgba('+r+','+gv+','+b+','+opacity+')');
+  g.addColorStop(0.5,'rgba('+r+','+gv+','+b+','+(opacity*0.3)+')');
+  g.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=g;ctx.fillRect(0,0,128,128);
+  var tex=new THREE.CanvasTexture(c);
+  var mat=new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false});
+  var sprite=new THREE.Sprite(mat);
+  sprite.scale.set(size,size,1);
   return sprite;
 }
-
-// ==================== BUILD GRAPH ====================
-
-var allNodes = [];
-var srcToAgentEdges = [];
-var agentToHubEdges = [];
-
-// Hub — Synthesis Agent: #FFD700 core, 5 glow layers
-var hubR = 0.5;
-var hubMesh = makeSphere(hubR, 0xFFD700, 0xFF6B00, 0.9);
-pivot.add(hubMesh);
-hubMesh.add(makeLabel('Synthesis Agent', 0.85, 'hub'));
-var hubHalo1 = addHalo(hubMesh, hubR * 1.5, 0xFFD700, 0.6);
-var hubHalo2 = addHalo(hubMesh, hubR * 2.2, 0xFFB347, 0.4);
-var hubHalo3 = addHalo(hubMesh, hubR * 3.5, 0xFF8C00, 0.25);
-var hubHalo4 = addHalo(hubMesh, hubR * 5.0, 0xFF4500, 0.12);
-var hubHalo5 = addHalo(hubMesh, hubR * 8.0, 0xFF2200, 0.05);
-allNodes.push({ mesh: hubMesh, name: 'Synthesis Agent', desc: 'Receives all 5 agent outputs simultaneously and issues a unified verdict with full reasoning chain', type: 'hub', phase: 0, baseR: hubR });
-
-// Agents + Leaves
-var agentOrbitR = 4.5;
-var agentYSeeds = [-0.6, 0.5, -0.2, 0.7, -0.4];
-var agentBaseR = 0.3;
-
-AGENTS.forEach(function(agent, ai) {
-  var angle = (ai / AGENTS.length) * Math.PI * 2 - Math.PI / 2;
-  var ax = Math.cos(angle) * agentOrbitR;
-  var az = Math.sin(angle) * agentOrbitR;
-  var ay = agentYSeeds[ai];
-  var r = agentBaseR * agent.sizeMult;
-
-  // Specialist agents: #E91E8C core, #FF4DB8 inner highlight
-  var agentMesh = makeSphere(r, 0xE91E8C, 0xFF4DB8, 0.6);
-  agentMesh.position.set(ax, ay, az);
-  pivot.add(agentMesh);
-  agentMesh.add(makeLabel(agent.name, r + 0.28, 'agent'));
-  addHalo(agentMesh, r * 1.7, 0xE91E8C, 0.4);
-  addHalo(agentMesh, r * 2.8, 0xC2185B, 0.15);
-
-  allNodes.push({ mesh: agentMesh, name: agent.name, desc: agent.desc, type: 'agent', phase: ai * (Math.PI * 2 / 5), baseR: r });
-  agentToHubEdges.push({ from: agentMesh.position, to: hubMesh.position });
-
-  var leafOrbitR = 2.0;
-  var leafCount = agent.leaves.length;
-  var arcSpan = Math.min(leafCount * 0.28, 1.8);
-
-  agent.leaves.forEach(function(leafName, li) {
-    var leafFrac = leafCount > 1 ? li / (leafCount - 1) : 0.5;
-    var leafAngle = angle + (leafFrac - 0.5) * arcSpan;
-    var row = Math.floor(li / 5);
-    var rowOffset = row * 0.9;
-    var lx = ax + Math.cos(leafAngle) * (leafOrbitR + rowOffset);
-    var ly = ay + (leafFrac - 0.5) * 1.8 + (row * 0.5 - 0.25);
-    var lz = az + Math.sin(leafAngle) * (leafOrbitR + rowOffset);
-
-    // Data sources: #A8D8EA, single tight glow
-    var leafMesh = makeSphere(0.1, 0xA8D8EA, 0x88C8E0, 0.3);
-    leafMesh.position.set(lx, ly, lz);
-    pivot.add(leafMesh);
-    leafMesh.add(makeLabel(leafName, 0.22, 'leaf'));
-    addHalo(leafMesh, 0.13, 0xA8D8EA, 0.2);
-
-    allNodes.push({ mesh: leafMesh, name: leafName, desc: null, type: 'leaf', phase: 0, baseR: 0.1 });
-    srcToAgentEdges.push({ from: leafMesh.position, to: agentMesh.position });
-  });
+var synthHalo=makeHaloSprite(0xA8C4D4,60,0.15);
+synthHalo.position.copy(meshes['synthesis'].position);scene.add(synthHalo);
+['a1','a2','a3','a4','a5'].forEach(function(id){
+  var h=makeHaloSprite(0xE91E8C,24,0.1);
+  h.position.copy(meshes[id].position);scene.add(h);
 });
 
-// ==================== CONNECTION LINES ====================
+// ===== CURVED TUBE EDGES =====
+var tubeRadii={'agent-synthesis':0.4,'agent-agent':0.2,'source-agent':0.15,'feed-source':0.15,'cross':0.1};
+var tubeColors={'agent-synthesis':0xA8C4D4,'agent-agent':0xE91E8C,'source-agent':0x4A90D9,'feed-source':0x9DD1B8,'cross':0xE2EEF5};
+var tubeOpacities={'agent-synthesis':0.9,'agent-agent':0.35,'source-agent':0.55,'feed-source':0.45,'cross':0.3};
 
-// Source → Agent: #A8D8EA at 0.4 opacity
-pivot.add((function() {
-  var pts = [];
-  for (var i = 0; i < srcToAgentEdges.length; i++) {
-    pts.push(srcToAgentEdges[i].from.x, srcToAgentEdges[i].from.y, srcToAgentEdges[i].from.z);
-    pts.push(srcToAgentEdges[i].to.x, srcToAgentEdges[i].to.y, srcToAgentEdges[i].to.z);
-  }
-  var geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
-  return new THREE.LineSegments(geo, new THREE.LineBasicMaterial({ color: 0xA8D8EA, transparent: true, opacity: 0.4 }));
-})());
-
-// Agent → Synthesis: per-vertex color gradient from #E91E8C to #FFD700
-pivot.add((function() {
-  var pts = [], cols = [];
-  var cAgent = new THREE.Color(0xE91E8C);
-  var cHub = new THREE.Color(0xFFD700);
-  for (var i = 0; i < agentToHubEdges.length; i++) {
-    var e = agentToHubEdges[i];
-    pts.push(e.from.x, e.from.y, e.from.z, e.to.x, e.to.y, e.to.z);
-    cols.push(cAgent.r, cAgent.g, cAgent.b, cHub.r, cHub.g, cHub.b);
-  }
-  var geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
-  geo.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3));
-  return new THREE.LineSegments(geo, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.6 }));
-})());
-
-// ==================== PARTICLES ====================
-
-// Source → Agent: cold magenta #E91E8C, 3 per line, speed 0.5
-var saPE = 3, saEdges = srcToAgentEdges, saCount = saEdges.length * saPE;
-var saPos = new Float32Array(saCount * 3);
-var saOff = new Float32Array(saCount);
-var saEI = new Uint16Array(saCount);
-for (var e = 0; e < saEdges.length; e++)
-  for (var p = 0; p < saPE; p++) {
-    var i = e * saPE + p;
-    saOff[i] = p / saPE + Math.random() * 0.15;
-    saEI[i] = e;
-  }
-var saGeo = new THREE.BufferGeometry();
-saGeo.setAttribute('position', new THREE.BufferAttribute(saPos, 3));
-pivot.add(new THREE.Points(saGeo, new THREE.PointsMaterial({
-  color: 0xE91E8C, size: 0.05, transparent: true, opacity: 0.85,
-  sizeAttenuation: true, depthWrite: false,
-})));
-
-// Agent → Hub: bright gold #FFD700, 6 per line, speed 0.8
-var ahPE = 6, ahEdges = agentToHubEdges, ahCount = ahEdges.length * ahPE;
-var ahPos = new Float32Array(ahCount * 3);
-var ahOff = new Float32Array(ahCount);
-var ahEI = new Uint16Array(ahCount);
-for (var e = 0; e < ahEdges.length; e++)
-  for (var p = 0; p < ahPE; p++) {
-    var i = e * ahPE + p;
-    ahOff[i] = p / ahPE + Math.random() * 0.08;
-    ahEI[i] = e;
-  }
-var ahGeo = new THREE.BufferGeometry();
-ahGeo.setAttribute('position', new THREE.BufferAttribute(ahPos, 3));
-pivot.add(new THREE.Points(ahGeo, new THREE.PointsMaterial({
-  color: 0xFFD700, size: 0.09, transparent: true, opacity: 0.9,
-  sizeAttenuation: true, depthWrite: false,
-})));
-
-// Agent → Hub glow particles
-var ahGlowPos = new Float32Array(ahCount * 3);
-var ahGlowGeo = new THREE.BufferGeometry();
-ahGlowGeo.setAttribute('position', new THREE.BufferAttribute(ahGlowPos, 3));
-pivot.add(new THREE.Points(ahGlowGeo, new THREE.PointsMaterial({
-  color: 0xFFD700, size: 0.24, transparent: true, opacity: 0.2,
-  sizeAttenuation: true, depthWrite: false,
-})));
-
-// ==================== HOVER / TOOLTIP / CLICK ====================
-
-var tooltip = document.getElementById('tooltip');
-var tooltipName = tooltip.querySelector('.name');
-var tooltipDesc = tooltip.querySelector('.desc');
-var raycaster = new THREE.Raycaster();
-var mouse = new THREE.Vector2();
-var hoveredNode = null;
-var selectedAgent = null;
-var hitMeshes = allNodes.map(function(n) { return n.mesh; });
-
-window.addEventListener('pointermove', function(ev) {
-  mouse.x = (ev.clientX / innerWidth) * 2 - 1;
-  mouse.y = -(ev.clientY / innerHeight) * 2 + 1;
-  raycaster.setFromCamera(mouse, camera);
-  var hits = raycaster.intersectObjects(hitMeshes, false);
-  if (hits.length > 0) {
-    var hit = hits[0].object;
-    var node = allNodes.find(function(n) { return n.mesh === hit; });
-    if (node && node !== hoveredNode) {
-      hoveredNode = node;
-      tooltipName.textContent = node.name;
-      if (node.desc) { tooltipDesc.textContent = node.desc; tooltipDesc.style.display = 'block'; }
-      else tooltipDesc.style.display = 'none';
-      tooltip.style.opacity = '1';
-      document.body.style.cursor = 'pointer';
-    }
-    if (node) {
-      tooltip.style.left = ev.clientX + 'px';
-      tooltip.style.top = (ev.clientY - 60) + 'px';
-    }
-  } else if (hoveredNode) {
-    hoveredNode = null;
-    tooltip.style.opacity = '0';
-    document.body.style.cursor = 'auto';
-  }
-});
-
-renderer.domElement.addEventListener('click', function() {
-  if (hoveredNode && hoveredNode.type === 'agent') {
-    selectedAgent = selectedAgent === hoveredNode ? null : hoveredNode;
-  } else if (!hoveredNode) {
-    selectedAgent = null;
-  }
-});
-
-// ==================== RESIZE ====================
-
-window.addEventListener('resize', function() {
-  camera.aspect = innerWidth / innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth, innerHeight);
-});
-
-// ==================== ANIMATE ====================
-
-var clock = new THREE.Clock();
-
-function animate() {
-  requestAnimationFrame(animate);
-  var t = clock.getElapsedTime();
-
-  // Breathing — hub and agents only, leaves are still
-  for (var n = 0; n < allNodes.length; n++) {
-    var nd = allNodes[n];
-    if (nd.type === 'hub') {
-      var s = 1.0 + Math.sin(t * (2 * Math.PI / 4) + nd.phase) * 0.15;
-      nd.mesh.scale.setScalar(s);
-    } else if (nd.type === 'agent') {
-      var s = 1.0 + Math.sin(t * (2 * Math.PI / 3) + nd.phase) * 0.08;
-      nd.mesh.scale.setScalar(s);
-    }
-  }
-
-  // Hub aura pulse
-  hubHalo1.material.opacity = 0.55 + Math.sin(t * 0.8) * 0.05;
-  hubHalo2.material.opacity = 0.35 + Math.sin(t * 0.6 + 1) * 0.05;
-  hubHalo3.material.opacity = 0.22 + Math.sin(t * 0.5 + 2) * 0.03;
-  hubHalo4.material.opacity = 0.10 + Math.sin(t * 0.4 + 3) * 0.02;
-  hubHalo5.material.opacity = 0.04 + Math.sin(t * 0.3 + 4) * 0.01;
-
-  // Source → Agent particles
-  for (var i = 0; i < saCount; i++) {
-    var ei = saEI[i];
-    var edge = saEdges[ei];
-    var frac = ((saOff[i] + t * 0.5) % 1 + 1) % 1;
-    saPos[i*3]   = edge.from.x + (edge.to.x - edge.from.x) * frac;
-    saPos[i*3+1] = edge.from.y + (edge.to.y - edge.from.y) * frac;
-    saPos[i*3+2] = edge.from.z + (edge.to.z - edge.from.z) * frac;
-  }
-  saGeo.attributes.position.needsUpdate = true;
-
-  // Agent → Hub particles
-  for (var i = 0; i < ahCount; i++) {
-    var ei = ahEI[i];
-    var edge = ahEdges[ei];
-    var frac = ((ahOff[i] + t * 0.8) % 1 + 1) % 1;
-    var px = edge.from.x + (edge.to.x - edge.from.x) * frac;
-    var py = edge.from.y + (edge.to.y - edge.from.y) * frac;
-    var pz = edge.from.z + (edge.to.z - edge.from.z) * frac;
-    ahPos[i*3] = px; ahPos[i*3+1] = py; ahPos[i*3+2] = pz;
-    ahGlowPos[i*3] = px; ahGlowPos[i*3+1] = py; ahGlowPos[i*3+2] = pz;
-  }
-  ahGeo.attributes.position.needsUpdate = true;
-  ahGlowGeo.attributes.position.needsUpdate = true;
-
-  // Parallax stars — driven by orbit controls accumulation
-  var pixelScale = 200;
-  _starOffsetX = controls.thetaAccum * pixelScale;
-  _starOffsetY = controls.phiAccum * pixelScale;
-  drawStars(_starOffsetX, _starOffsetY);
-
-  // Leaf label visibility — hover only
-  for (var n = 0; n < allNodes.length; n++) {
-    if (allNodes[n].type !== 'leaf') continue;
-    var children = allNodes[n].mesh.children;
-    for (var c = 0; c < children.length; c++) {
-      if (children[c].isSprite && children[c].userData.labelStyle === 'leaf') {
-        var isHov = hoveredNode && hoveredNode.mesh === allNodes[n].mesh;
-        var target = isHov ? 1.0 : 0.0;
-        children[c].material.opacity += (target - children[c].material.opacity) * 0.15;
-      }
-    }
-  }
-
-  // Click selection — dim non-related nodes
-  if (selectedAgent) {
-    for (var n = 0; n < allNodes.length; n++) {
-      var nd = allNodes[n];
-      var isSelected = nd.mesh === selectedAgent.mesh;
-      var isHub = nd.type === 'hub';
-      var isRelatedLeaf = false;
-      if (nd.type === 'leaf') {
-        for (var e = 0; e < srcToAgentEdges.length; e++) {
-          if (srcToAgentEdges[e].from === nd.mesh.position && srcToAgentEdges[e].to === selectedAgent.mesh.position) {
-            isRelatedLeaf = true; break;
-          }
-        }
-      }
-      var targetOp = (isSelected || isHub || isRelatedLeaf) ? 0.95 : 0.2;
-      nd.mesh.material.opacity += (targetOp - nd.mesh.material.opacity) * 0.1;
-      if (nd.type === 'leaf') {
-        var children = nd.mesh.children;
-        for (var c = 0; c < children.length; c++) {
-          if (children[c].isSprite && children[c].userData.labelStyle === 'leaf') {
-            if (isRelatedLeaf) children[c].material.opacity += (1.0 - children[c].material.opacity) * 0.15;
-          }
-        }
-      }
-    }
-  } else {
-    for (var n = 0; n < allNodes.length; n++) {
-      allNodes[n].mesh.material.opacity += (0.95 - allNodes[n].mesh.material.opacity) * 0.1;
-    }
-  }
-
-  controls.update();
-  renderer.render(scene, camera);
+function makeCurvedTube(s,e,linkType){
+  var mid=new THREE.Vector3().addVectors(s,e).multiplyScalar(0.5);
+  mid.x+=(Math.random()-0.5)*40;
+  mid.y+=(Math.random()-0.5)*40;
+  mid.z+=(Math.random()-0.5)*20;
+  var curve=new THREE.QuadraticBezierCurve3(s.clone(),mid,e.clone());
+  var tr=tubeRadii[linkType]||0.1;
+  var geo=new THREE.TubeGeometry(curve,20,tr,6,false);
+  var col=tubeColors[linkType]||0xCCCCCC;
+  var op=tubeOpacities[linkType]||0.3;
+  var mat=new THREE.MeshLambertMaterial({color:col,transparent:true,opacity:op});
+  var mesh=new THREE.Mesh(geo,mat);
+  return{mesh:mesh,curve:curve,mat:mat,baseOpacity:op};
 }
 
+var edgeObjects=[];
+links.forEach(function(l){
+  var sn=meshes[l.source.id],tn=meshes[l.target.id];
+  if(!sn||!tn)return;
+  var obj=makeCurvedTube(sn.position,tn.position,l.type);
+  scene.add(obj.mesh);
+  l.lineObj=obj;l.baseOpacity=obj.baseOpacity;
+});
+
+// ===== PARTICLES on agent-synthesis edges =====
+var particles=[];
+links.forEach(function(l){
+  if(l.type!=='agent-synthesis')return;
+  for(var p=0;p<4;p++){
+    var geo=new THREE.SphereGeometry(0.8,6,6);
+    var mat=new THREE.MeshLambertMaterial({color:0xA8C4D4});
+    var mesh=new THREE.Mesh(geo,mat);
+    scene.add(mesh);
+    particles.push({mesh:mesh,curve:l.lineObj.curve,t:p/4,speed:0.002+Math.random()*0.002});
+  }
+});
+
+// ===== LABELS =====
+var labelContainer=document.createElement('div');
+labelContainer.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;overflow:hidden';
+document.body.appendChild(labelContainer);
+var labelEls={};
+nodes.forEach(function(n){
+  var el=document.createElement('div');
+  el.className='node-label t-'+n.type;
+  if(n.type==='source'||n.type==='feed')el.classList.add('hidden');
+  el.textContent=n.label;
+  labelContainer.appendChild(el);
+  labelEls[n.id]=el;
+});
+
+function updateLabels(){
+  var hw=innerWidth/2,hh=innerHeight/2;
+  nodes.forEach(function(n){
+    var el=labelEls[n.id];if(!el)return;
+    var v=n.pos.clone().project(camera);
+    if(v.z>1){el.style.display='none';return}
+    el.style.display='';
+    var x=v.x*hw+hw;var y=-v.y*hh+hh;
+    el.style.transform='translate(-50%,-100%) translate('+x+'px,'+(y-n.r*2-10)+'px)';
+  });
+}
+
+// ===== INTERACTION =====
+var raycaster=new THREE.Raycaster();
+var mouse=new THREE.Vector2();
+var hoveredNode=null,selectedNode=null;
+var tooltip=document.getElementById('tooltip');
+var panel=document.getElementById('panel');
+
+function connSet(n){
+  var s=new Set();s.add(n.id);
+  links.forEach(function(l){if(l.source.id===n.id)s.add(l.target.id);if(l.target.id===n.id)s.add(l.source.id)});
+  return s;
+}
+
+function highlight(node){
+  var cs=connSet(node);
+  nodes.forEach(function(n){
+    var c=cs.has(n.id);
+    n.mat.transparent=true;
+    n.mat.opacity=c?1:(selectedNode?0.08:0.15);
+    n.mesh.scale.setScalar(n===node?1.5:1);
+  });
+  links.forEach(function(l){
+    if(!l.lineObj)return;
+    var c=cs.has(l.source.id)&&cs.has(l.target.id);
+    l.lineObj.mat.opacity=c?l.baseOpacity:(selectedNode?0.02:0.05);
+  });
+  // Show source/feed labels if connected
+  nodes.forEach(function(n){
+    var el=labelEls[n.id];if(!el)return;
+    if(n.type==='source'||n.type==='feed'){
+      el.classList.toggle('hidden',!cs.has(n.id));
+    }
+  });
+}
+
+function resetHighlight(){
+  nodes.forEach(function(n){n.mat.opacity=1;n.mat.transparent=false;n.mesh.scale.setScalar(1)});
+  links.forEach(function(l){if(l.lineObj)l.lineObj.mat.opacity=l.baseOpacity});
+  nodes.forEach(function(n){
+    var el=labelEls[n.id];if(!el)return;
+    if(n.type==='source'||n.type==='feed')el.classList.add('hidden');
+  });
+}
+
+window.addEventListener('pointermove',function(e){
+  mouse.x=(e.clientX/innerWidth)*2-1;mouse.y=-(e.clientY/innerHeight)*2+1;
+  raycaster.setFromCamera(mouse,camera);
+  var hits=raycaster.intersectObjects(allMeshes,false);
+  var node=hits.length?hits[0].object.userData:null;
+  if(node!==hoveredNode){
+    if(hoveredNode&&!selectedNode)resetHighlight();
+    hoveredNode=node;
+    if(node&&!selectedNode)highlight(node);
+    if(node){showTooltip(node,e.clientX,e.clientY);renderer.domElement.style.cursor='pointer'}
+    else{tooltip.style.opacity='0';renderer.domElement.style.cursor='grab'}
+  }else if(node){tooltip.style.left=(e.clientX+16)+'px';tooltip.style.top=(e.clientY-20)+'px'}
+});
+
+renderer.domElement.addEventListener('click',function(){
+  if(hoveredNode){
+    if(selectedNode===hoveredNode){selectedNode=null;resetHighlight();closePanel()}
+    else{selectedNode=hoveredNode;highlight(hoveredNode);showPanel(hoveredNode)}
+  }else{selectedNode=null;resetHighlight();closePanel()}
+});
+
+function showTooltip(n,x,y){
+  tooltip.querySelector('.tt-name').textContent=n.label;
+  tooltip.querySelector('.tt-type').textContent={synthesis:'Synthesis Agent',agent:'Specialist Agent',source:'Data Source',feed:'Sub-feed'}[n.type];
+  var d=tooltip.querySelector('.tt-desc');if(n.desc){d.textContent=n.desc;d.style.display=''}else d.style.display='none';
+  var conns=[];links.forEach(function(l){
+    if(l.source.id===n.id){var t=nodeMap[l.target.id];if(t&&t.type!=='feed')conns.push(t.label)}
+    if(l.target.id===n.id){var s=nodeMap[l.source.id];if(s&&s.type!=='feed')conns.push(s.label)}
+  });
+  var ce=tooltip.querySelector('.tt-conn');
+  if(conns.length&&conns.length<=8){ce.textContent='Connected: '+conns.join(', ');ce.style.display=''}else ce.style.display='none';
+  tooltip.style.left=(x+16+240>innerWidth?x-256:x+16)+'px';
+  tooltip.style.top=(y-20)+'px';tooltip.style.opacity='1';
+}
+
+function showPanel(n){
+  panel.querySelector('.p-name').textContent=n.label;
+  panel.querySelector('.p-type').textContent={synthesis:'Synthesis Agent',agent:'Specialist Agent',source:'Data Source',feed:'Sub-feed'}[n.type];
+  panel.querySelector('.p-desc').textContent=n.desc||'';
+  var conns=[];links.forEach(function(l){
+    if(l.source.id===n.id)conns.push(nodeMap[l.target.id].label);
+    if(l.target.id===n.id)conns.push(nodeMap[l.source.id].label);
+  });
+  panel.querySelector('.p-conns').textContent=conns.length?'Connected to: '+conns.join(', '):'';
+  panel.classList.add('visible');
+}
+function closePanel(){panel.classList.remove('visible')}
+window.closePanel=closePanel;
+
+// ===== ANIMATE =====
+function animate(){
+  requestAnimationFrame(animate);
+  controls.update();
+  particles.forEach(function(p){
+    p.t=(p.t+p.speed)%1;
+    var pt=p.curve.getPoint(p.t);
+    p.mesh.position.copy(pt);
+  });
+  updateLabels();
+  renderer.render(scene,camera);
+}
+window.addEventListener('resize',function(){
+  camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+});
 animate();
+})();
 </script>
 </body>
 </html>
