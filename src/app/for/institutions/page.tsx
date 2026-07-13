@@ -44,29 +44,29 @@ const FEATURES = [
 
 const ENTERPRISE_FEATURES = [
   {
-    title: "Isolated data environment",
+    title: "Immutable verdict record",
     description:
-      "Fully isolated data environment. Your portfolio data never touches another client's context.",
+      "Every verdict is recorded append-only — it cannot be edited or deleted after the fact, by anyone. The audit trail is a product promise, live today.",
   },
   {
-    title: "SOC 2 Type II",
+    title: "Your data stays yours",
     description:
-      "SOC 2 Type II compliant infrastructure. Enterprise-grade security for enterprise-grade decisions.",
+      "Portfolio data is never used to train KOANO's models, and row-level security scopes every record to your account.",
   },
   {
-    title: "SSO & role-based access",
+    title: "SOC 2 Type II — enterprise roadmap",
     description:
-      "Role-based access controls with single sign-on. Your team sees exactly what they need to.",
+      "SOC 2 Type II certification lands with enterprise onboarding. The immutable audit trail that underpins it is already in production.",
   },
   {
-    title: "Complete audit log",
+    title: "SSO & role-based access — enterprise roadmap",
     description:
-      "Every query, verdict, and API call logged. Full auditability for compliance and governance.",
+      "Sign-in today is email and Google. Single sign-on and role-based access controls arrive with the enterprise tier.",
   },
   {
-    title: "Air-gapped data",
+    title: "Dedicated data isolation — enterprise roadmap",
     description:
-      "Your portfolio data is air-gapped — it cannot and will not train KOANO's models. Ever.",
+      "Row-level security isolates your records today; dedicated per-tenant environments arrive with enterprise onboarding.",
   },
   {
     title: "API access",

@@ -34,7 +34,7 @@ export default function DataTickerSection() {
           marginBottom: "28px",
         }}
       >
-        50+ data sources powering every verdict
+        Dozens of data sources powering every verdict
       </p>
 
       {/* Ticker track */}

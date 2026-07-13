@@ -168,10 +168,10 @@ export default function DataContent() {
               margin: "0 auto 40px",
             }}
           >
-            KOANO ingests data from 50+ sources — a mix of free public datasets
-            and licensed commercial providers. Every verdict cites its top data
-            sources. We publish the full list here because trust requires
-            transparency.
+            KOANO ingests data from dozens of sources — free public datasets
+            live today, plus commercial providers that come online as they are
+            licensed. Every verdict cites its top data sources. We publish the
+            full list here because trust requires transparency.
           </motion.p>
 
           <motion.div
@@ -570,7 +570,7 @@ export default function DataContent() {
               }}
             >
               Every KOANO verdict cites its top data sources. Request early
-              access to see how all 50+ sources come together in a single
+              access to see how dozens of sources come together in a single
               verdict.
             </p>
             <div

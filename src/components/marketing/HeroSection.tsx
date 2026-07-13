@@ -20,7 +20,7 @@ const fadeUp = {
 };
 
 const STATS = [
-  { value: "50+", label: "Data sources" },
+  { value: "Dozens", label: "Data sources" },
   { value: "5", label: "Specialist agents" },
   { value: "6–18mo", label: "Signal advantage" },
 ];
@@ -128,9 +128,9 @@ export default function HeroSection() {
             marginBottom: "40px",
           }}
         >
-          KOANO deploys five specialist AI agents that ingest 50+ data sources,
-          reason autonomously, and deliver a single verdict — with every step
-          of the thinking visible and auditable.
+          KOANO deploys five specialist AI agents that ingest dozens of data
+          sources, reason autonomously, and deliver a single verdict, with
+          every step of the thinking visible and auditable.
         </motion.p>
 
         {/* CTA row */}

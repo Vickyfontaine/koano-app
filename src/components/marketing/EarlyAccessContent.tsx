@@ -316,7 +316,7 @@ export default function EarlyAccessContent() {
           }}
         >
           {[
-            { stat: "50+", label: "Data sources" },
+            { stat: "Dozens", label: "Data sources" },
             { stat: "5", label: "Specialist agents" },
             { stat: "6–18mo", label: "Signal advantage" },
           ].map((item) => (

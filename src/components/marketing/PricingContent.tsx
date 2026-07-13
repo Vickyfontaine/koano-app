@@ -92,9 +92,9 @@ const TIERS = [
       "Portfolio risk score with per-asset breakdown",
       "Monday morning briefing — what changed overnight",
       "Hold / sell / reposition analysis per asset",
-      "Air-gapped data environment — cannot train KOANO's models",
+      "Your portfolio data is never used to train KOANO's models",
     ],
-    addOn: "SOC 2 Type II · SSO · Custom billing · Full audit log",
+    addOn: "Immutable verdict log · Custom billing · Enterprise roadmap: SOC 2 Type II, SSO",
     href: "/for/institutions",
     isEnterprise: true,
   },
@@ -458,9 +458,11 @@ export default function PricingContent() {
                 marginBottom: "40px",
               }}
             >
-              Cluster 5 includes a fully isolated data environment, SOC 2
-              Type II compliance, SSO, role-based access controls, and a
-              complete audit log. Talk to us about custom pricing and dedicated
+              Cluster 5 runs on an immutable, append-only verdict record, and
+              your portfolio data is never used to train KOANO&apos;s models.
+              SOC 2 Type II certification, SSO, role-based access controls,
+              and dedicated per-tenant data isolation land with enterprise
+              onboarding. Talk to us about custom pricing and dedicated
               onboarding.
             </p>
             <div

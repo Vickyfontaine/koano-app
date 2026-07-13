@@ -5,7 +5,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "KOANO — The Real Estate Reasoning Engine",
   description:
-    "KOANO deploys five specialist AI agents that ingest 50+ data sources, reason autonomously, and deliver a single verdict — with every step of the thinking visible and auditable.",
+    "KOANO deploys five specialist AI agents that ingest dozens of data sources, reason autonomously, and deliver a single verdict, with every step of the thinking visible and auditable.",
   keywords: [
     "real estate",
     "AI",
