@@ -6,6 +6,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { generateNarrative } from '../../../../lib/agents/narrative';
+import { guardSpend } from '../../../../lib/koano-guard';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -25,6 +26,12 @@ export async function POST(req: Request) {
   const address = typeof body.address === 'string' ? body.address.trim() : '';
   if (!address) {
     return NextResponse.json({ error: '"address" is required' }, { status: 400 });
+  }
+
+  // Spend guard: approval + shared narrative/briefing rate limit + breaker.
+  const guard = await guardSpend({ userId, kind: 'content', route: '/api/narrative' });
+  if (!guard.ok) {
+    return NextResponse.json(guard.body, { status: guard.status });
   }
 
   try {

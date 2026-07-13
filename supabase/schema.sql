@@ -153,3 +153,34 @@ drop trigger if exists verdicts_no_update_delete on public.verdicts;
 create trigger verdicts_no_update_delete
   before update or delete on public.verdicts
   for each row execute function public.koano_verdicts_immutable();
+
+-- ---------------------------------------------------------------------------
+-- Access control + spend guarding (migration 002 — Phase B lockdown)
+-- profiles.access_status: access is by approval, not open signup.
+-- usage_events: one row per attempted spend; powers per-user rolling-24h
+-- rate limits and the global daily circuit breaker (KOANO_DAILY_RUN_CAP).
+-- ---------------------------------------------------------------------------
+alter table public.profiles
+  add column if not exists access_status text not null default 'pending'
+  check (access_status in ('pending', 'approved', 'denied'));
+
+create table if not exists public.usage_events (
+  id uuid primary key default gen_random_uuid(),
+  clerk_user_id text not null,
+  kind text not null check (kind in ('verdict', 'content')),
+  route text not null,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists usage_events_user_kind_time_idx
+  on public.usage_events (clerk_user_id, kind, created_at desc);
+create index if not exists usage_events_created_at_idx
+  on public.usage_events (created_at desc);
+
+alter table public.usage_events enable row level security;
+
+drop policy if exists "usage_events: select own" on public.usage_events;
+create policy "usage_events: select own"
+  on public.usage_events for select
+  using (clerk_user_id = public.koano_requesting_user_id());
+-- No insert/update/delete policies: only the service role writes usage.

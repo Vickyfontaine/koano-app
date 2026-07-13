@@ -5,6 +5,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { supabaseAdmin } from '../../../../lib/supabase/server';
+import { requireApproved } from '../../../../lib/koano-guard';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,6 +27,8 @@ export async function GET(req: Request) {
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+  const denied = await requireApproved(userId);
+  if (denied) return NextResponse.json(denied.body, { status: denied.status });
 
   const url = new URL(req.url);
   const limitRaw = Number(url.searchParams.get('limit') ?? 20);

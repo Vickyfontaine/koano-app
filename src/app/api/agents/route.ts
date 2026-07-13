@@ -7,6 +7,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { runKoanoPipeline } from '../../../../lib/agents/synthesis';
 import { persistVerdict } from '../../../../lib/supabase/verdicts';
+import { guardSpend } from '../../../../lib/koano-guard';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 300; // full pipeline runs ~60s
@@ -26,6 +27,12 @@ export async function POST(req: Request) {
   const address = typeof body.address === 'string' ? body.address.trim() : '';
   if (!address) {
     return NextResponse.json({ error: '"address" is required' }, { status: 400 });
+  }
+
+  // Spend guard: approval + per-user rate limit + global circuit breaker.
+  const guard = await guardSpend({ userId, kind: 'verdict', route: '/api/agents' });
+  if (!guard.ok) {
+    return NextResponse.json(guard.body, { status: guard.status });
   }
 
   let result;

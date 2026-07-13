@@ -9,6 +9,7 @@
 
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
+import { requireApproved } from '../../../../lib/koano-guard';
 import { registry } from '../../../../lib/providers/registry';
 import type {
   AcsDemographics,
@@ -107,6 +108,8 @@ export async function POST(req: Request) {
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+  const denied = await requireApproved(userId);
+  if (denied) return NextResponse.json(denied.body, { status: denied.status });
 
   let body: { address?: unknown; blocks?: unknown };
   try {

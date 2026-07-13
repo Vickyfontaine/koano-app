@@ -9,6 +9,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { registry } from '../../../../lib/providers/registry';
 import { supabaseAdmin } from '../../../../lib/supabase/server';
+import { requireApproved } from '../../../../lib/koano-guard';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -34,6 +35,8 @@ export interface PortfolioProperty {
 export async function GET() {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const denied = await requireApproved(userId);
+  if (denied) return NextResponse.json(denied.body, { status: denied.status });
 
   const [propsRes, verdictsRes] = await Promise.all([
     supabaseAdmin()
@@ -86,6 +89,8 @@ export async function GET() {
 export async function POST(req: Request) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const denied = await requireApproved(userId);
+  if (denied) return NextResponse.json(denied.body, { status: denied.status });
 
   let body: { address?: unknown };
   try {
@@ -141,6 +146,8 @@ export async function POST(req: Request) {
 export async function DELETE(req: Request) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const denied = await requireApproved(userId);
+  if (denied) return NextResponse.json(denied.body, { status: denied.status });
 
   const id = new URL(req.url).searchParams.get('id');
   if (!id) return NextResponse.json({ error: '"id" query param is required' }, { status: 400 });

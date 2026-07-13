@@ -8,6 +8,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { supabaseAdmin } from '../../../../lib/supabase/server';
 import { generateBriefing, type BriefingProperty } from '../../../../lib/agents/briefing';
+import { guardSpend } from '../../../../lib/koano-guard';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 120;
@@ -61,6 +62,13 @@ export async function POST() {
       { error: 'No properties in your portfolio yet — add properties first' },
       { status: 400 },
     );
+  }
+
+  // Spend guard after the free empty-portfolio check (no wasted slot):
+  // approval + shared narrative/briefing rate limit + circuit breaker.
+  const guard = await guardSpend({ userId, kind: 'content', route: '/api/briefing' });
+  if (!guard.ok) {
+    return NextResponse.json(guard.body, { status: guard.status });
   }
 
   try {

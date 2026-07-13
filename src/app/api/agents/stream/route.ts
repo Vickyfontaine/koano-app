@@ -13,6 +13,7 @@ import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { runKoanoPipeline } from '../../../../../lib/agents/synthesis';
 import { persistVerdict } from '../../../../../lib/supabase/verdicts';
+import { guardSpend } from '../../../../../lib/koano-guard';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 300; // full pipeline runs ~60s
@@ -40,6 +41,14 @@ export async function POST(req: Request) {
   const address = typeof body.address === 'string' ? body.address.trim() : '';
   if (!address) {
     return NextResponse.json({ error: '"address" is required' }, { status: 400 });
+  }
+
+  // Spend guard BEFORE the stream opens: approval + per-user rate limit +
+  // global circuit breaker. A Cluster 4 comparison issues one request per
+  // site, so each site consumes one verdict-run slot.
+  const guard = await guardSpend({ userId, kind: 'verdict', route: '/api/agents/stream' });
+  if (!guard.ok) {
+    return NextResponse.json(guard.body, { status: guard.status });
   }
 
   const encoder = new TextEncoder();
