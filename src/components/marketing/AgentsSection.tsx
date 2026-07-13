@@ -111,21 +111,23 @@ export default function AgentsSection() {
             margin: "0 auto",
           }}
         >
-          {/* Center vertical line */}
-          <div
-            style={{
-              position: "absolute",
-              left: "50%",
-              top: 0,
-              bottom: 0,
-              width: "1px",
-              background: "var(--brand-blue)",
-              transform: "translateX(-0.5px)",
-            }}
-          />
+          {/* Agent cards + connector line. The line lives inside this
+              wrapper so it spans the five agent rows and terminates at the
+              synthesis dot (7px = dot radius) — never past it. */}
+          <div style={{ position: "relative" }}>
+            <div
+              style={{
+                position: "absolute",
+                left: "50%",
+                top: 0,
+                bottom: "-7px",
+                width: "1px",
+                background: "var(--brand-blue)",
+                transform: "translateX(-0.5px)",
+              }}
+            />
 
-          {/* Agent cards */}
-          {AGENTS.map((agent, i) => {
+            {AGENTS.map((agent, i) => {
             const isLeft = i % 2 === 0;
             return (
               <motion.div
@@ -141,18 +143,20 @@ export default function AgentsSection() {
                   paddingBottom: "40px",
                 }}
               >
-                {/* Dot on center line */}
+                {/* Dot on center line — centered on the card's vertical
+                    middle. Row height = card height + 40px bottom padding,
+                    so the card's center sits at calc(50% - 20px). */}
                 <div
                   style={{
                     position: "absolute",
                     left: "50%",
-                    top: "24px",
+                    top: "calc(50% - 20px)",
                     width: "10px",
                     height: "10px",
                     borderRadius: "50%",
                     border: "2px solid var(--brand-blue)",
                     background: "var(--white)",
-                    transform: "translate(-50%, 0)",
+                    transform: "translate(-50%, -50%)",
                     zIndex: 2,
                   }}
                 />
@@ -194,11 +198,24 @@ export default function AgentsSection() {
                   >
                     {agent.description}
                   </p>
-                  <span className="data-chip">{agent.output}</span>
+                  {/* whiteSpace override: .data-chip is nowrap by default,
+                      which overflowed the card on longer outputs. */}
+                  <span
+                    className="data-chip"
+                    style={{
+                      whiteSpace: "normal",
+                      maxWidth: "100%",
+                      lineHeight: 1.6,
+                      textAlign: "left",
+                    }}
+                  >
+                    {agent.output}
+                  </span>
                 </div>
               </motion.div>
             );
           })}
+          </div>
 
           {/* Synthesis node */}
           <motion.div
@@ -214,9 +231,11 @@ export default function AgentsSection() {
               paddingBottom: "40px",
             }}
           >
-            {/* Filled synthesis dot */}
+            {/* Filled synthesis dot — the connector line terminates at this
+                dot's center (position needed for zIndex to apply). */}
             <div
               style={{
+                position: "relative",
                 width: "14px",
                 height: "14px",
                 borderRadius: "50%",

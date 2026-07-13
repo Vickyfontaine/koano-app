@@ -1,117 +1,29 @@
 "use client";
 
-import React, { useRef, useState, useEffect, Component, type ReactNode } from "react";
-import dynamic from "next/dynamic";
+import React, { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import SectionNumber from "@/components/ui/SectionNumber";
 import Button from "@/components/ui/Button";
 
-const NeuralMap = dynamic(() => import("@/components/ui/NeuralMap"), {
-  ssr: false,
-  loading: () => (
-    <div
+// The authoritative neural map is /public/neural-map.html (CLAUDE.md
+// Section 03) — embedded as a same-origin iframe, the same pattern the
+// dashboard embeds use. The former react-three-fiber duplicate broke in
+// production (drei <Text> was fed a CSS URL as a font file) and diverged
+// from the Section 10 neural-map palette; it has been removed.
+function NeuralMapSection() {
+  return (
+    <iframe
+      src="/neural-map.html"
+      title="KOANO neural map — agent and data source topology"
       style={{
         width: "100%",
         height: 600,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
+        border: "1px solid var(--border)",
+        borderRadius: "20px",
+        background: "var(--white)",
+        display: "block",
       }}
-    >
-      <span
-        style={{
-          fontFamily: "'DM Mono', monospace",
-          fontSize: "12px",
-          color: "var(--ink-faint)",
-          letterSpacing: "0.08em",
-        }}
-      >
-        Loading neural map...
-      </span>
-    </div>
-  ),
-});
-
-class NeuralMapErrorBoundary extends Component<
-  { children: ReactNode },
-  { hasError: boolean }
-> {
-  constructor(props: { children: ReactNode }) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError() {
-    return { hasError: true };
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div
-          style={{
-            width: "100%",
-            height: 600,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            background: "var(--pale-wash)",
-            borderRadius: "20px",
-          }}
-        >
-          <span
-            style={{
-              fontFamily: "'DM Mono', monospace",
-              fontSize: "12px",
-              color: "var(--ink-faint)",
-              letterSpacing: "0.08em",
-            }}
-          >
-            Neural map visualization
-          </span>
-        </div>
-      );
-    }
-    return this.props.children;
-  }
-}
-
-function NeuralMapSection() {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return (
-      <div
-        style={{
-          width: "100%",
-          height: 600,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <span
-          style={{
-            fontFamily: "'DM Mono', monospace",
-            fontSize: "12px",
-            color: "var(--ink-faint)",
-            letterSpacing: "0.08em",
-          }}
-        >
-          Loading neural map...
-        </span>
-      </div>
-    );
-  }
-
-  return (
-    <NeuralMapErrorBoundary>
-      <NeuralMap height={600} />
-    </NeuralMapErrorBoundary>
+    />
   );
 }
 
@@ -372,8 +284,8 @@ export default function IntelligenceContent() {
                   marginBottom: "32px",
                 }}
               >
-                50+ sources ingested continuously — census, permits, climate
-                risk, foot traffic, crime data, zoning changes, and more. Every
+                Dozens of sources ingested — census, permits, climate risk,
+                foot traffic, crime data, zoning changes, and more. Every
                 signal normalized and timestamped.
               </p>
 
