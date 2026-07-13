@@ -70,6 +70,9 @@ export function clamp(n: number, lo: number, hi: number): number {
 // ---------------------------------------------------------------------------
 
 let _client: Anthropic | null = null;
+export function getAnthropicClient(): Anthropic {
+  return anthropic();
+}
 function anthropic(): Anthropic {
   if (!_client) {
     const apiKey = process.env.ANTHROPIC_API_KEY;

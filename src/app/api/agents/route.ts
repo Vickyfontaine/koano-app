@@ -6,7 +6,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { runKoanoPipeline } from '../../../../lib/agents/synthesis';
-import { supabaseAdmin } from '../../../../lib/supabase/server';
+import { persistVerdict } from '../../../../lib/supabase/verdicts';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 300; // full pipeline runs ~60s
@@ -37,33 +37,14 @@ export async function POST(req: Request) {
   }
   const { resolved_address, verdict } = result;
 
-  // Persist (append-only verdicts table — Step 7 schema). If the table does not
-  // exist yet, still return the verdict but flag that persistence failed.
-  let persisted = false;
-  let persist_error: string | null = null;
-  try {
-    const { error } = await supabaseAdmin().from('verdicts').insert({
-      clerk_user_id: userId,
-      address_input: address,
-      address_normalized: resolved_address.normalized,
-      bbl: resolved_address.bbl,
-      tract_geoid: resolved_address.tract_geoid,
-      verdict: verdict.verdict,
-      confidence: verdict.confidence,
-      risk_score: verdict.risk_score,
-      signal_window_months: verdict.signal_window_months,
-      headline: verdict.headline,
-      overall_provenance: verdict.overall_provenance,
-      reasoning_chain: verdict.reasoning_chain,
-      minority_signals: verdict.minority_signals,
-      top_data_sources: verdict.top_data_sources,
-      agent_summaries: verdict.agent_summaries,
-    });
-    if (error) persist_error = error.message;
-    else persisted = true;
-  } catch (e) {
-    persist_error = e instanceof Error ? e.message : 'persist failed';
-  }
+  // Persist (append-only verdicts table — Step 7 schema). If the insert fails,
+  // still return the verdict but flag that persistence failed.
+  const { persisted, persist_error } = await persistVerdict({
+    clerkUserId: userId,
+    addressInput: address,
+    resolvedAddress: resolved_address,
+    verdict,
+  });
 
   return NextResponse.json({
     resolved_address: {

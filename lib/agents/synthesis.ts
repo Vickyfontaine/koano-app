@@ -14,10 +14,12 @@ import {
   callAgentLLM,
   clamp,
   weakestProvenance,
+  type AgentName,
   type AgentVerdict,
   type KoanoVerdict,
   type MinoritySignal,
   type ReasoningStep,
+  type Verdict,
 } from './shared';
 import { runRegulatoryPolicyAgent } from './regulatory-policy';
 import { runInfrastructureAgent } from './infrastructure';
@@ -178,8 +180,25 @@ export async function runSynthesis(
   };
 }
 
+// Progress events emitted as the pipeline advances. Every event reflects a
+// REAL completion — never simulated progress (Principle 2 applies to UI state
+// too). Consumed by the streaming API route for agent-by-agent loading UI.
+export type PipelineProgressEvent =
+  | { type: 'geocoded'; normalized: string; bbl: string | null }
+  | {
+      type: 'agent_complete';
+      agent: AgentName;
+      verdict: Verdict;
+      confidence: number;
+      overall_provenance: Provenance;
+    }
+  | { type: 'synthesis_start' };
+
 // Full KOANO pipeline: geocode → 5 specialist agents in parallel → synthesis.
-export async function runKoanoPipeline(address: string): Promise<{
+export async function runKoanoPipeline(
+  address: string,
+  onEvent?: (e: PipelineProgressEvent) => void
+): Promise<{
   resolved_address: ResolvedAddress;
   agents: AgentVerdict[];
   verdict: SynthesisResult;
@@ -189,15 +208,30 @@ export async function runKoanoPipeline(address: string): Promise<{
     throw new Error(`Geocoding failed for "${address}": ${geo.error ?? 'no data'}`);
   }
   const addr = geo.data;
+  onEvent?.({ type: 'geocoded', normalized: addr.normalized, bbl: addr.bbl });
+
+  // Report each specialist the moment its real verdict lands.
+  const track = (p: Promise<AgentVerdict>) =>
+    p.then((v) => {
+      onEvent?.({
+        type: 'agent_complete',
+        agent: v.agent,
+        verdict: v.verdict,
+        confidence: v.confidence,
+        overall_provenance: v.overall_provenance,
+      });
+      return v;
+    });
 
   const agents = await Promise.all([
-    runMarketTimingAgent(addr),
-    runInfrastructureAgent(addr),
-    runDemandSentimentAgent(addr),
-    runRiskVolatilityAgent(addr),
-    runRegulatoryPolicyAgent(addr),
+    track(runMarketTimingAgent(addr)),
+    track(runInfrastructureAgent(addr)),
+    track(runDemandSentimentAgent(addr)),
+    track(runRiskVolatilityAgent(addr)),
+    track(runRegulatoryPolicyAgent(addr)),
   ]);
 
+  onEvent?.({ type: 'synthesis_start' });
   const verdict = await runSynthesis(addr, agents);
   return { resolved_address: addr, agents, verdict };
 }
