@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Portfolio Intelligence — KOANO",
   description:
-    "Monitor everything. Miss nothing. Make billion-dollar decisions with the intelligence infrastructure that was previously only available to the world's largest financial institutions.",
+    "Monitor everything. Miss nothing. Make institutional decisions with intelligence infrastructure that was previously available only to the world's largest firms.",
 };
 
 const FEATURES = [
@@ -83,7 +83,7 @@ export default function InstitutionsPage() {
       <ClusterLanding
         clusterNumber="C5"
         clusterName="Portfolio intelligence"
-        tagline="Monitor everything. Miss nothing. Make billion-dollar decisions with the intelligence infrastructure that was previously only available to the world's largest financial institutions."
+        tagline="Monitor everything. Miss nothing. Make institutional decisions with intelligence infrastructure that was previously available only to the world's largest firms."
         price="From $1,499 / month"
         priceRange="$1,499–$4,999 / month + custom"
         headlinePlaceholder="[COPY TBD — cluster landing page H1: Cluster 5]"

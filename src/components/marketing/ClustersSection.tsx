@@ -21,7 +21,7 @@ const CLUSTERS = [
   },
   {
     name: "Portfolio intelligence",
-    copy: "Monitor everything. Miss nothing. Make billion-dollar decisions with the intelligence infrastructure that was previously only available to the world's largest financial institutions.",
+    copy: "Monitor everything. Miss nothing. Make institutional decisions with intelligence infrastructure that was previously available only to the world's largest firms.",
     price: "From $1,499 / month",
     href: "/for/institutions",
   },

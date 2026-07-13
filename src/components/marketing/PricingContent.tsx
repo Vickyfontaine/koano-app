@@ -82,7 +82,7 @@ const TIERS = [
     cluster: "C5",
     name: "Portfolio intelligence",
     tagline:
-      "Monitor everything. Miss nothing. Make billion-dollar decisions with the intelligence infrastructure that was previously only available to the world's largest financial institutions.",
+      "Monitor everything. Miss nothing. Make institutional decisions with intelligence infrastructure that was previously available only to the world's largest firms.",
     price: "From $1,499",
     priceRange: "$1,499–$4,999 / month + custom",
     users: "CEOs · CFOs · CIOs · REITs · PE firms",
