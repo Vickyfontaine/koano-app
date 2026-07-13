@@ -4,12 +4,14 @@ import React, { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import SectionNumber from "../ui/SectionNumber";
 
+// Ordered by KOANO's positioning priority (CLAUDE.md Section 01):
+// professional and institutional first, homeowners last.
 const CLUSTERS = [
   {
-    name: "Property intelligence",
-    copy: "Know what's happening to your property's value before your neighbors do — and know what to do about it.",
-    price: "From $19 / month",
-    href: "/for/homeowners",
+    name: "Development intelligence",
+    copy: "Find your best site. Model your deal. Understand your entitlement risk. Before anyone else does.",
+    price: "From $499 / month",
+    href: "/for/developers",
   },
   {
     name: "Transaction intelligence",
@@ -18,16 +20,16 @@ const CLUSTERS = [
     href: "/for/agents",
   },
   {
-    name: "Development intelligence",
-    copy: "Find your best site. Model your deal. Understand your entitlement risk. Before anyone else does.",
-    price: "From $499 / month",
-    href: "/for/developers",
-  },
-  {
     name: "Portfolio intelligence",
     copy: "Monitor everything. Miss nothing. Make billion-dollar decisions with the intelligence infrastructure that was previously only available to the world's largest financial institutions.",
     price: "From $1,499 / month",
     href: "/for/institutions",
+  },
+  {
+    name: "Property intelligence",
+    copy: "Know what's happening to your property's value before your neighbors do — and know what to do about it.",
+    price: "From $19 / month",
+    href: "/for/homeowners",
   },
 ];
 

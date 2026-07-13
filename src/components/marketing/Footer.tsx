@@ -9,11 +9,13 @@ const COLUMN_1 = [
   { label: "Data", href: "/data" },
 ];
 
+// Ordered by positioning priority (CLAUDE.md Section 01):
+// professional and institutional first, homeowners last.
 const COLUMN_2 = [
-  { label: "For homeowners", href: "/for/homeowners" },
-  { label: "For agents", href: "/for/agents" },
   { label: "For developers", href: "/for/developers" },
+  { label: "For agents", href: "/for/agents" },
   { label: "For institutions", href: "/for/institutions" },
+  { label: "For homeowners", href: "/for/homeowners" },
 ];
 
 export default function Footer() {

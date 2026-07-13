@@ -4,11 +4,14 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Button from "../ui/Button";
 
+// Cluster links ordered by positioning priority (CLAUDE.md Section 01):
+// professional and institutional first, homeowners last.
 const NAV_LINKS = [
   { label: "How it works", href: "/intelligence" },
-  { label: "For homeowners", href: "/for/homeowners" },
+  { label: "For developers", href: "/for/developers" },
   { label: "For professionals", href: "/for/agents" },
   { label: "For institutions", href: "/for/institutions" },
+  { label: "For homeowners", href: "/for/homeowners" },
   { label: "Pricing", href: "/pricing" },
 ];
 
