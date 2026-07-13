@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -20,20 +21,28 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <head>
-        {/* Neue Montreal — KOANO's primary typeface */}
-        <link
-          href="https://api.fontshare.com/v2/css?f[]=neue-montreal@400,500,700&display=swap"
-          rel="stylesheet"
-        />
-        {/* DM Mono — monospace for data labels, section numbers, stats */}
-        <link
-          href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className="antialiased">{children}</body>
-    </html>
+    <ClerkProvider
+      signInUrl="/login"
+      signUpUrl="/signup"
+      signInFallbackRedirectUrl="/dashboard"
+      signUpFallbackRedirectUrl="/onboarding"
+      afterSignOutUrl="/"
+    >
+      <html lang="en">
+        <head>
+          {/* Neue Montreal — KOANO's primary typeface */}
+          <link
+            href="https://api.fontshare.com/v2/css?f[]=neue-montreal@400,500,700&display=swap"
+            rel="stylesheet"
+          />
+          {/* DM Mono — monospace for data labels, section numbers, stats */}
+          <link
+            href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap"
+            rel="stylesheet"
+          />
+        </head>
+        <body className="antialiased">{children}</body>
+      </html>
+    </ClerkProvider>
   );
 }

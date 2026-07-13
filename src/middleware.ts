@@ -1,9 +1,14 @@
 // Clerk middleware — makes auth() available in API routes and pages.
-// Routes are not force-protected here; /api/agents checks auth() itself and 401s.
+// /dashboard and /onboarding are force-protected here (unauthenticated users
+// are redirected to /login); /api/agents additionally checks auth() itself and 401s.
 
-import { clerkMiddleware } from '@clerk/nextjs/server';
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
-export default clerkMiddleware();
+const isProtectedRoute = createRouteMatcher(['/dashboard(.*)', '/onboarding(.*)']);
+
+export default clerkMiddleware(async (auth, req) => {
+  if (isProtectedRoute(req)) await auth.protect();
+});
 
 export const config = {
   matcher: [
