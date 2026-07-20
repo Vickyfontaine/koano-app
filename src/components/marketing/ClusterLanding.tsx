@@ -33,6 +33,10 @@ interface ClusterLandingProps {
   priceRange: string;
   headline: string;
   subhead: string;
+  /** Optional short stance line rendered under the subhead, verbatim. */
+  stanceLine?: string;
+  /** Overrides the features-section h2 (defaults to "{clusterName} dashboard"). */
+  featuresHeading?: string;
   features: Feature[];
   secondaryFeatures?: {
     title: string;
@@ -49,6 +53,8 @@ export default function ClusterLanding({
   priceRange,
   headline,
   subhead,
+  stanceLine,
+  featuresHeading,
   features,
   secondaryFeatures,
   users,
@@ -117,6 +123,26 @@ export default function ClusterLanding({
           >
             {subhead}
           </motion.p>
+
+          {stanceLine && (
+            <motion.p
+              initial="hidden"
+              animate={heroInView ? "visible" : "hidden"}
+              variants={fadeUp}
+              custom={2}
+              style={{
+                fontFamily: "'DM Mono', monospace",
+                fontSize: "12px",
+                fontWeight: 500,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                color: "var(--brand-blue)",
+                margin: "0 auto 16px",
+              }}
+            >
+              {stanceLine}
+            </motion.p>
+          )}
 
           {/* Approved tagline from Section 10 */}
           <motion.p
@@ -199,7 +225,7 @@ export default function ClusterLanding({
                 maxWidth: "600px",
               }}
             >
-              {clusterName} dashboard
+              {featuresHeading ?? `${clusterName} dashboard`}
             </h2>
           </motion.div>
 
