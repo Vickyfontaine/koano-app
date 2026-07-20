@@ -86,7 +86,8 @@ export default function InstitutionsPage() {
         tagline="Monitor everything. Miss nothing. Make institutional decisions with intelligence infrastructure that was previously available only to the world's largest firms."
         price="From $1,499 / month"
         priceRange="$1,499–$4,999 / month + custom"
-        headlinePlaceholder="[COPY TBD — cluster landing page H1: Cluster 5]"
+        headline="A portfolio does not change on a reporting cycle."
+        subhead="KOANO watches the assets and the markets you hold, and tells you what moved, what is at risk, and why. Every claim is traceable to a source."
         users="CEOs, CFOs, CIOs, REITs, and PE firms"
         features={FEATURES}
         secondaryFeatures={{

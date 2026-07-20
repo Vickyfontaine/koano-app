@@ -161,16 +161,24 @@ export default function IntelligenceContent() {
             <SectionNumber number="01" />
           </motion.div>
 
-          <motion.div
+          {/* Headline + body — approved copy (KOANO_COPY.md) */}
+          <motion.h1
             initial="hidden"
             animate={heroInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={1}
-            className="copy-placeholder"
-            style={{ marginTop: "24px", marginBottom: "24px" }}
+            style={{
+              fontSize: "clamp(36px, 5vw, 64px)",
+              fontWeight: 700,
+              letterSpacing: "-0.02em",
+              lineHeight: 1.1,
+              color: "var(--ink-primary)",
+              margin: "24px auto 24px",
+              maxWidth: "760px",
+            }}
           >
-            [COPY TBD — /intelligence page headline]
-          </motion.div>
+            Five agents. One verdict. Every step on the record.
+          </motion.h1>
 
           <motion.p
             initial="hidden"
@@ -184,10 +192,11 @@ export default function IntelligenceContent() {
               margin: "0 auto 40px",
             }}
           >
-            KOANO is not a data dashboard. It is a coordinated reasoning system
-            — five specialist agents that ingest raw signals, reason
-            independently, and converge on a single verdict. Every conclusion is
-            visible. Every disagreement is surfaced.
+            KOANO is not a dashboard. It is a reasoning system. Each agent owns
+            a domain, works from its own sources, and reaches its own
+            conclusion. A synthesis agent reads all five, resolves what they
+            disagree on, and issues one verdict. Nothing is hidden, including
+            the disagreements.
           </motion.p>
 
           <motion.div

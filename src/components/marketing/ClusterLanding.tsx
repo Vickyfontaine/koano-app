@@ -31,7 +31,8 @@ interface ClusterLandingProps {
   tagline: string;
   price: string;
   priceRange: string;
-  headlinePlaceholder: string;
+  headline: string;
+  subhead: string;
   features: Feature[];
   secondaryFeatures?: {
     title: string;
@@ -46,7 +47,8 @@ export default function ClusterLanding({
   clusterName,
   tagline,
   priceRange,
-  headlinePlaceholder,
+  headline,
+  subhead,
   features,
   secondaryFeatures,
   users,
@@ -81,17 +83,40 @@ export default function ClusterLanding({
             <SectionNumber number={clusterNumber} />
           </motion.div>
 
-          {/* [COPY TBD] headline */}
-          <motion.div
+          {/* Headline + subhead — approved copy (KOANO_COPY.md) */}
+          <motion.h1
             initial="hidden"
             animate={heroInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={1}
-            className="copy-placeholder"
-            style={{ marginTop: "24px", marginBottom: "24px" }}
+            style={{
+              fontSize: "clamp(36px, 5vw, 64px)",
+              fontWeight: 700,
+              letterSpacing: "-0.02em",
+              lineHeight: 1.1,
+              color: "var(--ink-primary)",
+              margin: "24px auto 20px",
+              maxWidth: "760px",
+            }}
           >
-            {headlinePlaceholder}
-          </motion.div>
+            {headline}
+          </motion.h1>
+          <motion.p
+            initial="hidden"
+            animate={heroInView ? "visible" : "hidden"}
+            variants={fadeUp}
+            custom={2}
+            style={{
+              fontSize: "18px",
+              fontWeight: 400,
+              color: "var(--ink-secondary)",
+              lineHeight: 1.6,
+              maxWidth: "640px",
+              margin: "0 auto 16px",
+            }}
+          >
+            {subhead}
+          </motion.p>
 
           {/* Approved tagline from Section 10 */}
           <motion.p

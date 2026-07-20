@@ -165,9 +165,17 @@ export default function SiteComparison() {
       </form>
 
       {activeSlots.length === 0 && (
-        /* [COPY TBD] dashboard empty state — designated placeholder, Section 13 */
-        <div className="copy-placeholder" style={{ maxWidth: "620px" }}>
-          [COPY TBD — dashboard empty state]
+        /* Empty state — approved copy (KOANO_COPY.md) */
+        <div style={{ maxWidth: "620px" }}>
+          <h3 style={{ fontSize: "18px", fontWeight: 500, color: "var(--ink-primary)", margin: "0 0 8px" }}>
+            Enter up to three sites.
+          </h3>
+          <p style={{ fontSize: "14px", lineHeight: 1.6, color: "var(--ink-muted)", margin: 0 }}>
+            Each one gets the full engine: zoning, permits, entitlement risk,
+            and public investment in the catchment. KOANO ranks them by
+            risk-adjusted opportunity and shows you exactly how it got there.
+            Three sites take about two minutes.
+          </p>
         </div>
       )}
 

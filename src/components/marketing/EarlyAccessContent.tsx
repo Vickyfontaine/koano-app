@@ -91,29 +91,41 @@ export default function EarlyAccessContent() {
             <SectionNumber number="01" />
           </motion.div>
 
-          {/* COPY TBD headline */}
-          <motion.div
+          {/* Headline + subhead — approved copy (KOANO_COPY.md) */}
+          <motion.h1
             initial="hidden"
             animate={heroInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={1}
-            className="copy-placeholder"
-            style={{ marginTop: "24px", marginBottom: "16px" }}
+            style={{
+              fontSize: "clamp(36px, 5vw, 64px)",
+              fontWeight: 700,
+              letterSpacing: "-0.02em",
+              lineHeight: 1.1,
+              color: "var(--ink-primary)",
+              margin: "24px auto 16px",
+              maxWidth: "760px",
+            }}
           >
-            [COPY TBD — early access section headline]
-          </motion.div>
+            Ask for access.
+          </motion.h1>
 
-          {/* COPY TBD subhead */}
-          <motion.div
+          <motion.p
             initial="hidden"
             animate={heroInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={2}
-            className="copy-placeholder"
-            style={{ marginBottom: "48px" }}
+            className="text-body-lg"
+            style={{
+              color: "var(--ink-secondary)",
+              maxWidth: "600px",
+              margin: "0 auto 48px",
+            }}
           >
-            [COPY TBD — early access section subhead]
-          </motion.div>
+            KOANO is in a limited demo, so access is granted by hand, which
+            means we read what you send. Tell us what you work on and what you
+            would point this at, and we will take it from there.
+          </motion.p>
 
           {submitted ? (
             <motion.div

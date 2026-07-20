@@ -132,16 +132,59 @@ export default function PricingContent() {
             <SectionNumber number="01" />
           </motion.div>
 
-          <motion.div
+          {/* Headline + framing — approved copy (KOANO_COPY.md) */}
+          <motion.h1
             initial="hidden"
             animate={heroInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={1}
-            className="copy-placeholder"
-            style={{ marginTop: "24px", marginBottom: "24px" }}
+            style={{
+              fontSize: "clamp(36px, 5vw, 64px)",
+              fontWeight: 700,
+              letterSpacing: "-0.02em",
+              lineHeight: 1.1,
+              color: "var(--ink-primary)",
+              margin: "24px auto 24px",
+              maxWidth: "760px",
+            }}
           >
-            [COPY TBD — /pricing page headline and framing]
-          </motion.div>
+            KOANO is in demo. Nobody is being charged.
+          </motion.h1>
+          <motion.p
+            initial="hidden"
+            animate={heroInView ? "visible" : "hidden"}
+            variants={fadeUp}
+            custom={1.5}
+            className="text-body-lg"
+            style={{
+              color: "var(--ink-secondary)",
+              maxWidth: "640px",
+              margin: "0 auto 20px",
+            }}
+          >
+            The prices below are what these tiers are worth once the paid data
+            feeds are live. Today they are not. Three of the five agents run on
+            representative data where the licensed sources have not been funded
+            yet, and every figure that comes from one is labeled as such inside
+            the product.
+          </motion.p>
+          <motion.p
+            initial="hidden"
+            animate={heroInView ? "visible" : "hidden"}
+            variants={fadeUp}
+            custom={2}
+            className="text-body-lg"
+            style={{
+              color: "var(--ink-secondary)",
+              maxWidth: "640px",
+              margin: "0 auto 24px",
+            }}
+          >
+            So the demo is free, and it is by request rather than open signup.
+            Every analysis KOANO runs costs real money to produce, which is why
+            access is limited. If you want to see it work, ask, and we will let
+            you in.
+          </motion.p>
 
           <motion.p
             initial="hidden"
@@ -385,14 +428,40 @@ export default function PricingContent() {
                 gap: "16px",
               }}
             >
+              {/* FAQ answers — approved copy (KOANO_COPY.md) */}
               {[
-                "Can I switch clusters after I sign up?",
-                "Is there a free trial?",
-                "What data sources power the verdict?",
-                "How often is data updated?",
-                "What is the difference between the $19 and $49 Cluster 1 tiers?",
-                "How does enterprise pricing for Cluster 5 work?",
-              ].map((question, i) => (
+                {
+                  question: "Can I switch clusters after I sign up?",
+                  answer:
+                    "Yes. The engine is the same underneath. What changes is what gets put in front of you. A broker who also develops can flip between the transaction view and the site comparison view without a second account, and nothing about the analysis changes when they do.",
+                },
+                {
+                  question: "Is there a free trial?",
+                  answer:
+                    "The whole thing is free right now, because the whole thing is a demo. There is nothing to trial and nothing to cancel. Ask for access and if we have room, you get it.",
+                },
+                {
+                  question: "What data sources power the verdict?",
+                  answer:
+                    "Roughly a dozen sources today. The live ones are public and real: NYC zoning and permit records, Census demographics, FHFA price indices, FEMA flood data, IRS Opportunity Zone tracts, FBI crime statistics. The ones that cost money are not funded yet, so KOANO runs on representative stand-ins for MLS comps, foot traffic, and premium hazard data. Anywhere that happens, the product says so on the figure itself. The full catalog is on the data page.",
+                },
+                {
+                  question: "How often is data updated?",
+                  answer:
+                    "Every analysis pulls its sources at the moment you run it. There is no cached market report sitting behind the answer. What KOANO does not do yet is watch anything continuously. Alerts and the portfolio monitor are point in time, and they say so. Continuous monitoring is a funded capability, not a demo one.",
+                },
+                {
+                  question:
+                    "What is the difference between the $19 and $49 Cluster 1 tiers?",
+                  answer:
+                    "The lower tier answers questions about a property you own. The higher one answers questions about a property you are deciding on, which means the return math, the rehab benchmarks, and the rental picture. Both are free right now, so the honest answer is that the difference is theoretical until someone is being charged.",
+                },
+                {
+                  question: "How does enterprise pricing for Cluster 5 work?",
+                  answer:
+                    "It is a conversation, not a checkout. Institutional deployment involves data isolation, access controls, and compliance work that does not exist yet and will not exist until someone is paying for it to. If that is where you are, the enterprise tier is a description of what we would build with you, not a product you can buy today.",
+                },
+              ].map(({ question, answer }) => (
                 <div
                   key={question}
                   className="card"
@@ -408,12 +477,16 @@ export default function PricingContent() {
                   >
                     {question}
                   </p>
-                  <div
-                    className="copy-placeholder"
-                    style={{ fontSize: "14px" }}
+                  <p
+                    style={{
+                      fontSize: "14px",
+                      lineHeight: 1.7,
+                      color: "var(--ink-secondary)",
+                      margin: 0,
+                    }}
                   >
-                    [COPY TBD — pricing FAQ answers — question {i + 1}]
-                  </div>
+                    {answer}
+                  </p>
                 </div>
               ))}
             </div>

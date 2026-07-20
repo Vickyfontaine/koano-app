@@ -71,7 +71,8 @@ export default function AgentsPage() {
         tagline="Find opportunities before they hit the MLS. Make data-backed recommendations that close deals."
         price="From $149 / month"
         priceRange="$149–$299 / month"
-        headlinePlaceholder="[COPY TBD — cluster landing page H1: Cluster 2]"
+        headline="The MLS tells you what already happened."
+        subhead="KOANO reads the signals that move first. Permit filings, price momentum, search interest, the things that show up in the data months before they show up in a comp."
         users="agents, brokers, and mortgage officers"
         features={FEATURES}
         secondaryFeatures={{

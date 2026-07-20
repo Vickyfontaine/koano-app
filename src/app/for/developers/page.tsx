@@ -81,7 +81,8 @@ export default function DevelopersPage() {
         tagline="Find your best site. Model your deal. Understand your entitlement risk. Before anyone else does."
         price="From $499 / month"
         priceRange="$499–$1,499 / month"
-        headlinePlaceholder="[COPY TBD — cluster landing page H1: Cluster 4]"
+        headline="You already know the site. The question is what happens next to it."
+        subhead="Five agents read the zoning, the permit history, and the public investment around a parcel. They converge on a single verdict, and the reasoning comes with it."
         users="CRE brokers, developers, and contractors"
         features={FEATURES}
         secondaryFeatures={{

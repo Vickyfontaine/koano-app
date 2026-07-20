@@ -97,9 +97,16 @@ export default function Cluster2Dashboard() {
       <AddressInput onSubmit={analyze} busy={status === "running"} />
 
       {!started && (
-        /* [COPY TBD] dashboard empty state — designated placeholder, Section 13 */
-        <div className="copy-placeholder" style={{ maxWidth: "620px" }}>
-          [COPY TBD — dashboard empty state]
+        /* Empty state — approved copy (KOANO_COPY.md) */
+        <div style={{ maxWidth: "620px" }}>
+          <h3 style={{ fontSize: "18px", fontWeight: 500, color: "var(--ink-primary)", margin: "0 0 8px" }}>
+            Start with an address or a neighborhood.
+          </h3>
+          <p style={{ fontSize: "14px", lineHeight: 1.6, color: "var(--ink-muted)", margin: 0 }}>
+            You will get the market picture first, within a few seconds. The
+            verdict and the reasoning arrive when the agents finish, which
+            takes about a minute and a half.
+          </p>
         </div>
       )}
 

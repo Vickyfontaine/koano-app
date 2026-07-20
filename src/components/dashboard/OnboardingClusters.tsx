@@ -67,17 +67,42 @@ export default function OnboardingClusters() {
       </header>
 
       <main style={{ maxWidth: "1080px", margin: "0 auto", padding: "24px 40px 80px" }}>
-        {/* [COPY TBD] onboarding welcome copy — designated placeholder, Section 13 */}
-        <motion.div
+        {/* Welcome — approved copy (KOANO_COPY.md) */}
+        <motion.h1
           initial="hidden"
           animate="visible"
           variants={fadeUp}
           custom={0}
-          className="copy-placeholder"
-          style={{ maxWidth: "640px", margin: "0 auto 16px", textAlign: "center" }}
+          style={{
+            fontSize: "32px",
+            fontWeight: 700,
+            letterSpacing: "-0.02em",
+            color: "var(--ink-primary)",
+            maxWidth: "640px",
+            margin: "0 auto 12px",
+            textAlign: "center",
+          }}
         >
-          [COPY TBD — onboarding welcome copy]
-        </motion.div>
+          Which of these is your work?
+        </motion.h1>
+        <motion.p
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          custom={0.5}
+          style={{
+            fontSize: "16px",
+            lineHeight: 1.6,
+            color: "var(--ink-secondary)",
+            maxWidth: "560px",
+            margin: "0 auto 16px",
+            textAlign: "center",
+          }}
+        >
+          The engine is the same for all four. What changes is what it puts in
+          front of you. Pick the one closest to what you do, and you can switch
+          later without losing anything.
+        </motion.p>
 
         <motion.p
           initial="hidden"

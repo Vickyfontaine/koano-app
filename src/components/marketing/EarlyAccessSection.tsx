@@ -50,34 +50,38 @@ export default function EarlyAccessSection() {
           <SectionNumber number="03" />
         </motion.div>
 
-        {/* Headline placeholder */}
-        <motion.div
+        {/* Headline + subhead — approved copy (KOANO_COPY.md) */}
+        <motion.h2
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
           variants={fadeUp}
           custom={1}
-          className="copy-placeholder"
+          className="text-h2"
           style={{
+            color: "var(--ink-primary)",
             marginTop: "16px",
             marginBottom: "16px",
           }}
         >
-          [COPY TBD — early access section headline]
-        </motion.div>
+          KOANO is in demo, and access is by request.
+        </motion.h2>
 
-        {/* Subhead placeholder */}
-        <motion.div
+        <motion.p
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
           variants={fadeUp}
           custom={2}
-          className="copy-placeholder"
+          className="text-body-lg"
           style={{
-            marginBottom: "40px",
+            color: "var(--ink-secondary)",
+            maxWidth: "560px",
+            margin: "0 auto 40px",
           }}
         >
-          [COPY TBD — early access section subhead]
-        </motion.div>
+          Every analysis costs real money to run, so access is granted by
+          request rather than open signup. Tell us who you are and what you
+          would use it on, and we will let you in if we have room.
+        </motion.p>
 
         {/* Email capture form */}
         <motion.form

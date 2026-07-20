@@ -382,24 +382,62 @@ export default function CommunityContent() {
           >
             <SectionNumber number="03" />
 
-            <div
-              className="copy-placeholder"
-              style={{ marginTop: "24px", marginBottom: "24px" }}
+            {/* Where this stands — approved copy (KOANO_COPY.md). The former
+                partner-program paragraph and "Apply to become a partner" CTA
+                described a program that does not exist (CLAUDE.md Section 03)
+                and contradicted this copy; removed with it. */}
+            <h2
+              className="text-h2"
+              style={{
+                color: "var(--ink-primary)",
+                marginTop: "16px",
+                marginBottom: "24px",
+              }}
             >
-              [COPY TBD — /community page: partner CTA]
-            </div>
+              Where this stands
+            </h2>
 
             <p
               style={{
                 fontSize: "16px",
                 color: "var(--ink-secondary)",
-                lineHeight: 1.6,
-                marginBottom: "40px",
+                lineHeight: 1.7,
+                marginBottom: "16px",
+                textAlign: "left",
               }}
             >
-              If you represent a nonprofit, tenant advocacy organization, or
-              community group, we&apos;d like to talk. Community feeds are
-              provided at no cost and require no technical integration.
+              KOANO has no nonprofit partnerships. It is being deployed for the
+              first time and there is nothing yet that would be useful to hand
+              a housing organization.
+            </p>
+            <p
+              style={{
+                fontSize: "16px",
+                color: "var(--ink-secondary)",
+                lineHeight: 1.7,
+                marginBottom: "16px",
+                textAlign: "left",
+              }}
+            >
+              The intent is real and it is specific. Building violation
+              histories, landlord records, and displacement risk indicators are
+              the same public data the paid product already reads. Turning that
+              into something a tenant advocate can actually use is a build, and
+              it is one that will happen when KOANO is out of demo and can
+              support it.
+            </p>
+            <p
+              style={{
+                fontSize: "16px",
+                color: "var(--ink-secondary)",
+                lineHeight: 1.7,
+                marginBottom: "40px",
+                textAlign: "left",
+              }}
+            >
+              If you work in that world and want to be told when that is real,
+              say so. We will keep the list short and we will not pretend it is
+              a program until it is one.
             </p>
 
             <div
@@ -408,10 +446,10 @@ export default function CommunityContent() {
             >
               <Button
                 variant="primary"
-                href="/contact"
+                href="/early-access"
                 id="community-bottom-cta"
               >
-                Apply to become a partner
+                Get early access
               </Button>
               <Button variant="ghost" href="/about" id="community-bottom-about">
                 Our founding story

@@ -21,9 +21,15 @@ export default function VerdictWorkbench() {
       <AddressInput onSubmit={stream.run} busy={status === "running"} />
 
       {status === "idle" && (
-        /* [COPY TBD] dashboard empty state — designated placeholder, Section 13 */
-        <div className="copy-placeholder" style={{ maxWidth: "620px" }}>
-          [COPY TBD — dashboard empty state]
+        /* Empty state — approved copy (KOANO_COPY.md) */
+        <div style={{ maxWidth: "620px" }}>
+          <h3 style={{ fontSize: "18px", fontWeight: 500, color: "var(--ink-primary)", margin: "0 0 8px" }}>
+            Enter an address to begin.
+          </h3>
+          <p style={{ fontSize: "14px", lineHeight: 1.6, color: "var(--ink-muted)", margin: 0 }}>
+            KOANO runs five agents against it and returns a single verdict with
+            the reasoning attached.
+          </p>
         </div>
       )}
 

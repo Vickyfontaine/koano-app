@@ -76,7 +76,8 @@ export default function HomeownersPage() {
         tagline="Know what's happening to your property's value before your neighbors do — and know what to do about it."
         price="From $19 / month"
         priceRange="$19–$49 / month"
-        headlinePlaceholder="[COPY TBD — cluster landing page H1: Cluster 1]"
+        headline="Something is being built four blocks away. Nobody sent you a letter."
+        subhead="KOANO reads the permits, the zoning, and the flood maps around your address, and tells you what they mean for the thing you own."
         users="homeowners, landlords, and house flippers"
         features={FEATURES}
         secondaryFeatures={{

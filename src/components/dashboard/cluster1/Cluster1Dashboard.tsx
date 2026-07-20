@@ -90,9 +90,17 @@ export default function Cluster1Dashboard() {
       <AddressInput onSubmit={analyze} busy={status === "running"} />
 
       {status === "idle" && (
-        /* [COPY TBD] dashboard empty state — designated placeholder, Section 13 */
-        <div className="copy-placeholder" style={{ maxWidth: "620px" }}>
-          [COPY TBD — dashboard empty state]
+        /* Empty state — approved copy (KOANO_COPY.md) */
+        <div style={{ maxWidth: "620px" }}>
+          <h3 style={{ fontSize: "18px", fontWeight: 500, color: "var(--ink-primary)", margin: "0 0 8px" }}>
+            Start with an address.
+          </h3>
+          <p style={{ fontSize: "14px", lineHeight: 1.6, color: "var(--ink-muted)", margin: 0 }}>
+            KOANO will read the zoning, the permit history, and the flood and
+            risk data around it, then tell you what it means for the property.
+            It takes about a minute and a half, because the agents are actually
+            working.
+          </p>
         </div>
       )}
 

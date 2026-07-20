@@ -113,17 +113,41 @@ export default function AboutContent() {
                 <SectionNumber number="01" label="About KOANO" />
               </motion.div>
 
-              {/* COPY TBD */}
-              <motion.div
+              {/* Hero — approved copy (KOANO_COPY.md) */}
+              <motion.h1
                 initial="hidden"
                 animate={heroInView ? "visible" : "hidden"}
                 variants={fadeUp}
                 custom={1}
-                className="copy-placeholder"
-                style={{ marginTop: "24px", marginBottom: "32px" }}
+                style={{
+                  fontSize: "clamp(32px, 4vw, 52px)",
+                  fontWeight: 700,
+                  letterSpacing: "-0.02em",
+                  lineHeight: 1.15,
+                  color: "var(--ink-primary)",
+                  margin: "24px 0 20px",
+                }}
               >
-                [COPY TBD — /about page: founding story and team]
-              </motion.div>
+                Real estate has more data than almost any industry, and less
+                intelligence.
+              </motion.h1>
+              <motion.p
+                initial="hidden"
+                animate={heroInView ? "visible" : "hidden"}
+                variants={fadeUp}
+                custom={1.5}
+                className="text-body-lg"
+                style={{
+                  color: "var(--ink-secondary)",
+                  marginBottom: "32px",
+                }}
+              >
+                The information is public. The zoning is published. The permits
+                are filed. The bonds are issued and the census is taken. And
+                yet the work of turning any of it into a decision still happens
+                the way it did thirty years ago, which is a person, a
+                spreadsheet, and a week.
+              </motion.p>
 
               <motion.div
                 initial="hidden"
@@ -396,14 +420,89 @@ export default function AboutContent() {
             </h2>
           </motion.div>
 
+          {/* Founding story — approved copy (KOANO_COPY.md) */}
           <motion.div
             initial="hidden"
             animate={teamInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={1}
-            className="copy-placeholder"
+            style={{
+              maxWidth: "720px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "16px",
+            }}
           >
-            [COPY TBD — /about page: founding story and team]
+            <h3
+              style={{
+                fontSize: "22px",
+                fontWeight: 500,
+                color: "var(--ink-primary)",
+                margin: 0,
+              }}
+            >
+              Why this exists
+            </h3>
+            <p style={{ fontSize: "16px", lineHeight: 1.7, color: "var(--ink-secondary)", margin: 0 }}>
+              The gap is not data. It is reasoning. Nobody is short of sources.
+              What people are short of is the days it takes to read a zoning
+              code, cross-reference a permit history, and figure out whether a
+              community board is going to hand you a problem. That work is
+              tedious, it is expensive, and it is exactly the kind of work a
+              capable model can do now.
+            </p>
+            <p style={{ fontSize: "16px", lineHeight: 1.7, color: "var(--ink-secondary)", margin: 0 }}>
+              KOANO is an attempt to do it honestly. Every figure in the
+              product is labeled with where it came from. Every verdict is
+              written to a record that cannot be edited afterward. When the
+              engine disagrees with itself, it says so instead of averaging
+              the disagreement away. That is not a feature. It is the reason
+              the thing is worth trusting at all.
+            </p>
+            <h3
+              style={{
+                fontSize: "22px",
+                fontWeight: 500,
+                color: "var(--ink-primary)",
+                margin: "16px 0 0",
+              }}
+            >
+              The part that is harder to say
+            </h3>
+            <p style={{ fontSize: "16px", lineHeight: 1.7, color: "var(--ink-secondary)", margin: 0 }}>
+              A tool that makes development faster is a tool that makes
+              development faster. That has a history in this city, and the
+              people who lose in that history are usually the ones who were
+              never in the room.
+            </p>
+            <p style={{ fontSize: "16px", lineHeight: 1.7, color: "var(--ink-secondary)", margin: 0 }}>
+              KOANO is not going to claim it solves that. It has not earned the
+              standing to. What it can say is that the same engine that reads a
+              site for a developer can read a building for the person living in
+              it, and that the intention is to build that second thing rather
+              than talk about it. Not as a gesture. As a product, once there is
+              a product to give.
+            </p>
+            <p style={{ fontSize: "16px", lineHeight: 1.7, color: "var(--ink-secondary)", margin: 0 }}>
+              Today there is a demo, running on public data. That is the whole
+              of it.
+            </p>
+            <div style={{ marginTop: "16px" }}>
+              <p style={{ fontSize: "16px", fontWeight: 500, color: "var(--ink-primary)", margin: 0 }}>
+                Victor Fontaine
+              </p>
+              <p
+                style={{
+                  fontFamily: "'DM Mono', monospace",
+                  fontSize: "12px",
+                  letterSpacing: "0.08em",
+                  color: "var(--ink-faint)",
+                  margin: "4px 0 0",
+                }}
+              >
+                Founder, KOANO
+              </p>
+            </div>
           </motion.div>
         </div>
       </section>
