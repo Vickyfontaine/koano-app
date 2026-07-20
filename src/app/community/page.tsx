@@ -6,7 +6,7 @@ import CommunityContent from "@/components/marketing/CommunityContent";
 export const metadata: Metadata = {
   title: "Community — KOANO",
   description:
-    "Cluster 0 is KOANO's conscience. The same intelligence that serves institutional investors is made available free of charge to tenant advocacy organizations and community groups.",
+    "KOANO's community commitment, stated honestly: no partnerships yet, a specific intent to serve tenant advocates with the same engine, and no pretending it is a program until it is one.",
 };
 
 export default function CommunityPage() {

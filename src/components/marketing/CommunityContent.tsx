@@ -20,38 +20,13 @@ const fadeUp = {
   }),
 };
 
-const PARTNER_FEEDS = [
-  {
-    title: "Building violation histories",
-    description:
-      "Complete histories of HPD violations, ECB violations, and DOB complaints — organized by building and landlord.",
-  },
-  {
-    title: "Landlord harassment records",
-    description:
-      "Cross-referenced harassment complaint data, court filings, and predatory equity indicators.",
-  },
-  {
-    title: "Displacement risk indicators",
-    description:
-      "Neighborhood-level displacement risk scores derived from KOANO's full intelligence stack.",
-  },
-  {
-    title: "Affordable housing lottery availability",
-    description:
-      "Real-time affordable housing lottery listings, income limits, and application deadlines.",
-  },
-];
-
 export default function CommunityContent() {
   const heroRef = useRef<HTMLElement>(null);
   const missionRef = useRef<HTMLElement>(null);
-  const feedRef = useRef<HTMLElement>(null);
   const ctaRef = useRef<HTMLElement>(null);
 
   const heroInView = useInView(heroRef, { once: true, amount: 0.15 });
   const missionInView = useInView(missionRef, { once: true, amount: 0.1 });
-  const feedInView = useInView(feedRef, { once: true, amount: 0.1 });
   const ctaInView = useInView(ctaRef, { once: true, amount: 0.15 });
 
   return (
@@ -72,7 +47,7 @@ export default function CommunityContent() {
             variants={fadeUp}
             custom={0}
           >
-            <SectionNumber number="C0" label="Community" />
+            <SectionNumber number="01" label="Community" />
           </motion.div>
 
           <motion.h1
@@ -102,10 +77,10 @@ export default function CommunityContent() {
               margin: "0 auto 40px",
             }}
           >
-            The same engine that serves institutional investors is made
-            available — free of charge — to tenant advocacy organizations and
-            community groups. This is not charity. It is the founding principle
-            that separates KOANO from every other proptech company in existence.
+            The intent is that the same engine that serves institutional
+            investors serves tenant advocacy organizations and community
+            groups. This is not charity. It is the founding principle that
+            separates KOANO from every other proptech company in existence.
           </motion.p>
 
           <motion.div
@@ -116,13 +91,6 @@ export default function CommunityContent() {
             className="flex flex-wrap items-center justify-center"
             style={{ gap: "16px" }}
           >
-            <Button
-              variant="primary"
-              href="/contact"
-              id="community-hero-cta"
-            >
-              Apply for a community feed
-            </Button>
             <Button
               variant="ghost"
               href="/about"
@@ -147,7 +115,7 @@ export default function CommunityContent() {
             custom={0}
             style={{ marginBottom: "64px" }}
           >
-            <SectionNumber number="01" label="The principle" />
+            <SectionNumber number="02" label="The principle" />
             <h2
               className="text-h2"
               style={{
@@ -175,7 +143,6 @@ export default function CommunityContent() {
               variants={fadeUp}
               custom={1}
             >
-              {/* Verbatim approved copy — Section 10 */}
               <p
                 style={{
                   fontSize: "18px",
@@ -185,10 +152,10 @@ export default function CommunityContent() {
                   marginBottom: "24px",
                 }}
               >
-                KOANO is not positioned as a tool for gentrification. The same
-                engine that serves institutional investors is made available —
-                free of charge, through nonprofit partnerships — to tenant
-                advocacy organizations and community groups.
+                KOANO is not positioned as a tool for gentrification. The
+                intent is that the same engine that serves institutional
+                investors serves tenant advocacy organizations and community
+                groups.
               </p>
               <p
                 style={{
@@ -196,173 +163,17 @@ export default function CommunityContent() {
                   fontWeight: 400,
                   color: "var(--ink-primary)",
                   lineHeight: 1.7,
-                  marginBottom: "24px",
                 }}
               >
                 This is not charity. It is the founding principle that separates
                 KOANO from every other proptech company in existence.
               </p>
-              <p
-                style={{
-                  fontSize: "18px",
-                  fontWeight: 400,
-                  color: "var(--ink-primary)",
-                  lineHeight: 1.7,
-                }}
-              >
-                Cluster 0 is KOANO&apos;s conscience. It earns its weight in
-                trust, press, nonprofit partnerships, and moral authority — not
-                in revenue.
-              </p>
-            </motion.div>
-
-            <motion.div
-              initial="hidden"
-              animate={missionInView ? "visible" : "hidden"}
-              variants={fadeUp}
-              custom={2}
-            >
-              {/* IMPACCT Brooklyn */}
-              <div
-                className="card"
-                style={{
-                  background: "var(--white)",
-                  borderColor: "var(--brand-blue)",
-                  borderWidth: "1px",
-                  borderStyle: "solid",
-                  borderRadius: "20px",
-                  padding: "32px",
-                }}
-              >
-                <span
-                  className="section-number"
-                  style={{ display: "block", marginBottom: "16px" }}
-                >
-                  Partner spotlight
-                </span>
-                <h3
-                  style={{
-                    fontSize: "22px",
-                    fontWeight: 500,
-                    color: "var(--ink-primary)",
-                    marginBottom: "8px",
-                    lineHeight: 1.3,
-                  }}
-                >
-                  IMPACCT Brooklyn
-                </h3>
-                <p
-                  style={{
-                    fontFamily: "'DM Mono', monospace",
-                    fontSize: "12px",
-                    color: "var(--ink-faint)",
-                    letterSpacing: "0.08em",
-                    marginBottom: "16px",
-                  }}
-                >
-                  Serving Central Brooklyn since 1964
-                </p>
-                <p
-                  style={{
-                    fontSize: "15px",
-                    color: "var(--ink-secondary)",
-                    lineHeight: 1.55,
-                  }}
-                >
-                  KOANO partners with organizations like IMPACCT Brooklyn to
-                  provide community data feeds: building violation histories,
-                  landlord harassment records, displacement risk indicators, and
-                  affordable housing lottery availability. These partners receive
-                  a curated read-only intelligence feed at no cost.
-                </p>
-              </div>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* What partners receive */}
-      <section
-        ref={feedRef}
-        style={{ background: "var(--white)", padding: "120px 32px" }}
-      >
-        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
-          <motion.div
-            initial="hidden"
-            animate={feedInView ? "visible" : "hidden"}
-            variants={fadeUp}
-            custom={0}
-            style={{ marginBottom: "64px" }}
-          >
-            <SectionNumber number="02" label="The community feed" />
-            <h2
-              className="text-h2"
-              style={{
-                color: "var(--ink-primary)",
-                marginTop: "16px",
-                maxWidth: "560px",
-              }}
-            >
-              What community partners receive.
-            </h2>
-            <p
-              className="text-body-lg"
-              style={{
-                color: "var(--ink-secondary)",
-                maxWidth: "560px",
-                marginTop: "24px",
-              }}
-            >
-              A curated, read-only intelligence feed — at no cost — updated
-              continuously from KOANO&apos;s full data pipeline.
-            </p>
-          </motion.div>
-
-          <div
-            className="community-feed-grid"
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(2, 1fr)",
-              gap: "20px",
-            }}
-          >
-            {PARTNER_FEEDS.map((item, i) => (
-              <motion.div
-                key={item.title}
-                custom={i + 1}
-                initial="hidden"
-                animate={feedInView ? "visible" : "hidden"}
-                variants={fadeUp}
-                className="card"
-              >
-                <h3
-                  style={{
-                    fontSize: "18px",
-                    fontWeight: 500,
-                    color: "var(--ink-primary)",
-                    marginBottom: "10px",
-                    lineHeight: 1.3,
-                  }}
-                >
-                  {item.title}
-                </h3>
-                <p
-                  style={{
-                    fontSize: "15px",
-                    color: "var(--ink-secondary)",
-                    lineHeight: 1.55,
-                    margin: 0,
-                  }}
-                >
-                  {item.description}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Partner CTA */}
+      {/* Where this stands */}
       <section
         ref={ctaRef}
         style={{ background: "var(--pale-wash)", padding: "120px 32px" }}
@@ -380,7 +191,7 @@ export default function CommunityContent() {
             variants={fadeUp}
             custom={0}
           >
-            <SectionNumber number="03" />
+            <SectionNumber number="03" label="Where this stands" />
 
             {/* Where this stands — approved copy (KOANO_COPY.md). The former
                 partner-program paragraph and "Apply to become a partner" CTA
@@ -462,9 +273,6 @@ export default function CommunityContent() {
       <style jsx>{`
         @media (max-width: 900px) {
           .community-mission-grid {
-            grid-template-columns: 1fr !important;
-          }
-          .community-feed-grid {
             grid-template-columns: 1fr !important;
           }
         }
