@@ -79,8 +79,7 @@ export default function CommunityContent() {
           >
             The intent is that the same engine that serves institutional
             investors serves tenant advocacy organizations and community
-            groups. This is not charity. It is the founding principle that
-            separates KOANO from every other proptech company in existence.
+            groups. This is not charity.
           </motion.p>
 
           <motion.div
@@ -165,8 +164,7 @@ export default function CommunityContent() {
                   lineHeight: 1.7,
                 }}
               >
-                This is not charity. It is the founding principle that separates
-                KOANO from every other proptech company in existence.
+                This is not charity. It is a founding principle.
               </p>
             </motion.div>
           </div>
