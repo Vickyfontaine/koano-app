@@ -78,7 +78,7 @@ Build one vertical path through the entire stack (data provider to agent to synt
 ## 03 — Current Build State (Honest Inventory)
 
 **Built and working:**
-- Marketing site: homepage (all sections), and the pages /for/homeowners, /for/agents, /for/developers, /for/institutions, /intelligence, /pricing, /community, /about, /early-access, /data.
+- Marketing site: homepage (all sections), and the pages /for/community, /for/agents, /for/developers, /for/institutions, /intelligence, /pricing, /about, /early-access, /data.
 - Design system: Neue Montreal typography, full color palette as CSS variables, Button and SectionNumber components, Nav, Footer.
 - Neural map: /public/neural-map.html. 143 nodes, D3 v7 force layout combined with Three.js r128 rendering. White background, KOANO blue synthesis hub, magenta agents, blue data sources, sage sub-feeds, curved tube connections, auto-rotate, hover and click interaction. Functionally and cosmetically complete.
 
@@ -429,10 +429,9 @@ Glassmorphism only renders over a textured/image/video/3D background. On flat wh
 /app
   layout.tsx                    ← ClerkProvider, font, global CSS
   page.tsx                      ← Homepage
-  /for/{homeowners,agents,developers,institutions}/page.tsx
+  /for/{community,agents,developers,institutions}/page.tsx
   /intelligence/page.tsx
   /pricing/page.tsx
-  /community/page.tsx           ← values statement only, no live tier
   /about/page.tsx
   /early-access/page.tsx
   /data/page.tsx
@@ -476,7 +475,7 @@ The `ProvenanceBadge` component in /components/ui is mandatory and used anywhere
 
 ## 12 — Site Architecture (Routes)
 
-Marketing (koano.com): /, /for/homeowners, /for/agents, /for/developers, /for/institutions, /intelligence, /pricing, /community, /about, /early-access, /data.
+Marketing (koano.com): /, /for/community, /for/agents, /for/developers, /for/institutions, /intelligence, /pricing, /about, /early-access, /data. (/for/homeowners and /community 308-redirect to /for/community.)
 
 Application (app.koano.com or /dashboard): /login, /signup, /onboarding, /dashboard (cluster-aware), /dashboard/site/[id], /dashboard/property/[id], /dashboard/portfolio, /dashboard/reasoning/[id].
 
