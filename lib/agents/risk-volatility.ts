@@ -1,7 +1,10 @@
-// KOANO Risk & Volatility agent — Step 4d.
-// MIXED inputs: crime (fbi-ucr → NYPD live fallback) + flood zone (fema-flood) — live;
+// KOANO Risk & Volatility agent — Step 4d + Phase B violations wiring.
+// MIXED inputs: crime (fbi-ucr → NYPD live fallback) + flood zone (fema-flood)
+// + building violations (HPD/ECB/DOB, nyc-violations) — live;
 // premium climate hazard (premium-hazard) — representative until First Street is licensed.
 // Depends ONLY on the provider registry. Output: AgentVerdict (KoanoVerdict schema).
+// NOTE: violations feed SUMMARY data points only — recent_items is UI-only by
+// contract (token cost); never serialize raw rows into the prompt.
 
 import { registry } from '../providers/registry';
 import type { DataPoint, ResolvedAddress } from '../providers/types';
@@ -16,15 +19,17 @@ How to reason:
 - A property outside the SFHA but with a non-trivial 30-year flood probability is carrying unpriced tail risk — flag it.
 - Crime: level matters less than trend. Falling crime in a transitioning area is a classic risk-compression signal; rising crime is a leading indicator of value erosion. Note what the counts cover (rate_note).
 - Heat factor affects operating costs (cooling) and long-run livability, not acute loss.
+- Building condition: open HPD class C violations are immediately hazardous; class B hazardous; class A non-hazardous. A rising 24-month violation count versus the prior 24 months signals deteriorating maintenance — a leading indicator of capex risk and regulatory exposure. Active ECB violations carry penalties. IMPORTANT: hpd_registered=false means the building is outside HPD's universe (HPD covers registered rentals with 3+ units), so HPD zeros are a coverage fact, not a clean bill of health — do not read them as low risk.
 - Treat any data point with provenance "representative" as indicative only — say so explicitly in the observation that uses it.
 - Your verdict is about risk posture: "buy" = risk is low or compressing (risk-adjusted entry attractive), "hold" = risk stable and priced, "wait" = rising uncertainty, "sell"/"drop" = material unpriced risk.
 - risk_score is your headline output: 0-100, higher = riskier, synthesized across crime, flood, and climate trajectory.`;
 
 export async function runRiskVolatilityAgent(addr: ResolvedAddress): Promise<AgentVerdict> {
-  const [crimeRes, floodRes, hazardRes] = await Promise.all([
+  const [crimeRes, floodRes, hazardRes, violationsRes] = await Promise.all([
     registry.crime.getCrimeStats(addr),
     registry.flood.getFloodZone(addr),
     registry.premiumHazard.getHazards(addr),
+    registry.buildingViolations.getViolations(addr),
   ]);
 
   const dataPoints: DataPoint[] = [];
@@ -71,6 +76,33 @@ export async function runRiskVolatilityAgent(addr: ResolvedAddress): Promise<Age
     );
   } else {
     dataPoints.push({ label: 'premium_hazard_unavailable', value: hazardRes.error ?? 'no data', provenance: hazardRes.provenance, source: hazardRes.source });
+  }
+
+  if (violationsRes.data) {
+    const v = violationsRes.data;
+    const s = violationsRes.source;
+    const p = violationsRes.provenance;
+    // Summary counts only — recent_items is UI-only by contract.
+    dataPoints.push(
+      { label: 'hpd_registered_multiple_dwelling', value: v.hpd_registered, provenance: p, source: s },
+      { label: 'violations_coverage_note', value: v.scope_note, provenance: p, source: s },
+      { label: 'hpd_open_violations_total', value: v.hpd.open, provenance: p, source: s },
+      { label: 'hpd_open_class_c_immediately_hazardous', value: v.hpd.open_by_class.C, provenance: p, source: s },
+      { label: 'hpd_open_class_b_hazardous', value: v.hpd.open_by_class.B, provenance: p, source: s },
+      { label: 'hpd_violations_last_24mo', value: v.hpd.last_24mo, provenance: p, source: s },
+      { label: 'hpd_violations_prior_24mo', value: v.hpd.prior_24mo, provenance: p, source: s },
+      { label: 'ecb_active_violations', value: v.ecb.active, provenance: p, source: s },
+      {
+        label: 'ecb_active_by_severity',
+        value: Object.entries(v.ecb.active_by_severity).map(([k, n]) => `${k}: ${n}`).join(', ') || 'none',
+        provenance: p,
+        source: s,
+      },
+      { label: 'dob_complaints_active', value: v.dob_complaints.active, provenance: p, source: s },
+      { label: 'dob_complaints_last_24mo', value: v.dob_complaints.last_24mo, provenance: p, source: s }
+    );
+  } else {
+    dataPoints.push({ label: 'building_violations_unavailable', value: violationsRes.error ?? 'no data', provenance: violationsRes.provenance, source: violationsRes.source });
   }
 
   const llm = await callAgentLLM({

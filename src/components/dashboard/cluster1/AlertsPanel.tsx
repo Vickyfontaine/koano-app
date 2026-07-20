@@ -30,7 +30,55 @@ const SEVERITY_COLOR: Record<Severity, string> = {
 
 export function deriveAlerts(detail: SiteDetailResponse): AlertItem[] {
   const alerts: AlertItem[] = [];
-  const { flood, permits, hpi, opportunity_zone, zoning, mls_comps } = detail;
+  const { flood, permits, hpi, opportunity_zone, zoning, mls_comps, building_violations, landlord_portfolio } = detail;
+
+  if (building_violations?.data) {
+    const v = building_violations.data;
+    if (v.hpd.open_by_class.C > 0) {
+      alerts.push({
+        severity: "negative",
+        text: `${v.hpd.open_by_class.C} open class C (immediately hazardous) HPD violation${v.hpd.open_by_class.C === 1 ? "" : "s"} on this building`,
+        source: building_violations.source,
+        provenance: building_violations.provenance,
+      });
+    }
+    if (v.hpd.last_24mo > v.hpd.prior_24mo && v.hpd.last_24mo >= 5) {
+      alerts.push({
+        severity: "warning",
+        text: `HPD violations rising: ${v.hpd.last_24mo} in the last 24 months vs ${v.hpd.prior_24mo} in the prior 24`,
+        source: building_violations.source,
+        provenance: building_violations.provenance,
+      });
+    }
+    if (v.ecb.active > 0) {
+      alerts.push({
+        severity: "warning",
+        text: `${v.ecb.active} active ECB violation${v.ecb.active === 1 ? "" : "s"} with penalties possible`,
+        source: building_violations.source,
+        provenance: building_violations.provenance,
+      });
+    }
+  }
+
+  if (landlord_portfolio?.data) {
+    const pf = landlord_portfolio.data;
+    if (pf.on_speculation_watch_list) {
+      alerts.push({
+        severity: "negative",
+        text: "This building is on the NYC Speculation Watch List (flagged speculative sale profile)",
+        source: landlord_portfolio.source,
+        provenance: landlord_portfolio.provenance,
+      });
+    }
+    if (pf.portfolio_open_hpd_violations >= 50 && pf.portfolio_building_count > 1) {
+      alerts.push({
+        severity: "warning",
+        text: `The registered owner's portfolio (${pf.portfolio_building_count}${pf.portfolio_truncated ? "+" : ""} buildings, exact-match floor) carries ${pf.portfolio_open_hpd_violations} open HPD violations`,
+        source: landlord_portfolio.source,
+        provenance: landlord_portfolio.provenance,
+      });
+    }
+  }
 
   if (flood?.data) {
     alerts.push(

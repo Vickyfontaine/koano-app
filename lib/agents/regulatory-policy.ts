@@ -1,6 +1,9 @@
-// KOANO Regulatory & Policy agent — Step 4a.
-// LIVE inputs: nyc-zoning (MapPLUTO) + irs-opportunity (HUD Opportunity Zones).
+// KOANO Regulatory & Policy agent — Step 4a + Phase B ownership wiring.
+// LIVE inputs: nyc-zoning (MapPLUTO) + irs-opportunity (HUD Opportunity Zones)
+// + landlord portfolio (HPD registrations/contacts + Speculation Watch List).
 // Depends ONLY on the provider registry. Output: AgentVerdict (KoanoVerdict schema).
+// NOTE: portfolio feeds SUMMARY data points only — the buildings list is
+// UI-only by contract (token cost); never serialize raw rows into the prompt.
 
 import { registry } from '../providers/registry';
 import type { DataPoint, ResolvedAddress } from '../providers/types';
@@ -16,13 +19,15 @@ How to reason:
 - Special districts and commercial overlays change what can be built as-of-right — call them out explicitly.
 - Opportunity Zone designation is a material tax incentive for capital-gains investors (10-year basis step-up); absence of it is neutral, not negative.
 - Older year_built + low built FAR + high max FAR = classic redevelopment candidate.
+- Ownership records: the registered owner and portfolio come from HPD registrations under EXACT name matching only — treat portfolio size as a floor, never a ceiling, and say so when you use it. A portfolio with heavy open violations signals an operator with regulatory exposure. Speculation Watch List membership means the building sold at a price/cap-rate profile the city flags as speculative — material tenant-displacement and regulatory-scrutiny context. hpd_registered=false just means the building is not a registered 3+ unit rental.
 - Your verdict is about regulatory posture: "buy" = regulatory tailwinds/latent rights, "wait" = entitlement uncertainty, "hold" = neutral, "drop" = regulatory blockers.
 - risk_score reflects regulatory/entitlement risk specifically.`;
 
 export async function runRegulatoryPolicyAgent(addr: ResolvedAddress): Promise<AgentVerdict> {
-  const [zoningRes, ozRes] = await Promise.all([
+  const [zoningRes, ozRes, portfolioRes] = await Promise.all([
     registry.zoning.getZoning(addr),
     registry.opportunityZones.getOpportunityZone(addr),
+    registry.landlordPortfolio.getPortfolio(addr),
   ]);
 
   const dataPoints: DataPoint[] = [];
@@ -77,6 +82,27 @@ export async function runRegulatoryPolicyAgent(addr: ResolvedAddress): Promise<A
       provenance: ozRes.provenance,
       source: ozRes.source,
     });
+  }
+
+  if (portfolioRes.data) {
+    const pf = portfolioRes.data;
+    const s = portfolioRes.source;
+    const p = portfolioRes.provenance;
+    // Summary only — the buildings list is UI-only by contract.
+    dataPoints.push(
+      { label: 'hpd_registered_multiple_dwelling', value: pf.hpd_registered, provenance: p, source: s },
+      { label: 'registered_owner (as filed with HPD)', value: pf.registered_owner, provenance: p, source: s },
+      { label: 'owner_type', value: pf.owner_type, provenance: p, source: s },
+      { label: 'management_company', value: pf.management_company, provenance: p, source: s },
+      { label: 'owner_portfolio_building_count (exact-match floor)', value: pf.portfolio_building_count, provenance: p, source: s },
+      { label: 'owner_portfolio_count_truncated', value: pf.portfolio_truncated, provenance: p, source: s },
+      { label: 'owner_portfolio_open_hpd_violations', value: pf.portfolio_open_hpd_violations, provenance: p, source: s },
+      { label: 'owner_portfolio_total_hpd_violations', value: pf.portfolio_total_hpd_violations, provenance: p, source: s },
+      { label: 'on_nyc_speculation_watch_list', value: pf.on_speculation_watch_list, provenance: p, source: s },
+      { label: 'ownership_match_caveat', value: pf.match_caveat, provenance: p, source: s }
+    );
+  } else {
+    dataPoints.push({ label: 'landlord_portfolio_unavailable', value: portfolioRes.error ?? 'no data', provenance: portfolioRes.provenance, source: portfolioRes.source });
   }
 
   const llm = await callAgentLLM({

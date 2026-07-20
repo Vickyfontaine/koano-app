@@ -16,6 +16,8 @@ import VerdictHistory from "../VerdictHistory";
 import PermitHistoryPanel from "../PermitHistoryPanel";
 import ValuationPanel from "./ValuationPanel";
 import AlertsPanel from "./AlertsPanel";
+import ViolationsPanel from "./ViolationsPanel";
+import OwnershipPanel from "./OwnershipPanel";
 import type { SiteDetailResponse } from "@/app/api/site-detail/route";
 
 const PROPERTY_BLOCKS = [
@@ -26,6 +28,8 @@ const PROPERTY_BLOCKS = [
   "demographics",
   "hpi",
   "mls_comps",
+  "building_violations",
+  "landlord_portfolio",
 ];
 
 export default function Cluster1Dashboard() {
@@ -145,6 +149,16 @@ export default function Cluster1Dashboard() {
           >
             <ValuationPanel detail={detail} detailError={detailError} id="c1-valuation" />
             <PermitHistoryPanel permits={detail?.permits} error={detailError} id="c1-permits" />
+            <ViolationsPanel
+              violations={detail?.building_violations}
+              error={detailError}
+              id="c1-violations"
+            />
+            <OwnershipPanel
+              portfolio={detail?.landlord_portfolio}
+              error={detailError}
+              id="c1-ownership"
+            />
           </div>
 
           <AlertsPanel detail={detail} detailError={detailError} id="c1-alerts" />

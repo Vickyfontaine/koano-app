@@ -13,9 +13,11 @@ import { requireApproved } from '../../../../lib/koano-guard';
 import { registry } from '../../../../lib/providers/registry';
 import type {
   AcsDemographics,
+  BuildingViolationsSummary,
   CostarDealsSummary,
   CrimeStats,
   FloodInfo,
+  LandlordPortfolioSummary,
   FootTrafficInfo,
   HpiTrend,
   MlsCompsSummary,
@@ -61,6 +63,8 @@ export interface SiteDetailResponse {
   hpi?: SiteDetailBlock<HpiTrend>;
   mls_comps?: SiteDetailBlock<MlsCompsSummary>;
   crime?: SiteDetailBlock<CrimeStats>;
+  building_violations?: SiteDetailBlock<BuildingViolationsSummary>;
+  landlord_portfolio?: SiteDetailBlock<LandlordPortfolioSummary>;
   search_trends?: SiteDetailBlock<SearchTrendsInfo>;
   foot_traffic?: SiteDetailBlock<FootTrafficInfo>;
   premium_hazard?: SiteDetailBlock<PremiumHazardInfo>;
@@ -82,6 +86,8 @@ const BLOCK_FETCHERS: Record<
   hpi: (a) => registry.hpi.getHpi(a),
   mls_comps: (a) => registry.mlsComps.getComps(a),
   crime: (a) => registry.crime.getCrimeStats(a),
+  building_violations: (a) => registry.buildingViolations.getViolations(a),
+  landlord_portfolio: (a) => registry.landlordPortfolio.getPortfolio(a),
   search_trends: (a) => registry.searchTrends.getSearchTrends(a),
   foot_traffic: (a) => registry.footTraffic.getFootTraffic(a),
   premium_hazard: (a) => registry.premiumHazard.getHazards(a),
