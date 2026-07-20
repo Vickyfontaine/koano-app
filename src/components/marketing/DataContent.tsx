@@ -37,6 +37,14 @@ const FREE_SOURCES = [
   { name: "OpenStreetMap", category: "Geography" },
   { name: "USGS", category: "Terrain & geology" },
   { name: "NYC Open Data", category: "City data" },
+  {
+    name: "NYC HPD / ECB / DOB violations (wvxf-dwi5, 6bgk-3dad, eabe-havv)",
+    category: "Building violations",
+  },
+  {
+    name: "NYC HPD registrations + Speculation Watch List (tesw-yqqr, feu5-w2e2, adax-9mit)",
+    category: "Ownership records",
+  },
   { name: "LA GeoHub", category: "City data" },
   { name: "Chicago Data Portal", category: "City data" },
   { name: "OpenFEMA", category: "Disaster data" },
