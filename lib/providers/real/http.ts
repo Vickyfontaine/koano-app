@@ -10,8 +10,21 @@ interface FetchOpts {
   headers?: Record<string, string>;
 }
 
+// NYC Open Data (Socrata) app token — optional but recommended in production:
+// anonymous requests share a per-IP throttle (and Vercel egress IPs are
+// shared). Set NYC_OPEN_DATA_APP_TOKEN to get a dedicated quota; everything
+// works without it.
+function socrataHeaders(url: string): Record<string, string> {
+  const token = process.env.NYC_OPEN_DATA_APP_TOKEN;
+  if (token && url.includes('data.cityofnewyork.us')) {
+    return { 'X-App-Token': token };
+  }
+  return {};
+}
+
 async function fetchRaw(url: string, opts: FetchOpts = {}): Promise<Response> {
-  const { timeoutMs = 20000, retries = 1, headers } = opts;
+  const { timeoutMs = 20000, retries = 1 } = opts;
+  const headers = { ...socrataHeaders(url), ...opts.headers };
   let lastErr: unknown;
   for (let attempt = 0; attempt <= retries; attempt++) {
     const ctrl = new AbortController();

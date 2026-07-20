@@ -181,6 +181,90 @@ export interface SearchTrendsProvider {
 }
 
 // ---------------------------------------------------------------------------
+// Building violations (HPD + ECB + DOB complaints) — live NYC Open Data
+// ---------------------------------------------------------------------------
+
+export interface ViolationRecentItem {
+  source: 'HPD' | 'ECB' | 'DOB';
+  date: string; // ISO yyyy-mm-dd
+  label: string; // class/severity/category + short description
+  status: string;
+}
+
+export interface BuildingViolationsSummary {
+  bbl: string | null;
+  bin: string | null;
+  scope_note: string;
+  // HPD covers only registered multiple dwellings (3+ residential units).
+  // hpd_registered=false means zeros are a coverage fact, not a clean bill.
+  hpd_registered: boolean;
+  hpd: {
+    total: number;
+    open: number;
+    open_by_class: Record<'A' | 'B' | 'C' | 'I', number>;
+    last_24mo: number;
+    prior_24mo: number; // vs last_24mo → recency trend
+    most_recent_inspection: string | null;
+  };
+  ecb: {
+    total: number;
+    active: number;
+    active_by_severity: Record<string, number>;
+    most_recent_issue: string | null;
+  };
+  dob_complaints: {
+    total: number;
+    active: number;
+    last_24mo: number;
+    most_recent: string | null;
+    top_categories: string[]; // DOB category codes
+  };
+  // UI ONLY — never serialize recent_items into an agent prompt. Agents get
+  // the summary counts above; raw rows would 10x the token cost per run.
+  recent_items: ViolationRecentItem[];
+}
+
+export interface BuildingViolationsProvider {
+  name: string;
+  getViolations(addr: ResolvedAddress): Promise<ProviderResult<BuildingViolationsSummary>>;
+}
+
+// ---------------------------------------------------------------------------
+// Landlord portfolio (HPD registrations/contacts + Speculation Watch List)
+// v1 is EXACT entity matching only (uppercase/trim) — no fuzzy matching, no
+// LLC-variant resolution. Portfolios are therefore an undercount and every
+// summary says so. This is ownership records, not harassment/eviction data.
+// ---------------------------------------------------------------------------
+
+export interface PortfolioBuilding {
+  bbl: string | null;
+  address: string;
+  zip: string | null;
+  open_hpd_violations: number;
+}
+
+export interface LandlordPortfolioSummary {
+  subject_bbl: string | null;
+  hpd_registered: boolean;
+  registered_owner: string | null; // corporation or individual, exact as registered
+  owner_type: string | null; // CorporateOwner | IndividualOwner | HeadOfficer...
+  management_company: string | null; // Agent contact, if any
+  portfolio_building_count: number; // distinct buildings under exact-match entity
+  portfolio_truncated: boolean; // true when caps applied — never a silent cap
+  portfolio_open_hpd_violations: number;
+  portfolio_total_hpd_violations: number;
+  on_speculation_watch_list: boolean;
+  match_caveat: string; // exact-match undercount disclosure, always present
+  // UI ONLY — same contract as recent_items: never into an agent prompt.
+  buildings: PortfolioBuilding[];
+}
+
+export interface LandlordPortfolioProvider {
+  name: string;
+  getPortfolio(addr: ResolvedAddress): Promise<ProviderResult<LandlordPortfolioSummary>>;
+}
+
+// ---------------------------------------------------------------------------
 // Representative (mock) domains — paid sources, swapped in later (Step 3)
 // ---------------------------------------------------------------------------
 

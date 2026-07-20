@@ -3,8 +3,10 @@
 // a one-line change here (see each mock provider's swap_note).
 
 import type {
+  BuildingViolationsProvider,
   CostarDealsProvider,
   CrimeProvider,
+  LandlordPortfolioProvider,
   DemographicsProvider,
   FloodProvider,
   FootTrafficProvider,
@@ -20,7 +22,9 @@ import type {
 } from './types';
 
 import { nycGeoSearch } from './real/geocode';
+import { nycLandlord } from './real/nyc-landlord';
 import { nycPermits } from './real/nyc-permits';
+import { nycViolations } from './real/nyc-violations';
 import { nycZoning } from './real/nyc-zoning';
 import { irsOpportunity } from './real/irs-opportunity';
 import { censusAcs } from './real/census-acs';
@@ -38,6 +42,8 @@ export interface ProviderRegistry {
   // live (free) providers
   geocode: GeocodeProvider;
   permits: PermitsProvider;
+  buildingViolations: BuildingViolationsProvider;
+  landlordPortfolio: LandlordPortfolioProvider;
   zoning: ZoningProvider;
   opportunityZones: OpportunityZoneProvider;
   demographics: DemographicsProvider;
@@ -56,6 +62,8 @@ export interface ProviderRegistry {
 export const registry: ProviderRegistry = {
   geocode: nycGeoSearch,
   permits: nycPermits,
+  buildingViolations: nycViolations,
+  landlordPortfolio: nycLandlord,
   zoning: nycZoning,
   opportunityZones: irsOpportunity,
   demographics: censusAcs,
