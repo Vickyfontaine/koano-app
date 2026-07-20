@@ -35,7 +35,7 @@ The engine works by dispatching a query to five specialist AI agents, each ownin
 - Developers, CRE brokers, and contractors (Cluster 4) evaluating sites, entitlement risk, and pro forma viability.
 - Institutional investors, REITs, and C-suite (Cluster 5) monitoring portfolios and underwriting acquisitions.
 - Agents, brokers, and mortgage officers (Cluster 2) producing CMAs, neighborhood narratives, and pricing recommendations.
-- Homeowners, landlords, and flippers (Cluster 1) assessing a single property, permit history, and tax appeal opportunities.
+- Homeowners, renters, and neighbors (Cluster 1 — Community) assessing a single property, its violation and ownership record, permit history, and tax appeal opportunities.
 
 **What KOANO is NOT:**
 - NOT a Zillow / Redfin clone.
@@ -96,7 +96,7 @@ Build one vertical path through the entire stack (data provider to agent to synt
 - Clerk publishable and secret keys in .env.local.
 - Stripe and Mapbox keys are placeholders, to be added when those features are built.
 
-**Note on the /community page:** the former nonprofit tier (previously "Cluster 0") has been removed from KOANO's product scope. Working with nonprofit housing organizations requires an operating track record KOANO does not yet have. The /community page may remain as a values statement but must not describe a live product tier or promise partnerships that do not exist. Do not build any Cluster 0 functionality.
+**Note on Community (Cluster 1) and the former Cluster 0:** the former nonprofit tier (previously "Cluster 0") remains removed from KOANO's product scope, and no Cluster 0 functionality may be built. The standalone /community page has been deleted and 308-redirects to /for/community — Cluster 1, now named Community (audience: homeowners, renters, neighbors), which states plainly what it reads today and what is not built yet. Never describe partnerships that do not exist.
 
 ---
 
@@ -251,9 +251,10 @@ Live data is deepest for New York City, because NYC publishes permits, zoning (P
 
 Same engine, same five agents, four different presentations and depths. All four are in scope. Cluster 3 (due diligence) is reserved for a future roadmap and is not built. There is no Cluster 0.
 
-### Cluster 1 — Property Intelligence (Homeowners, landlords, flippers)
+### Cluster 1 — Community — Property Intelligence (Homeowners, renters, neighbors)
 Price band: 19–49 / month.
-Bureaucratic work replaced: manual comp pull and ARV calculation, permit history lookup, property tax assessment appeal research.
+Route: /for/community (nav label "For communities").
+Bureaucratic work replaced: manual comp pull, violation and ownership record lookup, permit history lookup, property tax assessment appeal research.
 Default view: single property. AVM with velocity, permit history, neighborhood trajectory, KOANO verdict.
 Neural map: not on default view.
 
@@ -284,7 +285,7 @@ Data reality and liability: institutional users will not act on unverifiable out
 
 | Cluster | Neural map presence |
 |---|---|
-| 1 — Homeowners | Not present |
+| 1 — Community | Not present |
 | 2 — Agents | Not present |
 | 4 — Developers | System View tab, on demand |
 | 5 — Institutional | Full-screen, default hero of the dashboard |
