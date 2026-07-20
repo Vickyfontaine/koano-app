@@ -166,7 +166,7 @@ export default function AboutContent() {
                 </Button>
                 <Button
                   variant="ghost"
-                  href="/community"
+                  href="/for/community"
                   id="about-hero-community"
                 >
                   Our community mission
@@ -559,7 +559,7 @@ export default function AboutContent() {
               >
                 Get early access
               </Button>
-              <Button variant="ghost" href="/community" id="about-bottom-community">
+              <Button variant="ghost" href="/for/community" id="about-bottom-community">
                 Our community mission
               </Button>
             </div>

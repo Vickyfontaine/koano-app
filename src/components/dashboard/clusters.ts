@@ -27,7 +27,7 @@ export const CLUSTERS: Record<ClusterId, ClusterMeta> = {
     number: "01",
     badge: "C1",
     label: "Property intelligence",
-    audience: "Homeowners, landlords, flippers",
+    audience: "Homeowners, renters, neighbors",
     tagline:
       "Know what's happening to your property's value before your neighbors do, and know what to do about it.",
     price: "From 19 / month",

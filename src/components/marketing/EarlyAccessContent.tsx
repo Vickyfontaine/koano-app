@@ -23,7 +23,7 @@ const CLUSTERS = [
   {
     id: "cluster_1",
     label: "Property intelligence",
-    sub: "Homeowners · Landlords · Flippers",
+    sub: "Homeowners · Renters · Neighbors",
   },
   {
     id: "cluster_2",

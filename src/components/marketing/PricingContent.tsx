@@ -28,7 +28,7 @@ const TIERS = [
       "Know what's happening to your property's value before your neighbors do — and know what to do about it.",
     price: "From $19",
     priceRange: "$19–$49 / month",
-    users: "Homeowners · Landlords · House flippers",
+    users: "Homeowners · Renters · Neighbors",
     features: [
       "Automated valuation model with velocity indicator",
       "Equity position & 12-month projection",
@@ -38,7 +38,7 @@ const TIERS = [
       "Push alert feed for significant signals",
     ],
     addOn: "Cap rate, ARV modeling & cash-on-cash projections at $49/mo",
-    href: "/for/homeowners",
+    href: "/for/community",
   },
   {
     cluster: "C2",

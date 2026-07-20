@@ -11,7 +11,7 @@ const NAV_LINKS = [
   { label: "For developers", href: "/for/developers" },
   { label: "For professionals", href: "/for/agents" },
   { label: "For institutions", href: "/for/institutions" },
-  { label: "For homeowners", href: "/for/homeowners" },
+  { label: "For communities", href: "/for/community" },
   { label: "Pricing", href: "/pricing" },
 ];
 

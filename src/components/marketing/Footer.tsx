@@ -5,7 +5,6 @@ import React from "react";
 const COLUMN_1 = [
   { label: "How it works", href: "/intelligence" },
   { label: "Pricing", href: "/pricing" },
-  { label: "Community", href: "/community" },
   { label: "Data", href: "/data" },
 ];
 
@@ -15,7 +14,7 @@ const COLUMN_2 = [
   { label: "For developers", href: "/for/developers" },
   { label: "For agents", href: "/for/agents" },
   { label: "For institutions", href: "/for/institutions" },
-  { label: "For homeowners", href: "/for/homeowners" },
+  { label: "For communities", href: "/for/community" },
 ];
 
 export default function Footer() {
