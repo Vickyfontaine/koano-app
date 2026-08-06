@@ -378,7 +378,7 @@ export default function PricingContent() {
                 {/* CTA */}
                 <Button
                   variant={tier.isEnterprise ? "primary" : "ghost"}
-                  href={tier.isEnterprise ? "/contact" : "/early-access"}
+                  href="/early-access"
                   id={`pricing-cta-${tier.cluster.toLowerCase()}`}
                 >
                   {tier.isEnterprise ? "Contact sales" : "Get early access"}
@@ -544,7 +544,7 @@ export default function PricingContent() {
             >
               <Button
                 variant="primary"
-                href="/contact"
+                href="/early-access"
                 id="pricing-enterprise-cta"
               >
                 Contact sales
