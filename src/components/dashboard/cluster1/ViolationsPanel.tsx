@@ -60,7 +60,7 @@ export default function ViolationsPanel({ violations, error, id }: ViolationsPan
           </>
         ) : (
           <p style={{ fontSize: "13px", lineHeight: 1.6, color: "var(--ink-muted)", margin: 0 }}>
-            Not applicable — HPD violations only apply to registered multiple dwellings (3 or
+            Not applicable. HPD violations only apply to registered multiple dwellings (3 or
             more units). This building is not in HPD&apos;s registry, so there is no HPD history
             to show. That is a coverage fact, not a clean record.
           </p>

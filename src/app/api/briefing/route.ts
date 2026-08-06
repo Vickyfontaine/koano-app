@@ -59,7 +59,7 @@ export async function POST() {
 
   if (properties.length === 0) {
     return NextResponse.json(
-      { error: 'No properties in your portfolio yet — add properties first' },
+      { error: 'No properties in your portfolio yet. Add properties first.' },
       { status: 400 },
     );
   }

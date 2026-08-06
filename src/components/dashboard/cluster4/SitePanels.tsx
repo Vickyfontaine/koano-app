@@ -147,7 +147,7 @@ export default function SitePanels({ detail, detailError, verdict }: SitePanelsP
           />
           {proforma.provenance !== "live" && (
             <p style={{ fontSize: "12px", color: "var(--ink-muted)", margin: 0 }}>
-              Representative data — becomes live with{" "}
+              Representative data becomes live with{" "}
               {swapIntegrationFor([proforma.source]) ?? "a paid benchmark source"} integration.
             </p>
           )}

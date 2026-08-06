@@ -25,7 +25,7 @@ const TIERS = [
     cluster: "C1",
     name: "Property intelligence",
     tagline:
-      "Know what's happening to your property's value before your neighbors do — and know what to do about it.",
+      "Know what's happening to your property's value before your neighbors do, and know what to do about it.",
     price: "From $19",
     priceRange: "$19–$49 / month",
     users: "Homeowners · Renters · Neighbors",

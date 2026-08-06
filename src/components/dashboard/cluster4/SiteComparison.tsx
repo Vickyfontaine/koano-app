@@ -204,7 +204,7 @@ export default function SiteComparison() {
                 </p>
               ) : (
                 <p style={{ fontSize: "13px", color: "var(--signal-positive)", margin: 0 }}>
-                  Complete — waiting for the other sites
+                  Complete. Waiting for the other sites
                 </p>
               )}
             </div>
@@ -228,7 +228,7 @@ export default function SiteComparison() {
               Risk-adjusted opportunity ranking
             </h2>
             <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
-              Ranked by verdict favorability, then confidence net of risk — computed from the
+              Ranked by verdict favorability, then confidence net of risk. Computed from the
               verdicts below, every input auditable.
             </p>
           </div>
@@ -360,7 +360,7 @@ export default function SiteComparison() {
             </p>
           ))}
           <p style={{ fontSize: "12px", color: "var(--ink-faint)", margin: "6px 0 0" }}>
-            Live NYC data is deepest — try New York City street addresses.
+            Live NYC data is deepest. Try New York City street addresses.
           </p>
         </div>
       )}

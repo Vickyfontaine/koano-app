@@ -80,7 +80,7 @@ export default function PricingPanel({ detail, detailError, verdict, id }: Prici
             Benchmark {fmtMoney(psf)}/sq ft (median comp, indicative) × {fmtInt(sqft)} sq ft
             building area (live PLUTO) = {fmtMoney(Math.round(base))}; {bandNote}.
             {comps?.provenance !== "live" && (
-              <> Representative benchmark — becomes live with {mlsSwap ?? "MLS"} integration.</>
+              <> Representative benchmark becomes live with {mlsSwap ?? "MLS"} integration.</>
             )}
           </p>
         </>
@@ -120,7 +120,7 @@ export default function PricingPanel({ detail, detailError, verdict, id }: Prici
           </>
         ) : (
           <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
-            KOANO timing verdict pending — the five-agent pipeline is still running.
+            KOANO timing verdict pending. The five-agent pipeline is still running.
           </p>
         )}
       </div>

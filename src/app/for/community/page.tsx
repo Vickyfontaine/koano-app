@@ -62,7 +62,7 @@ export default function CommunityPage() {
       <ClusterLanding
         clusterNumber="C1"
         clusterName="Property intelligence"
-        tagline="Know what's happening to your property's value before your neighbors do — and know what to do about it."
+        tagline="Know what's happening to your property's value before your neighbors do, and know what to do about it."
         price="From $19 / month"
         priceRange="$19–$49 / month"
         headline="The record on your building is public. Reading it is the hard part."

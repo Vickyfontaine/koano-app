@@ -50,7 +50,7 @@ const AGENTS_DETAIL = [
     inputs: "Pricing velocity · DOM trends · Absorption rates",
     outputs: "Timing verdict · Confidence score · Signal window",
     description:
-      "Analyzes how fast prices are moving, how long properties sit on the market, and how quickly inventory absorbs — to determine whether conditions favor buying, selling, or waiting.",
+      "Analyzes how fast prices are moving, how long properties sit on the market, and how quickly inventory absorbs, to determine whether conditions favor buying, selling, or waiting.",
   },
   {
     number: "02",
@@ -68,7 +68,7 @@ const AGENTS_DETAIL = [
     inputs: "Foot traffic (Placer.ai) · Search trends · Review velocity",
     outputs: "Demand momentum · Gentrification stage (1–7)",
     description:
-      "Measures foot traffic patterns, search interest, and review velocity to detect demand shifts in real time — before they appear in listing prices.",
+      "Measures foot traffic patterns, search interest, and review velocity to detect demand shifts in real time, before they appear in listing prices.",
   },
   {
     number: "04",
@@ -86,7 +86,7 @@ const AGENTS_DETAIL = [
     inputs: "Zoning (Zoneomics) · City council decisions · FEMA · Opportunity zones",
     outputs: "Regulatory risk · Entitlement timeline",
     description:
-      "Monitors the regulatory environment for changes that could affect property value — from city council votes to federal opportunity zone designations.",
+      "Monitors the regulatory environment for changes that could affect property value, from city council votes to federal opportunity zone designations.",
   },
 ];
 
@@ -101,7 +101,7 @@ const ARBITRATION = [
     number: "02",
     title: "Conflict surfacing",
     description:
-      "When agents disagree, the disagreement appears in the verdict under Minority signals. Dissent is never hidden — it is the most important signal you can receive.",
+      "When agents disagree, the disagreement appears in the verdict under Minority signals. Dissent is never hidden. It is the most important signal you can receive.",
   },
   {
     number: "03",
@@ -113,7 +113,7 @@ const ARBITRATION = [
     number: "04",
     title: "Recency bias",
     description:
-      "More recent signals are weighted higher. Data from the last 30 days outweighs data from 12 months ago. The engine reasons about now — not about what happened then.",
+      "More recent signals are weighted higher. Data from the last 30 days outweighs data from 12 months ago. The engine reasons about now, not about what happened then.",
   },
 ];
 
@@ -245,7 +245,7 @@ export default function IntelligenceContent() {
                 margin: "24px auto 0",
               }}
             >
-              The intelligence is structured as a Russian doll — each layer
+              The intelligence is structured as a Russian doll. Each layer
               understands the layers inside it. Raw data becomes structured
               signals. Signals become agent verdicts. Agent verdicts become one
               unified conclusion.
@@ -293,7 +293,7 @@ export default function IntelligenceContent() {
                   marginBottom: "32px",
                 }}
               >
-                Dozens of sources ingested — census, permits, climate risk,
+                Dozens of sources ingested: census, permits, climate risk,
                 foot traffic, crime data, zoning changes, and more. Every
                 signal normalized and timestamped.
               </p>
@@ -332,7 +332,7 @@ export default function IntelligenceContent() {
                   }}
                 >
                   Five specialist agents reason independently against the
-                  ingested data. Each agent owns a domain — market timing,
+                  ingested data. Each agent owns a domain: market timing,
                   infrastructure, demand, risk, and regulatory policy.
                 </p>
 
@@ -371,7 +371,7 @@ export default function IntelligenceContent() {
                   >
                     One synthesis agent receives all five agent outputs
                     simultaneously, arbitrates conflicts, and issues a single
-                    verdict — with confidence score, signal window, and a full
+                    verdict, with confidence score, signal window, and a full
                     auditable reasoning chain.
                   </p>
                 </div>
@@ -615,8 +615,8 @@ export default function IntelligenceContent() {
               }}
             >
               The synthesis agent receives all five structured outputs
-              simultaneously. It amplifies consensus and surfaces conflicts —
-              never hides them. If agents disagree, the disagreement appears in
+              simultaneously. It amplifies consensus and surfaces conflicts.
+              It never hides them. If agents disagree, the disagreement appears in
               the verdict as a minority signal.
             </p>
           </motion.div>
@@ -702,7 +702,7 @@ export default function IntelligenceContent() {
             >
               Every KOANO verdict is a structured output with a headline,
               confidence score, signal window, and full reasoning chain. The
-              reasoning chain is not optional — it is the product.
+              reasoning chain is not optional. It is the product.
             </p>
           </motion.div>
 

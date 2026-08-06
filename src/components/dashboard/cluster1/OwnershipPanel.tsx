@@ -40,7 +40,7 @@ export default function OwnershipPanel({ portfolio, error, id }: OwnershipPanelP
         </>
       ) : (
         <p style={{ fontSize: "13px", lineHeight: 1.6, color: "var(--ink-muted)", margin: 0 }}>
-          No HPD registration — registered-owner records only exist for multiple dwellings
+          No HPD registration. Registered-owner records only exist for multiple dwellings
           (3 or more rental units).
         </p>
       )}

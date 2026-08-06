@@ -99,7 +99,7 @@ const PIPELINE_STEPS = [
     number: "03",
     title: "Storage",
     description:
-      "Normalized signals are stored in Supabase with Row Level Security enforced. Cluster 5 data lives in an isolated schema per enterprise client — never co-mingled.",
+      "Normalized signals are stored in Supabase with Row Level Security enforced. Cluster 5 data lives in an isolated schema per enterprise client, never co-mingled.",
   },
   {
     number: "04",
@@ -176,7 +176,7 @@ export default function DataContent() {
               margin: "0 auto 40px",
             }}
           >
-            KOANO ingests data from dozens of sources — free public datasets
+            KOANO ingests data from dozens of sources. Free public datasets are
             live today, plus commercial providers that come online as they are
             licensed. Every verdict cites its top data sources. We publish the
             full list here because trust requires transparency.

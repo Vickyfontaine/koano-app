@@ -13,7 +13,7 @@ const FEATURES = [
   {
     title: "Velocity heatmap",
     description:
-      "See the fastest-changing neighborhoods at a glance — where prices are moving before anyone notices.",
+      "See the fastest-changing neighborhoods at a glance, where prices are moving before anyone notices.",
   },
   {
     title: "Absorption rate analysis",
@@ -23,7 +23,7 @@ const FEATURES = [
   {
     title: "DOM trend detection",
     description:
-      "Where days-on-market is compressing — the early signal that a market is about to heat up.",
+      "Where days-on-market is compressing. It is the early signal that a market is about to heat up.",
   },
   {
     title: "Price reduction patterns",

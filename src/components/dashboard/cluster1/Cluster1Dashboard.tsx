@@ -131,7 +131,7 @@ export default function Cluster1Dashboard() {
             Analysis failed: {stream.error}
           </p>
           <p style={{ fontSize: "12px", color: "var(--ink-faint)", margin: "6px 0 0" }}>
-            Live NYC data is deepest — try a New York City street address.
+            Live NYC data is deepest. Try a New York City street address.
           </p>
         </div>
       )}

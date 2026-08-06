@@ -13,7 +13,7 @@ const FEATURES = [
   {
     title: "Real-time NAV tracking",
     description:
-      "Real-time net asset value tracking across your entire portfolio — every asset, every market, always current.",
+      "Real-time net asset value tracking across your entire portfolio. Every asset, every market, always current.",
   },
   {
     title: "FFO & NOI monitoring",
@@ -38,7 +38,7 @@ const FEATURES = [
   {
     title: "Regulatory change alerts",
     description:
-      "Regulatory changes affecting held assets — zoning updates, policy shifts, opportunity zone expirations.",
+      "Regulatory changes affecting held assets: zoning updates, policy shifts, opportunity zone expirations.",
   },
 ];
 
@@ -46,7 +46,7 @@ const ENTERPRISE_FEATURES = [
   {
     title: "Immutable verdict record",
     description:
-      "Every verdict is recorded append-only — it cannot be edited or deleted after the fact, by anyone. The audit trail is a product promise, live today.",
+      "Every verdict is recorded append-only. It cannot be edited or deleted after the fact, by anyone. The audit trail is a product promise, live today.",
   },
   {
     title: "Your data stays yours",

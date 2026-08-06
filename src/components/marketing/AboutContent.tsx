@@ -48,13 +48,13 @@ const PRINCIPLES = [
     number: "01",
     title: "Reasoning over reporting",
     description:
-      "Real estate has always had data. What it has never had is a brain. KOANO does not report data — it reasons about it.",
+      "Real estate has always had data. What it has never had is a brain. KOANO does not report data. It reasons about it.",
   },
   {
     number: "02",
     title: "Transparency as trust",
     description:
-      "Every verdict comes with a full reasoning chain. You can see exactly why KOANO reached its conclusion — and exactly where its agents disagreed.",
+      "Every verdict comes with a full reasoning chain. You can see exactly why KOANO reached its conclusion, and exactly where its agents disagreed.",
   },
   {
     number: "03",
@@ -66,7 +66,7 @@ const PRINCIPLES = [
     number: "04",
     title: "Decisions, not dashboards",
     description:
-      "KOANO ends at a verdict. Buy, sell, hold, wait, or drop — with a confidence score, a signal window, and every step of the thinking that got there.",
+      "KOANO ends at a verdict. Buy, sell, hold, wait, or drop, with a confidence score, a signal window, and every step of the thinking that got there.",
   },
 ];
 
@@ -327,8 +327,8 @@ export default function AboutContent() {
                 marginTop: "24px",
               }}
             >
-              KOANO is a real estate reasoning engine. This is a new category
-              — not analytics, not listings, not data.
+              KOANO is a real estate reasoning engine. This is a new category.
+              Not analytics, not listings, not data.
             </p>
           </motion.div>
 

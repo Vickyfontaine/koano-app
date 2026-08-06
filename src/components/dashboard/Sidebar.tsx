@@ -111,7 +111,7 @@ export default function Sidebar({
             lineHeight: 1.5,
           }}
         >
-          Viewing {CLUSTERS[cluster].badge} — your home cluster is {CLUSTERS[homeCluster].badge}
+          Viewing {CLUSTERS[cluster].badge}. Your home cluster is {CLUSTERS[homeCluster].badge}.
         </p>
       )}
 

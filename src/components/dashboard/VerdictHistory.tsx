@@ -41,7 +41,7 @@ export default function VerdictHistory({ id }: { id?: string }) {
       )}
       {rows !== null && rows.length === 0 && (
         <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
-          No verdicts yet — run an analysis above.
+          No verdicts yet. Run an analysis above.
         </p>
       )}
       {rows !== null && rows.length > 0 && (

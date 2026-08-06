@@ -74,7 +74,7 @@ export default function CmaBuilder({ detail, detailError, id }: CmaBuilderProps)
               color: "var(--ink-secondary)",
             }}
           >
-            These comparables are representative stand-ins, not live MLS records — they become
+            These comparables are representative stand-ins, not live MLS records. They become
             live with {mlsSwap ?? "MLS"} integration. Do not present them to a client as live
             market data.
           </div>

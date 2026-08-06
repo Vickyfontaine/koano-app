@@ -13,7 +13,7 @@ const FEATURES = [
   {
     title: "KOANO composite score",
     description:
-      "Sites ranked by risk-adjusted opportunity — the single number that tells you where to look first.",
+      "Sites ranked by risk-adjusted opportunity. The single number tells you where to look first.",
   },
   {
     title: "Zoning & entitlement risk",
@@ -23,7 +23,7 @@ const FEATURES = [
   {
     title: "BSA approval rate history",
     description:
-      "Board of Standards and Appeals approval rate history by submarket — know your odds before you apply.",
+      "Board of Standards and Appeals approval rate history by submarket. Know your odds before you apply.",
   },
   {
     title: "Community board sentiment",
@@ -33,7 +33,7 @@ const FEATURES = [
   {
     title: "Permitting timeline benchmarks",
     description:
-      "Permitting timeline benchmarks by jurisdiction — plan your schedule with data, not guesswork.",
+      "Permitting timeline benchmarks by jurisdiction. Plan your schedule with data, not guesswork.",
   },
   {
     title: "Multi-site comparison",
@@ -46,7 +46,7 @@ const PRO_FORMA_FEATURES = [
   {
     title: "Land cost benchmarks",
     description:
-      "Land cost benchmarks by micro-market and zoning class — know what you should be paying.",
+      "Land cost benchmarks by micro-market and zoning class. Know what you should be paying.",
   },
   {
     title: "Construction cost per SF",
@@ -61,7 +61,7 @@ const PRO_FORMA_FEATURES = [
   {
     title: "Exit cap rate estimate",
     description:
-      "Exit cap rate estimates informed by KOANO's 5 agents — not just historical averages.",
+      "Exit cap rate estimates informed by KOANO's 5 agents, not just historical averages.",
   },
   {
     title: "IRR projection",

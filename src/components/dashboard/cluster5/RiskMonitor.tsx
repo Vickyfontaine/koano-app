@@ -172,7 +172,7 @@ export default function RiskMonitor({ properties, id }: RiskMonitorProps) {
       )}
 
       <p style={{ fontSize: "11px", color: "var(--ink-faint)", margin: 0 }}>
-        Hazard factors are representative — become live with {hazardSwap ?? "premium hazard"}{" "}
+        Hazard factors are representative. They become live with {hazardSwap ?? "premium hazard"}{" "}
         integration. Point-in-time fetches; continuous monitoring is a funded-roadmap capability.
       </p>
     </div>

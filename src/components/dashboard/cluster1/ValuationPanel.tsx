@@ -59,7 +59,7 @@ export default function ValuationPanel({ detail, detailError, id }: ValuationPan
           Indicative value: median comp {psf != null ? fmtMoney(psf) : "—"}/sq ft ×{" "}
           {sqft != null ? fmtInt(sqft) : "—"} sq ft building area (live PLUTO).
           {comps?.provenance !== "live" && (
-            <> Representative data — becomes live with {mlsSwap ?? "MLS"} integration.</>
+            <> Representative data becomes live with {mlsSwap ?? "MLS"} integration.</>
           )}
         </p>
       </div>
@@ -106,7 +106,7 @@ export default function ValuationPanel({ detail, detailError, id }: ValuationPan
       </div>
 
       <p style={{ fontSize: "11px", color: "var(--ink-faint)", margin: 0 }}>
-        Assembled from the sources above, each badged with its provenance — not a live appraisal.
+        Assembled from the sources above, each badged with its provenance, not a live appraisal.
       </p>
     </div>
   );

@@ -132,7 +132,7 @@ export default function ReasoningChain({
               </span>{" "}
               {m.signal}
               {m.note && (
-                <span style={{ color: "var(--ink-muted)" }}> — {m.note}</span>
+                <span style={{ color: "var(--ink-muted)" }}> ({m.note})</span>
               )}
             </div>
           ))}
@@ -158,7 +158,7 @@ export default function ReasoningChain({
       >
         {expanded
           ? "Hide reasoning chain"
-          : `View full reasoning chain — ${reasoningChain.length} steps`}
+          : `View full reasoning chain (${reasoningChain.length} steps)`}
       </button>
 
       {/* Full chain — per-step citations + provenance */}

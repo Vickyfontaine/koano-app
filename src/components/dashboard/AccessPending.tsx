@@ -97,7 +97,7 @@ export default function AccessPending({ status, queuePosition, email }: AccessPe
             <>
               <p style={{ fontSize: "15px", lineHeight: 1.6, color: "var(--ink-secondary)", margin: 0 }}>
                 KOANO is in private demo. Your account is created and your access request is in
-                the queue — every account is approved by hand while the demo runs on a limited
+                the queue. Every account is approved by hand while the demo runs on a limited
                 budget.
               </p>
               {queuePosition !== null && (
@@ -113,7 +113,7 @@ export default function AccessPending({ status, queuePosition, email }: AccessPe
                 </p>
               )}
               <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
-                Check back here — this page unlocks the moment your account is approved.
+                Check back here. This page unlocks the moment your account is approved.
               </p>
             </>
           ) : (

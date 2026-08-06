@@ -27,7 +27,7 @@ const CLUSTERS = [
   },
   {
     name: "Property intelligence",
-    copy: "Know what's happening to your property's value before your neighbors do — and know what to do about it.",
+    copy: "Know what's happening to your property's value before your neighbors do, and know what to do about it.",
     price: "From $19 / month",
     href: "/for/community",
   },

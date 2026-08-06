@@ -103,7 +103,7 @@ export function deriveAlerts(detail: SiteDetailResponse): AlertItem[] {
     if (p.new_building_permits > 0) {
       alerts.push({
         severity: "warning",
-        text: `${p.new_building_permits} new-building permit${p.new_building_permits === 1 ? "" : "s"} in the covered area in 24 months — construction activity nearby`,
+        text: `${p.new_building_permits} new-building permit${p.new_building_permits === 1 ? "" : "s"} in the covered area in 24 months. Construction activity nearby`,
         source: permits.source,
         provenance: permits.provenance,
       });
@@ -140,7 +140,7 @@ export function deriveAlerts(detail: SiteDetailResponse): AlertItem[] {
   if (zoning?.data?.unused_far_pct != null && zoning.data.unused_far_pct >= 50) {
     alerts.push({
       severity: "info",
-      text: `${zoning.data.unused_far_pct}% of the lot's residential FAR is unused — development headroom on this parcel`,
+      text: `${zoning.data.unused_far_pct}% of the lot's residential FAR is unused. Development headroom on this parcel`,
       source: zoning.source,
       provenance: zoning.provenance,
     });

@@ -5,7 +5,7 @@ import { koanoClerkAppearance } from "@/components/ui/clerkAppearance";
 
 export const metadata: Metadata = {
   title: "Log in — KOANO",
-  description: "Log in to KOANO — the real estate reasoning engine.",
+  description: "Log in to KOANO, the real estate reasoning engine.",
 };
 
 export default function LoginPage() {

@@ -56,7 +56,7 @@ export default function PortfolioOverview({
           type="text"
           value={address}
           onChange={(e) => setAddress(e.target.value)}
-          placeholder="Add a property — 175 3rd Street, Brooklyn, NY"
+          placeholder="Add a property: 175 3rd Street, Brooklyn, NY"
           disabled={adding}
           aria-label="Property address to track"
           style={{
@@ -94,7 +94,7 @@ export default function PortfolioOverview({
         <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>Loading portfolio…</p>
       ) : properties && properties.length === 0 ? (
         <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
-          No tracked properties yet — add the first one above.
+          No tracked properties yet. Add the first one above.
         </p>
       ) : properties && properties.length > 0 ? (
         <div style={{ overflowX: "auto" }}>

@@ -88,7 +88,7 @@ export default function LoadingState({
             ? "Resolving address…"
             : phase === "synthesis"
               ? "Synthesizing one verdict from five agents…"
-              : `Five agents analyzing — ${completed}/5 complete`}
+              : `Five agents analyzing, ${completed}/5 complete`}
         </span>
         <span
           style={{

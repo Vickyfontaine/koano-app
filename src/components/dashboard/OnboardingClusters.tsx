@@ -119,7 +119,7 @@ export default function OnboardingClusters() {
             margin: "0 0 48px",
           }}
         >
-          Select your cluster — you can switch views anytime
+          Select your cluster. You can switch views anytime
         </motion.p>
 
         <div
