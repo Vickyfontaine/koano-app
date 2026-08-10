@@ -8,6 +8,7 @@ import React, { useState } from "react";
 import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
 import type { Provenance } from "@/components/ui/verdict";
 import { PanelHeader, panelStyle, panelTitle } from "../panels";
+import { useUpgrade, isUpgradeRequired } from "../UpgradeProvider";
 
 interface NarrativeResult {
   narrative: string;
@@ -22,6 +23,7 @@ interface NarrativePanelProps {
 }
 
 export default function NarrativePanel({ address, id }: NarrativePanelProps) {
+  const { openUpgrade } = useUpgrade();
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<NarrativeResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -39,6 +41,11 @@ export default function NarrativePanel({ address, id }: NarrativePanelProps) {
         body: JSON.stringify({ address }),
       });
       const json = await res.json();
+      // Free-tier limit → surface the upgrade screen, not a raw error.
+      if (isUpgradeRequired(res.status, json)) {
+        openUpgrade({ plan: json.plan, kind: json.kind, limit: json.limit });
+        return;
+      }
       if (!res.ok) throw new Error(json?.error || `Request failed (${res.status})`);
       setResult(json as NarrativeResult);
     } catch (e) {

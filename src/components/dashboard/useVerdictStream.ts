@@ -8,6 +8,7 @@
 import { useCallback, useState } from "react";
 import type { AgentProgress, PipelinePhase } from "@/components/ui/LoadingState";
 import type { AgentName, SynthesisResult } from "@/components/ui/verdict";
+import { useUpgrade, isUpgradeRequired } from "./UpgradeProvider";
 
 export interface StreamComplete {
   resolved_address: {
@@ -50,6 +51,7 @@ export interface VerdictStream {
 }
 
 export function useVerdictStream(): VerdictStream {
+  const { openUpgrade } = useUpgrade();
   const [status, setStatus] = useState<VerdictStreamStatus>("idle");
   const [phase, setPhase] = useState<PipelinePhase>("geocoding");
   const [agents, setAgents] = useState<Partial<Record<AgentName, AgentProgress>>>({});
@@ -117,6 +119,12 @@ export function useVerdictStream(): VerdictStream {
       });
       if (!res.ok) {
         const json = await res.json().catch(() => null);
+        // Free-tier limit → surface the upgrade screen, not a raw error.
+        if (isUpgradeRequired(res.status, json)) {
+          openUpgrade({ plan: json.plan, kind: json.kind, limit: json.limit });
+          setStatus("idle");
+          return;
+        }
         throw new Error(json?.error || `Request failed (${res.status})`);
       }
       if (!res.body) throw new Error("No response stream");
@@ -141,7 +149,7 @@ export function useVerdictStream(): VerdictStream {
       setError(e instanceof Error ? e.message : "Analysis failed");
       setStatus("error");
     }
-  }, []);
+  }, [openUpgrade]);
 
   return { status, phase, agents, normalized, startedAt, result, error, run, reset };
 }

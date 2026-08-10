@@ -9,6 +9,7 @@ import React, { useState } from "react";
 import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
 import type { Provenance } from "@/components/ui/verdict";
 import { PanelHeader, panelStyle, panelTitle } from "../panels";
+import { useUpgrade, isUpgradeRequired } from "../UpgradeProvider";
 
 interface BriefingResult {
   briefing: string;
@@ -24,6 +25,7 @@ interface MondayBriefingProps {
 }
 
 export default function MondayBriefing({ hasProperties, id }: MondayBriefingProps) {
+  const { openUpgrade } = useUpgrade();
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<BriefingResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -35,6 +37,11 @@ export default function MondayBriefing({ hasProperties, id }: MondayBriefingProp
     try {
       const res = await fetch("/api/briefing", { method: "POST" });
       const json = await res.json();
+      // Free-tier limit → surface the upgrade screen, not a raw error.
+      if (isUpgradeRequired(res.status, json)) {
+        openUpgrade({ plan: json.plan, kind: json.kind, limit: json.limit });
+        return;
+      }
       if (!res.ok) throw new Error(json?.error || `Request failed (${res.status})`);
       setResult(json as BriefingResult);
     } catch (e) {
