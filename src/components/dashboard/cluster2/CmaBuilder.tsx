@@ -9,7 +9,6 @@
 
 import React from "react";
 import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
-import { swapIntegrationFor } from "@/components/ui/verdict";
 import { BlockError, PanelHeader, Row, fmtInt, fmtMoney, panelStyle, panelTitle } from "../panels";
 import { deriveAlerts } from "../cluster1/AlertsPanel";
 import type { SiteDetailResponse } from "@/app/api/site-detail/route";
@@ -27,17 +26,12 @@ export default function CmaBuilder({ detail, detailError, id }: CmaBuilderProps)
 
   const comps = detail.mls_comps;
   const zoning = detail.zoning;
-  const mlsSwap = comps ? swapIntegrationFor([comps.source]) : null;
   // Early signals: live-provenance leading indicators only.
   const earlySignals = deriveAlerts(detail).filter((a) => a.provenance === "live");
 
   return (
     <div style={panelStyle} id={id}>
-      <PanelHeader
-        title="CMA builder"
-        provenance={comps?.provenance}
-        becomesLiveWith={mlsSwap}
-      />
+      <PanelHeader title="CMA builder" provenance={comps?.provenance} />
 
       {/* Subject property — live PLUTO */}
       {zoning?.data && (
@@ -61,28 +55,26 @@ export default function CmaBuilder({ detail, detailError, id }: CmaBuilderProps)
         </div>
       )}
 
-      {/* Comparable sales — representative until MLS is funded */}
-      {comps?.data ? (
+      {/* Comparable sales — LIVE NYC recorded sales (DOF Rolling Sales) */}
+      {comps?.data && comps.data.comps.length > 0 ? (
         <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           <div
             style={{
-              borderLeft: "3px solid var(--signal-warning)",
-              background: "rgba(245, 158, 11, 0.05)",
+              borderLeft: "3px solid var(--mid-blue)",
+              background: "var(--pale-wash)",
               borderRadius: "0 12px 12px 0",
               padding: "10px 14px",
               fontSize: "12px",
               color: "var(--ink-secondary)",
             }}
           >
-            These comparables are representative stand-ins, not live MLS records. They become
-            live with {mlsSwap ?? "MLS"} integration. Do not present them to a client as live
-            market data.
+            Live recorded residential sales from NYC public records. {comps.data.scope_note}
           </div>
           <div style={{ overflowX: "auto" }}>
             <table style={{ borderCollapse: "collapse", width: "100%", minWidth: "520px" }}>
               <thead>
                 <tr>
-                  {["Comparable", "Sale price", "Sale date", "DOM", "$/sq ft"].map((h) => (
+                  {["Comparable", "Sale price", "Sale date", "Sq ft", "$/sq ft"].map((h) => (
                     <th
                       key={h}
                       style={{
@@ -110,7 +102,7 @@ export default function CmaBuilder({ detail, detailError, id }: CmaBuilderProps)
                       {comp.sale_date}
                     </td>
                     <td style={{ padding: "10px 12px", fontFamily: "'DM Mono', monospace", fontSize: "13px", color: "var(--ink-primary)", borderBottom: "1px solid var(--border-light)" }}>
-                      {comp.days_on_market}
+                      {fmtInt(comp.gross_square_feet)}
                     </td>
                     <td style={{ padding: "10px 12px", fontFamily: "'DM Mono', monospace", fontSize: "13px", color: "var(--ink-primary)", borderBottom: "1px solid var(--border-light)" }}>
                       {fmtMoney(comp.price_per_sqft)}
@@ -120,8 +112,13 @@ export default function CmaBuilder({ detail, detailError, id }: CmaBuilderProps)
               </tbody>
             </table>
           </div>
-          <Row label="Median" value={`${fmtMoney(comps.data.median_price_per_sqft)}/sq ft · ${comps.data.median_dom} DOM · ${comps.data.dom_trend}`} />
+          <Row label="Median" value={`${fmtMoney(comps.data.median_price_per_sqft)}/sq ft · ${comps.data.sales_count} sales · ${comps.data.price_trend}`} />
         </div>
+      ) : comps?.data ? (
+        // Live result with no qualifying comps — a coverage fact, not a failure.
+        <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
+          {comps.data.scope_note}
+        </p>
       ) : (
         <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
           Comparables unavailable{comps?.error ? `: ${comps.error}` : ""}.

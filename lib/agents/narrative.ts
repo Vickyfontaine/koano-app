@@ -2,9 +2,10 @@
 // Produces a client-ready neighborhood narrative for agents/brokers, written
 // by the runtime model from provider data ONLY (never invented facts).
 // The output is a GENERATED text: the UI labels it as such, and its
-// provenance rolls up to the weakest input (Section 06). Representative
-// inputs (MLS comps stand-in) are referred to as indicative benchmarks in the
-// text itself — never as live market data.
+// provenance rolls up to the weakest input (Section 06). Comps are now LIVE
+// NYC recorded sales; any remaining representative input (on a live-call
+// fallback) is still referred to as an indicative benchmark, never as live
+// market data.
 
 import { registry } from '../providers/registry';
 import type { DataPoint, Provenance } from '../providers/types';
@@ -70,9 +71,9 @@ export async function generateNarrative(address: string): Promise<NarrativeResul
     push('search interest now (0-100)', trends.data.interest_current, trends);
   }
   if (comps.data) {
-    push('median comparable price per sq ft (indicative benchmark)', comps.data.median_price_per_sqft, comps);
-    push('median comparable days on market (indicative benchmark)', comps.data.median_dom, comps);
-    push('days-on-market trend (indicative benchmark)', comps.data.dom_trend, comps);
+    push('median recorded-sale price per sq ft (NYC DOF recorded sales)', comps.data.median_price_per_sqft, comps);
+    push('recorded residential sales in ZIP, last 12 months', comps.data.sales_count, comps);
+    push('local price trend from recorded sales (recent vs prior period)', comps.data.price_trend, comps);
   }
 
   if (dataPoints.length === 0) {

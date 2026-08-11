@@ -146,10 +146,10 @@ export function deriveAlerts(detail: SiteDetailResponse): AlertItem[] {
     });
   }
 
-  if (mls_comps?.data && mls_comps.data.dom_trend !== "flat") {
+  if (mls_comps?.data && mls_comps.data.sales_count > 0 && mls_comps.data.price_trend !== "flat") {
     alerts.push({
-      severity: mls_comps.data.dom_trend === "compressing" ? "positive" : "warning",
-      text: `Comparable days-on-market ${mls_comps.data.dom_trend} (median ${mls_comps.data.median_dom} days)`,
+      severity: mls_comps.data.price_trend === "rising" ? "positive" : "warning",
+      text: `Local recorded-sale prices ${mls_comps.data.price_trend} (median $${mls_comps.data.median_price_per_sqft}/sq ft across ${mls_comps.data.sales_count} sales)`,
       source: mls_comps.source,
       provenance: mls_comps.provenance,
     });

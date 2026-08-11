@@ -8,7 +8,7 @@
 
 import React from "react";
 import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
-import { swapIntegrationFor, VERDICT_COLORS, type SynthesisResult } from "@/components/ui/verdict";
+import { VERDICT_COLORS, type SynthesisResult } from "@/components/ui/verdict";
 import { BlockError, PanelHeader, Row, fmtInt, fmtMoney, panelStyle } from "../panels";
 import type { SiteDetailResponse } from "@/app/api/site-detail/route";
 
@@ -28,38 +28,34 @@ export default function PricingPanel({ detail, detailError, verdict, id }: Prici
   const zoning = detail.zoning;
   const psf = comps?.data?.median_price_per_sqft ?? null;
   const sqft = zoning?.data?.building_area_sqft ?? null;
-  const trend = comps?.data?.dom_trend ?? null;
+  const trend = comps?.data?.price_trend ?? null;
   const base = psf != null && sqft != null && sqft > 0 ? psf * sqft : null;
-  const mlsSwap = comps ? swapIntegrationFor([comps.source]) : null;
 
-  // Transparent banding rule: DOM compressing → price toward the top of the
-  // band; expanding → toward the bottom; flat → symmetric.
+  // Transparent banding rule keyed to recorded-sale price movement: rising →
+  // price toward the top of the band; falling → toward the bottom; flat →
+  // symmetric. (Replaces the DOM-based rule; recorded sales have no DOM.)
   let low: number | null = null;
   let high: number | null = null;
   let bandNote = "";
   if (base != null) {
-    if (trend === "compressing") {
+    if (trend === "rising") {
       low = base;
       high = base * 1.05;
-      bandNote = "days-on-market compressing → band set at benchmark to +5%";
-    } else if (trend === "expanding") {
+      bandNote = "local prices rising → band set at benchmark to +5%";
+    } else if (trend === "falling") {
       low = base * 0.95;
       high = base;
-      bandNote = "days-on-market expanding → band set at −5% to benchmark";
+      bandNote = "local prices falling → band set at −5% to benchmark";
     } else {
       low = base * 0.975;
       high = base * 1.025;
-      bandNote = "days-on-market flat → symmetric ±2.5% band";
+      bandNote = "local prices flat → symmetric ±2.5% band";
     }
   }
 
   return (
     <div style={panelStyle} id={id}>
-      <PanelHeader
-        title="Pricing recommendation"
-        provenance={comps?.provenance}
-        becomesLiveWith={mlsSwap}
-      />
+      <PanelHeader title="Pricing recommendation" provenance={comps?.provenance} />
 
       {base != null ? (
         <>
@@ -77,10 +73,10 @@ export default function PricingPanel({ detail, detailError, verdict, id }: Prici
             {comps && <ProvenanceBadge provenance={comps.provenance} />}
           </div>
           <p style={{ fontSize: "12px", color: "var(--ink-muted)", margin: 0 }}>
-            Benchmark {fmtMoney(psf)}/sq ft (median comp, indicative) × {fmtInt(sqft)} sq ft
+            Benchmark {fmtMoney(psf)}/sq ft (median recorded sale) × {fmtInt(sqft)} sq ft
             building area (live PLUTO) = {fmtMoney(Math.round(base))}; {bandNote}.
             {comps?.provenance !== "live" && (
-              <> Representative benchmark becomes live with {mlsSwap ?? "MLS"} integration.</>
+              <> Representative fallback — live recorded sales were unavailable for this request.</>
             )}
           </p>
         </>

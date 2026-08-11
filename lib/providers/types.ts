@@ -281,19 +281,27 @@ export interface ProformaBenchmarkProvider {
   getBenchmarks(addr: ResolvedAddress): Promise<ProviderResult<ProformaBenchmark>>;
 }
 
+// Comparable sales — LIVE from NYC recorded sales (DOF Rolling Sales).
+// Recorded sales carry price, date, and gross square feet, so $/sq ft is
+// per-comp real. They do NOT carry days-on-market (an MLS concept, and MLS is
+// the paid source we do not access) — so this contract exposes price MOVEMENT
+// over time (price_trend), which is what recorded sales honestly provide,
+// rather than fabricated DOM zeros.
 export interface MlsComp {
   address: string;
   sale_price: number;
   sale_date: string;
-  days_on_market: number;
   price_per_sqft: number;
+  gross_square_feet: number;
+  building_class: string;
 }
 
 export interface MlsCompsSummary {
   comps: MlsComp[];
-  median_dom: number;
   median_price_per_sqft: number;
-  dom_trend: 'compressing' | 'expanding' | 'flat';
+  sales_count: number; // qualifying recorded sales in scope
+  price_trend: 'rising' | 'falling' | 'flat'; // recent vs prior period median $/sqft
+  scope_note: string; // coverage + proximity honesty (ZIP-keyed, NYC-only, etc.)
 }
 
 export interface MlsCompsProvider {

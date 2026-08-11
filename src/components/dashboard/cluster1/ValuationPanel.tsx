@@ -11,7 +11,6 @@
 
 import React from "react";
 import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
-import { swapIntegrationFor } from "@/components/ui/verdict";
 import { BlockError, PanelHeader, Row, fmtInt, fmtMoney, panelStyle } from "../panels";
 import type { SiteDetailResponse } from "@/app/api/site-detail/route";
 
@@ -34,13 +33,12 @@ export default function ValuationPanel({ detail, detailError, id }: ValuationPan
   const psf = comps?.data?.median_price_per_sqft ?? null;
   const sqft = zoning?.data?.building_area_sqft ?? null;
   const indicative = psf != null && sqft != null && sqft > 0 ? Math.round(psf * sqft) : null;
-  const mlsSwap = comps ? swapIntegrationFor([comps.source]) : null;
 
   return (
     <div style={panelStyle} id={id}>
       <PanelHeader title="Valuation" />
 
-      {/* Indicative value — representative comps × live building area */}
+      {/* Indicative value — live recorded-sale $/sq ft × live PLUTO area */}
       <div>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
           <span
@@ -56,27 +54,25 @@ export default function ValuationPanel({ detail, detailError, id }: ValuationPan
           {comps && <ProvenanceBadge provenance={comps.provenance} />}
         </div>
         <p style={{ fontSize: "12px", color: "var(--ink-muted)", margin: "6px 0 0" }}>
-          Indicative value: median comp {psf != null ? fmtMoney(psf) : "—"}/sq ft ×{" "}
+          Indicative value: median recorded-sale {psf != null ? fmtMoney(psf) : "—"}/sq ft ×{" "}
           {sqft != null ? fmtInt(sqft) : "—"} sq ft building area (live PLUTO).
           {comps?.provenance !== "live" && (
-            <> Representative data becomes live with {mlsSwap ?? "MLS"} integration.</>
+            <> Representative fallback — live NYC recorded sales were unavailable for this request.</>
           )}
         </p>
       </div>
 
       <div style={{ borderTop: "1px solid var(--border-light)", paddingTop: "14px", display: "flex", flexDirection: "column", gap: "10px" }}>
-        {comps?.data && (
-          <>
-            <Row
-              label="Median comp days on market"
-              value={
-                <span style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
-                  {comps.data.median_dom} days · {comps.data.dom_trend}
-                  <ProvenanceBadge provenance={comps.provenance} />
-                </span>
-              }
-            />
-          </>
+        {comps?.data && comps.data.sales_count > 0 && (
+          <Row
+            label="Recorded residential sales (ZIP, 12mo)"
+            value={
+              <span style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
+                {fmtInt(comps.data.sales_count)} sales · {comps.data.price_trend}
+                <ProvenanceBadge provenance={comps.provenance} />
+              </span>
+            }
+          />
         )}
         {acs?.data && (
           <Row

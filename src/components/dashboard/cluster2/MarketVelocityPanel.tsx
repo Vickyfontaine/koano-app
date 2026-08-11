@@ -78,17 +78,17 @@ export default function MarketVelocityPanel({ detail, detailError, id }: MarketV
       provenance: hpi.provenance,
     });
   }
-  if (mls_comps?.data) {
+  if (mls_comps?.data && mls_comps.data.sales_count > 0) {
     tiles.push({
-      label: "Median days on market",
-      value: `${mls_comps.data.median_dom} days`,
-      sub: `trend: ${mls_comps.data.dom_trend}`,
+      label: "Recorded sales (ZIP, 12mo)",
+      value: `${mls_comps.data.sales_count}`,
+      sub: `price trend: ${mls_comps.data.price_trend}`,
       provenance: mls_comps.provenance,
     });
     tiles.push({
-      label: "Median comp $/sq ft",
+      label: "Median recorded $/sq ft",
       value: `$${mls_comps.data.median_price_per_sqft.toLocaleString("en-US")}`,
-      sub: "indicative benchmark",
+      sub: "NYC DOF recorded sales",
       provenance: mls_comps.provenance,
     });
   }

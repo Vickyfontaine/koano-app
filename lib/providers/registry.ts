@@ -33,7 +33,7 @@ import { femaFlood } from './real/fema-flood';
 import { fbiUcr } from './real/fbi-ucr';
 import { googleTrends } from './real/google-trends';
 import { mockProformaBenchmark } from './mock/proforma-benchmark';
-import { mockMlsComps } from './mock/mls-comps';
+import { nycSalesComps } from './real/nyc-sales';
 import { mockPlacerTraffic } from './mock/placer-traffic';
 import { mockPremiumHazard } from './mock/premium-hazard';
 import { mockCostarDeals } from './mock/costar-deals';
@@ -73,7 +73,7 @@ export const registry: ProviderRegistry = {
   searchTrends: googleTrends,
   // representative (mock) providers — one-line swap to live per swap_note
   proformaBenchmark: mockProformaBenchmark,
-  mlsComps: mockMlsComps,
+  mlsComps: nycSalesComps, // LIVE — NYC recorded sales (was mock/mls-comps.ts)
   footTraffic: mockPlacerTraffic,
   premiumHazard: mockPremiumHazard,
   costarDeals: mockCostarDeals,

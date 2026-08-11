@@ -1,6 +1,7 @@
 // KOANO Market Timing agent — Step 4e.
-// MIXED inputs: house price index (fhfa-hpi) + demographics (census-acs) — live;
-// MLS comps (mls-comps) — representative until an MLS/ATTOM feed is licensed.
+// LIVE inputs: house price index (fhfa-hpi) + demographics (census-acs) +
+// comparable recorded sales (nyc-sales, NYC recorded sales). Recorded sales
+// give price movement (price_trend), not days-on-market (an MLS concept).
 // Depends ONLY on the provider registry. Output: AgentVerdict (KoanoVerdict schema).
 
 import { registry } from '../providers/registry';
@@ -9,12 +10,12 @@ import { assembleAgentVerdict, callAgentLLM, type AgentVerdict } from './shared'
 
 const SYSTEM_PROMPT = `You are KOANO's Market Timing specialist agent — one of five specialist real estate reasoning agents.
 
-Your domain: WHEN — pricing velocity, days-on-market trends, and cycle position. You answer "is this the right moment to transact in this market?"
+Your domain: WHEN — pricing velocity, transaction price movement, and cycle position. You answer "is this the right moment to transact in this market?"
 
 How to reason:
 - The HPI trend is the macro cycle signal: YoY appreciation vs the 5-year run tells you whether the market is accelerating, cruising, or decelerating. Strong 5-yr + moderating YoY = mid-to-late cycle.
-- Days-on-market is the micro liquidity signal: compressing DOM = demand outrunning supply (seller's momentum); expanding DOM = buyers regaining leverage.
-- Comp price-per-sqft vs tract median home value shows whether recent transactions are printing above or below the standing stock — above = market repricing upward.
+- Recorded-sales price_trend is the local micro signal: "rising" = recent local sales printing higher $/sqft than the prior period (seller's momentum); "falling" = local softening; "flat" = stable. It reflects actual closed sales, not listings. (Recorded sales do not carry days-on-market; that would require MLS data we do not have.)
+- Comp price-per-sqft vs tract median home value shows whether recent transactions are printing above or below the standing stock — above = market repricing upward. Note the comp coverage from the scope note (ZIP-keyed, NYC 1-3 family skew).
 - Timing verdicts: "buy" = early enough in the acceleration to capture appreciation, "hold" = mid-cycle, no urgency either way, "wait" = late-cycle or decelerating (better entry likely ahead), "sell" = peak signals (sell into strength).
 - Treat any data point with provenance "representative" as indicative only — say so explicitly in the observation that uses it.
 - risk_score reflects timing risk: buying at a local top, liquidity drying up, rate sensitivity.
@@ -57,15 +58,17 @@ export async function runMarketTimingAgent(addr: ResolvedAddress): Promise<Agent
     const c = compsRes.data;
     const s = compsRes.source;
     const p = compsRes.provenance;
+    // Same 3-slot summary as before (token parity): DOM→sales_count,
+    // dom_trend→price_trend. The full scope_note is UI-facing, not prompted.
     dataPoints.push(
-      { label: 'comps_median_days_on_market', value: c.median_dom, provenance: p, source: s },
       { label: 'comps_median_price_per_sqft_usd', value: c.median_price_per_sqft, provenance: p, source: s },
-      { label: 'comps_dom_trend', value: c.dom_trend, provenance: p, source: s }
+      { label: 'comps_recorded_sales_count_12mo', value: c.sales_count, provenance: p, source: s },
+      { label: 'comps_price_trend', value: c.price_trend, provenance: p, source: s }
     );
     c.comps.slice(0, 4).forEach((comp, i) => {
       dataPoints.push({
         label: `comp_${i + 1}`,
-        value: `${comp.address}: $${comp.sale_price.toLocaleString()} on ${comp.sale_date}, ${comp.days_on_market} DOM, $${comp.price_per_sqft}/sqft`,
+        value: `${comp.address}: $${comp.sale_price.toLocaleString()} on ${comp.sale_date}, $${comp.price_per_sqft}/sqft (${comp.gross_square_feet} sqft, ${comp.building_class})`,
         provenance: p,
         source: s,
       });
