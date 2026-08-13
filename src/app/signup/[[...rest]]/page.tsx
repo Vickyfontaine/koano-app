@@ -18,6 +18,18 @@ export default function SignupPage() {
         fallbackRedirectUrl="/onboarding"
         appearance={koanoClerkAppearance}
       />
+      <p
+        style={{
+          marginTop: "20px",
+          textAlign: "center",
+          fontSize: "13px",
+          lineHeight: 1.6,
+          color: "var(--ink-muted)",
+        }}
+      >
+        The free plan includes a limited number of analyses; a subscription is
+        required to continue.
+      </p>
     </AuthShell>
   );
 }

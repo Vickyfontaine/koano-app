@@ -142,8 +142,8 @@ export default function HeroSection() {
           className="flex flex-wrap items-center"
           style={{ gap: "16px", marginBottom: "48px" }}
         >
-          <Button variant="primary" href="/early-access" id="hero-cta-primary">
-            Get early access
+          <Button variant="primary" href="/signup" id="hero-cta-primary">
+            Sign up
           </Button>
           <Button variant="ghost-light" href="/intelligence" id="hero-cta-secondary">
             See how it works

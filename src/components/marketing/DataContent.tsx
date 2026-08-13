@@ -585,8 +585,8 @@ export default function DataContent() {
               className="flex flex-wrap items-center justify-center"
               style={{ gap: "16px" }}
             >
-              <Button variant="primary" href="/early-access" id="data-bottom-cta">
-                Get early access
+              <Button variant="primary" href="/signup" id="data-bottom-cta">
+                Sign up
               </Button>
               <Button
                 variant="ghost"

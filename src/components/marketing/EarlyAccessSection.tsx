@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import SectionNumber from "../ui/SectionNumber";
+import Button from "../ui/Button";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -22,7 +23,6 @@ const fadeUp = {
 export default function EarlyAccessSection() {
   const ref = useRef<HTMLElement>(null);
   const isInView = useInView(ref, { once: true, amount: 0.15 });
-  const [email, setEmail] = useState("");
 
   return (
     <section
@@ -63,7 +63,7 @@ export default function EarlyAccessSection() {
             marginBottom: "16px",
           }}
         >
-          KOANO is in demo, and access is by request.
+          See it work on a building you know.
         </motion.h2>
 
         <motion.p
@@ -78,60 +78,27 @@ export default function EarlyAccessSection() {
             margin: "0 auto 40px",
           }}
         >
-          Every analysis costs real money to run, so access is granted by
-          request rather than open signup. Tell us who you are and what you
-          would use it on, and we will let you in if we have room.
+          Sign up and run three full analyses at no cost. Every verdict
+          arrives with its reasoning and its sources, so you can check the
+          work against what you already know about the address.
         </motion.p>
 
-        {/* Email capture form */}
-        <motion.form
+        {/* Self-serve signup CTA (replaced the retired waitlist email form) */}
+        <motion.div
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
           variants={fadeUp}
           custom={3}
-          onSubmit={(e) => {
-            e.preventDefault();
-            // Supabase email capture will be connected in Phase 2
-          }}
-          className="flex flex-col sm:flex-row items-center justify-center"
-          style={{ gap: "12px" }}
+          className="flex flex-wrap items-center justify-center"
+          style={{ gap: "16px" }}
         >
-          <input
-            type="email"
-            id="early-access-email"
-            placeholder="Enter your email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{
-              border: "1px solid var(--border)",
-              borderRadius: "100px",
-              padding: "13px 20px",
-              fontSize: "16px",
-              color: "var(--ink-primary)",
-              background: "var(--white)",
-              outline: "none",
-              width: "100%",
-              maxWidth: "360px",
-              fontFamily: "inherit",
-              transition: "border-color 0.2s ease",
-            }}
-            onFocus={(e) =>
-              (e.currentTarget.style.borderColor = "var(--brand-blue)")
-            }
-            onBlur={(e) =>
-              (e.currentTarget.style.borderColor = "var(--border)")
-            }
-          />
-          <button
-            type="submit"
-            id="early-access-submit"
-            className="btn-primary"
-          >
-            Join waitlist
-            <span aria-hidden="true">↗</span>
-          </button>
-        </motion.form>
+          <Button variant="primary" href="/signup" id="early-access-signup">
+            Sign up
+          </Button>
+          <Button variant="ghost" href="/pricing" id="early-access-pricing">
+            See pricing
+          </Button>
+        </motion.div>
       </div>
     </section>
   );

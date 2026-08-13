@@ -148,7 +148,7 @@ export default function PricingContent() {
               maxWidth: "760px",
             }}
           >
-            KOANO is in demo. Nobody is being charged.
+            Start free. Upgrade when you hit the limit.
           </motion.h1>
           <motion.p
             initial="hidden"
@@ -177,13 +177,30 @@ export default function PricingContent() {
             style={{
               color: "var(--ink-secondary)",
               maxWidth: "640px",
+              margin: "0 auto 20px",
+            }}
+          >
+            Every account starts with three analyses and three generated
+            documents. No approval, no waitlist, no card. When you reach the
+            limit, a subscription continues the work at the volume your role
+            actually requires.
+          </motion.p>
+          <motion.p
+            initial="hidden"
+            animate={heroInView ? "visible" : "hidden"}
+            variants={fadeUp}
+            custom={2}
+            className="text-body-lg"
+            style={{
+              color: "var(--ink-secondary)",
+              maxWidth: "640px",
               margin: "0 auto 24px",
             }}
           >
-            So the demo is free, and it is by request rather than open signup.
-            Every analysis KOANO runs costs real money to produce, which is why
-            access is limited. If you want to see it work, ask, and we will let
-            you in.
+            Every figure KOANO returns is labeled with its source. Where a
+            source is licensed and not yet funded, the product says so on the
+            figure rather than burying it. You always know what the engine
+            knows.
           </motion.p>
 
           <motion.p
@@ -378,10 +395,10 @@ export default function PricingContent() {
                 {/* CTA */}
                 <Button
                   variant={tier.isEnterprise ? "primary" : "ghost"}
-                  href="/early-access"
+                  href="/signup"
                   id={`pricing-cta-${tier.cluster.toLowerCase()}`}
                 >
-                  {tier.isEnterprise ? "Contact sales" : "Get early access"}
+                  {tier.isEnterprise ? "Contact sales" : "Sign up"}
                 </Button>
               </motion.div>
             ))}
@@ -438,7 +455,7 @@ export default function PricingContent() {
                 {
                   question: "Is there a free trial?",
                   answer:
-                    "The whole thing is free right now, because the whole thing is a demo. There is nothing to trial and nothing to cancel. Ask for access and if we have room, you get it.",
+                    "Every account starts with three analyses and three generated documents, free. There is no card required and nothing to cancel. When you reach the limit, you choose whether to continue on a paid plan.",
                 },
                 {
                   question: "What data sources power the verdict?",
@@ -544,7 +561,7 @@ export default function PricingContent() {
             >
               <Button
                 variant="primary"
-                href="/early-access"
+                href="/signup"
                 id="pricing-enterprise-cta"
               >
                 Contact sales

@@ -207,8 +207,8 @@ export default function IntelligenceContent() {
             className="flex flex-wrap items-center justify-center"
             style={{ gap: "16px" }}
           >
-            <Button variant="primary" href="/early-access" id="intelligence-hero-cta">
-              Get early access
+            <Button variant="primary" href="/signup" id="intelligence-hero-cta">
+              Sign up
             </Button>
             <Button variant="ghost" href="/pricing" id="intelligence-hero-pricing">
               See pricing
@@ -827,7 +827,7 @@ export default function IntelligenceContent() {
               </div>
 
               <a
-                href="/early-access"
+                href="/signup"
                 style={{
                   fontSize: "14px",
                   fontWeight: 500,
@@ -888,10 +888,10 @@ export default function IntelligenceContent() {
             >
               <Button
                 variant="primary"
-                href="/early-access"
+                href="/signup"
                 id="intelligence-bottom-cta"
               >
-                Get early access
+                Sign up
               </Button>
               <Button variant="ghost" href="/pricing" id="intelligence-bottom-pricing">
                 See pricing

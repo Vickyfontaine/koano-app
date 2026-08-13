@@ -190,8 +190,8 @@ export default function ClusterLanding({
             className="flex flex-wrap items-center justify-center"
             style={{ gap: "16px" }}
           >
-            <Button variant="primary" href="/early-access">
-              Get early access
+            <Button variant="primary" href="/signup">
+              Sign up
             </Button>
             <Button variant="ghost" href="/pricing">
               See pricing
@@ -408,8 +408,8 @@ export default function ClusterLanding({
               className="flex flex-wrap items-center justify-center"
               style={{ gap: "16px" }}
             >
-              <Button variant="primary" href="/early-access">
-                Get early access
+              <Button variant="primary" href="/signup">
+                Sign up
               </Button>
               <Button variant="ghost" href="/pricing">
                 Compare all plans

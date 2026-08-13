@@ -112,8 +112,8 @@ export default function Nav() {
             <Button variant="ghost" href="/login" id="nav-sign-in">
               Sign in
             </Button>
-            <Button variant="primary" href="/early-access" id="nav-early-access">
-              Get early access
+            <Button variant="primary" href="/signup" id="nav-sign-up">
+              Sign up
             </Button>
           </div>
 
@@ -226,8 +226,8 @@ export default function Nav() {
                 <Button variant="ghost" href="/login">
                   Sign in
                 </Button>
-                <Button variant="primary" href="/early-access">
-                  Get early access
+                <Button variant="primary" href="/signup">
+                  Sign up
                 </Button>
               </motion.div>
             </div>

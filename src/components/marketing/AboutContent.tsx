@@ -159,10 +159,10 @@ export default function AboutContent() {
               >
                 <Button
                   variant="primary"
-                  href="/early-access"
+                  href="/signup"
                   id="about-hero-cta"
                 >
-                  Get early access
+                  Sign up
                 </Button>
                 <Button
                   variant="ghost"
@@ -554,10 +554,10 @@ export default function AboutContent() {
             >
               <Button
                 variant="primary"
-                href="/early-access"
+                href="/signup"
                 id="about-bottom-cta"
               >
-                Get early access
+                Sign up
               </Button>
               <Button variant="ghost" href="/for/community" id="about-bottom-community">
                 Our community mission
