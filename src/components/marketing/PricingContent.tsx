@@ -51,7 +51,7 @@ const TIERS = [
     features: [
       "Multi-market velocity heatmap",
       "Absorption rate by micro-market",
-      "DOM trends — where days-on-market is compressing",
+      "Price trends: where recorded sale prices are moving",
       "Price reduction pattern detection",
       "CMA builder with KOANO early-signal overlay",
       "Client-ready PDF report generator",
@@ -155,24 +155,6 @@ export default function PricingContent() {
             animate={heroInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={1.5}
-            className="text-body-lg"
-            style={{
-              color: "var(--ink-secondary)",
-              maxWidth: "640px",
-              margin: "0 auto 20px",
-            }}
-          >
-            The prices below are what these tiers are worth once the paid data
-            feeds are live. Today they are not. Three of the five agents run on
-            representative data where the licensed sources have not been funded
-            yet, and every figure that comes from one is labeled as such inside
-            the product.
-          </motion.p>
-          <motion.p
-            initial="hidden"
-            animate={heroInView ? "visible" : "hidden"}
-            variants={fadeUp}
-            custom={2}
             className="text-body-lg"
             style={{
               color: "var(--ink-secondary)",
