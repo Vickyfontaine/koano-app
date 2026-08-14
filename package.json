@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:disclaimer": "tsx scripts/test-disclaimer-regression.ts",
+    "test:docs": "tsx scripts/test-document-engine.ts && tsx scripts/test-render.ts && tsx scripts/test-tax-appeal.ts && tsx scripts/test-disclaimer-regression.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.110.0",

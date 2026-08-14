@@ -11,6 +11,7 @@ import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '../../../../lib/supabase/server';
 import { getDocumentType } from '../../../../lib/documents/registry';
+import { IMPLEMENTED_DOC_TYPE_SET } from '../../../../lib/documents/implemented';
 import { guardDocument } from '../../../../lib/documents/guard';
 import { assembleDocumentData, getLetterhead } from '../../../../lib/documents/assembler';
 import { buildProvenanceAppendix } from '../../../../lib/documents/disclaimer';
@@ -27,11 +28,6 @@ import {
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 120;
-
-// Document types with a renderer wired today. Others are declared in the
-// registry but not yet implemented — the route refuses them cleanly (501)
-// rather than pretending. (Slice 4 ships tax_appeal_packet only.)
-const IMPLEMENTED = new Set(['tax_appeal_packet']);
 
 function filenameFor(docType: string, bbl: string | null, format: DocumentFormat): string {
   const slug = bbl ? bbl : 'property';
@@ -72,7 +68,7 @@ export async function POST(req: Request) {
       { status: 409 },
     );
   }
-  if (!IMPLEMENTED.has(doc.id)) {
+  if (!IMPLEMENTED_DOC_TYPE_SET.has(doc.id)) {
     return NextResponse.json(
       { error: `The ${doc.title} is declared but its renderer is not built yet.` },
       { status: 501 },
