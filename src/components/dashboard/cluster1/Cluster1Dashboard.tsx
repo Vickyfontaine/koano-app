@@ -14,6 +14,7 @@ import { CLUSTERS } from "../clusters";
 import { useVerdictStream } from "../useVerdictStream";
 import VerdictHistory from "../VerdictHistory";
 import PermitHistoryPanel from "../PermitHistoryPanel";
+import DocumentButton from "../DocumentButton";
 import ValuationPanel from "./ValuationPanel";
 import AlertsPanel from "./AlertsPanel";
 import ViolationsPanel from "./ViolationsPanel";
@@ -162,6 +163,15 @@ export default function Cluster1Dashboard() {
           </div>
 
           <AlertsPanel detail={detail} detailError={detailError} id="c1-alerts" />
+
+          <DocumentButton
+            docType="tax_appeal_packet"
+            title="Property Tax Appeal Evidence Packet"
+            address={result.resolved_address.normalized || result.resolved_address.input}
+            formats={["pdf"]}
+            hasRecentVerdict={true}
+            id="c1-tax-appeal-doc"
+          />
 
           <ReasoningChain
             reasoningChain={result.verdict.reasoning_chain}
