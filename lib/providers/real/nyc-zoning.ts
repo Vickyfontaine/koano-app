@@ -20,6 +20,8 @@ interface PlutoRow {
   commfar?: string;
   yearbuilt?: string;
   unitsres?: string;
+  assessland?: string;
+  assesstot?: string;
 }
 
 function num(v: string | undefined): number | null {
@@ -43,6 +45,8 @@ const REPRESENTATIVE_FALLBACK: ZoningInfo = {
   unused_far_pct: 10,
   year_built: 1931,
   residential_units: 3,
+  assessed_total_usd: 90000,
+  assessed_land_usd: 24000,
 };
 
 export const nycZoning: ZoningProvider = {
@@ -96,6 +100,8 @@ export const nycZoning: ZoningProvider = {
         unused_far_pct: unused,
         year_built: num(row.yearbuilt),
         residential_units: num(row.unitsres),
+        assessed_total_usd: num(row.assesstot),
+        assessed_land_usd: num(row.assessland),
       };
 
       return {

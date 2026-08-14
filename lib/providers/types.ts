@@ -92,6 +92,8 @@ export interface ZoningInfo {
   unused_far_pct: number | null; // development headroom
   year_built: number | null;
   residential_units: number | null;
+  assessed_total_usd: number | null; // PLUTO assesstot — total assessed value (current roll)
+  assessed_land_usd: number | null; // PLUTO assessland — land-only assessed value
 }
 
 export interface ZoningProvider {
