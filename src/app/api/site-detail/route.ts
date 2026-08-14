@@ -11,103 +11,24 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { requireApproved } from '../../../../lib/koano-guard';
 import { registry } from '../../../../lib/providers/registry';
-import type {
-  AcsDemographics,
-  BuildingViolationsSummary,
-  CostarDealsSummary,
-  CrimeStats,
-  FloodInfo,
-  LandlordPortfolioSummary,
-  FootTrafficInfo,
-  HpiTrend,
-  MlsCompsSummary,
-  OpportunityZoneInfo,
-  PermitsSummary,
-  PremiumHazardInfo,
-  ProformaBenchmark,
-  ProviderResult,
-  Provenance,
-  ResolvedAddress,
-  SearchTrendsInfo,
-  ZoningInfo,
-} from '../../../../lib/providers/types';
+import {
+  BLOCK_FETCHERS,
+  VALID_BLOCKS,
+  toBlock,
+  type BlockKey,
+  type SiteDetailBlock,
+  type SiteDetailResponse,
+} from '../../../../lib/providers/blocks';
+
+// Re-exported so existing dashboard panels keep importing these from the route.
+// The definitions now live in lib/providers/blocks.ts (shared with the document
+// engine's assembler), so there is one data path, never two.
+export type { SiteDetailBlock, SiteDetailResponse };
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-// Client-facing envelope: ProviderResult minus internal endpoint URLs.
-export interface SiteDetailBlock<T> {
-  ok: boolean;
-  data: T | null;
-  provenance: Provenance;
-  source: string;
-  fetched_at: string;
-  swap_note?: string;
-  error?: string;
-}
-
-export interface SiteDetailResponse {
-  resolved_address: {
-    input: string;
-    normalized: string;
-    bbl: string | null;
-    borough: string | null;
-    tract_geoid: string | null;
-  };
-  zoning?: SiteDetailBlock<ZoningInfo>;
-  permits?: SiteDetailBlock<PermitsSummary>;
-  opportunity_zone?: SiteDetailBlock<OpportunityZoneInfo>;
-  proforma?: SiteDetailBlock<ProformaBenchmark>;
-  flood?: SiteDetailBlock<FloodInfo>;
-  demographics?: SiteDetailBlock<AcsDemographics>;
-  hpi?: SiteDetailBlock<HpiTrend>;
-  mls_comps?: SiteDetailBlock<MlsCompsSummary>;
-  crime?: SiteDetailBlock<CrimeStats>;
-  building_violations?: SiteDetailBlock<BuildingViolationsSummary>;
-  landlord_portfolio?: SiteDetailBlock<LandlordPortfolioSummary>;
-  search_trends?: SiteDetailBlock<SearchTrendsInfo>;
-  foot_traffic?: SiteDetailBlock<FootTrafficInfo>;
-  premium_hazard?: SiteDetailBlock<PremiumHazardInfo>;
-  costar_deals?: SiteDetailBlock<CostarDealsSummary>;
-}
-
-type BlockKey = Exclude<keyof SiteDetailResponse, 'resolved_address'>;
-
-const BLOCK_FETCHERS: Record<
-  BlockKey,
-  (addr: ResolvedAddress) => Promise<ProviderResult<unknown>>
-> = {
-  zoning: (a) => registry.zoning.getZoning(a),
-  permits: (a) => registry.permits.getPermits(a),
-  opportunity_zone: (a) => registry.opportunityZones.getOpportunityZone(a),
-  proforma: (a) => registry.proformaBenchmark.getBenchmarks(a),
-  flood: (a) => registry.flood.getFloodZone(a),
-  demographics: (a) => registry.demographics.getDemographics(a),
-  hpi: (a) => registry.hpi.getHpi(a),
-  mls_comps: (a) => registry.mlsComps.getComps(a),
-  crime: (a) => registry.crime.getCrimeStats(a),
-  building_violations: (a) => registry.buildingViolations.getViolations(a),
-  landlord_portfolio: (a) => registry.landlordPortfolio.getPortfolio(a),
-  search_trends: (a) => registry.searchTrends.getSearchTrends(a),
-  foot_traffic: (a) => registry.footTraffic.getFootTraffic(a),
-  premium_hazard: (a) => registry.premiumHazard.getHazards(a),
-  costar_deals: (a) => registry.costarDeals.getDeals(a),
-};
-
-const VALID_BLOCKS = Object.keys(BLOCK_FETCHERS) as BlockKey[];
 const DEFAULT_BLOCKS: BlockKey[] = ['zoning', 'permits', 'opportunity_zone', 'proforma'];
-
-function toBlock<T>(r: ProviderResult<T>): SiteDetailBlock<T> {
-  return {
-    ok: r.ok,
-    data: r.data,
-    provenance: r.provenance,
-    source: r.source,
-    fetched_at: r.fetched_at,
-    ...(r.swap_note ? { swap_note: r.swap_note } : {}),
-    ...(r.error ? { error: r.error } : {}),
-  };
-}
 
 export async function POST(req: Request) {
   const { userId } = await auth();

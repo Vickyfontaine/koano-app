@@ -68,7 +68,8 @@ function failClosed(detail: string): GuardDenial {
 
 // Resolve a user's plan. A missing profile row → free (not an error). Only a
 // real DB error fails closed (surfaced via the thrown branch in the caller).
-async function resolvePlan(userId: string): Promise<Plan> {
+// Exported so the document guard reuses the exact same plan resolution.
+export async function resolvePlan(userId: string): Promise<Plan> {
   const { data, error } = await supabaseAdmin()
     .from('profiles')
     .select('plan')
