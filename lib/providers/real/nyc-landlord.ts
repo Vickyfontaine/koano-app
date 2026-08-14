@@ -48,6 +48,28 @@ interface ContactRow {
   corporationname?: string;
   firstname?: string;
   lastname?: string;
+  businesshousenumber?: string;
+  businessstreetname?: string;
+  businessapartment?: string;
+  businesscity?: string;
+  businessstate?: string;
+  businesszip?: string;
+}
+
+// Compose a one-line business mailing address from an HPD contact row.
+function contactAddress(c: ContactRow | undefined): string | null {
+  if (!c) return null;
+  const line1 = [c.businesshousenumber, c.businessstreetname, c.businessapartment]
+    .map((s) => (s ?? '').trim())
+    .filter(Boolean)
+    .join(' ');
+  const cityState = [c.businesscity, c.businessstate]
+    .map((s) => (s ?? '').trim())
+    .filter(Boolean)
+    .join(', ');
+  const line2 = [cityState, (c.businesszip ?? '').trim()].filter(Boolean).join(' ');
+  const full = [line1, line2].filter(Boolean).join(', ');
+  return full || null;
 }
 interface ViolationAggRow {
   boroid?: string;
@@ -69,6 +91,7 @@ const REPRESENTATIVE_FALLBACK: LandlordPortfolioSummary = {
   subject_bbl: null,
   hpd_registered: true,
   registered_owner: 'REPRESENTATIVE — live ownership lookup failed',
+  registered_owner_address: null,
   owner_type: null,
   management_company: null,
   portfolio_building_count: 8,
@@ -113,6 +136,7 @@ export const nycLandlord: LandlordPortfolioProvider = {
             subject_bbl: addr.bbl,
             hpd_registered: false,
             registered_owner: null,
+            registered_owner_address: null,
             owner_type: null,
             management_company: null,
             portfolio_building_count: 0,
@@ -155,6 +179,7 @@ export const nycLandlord: LandlordPortfolioProvider = {
           ? `${indiv.firstname!.trim().toUpperCase()} ${indiv.lastname!.trim().toUpperCase()}`
           : null;
       const ownerType = ownerIsCorp ? 'CorporateOwner' : indiv ? (indiv.type ?? null) : null;
+      const ownerAddress = contactAddress(ownerIsCorp ? corp : indiv);
 
       // 3. Portfolio: exact-match the owner entity across all contacts.
       let portfolioRegIds: string[] = [registrationId];
@@ -242,6 +267,7 @@ export const nycLandlord: LandlordPortfolioProvider = {
         subject_bbl: addr.bbl,
         hpd_registered: true,
         registered_owner: ownerName,
+        registered_owner_address: ownerAddress,
         owner_type: ownerType,
         management_company: agent?.corporationname?.trim().toUpperCase() ?? null,
         portfolio_building_count: buildingsAll.length,

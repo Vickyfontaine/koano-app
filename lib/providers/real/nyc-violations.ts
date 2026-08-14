@@ -31,6 +31,7 @@ interface HpdRow {
   violationstatus?: string;
   inspectiondate?: string;
   novdescription?: string;
+  violationid?: string;
 }
 interface EcbRow {
   severity?: string;
@@ -38,6 +39,7 @@ interface EcbRow {
   issue_date?: string; // YYYYMMDD
   violation_type?: string;
   violation_description?: string;
+  ecb_violation_number?: string;
 }
 interface DobComplaintRow {
   status?: string;
@@ -134,7 +136,7 @@ export const nycViolations: BuildingViolationsProvider = {
           : Promise.resolve([]),
         hpdWhere
           ? fetchJson<HpdRow[]>(
-              `${HPD_VIOLATIONS}?$where=${hpdWhere}&$select=class,violationstatus,inspectiondate,novdescription&$order=inspectiondate DESC&$limit=5`,
+              `${HPD_VIOLATIONS}?$where=${hpdWhere}&$select=class,violationstatus,inspectiondate,novdescription,violationid&$order=inspectiondate DESC&$limit=5`,
             )
           : Promise.resolve([]),
         hpdWhere
@@ -142,7 +144,7 @@ export const nycViolations: BuildingViolationsProvider = {
           : Promise.resolve([]),
         ecbWhere
           ? fetchJson<EcbRow[]>(
-              `${ECB_VIOLATIONS}?$where=${ecbWhere}&$select=severity,ecb_violation_status,issue_date,violation_type,violation_description&$limit=2000`,
+              `${ECB_VIOLATIONS}?$where=${ecbWhere}&$select=severity,ecb_violation_status,issue_date,violation_type,violation_description,ecb_violation_number&$limit=2000`,
               { timeoutMs: 30000 },
             )
           : Promise.resolve([]),
@@ -222,6 +224,7 @@ export const nycViolations: BuildingViolationsProvider = {
           date: r.inspectiondate?.slice(0, 10) ?? '',
           label: `Class ${r.class ?? '?'} — ${(r.novdescription ?? '').slice(0, 120)}`,
           status: r.violationstatus ?? '',
+          violation_id: r.violationid ?? null,
         })),
         ...ecbRows
           .filter((r) => ecbDateToIso(r.issue_date))
@@ -232,6 +235,7 @@ export const nycViolations: BuildingViolationsProvider = {
             date: ecbDateToIso(r.issue_date) ?? '',
             label: `${r.severity ?? ''} ${r.violation_type ?? ''} — ${(r.violation_description ?? '').slice(0, 120)}`.trim(),
             status: r.ecb_violation_status ?? '',
+            violation_id: r.ecb_violation_number ?? null,
           })),
       ]
         .filter((r) => r.date)

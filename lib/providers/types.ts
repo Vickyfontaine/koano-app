@@ -189,6 +189,7 @@ export interface ViolationRecentItem {
   date: string; // ISO yyyy-mm-dd
   label: string; // class/severity/category + short description
   status: string;
+  violation_id: string | null; // HPD violationid / ECB violation number — citable in documents
 }
 
 export interface BuildingViolationsSummary {
@@ -247,6 +248,7 @@ export interface LandlordPortfolioSummary {
   subject_bbl: string | null;
   hpd_registered: boolean;
   registered_owner: string | null; // corporation or individual, exact as registered
+  registered_owner_address: string | null; // owner's registered business mailing address (letter addressee)
   owner_type: string | null; // CorporateOwner | IndividualOwner | HeadOfficer...
   management_company: string | null; // Agent contact, if any
   portfolio_building_count: number; // distinct buildings under exact-match entity
