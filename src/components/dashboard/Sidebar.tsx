@@ -150,6 +150,22 @@ export default function Sidebar({
         })}
       </nav>
 
+      {/* Settings — leaves the cluster SPA for the standalone settings route */}
+      <a
+        href="/dashboard/settings"
+        style={{
+          margin: "0 12px 4px",
+          padding: "10px 12px",
+          borderRadius: "8px",
+          color: "var(--ink-muted)",
+          fontSize: "14px",
+          textDecoration: "none",
+          display: "block",
+        }}
+      >
+        Settings
+      </a>
+
       {/* Account */}
       <div
         style={{
