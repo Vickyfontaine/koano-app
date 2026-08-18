@@ -312,7 +312,9 @@ function usedAppendix(data: DocumentData, demoLive: boolean): ProvenanceAppendix
   return buildProvenanceAppendix({ ...data, blocks, overall_provenance: overall });
 }
 
-function ddRegisterSection(f: ScreeningFacts): RenderSection {
+// The DD register is a fixed pre-acquisition checklist — independent of the
+// site's facts (it states what KOANO verified vs what needs a vendor).
+function ddRegisterSection(): RenderSection {
   const rows: string[][] = [
     ['Zoning verification', 'Verified — NYC MapPLUTO (26v1, City of Yes)'],
     ['Permit research', 'Verified — DOB permits + Job Application Filings'],
@@ -439,7 +441,7 @@ export function buildScreeningModel(args: {
   });
 
   // 6. Due diligence gap register (never trimmed).
-  sections.push(ddRegisterSection(f));
+  sections.push(ddRegisterSection());
 
   // 7. Proof points (best-effort ACS is dropped visibly when not live).
   const proof: string[][] = [];
