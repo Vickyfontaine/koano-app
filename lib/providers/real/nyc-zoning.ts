@@ -22,6 +22,10 @@ interface PlutoRow {
   unitsres?: string;
   assessland?: string;
   assesstot?: string;
+  affresfar?: string;
+  facilfar?: string;
+  ownername?: string;
+  cd?: string;
 }
 
 function num(v: string | undefined): number | null {
@@ -47,6 +51,10 @@ const REPRESENTATIVE_FALLBACK: ZoningInfo = {
   residential_units: 3,
   assessed_total_usd: 90000,
   assessed_land_usd: 24000,
+  max_affordable_residential_far: 2.4,
+  max_facility_far: 2.0,
+  owner_name: null,
+  community_district: null,
 };
 
 export const nycZoning: ZoningProvider = {
@@ -102,6 +110,10 @@ export const nycZoning: ZoningProvider = {
         residential_units: num(row.unitsres),
         assessed_total_usd: num(row.assesstot),
         assessed_land_usd: num(row.assessland),
+        max_affordable_residential_far: num(row.affresfar),
+        max_facility_far: num(row.facilfar),
+        owner_name: row.ownername?.trim() || null,
+        community_district: row.cd ?? null,
       };
 
       return {

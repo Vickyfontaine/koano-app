@@ -94,11 +94,86 @@ export interface ZoningInfo {
   residential_units: number | null;
   assessed_total_usd: number | null; // PLUTO assesstot — total assessed value (current roll)
   assessed_land_usd: number | null; // PLUTO assessland — land-only assessed value
+  // City of Yes (PLUTO 26v1): base residential FAR is max_residential_far above;
+  // affordable is the UAP affordable-housing maximum (a genuine decision input).
+  max_affordable_residential_far: number | null; // PLUTO affresfar — City of Yes affordable-housing max residential FAR
+  max_facility_far: number | null; // PLUTO facilfar — community facility FAR
+  owner_name: string | null; // PLUTO ownername — as recorded (assemblage owner match)
+  community_district: string | null; // PLUTO cd — e.g. "306" (Brooklyn CB6)
 }
 
 export interface ZoningProvider {
   name: string;
   getZoning(addr: ResolvedAddress): Promise<ProviderResult<ZoningInfo>>;
+}
+
+// ---------------------------------------------------------------------------
+// Assemblage / air rights (block-level). NYC zoning lots and TDR (air-rights)
+// transfers are constrained to a single tax block, so block-level ownership +
+// unused FAR is the correct basis — not a spatial-adjacency approximation.
+// ---------------------------------------------------------------------------
+
+export interface AssemblageNeighbor {
+  bbl: string;
+  owner_name: string | null;
+  lot_area_sqft: number | null;
+  building_area_sqft: number | null;
+  unused_far_floor_area_sqft: number | null; // max(0, residfar*lotarea − bldgarea)
+  same_owner_as_subject: boolean;
+}
+
+export interface AssemblageSummary {
+  subject_bbl: string | null;
+  subject_owner_name: string | null;
+  block_lot_count: number; // lots on the tax block (incl. subject)
+  same_owner_lot_count: number; // OTHER lots on the block held by the subject's owner
+  same_owner_bbls: string[];
+  block_unused_far_floor_area_sqft: number; // sum over OTHER lots on the block
+  same_owner_unused_far_floor_area_sqft: number; // sum over same-owner OTHER lots
+  block_note: string; // the block-level rule, always present
+  // UI ONLY — same contract as recent_items: never into an agent prompt.
+  neighbors: AssemblageNeighbor[];
+}
+
+export interface AssemblageProvider {
+  name: string;
+  getAssemblage(addr: ResolvedAddress): Promise<ProviderResult<AssemblageSummary>>;
+}
+
+// ---------------------------------------------------------------------------
+// Entitlement track record — DOB Job Application Filings (ic3t-wcy2, legacy
+// BIS). The highest-risk development stage: not "what can I build" but "will I
+// get to build it." Subject-lot filings + the community district's disposition
+// track record (denials, withdrawals, stalls) and a typical filing timeline.
+// ---------------------------------------------------------------------------
+
+export interface EntitlementFilingItem {
+  job: string;
+  job_type: string; // NB, A1, A2, DM, ...
+  status: string; // job_status_descrp
+  latest_action_date: string | null; // as recorded (MM/DD/YYYY)
+}
+
+export interface EntitlementSummary {
+  subject_bbl: string | null;
+  community_district: string | null; // "306"
+  subject_filing_count: number;
+  cd_total_filings: number;
+  cd_approved: number; // reached approval / permit / sign-off
+  cd_disapproved: number; // PLAN EXAM - DISAPPROVED
+  cd_withdrawn: number;
+  cd_suspended: number;
+  cd_in_process: number; // in plan exam / assigned / pre-filing
+  cd_approval_ratio_pct: number | null; // approved / (approved + disapproved)
+  cd_median_timeline_days: number | null; // median pre-filing → latest action for advanced filings
+  scope_note: string; // dataset + interpretation caveat, always present
+  // UI ONLY — same contract as recent_items: never into an agent prompt.
+  subject_recent_items: EntitlementFilingItem[];
+}
+
+export interface EntitlementProvider {
+  name: string;
+  getEntitlement(addr: ResolvedAddress): Promise<ProviderResult<EntitlementSummary>>;
 }
 
 export interface OpportunityZoneInfo {
