@@ -8,7 +8,11 @@
 // design — a new document type cannot ship without disclaimer-on-every-page
 // coverage.
 
-export const IMPLEMENTED_DOC_TYPES = ['tax_appeal_packet'] as const;
+export const IMPLEMENTED_DOC_TYPES = [
+  'tax_appeal_packet',
+  'site_screening_memo',
+  'three_site_comparison_brief',
+] as const;
 
 export type ImplementedDocType = (typeof IMPLEMENTED_DOC_TYPES)[number];
 

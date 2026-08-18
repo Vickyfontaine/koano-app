@@ -153,7 +153,134 @@ export const STRESS_MODEL: RenderModel = {
   generatedAt: GENERATED_AT,
 };
 
+// A representative Development Site Screening Memo — exercises the verdict
+// headline, identity band, FAR-contrast highlight, two-column tables, a visible
+// trim note, and compact density.
+function siteScreeningSample(): RenderModel {
+  return {
+    docTitle: 'Development Site Screening Memo',
+    subtitle: '175 3rd Street, Brooklyn, NY',
+    letterhead: EMPTY_LETTERHEAD,
+    compact: true,
+    sections: [
+      { verdict: { decision: 'ADVANCE', tone: 'positive', confidence: 87, rationale: 'Material unused FAR and a 95% CD approval rate, with no disqualifying flags.' } },
+      {
+        heading: 'Site Identity',
+        band: {
+          items: [
+            { label: 'Address', value: '175 3rd Street, Brooklyn' },
+            { label: 'BBL', value: '3009720058' },
+            { label: 'Borough', value: 'Brooklyn' },
+            { label: 'Lot area', value: '120,793 sq ft' },
+            { label: 'Zoning', value: 'M1-4/R7-2' },
+            { label: 'Opportunity Zone', value: 'No' },
+          ],
+        },
+      },
+      {
+        heading: 'As-of-Right Envelope',
+        highlight: {
+          figures: [
+            { label: 'Base as-of-right max floor area', value: '415,528 sq ft', sub: 'residential FAR 3.44' },
+            { label: 'City of Yes affordable-housing max', value: '605,173 sq ft', sub: 'FAR 5.01 · +189,645 sq ft with affordability', emphasis: true },
+          ],
+        },
+        table: {
+          columns: ['Envelope', 'Value'],
+          rows: [
+            ['Zoning district', 'M1-4/R7-2'],
+            ['Unused development rights (base)', '402,010 sq ft'],
+            ['Year built / building class', '1973 / K4'],
+          ],
+        },
+        paragraphs: ['Envelope covers FAR and floor area only, under current PLUTO (26v1, City of Yes-updated). Not height- or parking-complete.'],
+      },
+      {
+        heading: 'Entitlement Risk Read',
+        table: {
+          columns: ['Community district track record', 'Value'],
+          rows: [
+            ['CD approval ratio', '95%'],
+            ['Disapproved filings', '2,731'],
+            ['Median filing timeline', '573 days'],
+          ],
+        },
+      },
+      {
+        heading: 'Assemblage & Air Rights',
+        table: { columns: ['Block-level', 'Value'], rows: [['Registered owner', 'GOWANUS 3RD STREET OWNER LLC'], ['Block unused development rights', '0 sq ft']] },
+        paragraphs: ['Block-level unused development rights are the assemblage read here.'],
+      },
+      {
+        heading: 'Due Diligence Gap Register',
+        table: {
+          columns: ['Item', 'Status'],
+          rows: [
+            ['Zoning verification', 'Verified — NYC MapPLUTO (26v1)'],
+            ['Title examination', 'Open — requires a title company'],
+            ['Environmental assessment', 'Open — requires a Phase I/II'],
+          ],
+        },
+      },
+      {
+        heading: 'Proof Points',
+        table: { columns: ['Signal', 'Reading'], rows: [['Permit activity (24mo)', '312 permits'], ['FEMA flood', 'Zone X · outside SFHA']] },
+        trimNote: 'Showing 4 of 5 proof points; ACS demographic direction was unavailable this run.',
+      },
+      {
+        heading: 'Risk & Mitigant',
+        table: { columns: ['Risk', 'Mitigant / note'], rows: [['No disqualifying public-record flags on the lot', 'Screening only — open due-diligence items still apply.']] },
+      },
+      { heading: 'Reasoning', paragraphs: ['On the selection rule, this site is an ADVANCE at confidence 87. This is a screening read of public record, not a feasibility study.'] },
+    ],
+    appendix: {
+      overall: 'live',
+      overall_note: 'Every figure in this document was fetched live from an authoritative public source at generation time.',
+      rows: [
+        { block: 'Zoning / PLUTO', source: 'NYC Open Data — MapPLUTO (64uk-42ks)', provenance: 'live', fetched_at: GENERATED_AT },
+        { block: 'Entitlement track record', source: 'NYC Open Data — DOB Job Application Filings (ic3t-wcy2)', provenance: 'live', fetched_at: GENERATED_AT },
+      ],
+    },
+    generatedAt: GENERATED_AT,
+  };
+}
+
+// A representative Three-Site Comparison Brief — the comparison grid.
+function comparisonSample(): RenderModel {
+  return {
+    docTitle: 'Three-Site Comparison Brief',
+    subtitle: '175 3rd Street  ·  517 8th Avenue  ·  47-07 Vernon Blvd',
+    letterhead: EMPTY_LETTERHEAD,
+    compact: true,
+    sections: [
+      {
+        heading: 'Site Comparison',
+        table: {
+          columns: ['Metric', '175 3rd Street', '517 8th Avenue', '47-07 Vernon Blvd'],
+          rows: [
+            ['KOANO verdict', 'ADVANCE (87)', 'ADVANCE (71)', 'HOLD (61)'],
+            ['Risk-adjusted rank', '#1', '#2', '#3'],
+            ['City of Yes affordable max', '605,173 sf', '8,412 sf', '9,750 sf'],
+            ['CD approval ratio', '95%', '95%', '95%'],
+            ['Block unused FAR', '0 sf', '100,666 sf', '110,791 sf'],
+          ],
+          caption: 'Identical structure across all sites — every row is present for every site.',
+        },
+      },
+      { heading: 'Reasoning', paragraphs: ['Applying the selection rule across the sites, 175 3rd Street ranks first on development headroom and entitlement record.'] },
+    ],
+    appendix: {
+      overall: 'live',
+      overall_note: 'Every figure in this document was fetched live from an authoritative public source at generation time.',
+      rows: [{ block: 'Zoning / PLUTO', source: 'NYC Open Data — MapPLUTO (64uk-42ks)', provenance: 'live', fetched_at: GENERATED_AT }],
+    },
+    generatedAt: GENERATED_AT,
+  };
+}
+
 // One representative model per implemented document type.
 export const SAMPLE_MODELS: Record<string, RenderModel> = {
   tax_appeal_packet: taxAppealSample(),
+  site_screening_memo: siteScreeningSample(),
+  three_site_comparison_brief: comparisonSample(),
 };

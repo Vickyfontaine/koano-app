@@ -17,13 +17,28 @@ import { assembleDocumentData, getLetterhead } from '../../../../lib/documents/a
 import { buildProvenanceAppendix } from '../../../../lib/documents/disclaimer';
 import { renderPdf } from '../../../../lib/documents/render/pdf';
 import { renderDocx } from '../../../../lib/documents/render/docx';
+import type { RenderModel } from '../../../../lib/documents/render/model';
 import type { BuildSource, DocumentFormat } from '../../../../lib/documents/types';
+import type { Provenance } from '../../../../lib/providers/types';
 import {
   extractTaxAppealFacts,
   deterministicArgument,
   generateTaxAppealArgument,
   buildTaxAppealModel,
 } from '../../../../lib/documents/builders/tax-appeal';
+import {
+  extractScreeningFacts,
+  computeVerdict,
+  deterministicReasoning,
+  generateScreeningReasoning,
+  buildScreeningModel,
+} from '../../../../lib/documents/builders/site-screening';
+import {
+  buildComparisonModel,
+  deterministicComparisonReasoning,
+  generateComparisonReasoning,
+  type ComparisonSite,
+} from '../../../../lib/documents/builders/site-comparison';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -41,6 +56,7 @@ export async function POST(req: Request) {
   let body: {
     docType?: unknown;
     address?: unknown;
+    addresses?: unknown;
     format?: unknown;
     buildSource?: unknown;
     verdictId?: unknown;
@@ -53,10 +69,21 @@ export async function POST(req: Request) {
 
   const docTypeId = typeof body.docType === 'string' ? body.docType : '';
   const address = typeof body.address === 'string' ? body.address.trim() : '';
-  if (!address) return NextResponse.json({ error: '"address" is required' }, { status: 400 });
+  const addresses = Array.isArray(body.addresses)
+    ? body.addresses.filter((a): a is string => typeof a === 'string' && a.trim().length > 0).map((a) => a.trim())
+    : [];
 
   const doc = getDocumentType(docTypeId);
   if (!doc) return NextResponse.json({ error: `Unknown document type "${docTypeId}"` }, { status: 404 });
+
+  // Address requirement is scope-aware: multi_site takes up to 3 addresses.
+  if (doc.scope === 'multi_site') {
+    if (addresses.length === 0) {
+      return NextResponse.json({ error: '"addresses" (1–3) is required for this document' }, { status: 400 });
+    }
+  } else if (!address) {
+    return NextResponse.json({ error: '"address" is required' }, { status: 400 });
+  }
 
   // Blocked-by-design types (representative-provider dependencies) never ship.
   if (doc.status === 'blocked') {
@@ -90,31 +117,70 @@ export async function POST(req: Request) {
   const guard = await guardDocument({ userId, doc, buildSource, route: '/api/documents' });
   if (!guard.ok) return NextResponse.json(guard.body, { status: guard.status });
 
-  // Assemble live data through the shared block layer.
-  const assembled = await assembleDocumentData(address, doc.requiredBlocks);
-  if (!assembled.ok) return NextResponse.json({ error: assembled.error }, { status: assembled.status });
-  const data = assembled.data;
+  const letterhead = await getLetterhead(userId);
+  const generatedAt = new Date().toISOString();
 
-  // Tax-appeal-specific build.
-  const extracted = extractTaxAppealFacts(data);
-  if (!extracted.ok) return NextResponse.json({ error: extracted.error }, { status: 422 });
-  const facts = extracted.facts;
+  // Per-type build → a RenderModel plus the audit fields. Every branch asserts
+  // its own provenance (from the blocks it actually uses).
+  let model: RenderModel;
+  let addressInput: string;
+  let bbl: string | null;
+  let overallProvenance: Provenance;
 
-  let argument: string[];
   try {
-    argument =
-      buildSource === 'fresh' ? await generateTaxAppealArgument(facts) : deterministicArgument(facts);
+    if (doc.id === 'three_site_comparison_brief') {
+      const sites: ComparisonSite[] = [];
+      for (const a of addresses.slice(0, 3)) {
+        const r = await assembleDocumentData(a, doc.requiredBlocks);
+        if (!r.ok) return NextResponse.json({ error: `${a}: ${r.error}` }, { status: r.status });
+        const ex = extractScreeningFacts(r.data);
+        if (!ex.ok) return NextResponse.json({ error: `${a}: ${ex.error}` }, { status: 422 });
+        sites.push({ address: a, data: r.data, facts: ex.facts, verdict: computeVerdict(ex.facts) });
+      }
+      const reasoning =
+        buildSource === 'fresh' ? await generateComparisonReasoning(sites) : deterministicComparisonReasoning(sites);
+      model = buildComparisonModel({ sites, letterhead, reasoning, generatedAt });
+      addressInput = sites.map((s) => s.address).join(' | ');
+      bbl = sites[0].facts.bbl;
+      overallProvenance = model.appendix.overall;
+    } else if (doc.id === 'site_screening_memo') {
+      const r = await assembleDocumentData(address, doc.requiredBlocks);
+      if (!r.ok) return NextResponse.json({ error: r.error }, { status: r.status });
+      const ex = extractScreeningFacts(r.data);
+      if (!ex.ok) return NextResponse.json({ error: ex.error }, { status: 422 });
+      const verdict = computeVerdict(ex.facts);
+      const reasoning =
+        buildSource === 'fresh' ? await generateScreeningReasoning(ex.facts, verdict) : deterministicReasoning(ex.facts, verdict);
+      model = buildScreeningModel({ data: r.data, facts: ex.facts, verdict, letterhead, reasoning, generatedAt });
+      addressInput = r.data.resolved_address.input;
+      bbl = r.data.resolved_address.bbl;
+      overallProvenance = model.appendix.overall;
+    } else {
+      // tax_appeal_packet
+      const r = await assembleDocumentData(address, doc.requiredBlocks);
+      if (!r.ok) return NextResponse.json({ error: r.error }, { status: r.status });
+      const ex = extractTaxAppealFacts(r.data);
+      if (!ex.ok) return NextResponse.json({ error: ex.error }, { status: 422 });
+      const argument =
+        buildSource === 'fresh' ? await generateTaxAppealArgument(ex.facts) : deterministicArgument(ex.facts);
+      model = buildTaxAppealModel({
+        data: r.data,
+        facts: ex.facts,
+        letterhead,
+        argument,
+        appendix: buildProvenanceAppendix(r.data),
+        generatedAt,
+      });
+      addressInput = r.data.resolved_address.input;
+      bbl = r.data.resolved_address.bbl;
+      overallProvenance = r.data.overall_provenance;
+    }
   } catch (e) {
     return NextResponse.json(
-      { error: `Argument generation failed: ${e instanceof Error ? e.message : String(e)}` },
+      { error: `Build failed: ${e instanceof Error ? e.message : String(e)}` },
       { status: 502 },
     );
   }
-
-  const letterhead = await getLetterhead(userId);
-  const appendix = buildProvenanceAppendix(data);
-  const generatedAt = new Date().toISOString();
-  const model = buildTaxAppealModel({ data, facts, letterhead, argument, appendix, generatedAt });
 
   let buffer: Buffer;
   try {
@@ -140,8 +206,8 @@ export async function POST(req: Request) {
         format,
         build_source: buildSource,
         title: doc.title,
-        address_input: data.resolved_address.input,
-        overall_provenance: data.overall_provenance,
+        address_input: addressInput,
+        overall_provenance: overallProvenance,
       });
   } catch (e) {
     console.error('[documents] audit insert failed:', e instanceof Error ? e.message : String(e));
@@ -156,8 +222,8 @@ export async function POST(req: Request) {
     status: 200,
     headers: {
       'Content-Type': contentType,
-      'Content-Disposition': `attachment; filename="${filenameFor(doc.id, data.resolved_address.bbl, format)}"`,
-      'X-KOANO-Provenance': data.overall_provenance,
+      'Content-Disposition': `attachment; filename="${filenameFor(doc.id, bbl, format)}"`,
+      'X-KOANO-Provenance': overallProvenance,
       'Cache-Control': 'no-store',
     },
   });

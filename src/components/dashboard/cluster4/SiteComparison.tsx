@@ -14,6 +14,7 @@ import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
 import { VERDICT_COLORS, type SynthesisResult, type Verdict } from "@/components/ui/verdict";
 import { useVerdictStream, type VerdictStream } from "../useVerdictStream";
 import SitePanels from "./SitePanels";
+import DocumentButton from "../DocumentButton";
 import type { SiteDetailResponse } from "@/app/api/site-detail/route";
 
 const SLOT_LABELS = ["Site A", "Site B", "Site C"];
@@ -337,9 +338,27 @@ export default function SiteComparison() {
                   minoritySignals={r.verdict.minority_signals}
                   agentSummaries={r.verdict.agent_summaries}
                 />
+                <DocumentButton
+                  docType="site_screening_memo"
+                  title="Development Site Screening Memo"
+                  address={r.resolved_address.normalized}
+                  hasRecentVerdict={true}
+                  id={`c4-screening-${slot}`}
+                />
               </div>
             );
           })}
+
+          {/* One comparison brief across the ranked sites */}
+          {ranked.length >= 2 && (
+            <DocumentButton
+              docType="three_site_comparison_brief"
+              title="Three-Site Comparison Brief"
+              addresses={ranked.map((slot) => streams[slot].result!.resolved_address.normalized)}
+              hasRecentVerdict={true}
+              id="c4-comparison-brief"
+            />
+          )}
         </>
       )}
 

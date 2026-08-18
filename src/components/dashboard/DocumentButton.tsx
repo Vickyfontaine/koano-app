@@ -18,7 +18,8 @@ type DocumentFormat = "pdf" | "docx";
 interface DocumentButtonProps {
   docType: string;
   title: string; // human label, e.g. "Tax Appeal Evidence Packet"
-  address: string; // the analyzed subject address
+  address?: string; // single-site subject address
+  addresses?: string[]; // multi_site (comparison brief) — up to 3
   formats?: DocumentFormat[]; // default ['pdf']
   hasRecentVerdict?: boolean; // when true, default to reusing the last analysis
   id?: string;
@@ -34,10 +35,12 @@ export default function DocumentButton({
   docType,
   title,
   address,
+  addresses,
   formats = ["pdf"],
   hasRecentVerdict = false,
   id,
 }: DocumentButtonProps) {
+  const isMulti = Array.isArray(addresses) && addresses.length > 0;
   const [source, setSource] = useState<BuildSource>(hasRecentVerdict ? "verdict" : "fresh");
   const [format, setFormat] = useState<DocumentFormat>(formats[0]);
   const [busy, setBusy] = useState(false);
@@ -52,7 +55,11 @@ export default function DocumentButton({
       const res = await fetch("/api/documents", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ docType, address, format, buildSource: source }),
+        body: JSON.stringify(
+          isMulti
+            ? { docType, addresses, format, buildSource: source }
+            : { docType, address, format, buildSource: source },
+        ),
       });
       if (!res.ok) {
         // Errors come back as JSON; surface the guard/validation message.
