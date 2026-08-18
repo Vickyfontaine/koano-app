@@ -37,7 +37,10 @@ export const femaFlood: FloodProvider = {
       `&outFields=FLD_ZONE,ZONE_SUBTY,STATIC_BFE&returnGeometry=false&f=json`;
 
     try {
-      const res = await fetchJson<NfhlResponse>(url, { timeoutMs: 30000 });
+      // retries: an all-live memo must not degrade to a representative flood
+      // figure on a transient NFHL blip (matches the entitlement/assemblage
+      // providers). fetchJson backs off between attempts.
+      const res = await fetchJson<NfhlResponse>(url, { timeoutMs: 30000, retries: 3 });
       if (res.error) throw new Error(res.error.message ?? 'NFHL service error');
       if (!Array.isArray(res.features)) throw new Error('Unexpected NFHL response shape');
 

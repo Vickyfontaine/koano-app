@@ -72,7 +72,9 @@ function check(name: string, cond: boolean, detail?: string) {
   check('verdict row present', text.includes('KOANO verdict'));
   check('rank row present', text.includes('Risk-adjusted rank') && /#1/.test(text));
   check('City of Yes affordable row present', text.includes('affordable max'));
-  check('all 3 sites as columns', ADDRESSES.every((a) => text.includes(a.split(',')[0].slice(0, 18))));
+  // Stable prefixes (street-type is abbreviated in the grid, never truncated mid-word).
+  check('all 3 sites as columns', ['175 3rd', '517 8th', '47-07 Vernon'].every((p) => text.includes(p)));
+  check('site name not truncated mid-word', !/Bouleva\b/.test(text));
   check('reasoning present', text.includes('Reasoning'));
   check('provenance resolved', ['live', 'representative'].includes(model.appendix.overall), model.appendix.overall);
 

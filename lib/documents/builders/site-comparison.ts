@@ -10,7 +10,7 @@ import type { Provenance } from '../../providers/types';
 import type { DocumentData, Letterhead } from '../types';
 import type { RenderModel, RenderSection } from '../render/model';
 import { getAnthropicClient, KOANO_RUNTIME_MODEL } from '../../agents/shared';
-import { SELECTION_RULE, type ScreeningFacts, type ScreeningVerdict } from './site-screening';
+import { SELECTION_RULE, capSentences, type ScreeningFacts, type ScreeningVerdict } from './site-screening';
 
 export interface ComparisonSite {
   address: string;
@@ -27,8 +27,21 @@ function fmtMoney(n: number | null | undefined): string {
   if (n == null || !Number.isFinite(n)) return '—';
   return `$${Math.round(n).toLocaleString('en-US')}`;
 }
+// Short, non-truncating column label: abbreviate street types, then only
+// ellipsize at a word boundary if still long (never mid-word like "Bouleva").
 function shortAddr(a: string): string {
-  return (a.split(',')[0] || a).slice(0, 20);
+  let s = (a.split(',')[0] || a).trim();
+  s = s
+    .replace(/\bBoulevard\b/gi, 'Blvd')
+    .replace(/\bStreet\b/gi, 'St')
+    .replace(/\bAvenue\b/gi, 'Ave')
+    .replace(/\bPlace\b/gi, 'Pl')
+    .replace(/\bRoad\b/gi, 'Rd')
+    .replace(/\bDrive\b/gi, 'Dr')
+    .replace(/\bParkway\b/gi, 'Pkwy')
+    .replace(/\bTerrace\b/gi, 'Ter');
+  if (s.length > 22) s = s.slice(0, 21).replace(/\s\S*$/, '').trim() + '…';
+  return s;
 }
 function decisionScore(d: ScreeningVerdict['decision']): number {
   return d === 'ADVANCE' ? 2 : d === 'HOLD' ? 1 : 0;
@@ -76,6 +89,7 @@ export const COMPARISON_REASONING_SYSTEM_PROMPT = `You are KOANO's development s
 
 Rules:
 - Use ONLY the provided facts. Never invent figures or entitlement outcomes.
+- Do NOT speculate beyond the facts. When a value is zero because a condition does not apply (e.g. adjacent-block unused FAR is zero on a single-lot block), do not invent an explanation for it.
 - You MUST state the selection rule (provided) and rank the sites under it — explain why the top site ranks first, not just which one.
 - Screening, not feasibility: no financial modelling, no pro forma, no rents or returns.
 - Neutral, decision-support tone. Not investment advice, not a guarantee.
@@ -113,14 +127,14 @@ export function deterministicComparisonReasoning(sites: ComparisonSite[]): strin
 export async function generateComparisonReasoning(sites: ComparisonSite[]): Promise<string[]> {
   const msg = await getAnthropicClient().messages.create({
     model: KOANO_RUNTIME_MODEL,
-    max_tokens: 500,
+    max_tokens: 400,
     system: [{ type: 'text', text: COMPARISON_REASONING_SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }],
     messages: [{ role: 'user', content: JSON.stringify(factsForModel(sites), null, 2) }],
   });
   const block = msg.content.find((b) => b.type === 'text');
   const text = block && block.type === 'text' ? block.text.trim() : '';
   if (!text) return deterministicComparisonReasoning(sites);
-  return text.split(/\n{2,}/).map((p) => p.replace(/\s+/g, ' ').trim()).filter(Boolean);
+  return capSentences(text.split(/\n{2,}/).map((p) => p.replace(/\s+/g, ' ').trim()).filter(Boolean));
 }
 
 // ---- assembly ---------------------------------------------------------------
@@ -147,11 +161,15 @@ export function buildComparisonModel(args: {
     row('Zoning district', (s) => s.facts.zoningDistrict ?? '—'),
     row('Base max floor area', (s) => `${fmtInt(s.facts.baseMaxFloorArea)} sf`),
     row('City of Yes affordable max', (s) => `${fmtInt(s.facts.affMaxFloorArea)} sf`),
-    row('Unused development rights', (s) => `${fmtInt(s.facts.unusedDevRights)} sf`),
+    row('Unused development rights', (s) =>
+      s.facts.unusedDevRights === 0 && (s.facts.buildingAreaSqft ?? 0) > 0
+        ? '0 · built out'
+        : `${fmtInt(s.facts.unusedDevRights)} sf`,
+    ),
     row('CD approval ratio', (s) => (s.facts.approvalRatio != null ? `${s.facts.approvalRatio}%` : '—')),
     row('Median filing timeline', (s) => (s.facts.cdMedianTimelineDays != null ? `${fmtInt(s.facts.cdMedianTimelineDays)} d` : '—')),
     row('Opportunity Zone', (s) => (s.facts.isOpportunityZone ? 'Yes' : 'No')),
-    row('Block unused FAR', (s) => `${fmtInt(s.facts.blockUnusedFar)} sf`),
+    row('Adjacent block unused FAR', (s) => `${fmtInt(s.facts.blockUnusedFar)} sf`),
     row('Flood (SFHA)', (s) => (s.facts.floodZone ? `${s.facts.floodZone}${s.facts.inSFHA ? ' · SFHA' : ''}` : '—')),
     row('Open HPD violations', (s) => fmtInt(s.facts.openViolationsLot)),
     row('Speculation watch', (s) => (s.facts.onSpeculationWatch ? 'Yes' : 'No')),

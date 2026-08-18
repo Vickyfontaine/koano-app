@@ -80,7 +80,10 @@ async function assertDocxFooter(label: string, model: RenderModel, tag: string) 
     const model = SAMPLE_MODELS[type];
     if (!model) continue; // already flagged in [1]
     const doc = getDocumentType(type);
-    await assertPdfEveryPage(type, model);
+    // multi_site samples MUST span ≥2 pages so the page-2 footer is actually
+    // tested for that type (a 1-page sample silently skips the pagination path).
+    const minPages = doc?.scope === 'multi_site' ? 2 : undefined;
+    await assertPdfEveryPage(type, model, minPages ? { minPages } : undefined);
     if (doc && doc.formats.includes('docx')) {
       await assertDocxFooter(type, model, type);
     }

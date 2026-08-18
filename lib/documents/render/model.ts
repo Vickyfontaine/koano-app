@@ -50,6 +50,9 @@ export interface RenderSection {
   band?: RenderBand;
   highlight?: RenderHighlight;
   trimNote?: string;
+  // When true, the section is kept on a single page (wrap=false) rather than
+  // splitting mid-table across a page break — used for the DD gap register.
+  keepTogether?: boolean;
   // Optional inline provenance callout under the heading (e.g. a representative
   // figure the reader must not treat as live).
   provenanceNote?: { provenance: Provenance; text: string };

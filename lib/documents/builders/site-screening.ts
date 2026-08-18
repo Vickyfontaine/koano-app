@@ -202,25 +202,44 @@ export const SELECTION_RULE =
 
 // Deterministic ADVANCE / HOLD / PASS — transparent scoring over live signals.
 export function computeVerdict(f: ScreeningFacts): ScreeningVerdict {
+  // Continuous scoring so magnitude actually moves the number — two sites with
+  // different headroom and different entitlement timelines must not land on the
+  // same figure. Base 50; each driver is a signed, bounded contribution.
   let score = 50;
   const pos: string[] = [];
   const neg: string[] = [];
 
+  // 1. Headroom MAGNITUDE (primary): absolute buildable rights, continuous.
+  //    ~+1 per 20k sq ft, capped at +20 (≈400k sq ft saturates).
+  if (f.unusedDevRights != null) {
+    const mag = clamp(f.unusedDevRights / 20000, 0, 20);
+    score += mag;
+    if (mag >= 12) pos.push(`${fmtInt(f.unusedDevRights)} sq ft of unused development rights`);
+    else if (mag <= 3) neg.push('limited unused development rights');
+  }
+  // 2. Headroom EFFICIENCY (%): is the lot underbuilt relative to its district?
   if (f.unusedFarPct != null) {
-    if (f.unusedFarPct >= 50) { score += 20; pos.push('material unused FAR'); }
-    else if (f.unusedFarPct >= 20) { score += 10; pos.push('moderate unused FAR'); }
-    else if (f.unusedFarPct < 5) { score -= 12; neg.push('little development headroom'); }
+    if (f.unusedFarPct >= 50) score += 8;
+    else if (f.unusedFarPct >= 20) score += 4;
+    else if (f.unusedFarPct < 5) { score -= 10; neg.push('little development headroom'); }
   }
+  // 3. Entitlement FAVORABILITY: CD approval rate, continuous around 70%.
   if (f.approvalRatio != null) {
-    if (f.approvalRatio >= 90) { score += 15; pos.push(`a ${f.approvalRatio}% CD approval rate`); }
-    else if (f.approvalRatio >= 75) { score += 6; }
-    else if (f.approvalRatio < 60) { score -= 12; neg.push('a weak CD approval rate'); }
+    score += clamp((f.approvalRatio - 70) / 2.5, -12, 12);
+    if (f.approvalRatio >= 90) pos.push(`a ${f.approvalRatio}% CD approval rate`);
+    else if (f.approvalRatio < 60) neg.push('a weak CD approval rate');
   }
+  // 4. Entitlement TIMELINE friction: longer median filing timeline lowers the
+  //    score, faster raises it — a real input, not a noted-but-ignored factor.
+  if (f.cdMedianTimelineDays != null) {
+    const friction = clamp((f.cdMedianTimelineDays - 300) / 40, -4, 12); // >300d penalizes, <300d rewards
+    score -= friction;
+    if (f.cdMedianTimelineDays >= 500) neg.push(`a ~${fmtInt(f.cdMedianTimelineDays)}-day entitlement timeline`);
+    else if (f.cdMedianTimelineDays <= 300) pos.push('a fast entitlement timeline');
+  }
+  // 5. Flags.
   if (f.isOpportunityZone) { score += 5; pos.push('Opportunity Zone status'); }
-  if (f.hpiYoy != null) {
-    if (f.hpiYoy > 0) score += 5;
-    else if (f.hpiYoy < -3) { score -= 8; neg.push('falling area prices'); }
-  }
+  if (f.hpiYoy != null && f.hpiYoy < -3) { score -= 8; neg.push('falling area prices'); }
   if (f.inSFHA) { score -= 12; neg.push('a FEMA special flood hazard area'); }
   if (f.openViolationsLot > 0) { score -= 8; neg.push(`${f.openViolationsLot} open HPD violations`); }
   if (f.onSpeculationWatch) { score -= 8; neg.push('Speculation Watch List status'); }
@@ -229,9 +248,10 @@ export function computeVerdict(f: ScreeningFacts): ScreeningVerdict {
   const decision: ScreeningVerdict['decision'] = score >= 66 ? 'ADVANCE' : score >= 45 ? 'HOLD' : 'PASS';
   const tone: ScreeningVerdict['tone'] = decision === 'ADVANCE' ? 'positive' : decision === 'HOLD' ? 'warning' : 'negative';
 
-  // Confidence: distance from the midpoint, softened; trimmed if the entitlement
-  // signal (the highest-weight input) is missing.
-  let confidence = clamp(55 + Math.abs(score - 50) * 0.8, 45, 95);
+  // Confidence tracks the score's distance from the decision midpoint (a strong
+  // signal either way is high confidence); trimmed if the highest-weight
+  // entitlement signal is missing.
+  let confidence = clamp(50 + Math.abs(score - 50) * 0.9, 45, 95);
   if (f.approvalRatio == null) confidence = clamp(confidence - 12, 40, 90);
 
   const posPart = pos.length ? pos.slice(0, 2).join(' and ') : 'limited positive signal';
@@ -247,6 +267,7 @@ export const SCREENING_REASONING_SYSTEM_PROMPT = `You are KOANO's development si
 
 Rules:
 - Use ONLY the provided facts. Never invent figures, rules, or entitlement outcomes.
+- Do NOT speculate beyond the facts or contradict the memo's deterministic sections. When a value is zero or absent because the underlying condition does not apply, say the condition does not apply — do NOT invent a market or physical explanation. Specifically: if sole_lot_on_block is true, adjacent_block_unused_far_sqft is zero because there are no adjacent lots on the tax block; never suggest neighboring parcels are built out, at capacity, or unavailable.
 - You MUST state the selection rule (provided) — explain why this site earned its verdict under that rule, not just the conclusion.
 - This is a screening memo, not a feasibility study: no financial modelling, no pro forma, no residual land value, no rents or returns.
 - Neutral, decision-support tone. Not investment advice, not a guarantee.
@@ -268,8 +289,10 @@ function factsForModel(f: ScreeningFacts, v: ScreeningVerdict) {
     in_special_flood_hazard_area: f.inSFHA,
     open_hpd_violations: f.openViolationsLot,
     on_speculation_watch: f.onSpeculationWatch,
+    block_lot_count: f.blockLotCount,
+    sole_lot_on_block: f.blockLotCount <= 1,
     same_owner_adjacent_lots: f.sameOwnerLotCount,
-    block_unused_far_sqft: f.blockUnusedFar,
+    adjacent_block_unused_far_sqft: f.blockUnusedFar, // excludes the subject lot
   };
 }
 
@@ -280,17 +303,28 @@ export function deterministicReasoning(f: ScreeningFacts, v: ScreeningVerdict): 
   ];
 }
 
+// Enforce the spec's 4–6 sentence ceiling on model prose regardless of what the
+// model returns, grouped into paragraphs of three for readability.
+export function capSentences(paras: string[], max = 6): string[] {
+  const joined = paras.join(' ').replace(/\s+/g, ' ').trim();
+  const sentences = (joined.match(/[^.!?]+[.!?]+/g) ?? [joined]).map((s) => s.trim()).filter(Boolean).slice(0, max);
+  if (sentences.length === 0) return paras;
+  const out: string[] = [];
+  for (let i = 0; i < sentences.length; i += 3) out.push(sentences.slice(i, i + 3).join(' '));
+  return out;
+}
+
 export async function generateScreeningReasoning(f: ScreeningFacts, v: ScreeningVerdict): Promise<string[]> {
   const msg = await getAnthropicClient().messages.create({
     model: KOANO_RUNTIME_MODEL,
-    max_tokens: 450,
+    max_tokens: 380,
     system: [{ type: 'text', text: SCREENING_REASONING_SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }],
     messages: [{ role: 'user', content: JSON.stringify(factsForModel(f, v), null, 2) }],
   });
   const block = msg.content.find((b) => b.type === 'text');
   const text = block && block.type === 'text' ? block.text.trim() : '';
   if (!text) return deterministicReasoning(f, v);
-  return text.split(/\n{2,}/).map((p) => p.replace(/\s+/g, ' ').trim()).filter(Boolean);
+  return capSentences(text.split(/\n{2,}/).map((p) => p.replace(/\s+/g, ' ').trim()).filter(Boolean));
 }
 
 // ---- assembly ---------------------------------------------------------------
@@ -329,6 +363,7 @@ function ddRegisterSection(): RenderSection {
   ];
   return {
     heading: 'Due Diligence Gap Register',
+    keepTogether: true, // never split the register mid-table across a page break
     table: { columns: ['Item', 'Status'], rows },
     paragraphs: ['This register states what KOANO verified from public record and what remains open — it is not a complete due-diligence report.'],
   };
@@ -388,7 +423,12 @@ export function buildScreeningModel(args: {
         ['Zoning district', f.zoningDistrict ?? '—'],
         ['Commercial / community-facility FAR', `${fmtFar(f.commFar)} / ${fmtFar(f.facilFar)}`],
         ['Existing building area', `${fmtInt(f.buildingAreaSqft)} sq ft (built FAR ${fmtFar(f.builtFar)})`],
-        ['Unused development rights (base)', `${fmtInt(f.unusedDevRights)} sq ft`],
+        [
+          'Unused development rights (base)',
+          f.unusedDevRights === 0 && (f.buildingAreaSqft ?? 0) > 0
+            ? 'Built out at base FAR (affordable-housing rights may remain — see above)'
+            : `${fmtInt(f.unusedDevRights)} sq ft`,
+        ],
         ['Year built / building class', `${f.yearBuilt ?? '—'} / ${f.buildingClass ?? '—'}`],
       ],
     },
@@ -416,11 +456,16 @@ export function buildScreeningModel(args: {
   // 5. Assemblage & air rights (block-level rule). Block-level unused FAR always
   // leads; same-owner adjacency earns space ONLY when it fires (it is rare, and
   // dead "0" rows waste the 2-page ceiling).
+  // "Other block lots" is explicit: block_unused_far EXCLUDES the subject lot
+  // (the subject's own unused rights are the envelope, above), so a single-lot
+  // block correctly reads 0 — no adjacent lots to assemble from.
   const hasSameOwner = f.sameOwnerLotCount > 0;
+  const soleLot = f.blockLotCount <= 1;
   const asmRows: string[][] = [
     ['Registered owner', f.ownerName ?? '—'],
     ['Lots on the tax block', fmtInt(f.blockLotCount)],
-    ['Block unused development rights', `${fmtInt(f.blockUnusedFar)} sq ft`],
+    ['Other lots on block', fmtInt(Math.max(0, f.blockLotCount - 1))],
+    ['Unused rights on OTHER block lots', `${fmtInt(f.blockUnusedFar)} sq ft`],
   ];
   if (hasSameOwner) {
     asmRows.push([
@@ -431,11 +476,13 @@ export function buildScreeningModel(args: {
   }
   sections.push({
     heading: 'Assemblage & Air Rights',
-    table: { columns: ['Block-level', 'Value'], rows: asmRows },
+    table: { columns: ['Block-level (excludes the subject lot)', 'Value'], rows: asmRows },
     paragraphs: [
-      hasSameOwner
-        ? 'A single entity already controls adjacent block lots — a potential assemblage opportunity.'
-        : 'Block-level unused development rights are the assemblage read here.',
+      soleLot
+        ? 'The subject is the only lot on its tax block, so there are no adjacent block lots to assemble; its own unused rights are in the envelope above.'
+        : hasSameOwner
+          ? 'A single entity already controls adjacent block lots — a potential assemblage opportunity.'
+          : `Adjacent block lots hold ${fmtInt(f.blockUnusedFar)} sq ft of unused development rights (separate from the subject's own).`,
       f.assemblageBlockNote,
     ],
   });
@@ -463,22 +510,29 @@ export function buildScreeningModel(args: {
   if (!f.demoLive) proofSection.trimNote = 'Showing 4 of 5 proof points; ACS demographic direction was unavailable this run.';
   sections.push(proofSection);
 
-  // 8. Risk & mitigant (capped, with a visible trim note on overflow).
+  // 8. Risk & mitigant. Only REAL risks make a table; when none fire, say so in
+  // a line of prose rather than rendering a one-row table with a non-risk.
   const risks: string[][] = [];
   if (f.openViolationsLot > 0) risks.push([`${fmtInt(f.openViolationsLot)} open HPD violations on the lot`, 'Price the cure; confirm no vacate orders before closing.']);
   if (f.portfolioBuildingCount > 1) risks.push([`Owner holds ${fmtInt(f.portfolioBuildingCount)} buildings (concentration)`, 'Ownership concentration can signal portfolio-level distress or leverage.']);
   if (f.onSpeculationWatch) risks.push(['On the NYC Speculation Watch List', 'Rapid-flip pattern; scrutinize prior sale and financing.']);
   if (f.inSFHA) risks.push([`Flood zone ${f.floodZone ?? ''} (in SFHA)`, 'Flood insurance + resilient design required; affects cost and financing.']);
-  if (risks.length === 0) risks.push(['No disqualifying public-record flags on the lot', 'Screening only — open due-diligence items still apply.']);
-  const risksShown = risks.slice(0, MAX_RISK_ROWS);
-  const riskSection: RenderSection = {
-    heading: 'Risk & Mitigant',
-    table: { columns: ['Risk', 'Mitigant / note'], rows: risksShown },
-  };
-  if (risks.length > MAX_RISK_ROWS) {
-    riskSection.trimNote = `Showing ${risksShown.length} of ${risks.length} risk factors; the full set is in the dashboard.`;
+  if (risks.length === 0) {
+    sections.push({
+      heading: 'Risk & Mitigant',
+      paragraphs: ['No disqualifying public-record flags were found on the lot. Open due-diligence items still apply.'],
+    });
+  } else {
+    const risksShown = risks.slice(0, MAX_RISK_ROWS);
+    const riskSection: RenderSection = {
+      heading: 'Risk & Mitigant',
+      table: { columns: ['Risk', 'Mitigant / note'], rows: risksShown },
+    };
+    if (risks.length > MAX_RISK_ROWS) {
+      riskSection.trimNote = `Showing ${risksShown.length} of ${risks.length} risk factors; the full set is in the dashboard.`;
+    }
+    sections.push(riskSection);
   }
-  sections.push(riskSection);
 
   // 9. Reasoning (the single model call, or the deterministic template).
   sections.push({ heading: 'Reasoning', paragraphs: reasoning });

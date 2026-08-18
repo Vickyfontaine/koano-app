@@ -147,7 +147,9 @@ function LetterheadBlock({ lh, s }: { lh: Letterhead; s: Styles }) {
     lh.license_number ? `License ${lh.license_number}` : null,
     [lh.phone, lh.contact_email].filter(Boolean).join('  ·  ') || null,
   ].filter(Boolean) as string[];
-  const hasIdentity = !!(lh.full_name || lines.length);
+  // Left = the PREPARER's identity; right = the KOANO brand mark (once). When
+  // there is no preparer identity, the left is left blank — never a second
+  // "KOANO", which duplicated the wordmark.
   return (
     <View style={s.letterhead}>
       <View>
@@ -155,7 +157,6 @@ function LetterheadBlock({ lh, s }: { lh: Letterhead; s: Styles }) {
         {lines.map((l, i) => (
           <Text key={i} style={s.letterheadLine}>{l}</Text>
         ))}
-        {!hasIdentity ? <Text style={s.letterheadLine}>Prepared with KOANO</Text> : null}
       </View>
       <Text style={s.brandMark}>KOANO</Text>
     </View>
@@ -220,8 +221,14 @@ function HighlightFigures({ highlight, s }: { highlight: NonNullable<RenderSecti
 }
 
 function Section({ section, s }: { section: RenderSection; s: Styles }) {
+  // keepTogether → the whole section moves to the next page rather than
+  // splitting mid-table (e.g. the DD register orphaning its first row).
+  // IMPORTANT: only ever pass `wrap` when keeping together. Passing
+  // wrap={undefined} is coerced to wrap={false} by @react-pdf, which disables
+  // pagination for that section and DROPS the fixed footer on continuation
+  // pages (the multi-page stress test catches this).
   return (
-    <View style={s.section}>
+    <View style={s.section} {...(section.keepTogether ? { wrap: false } : {})}>
       {section.verdict ? <VerdictHeadline v={section.verdict} s={s} /> : null}
       {section.heading ? (
         <Text style={s.heading} minPresenceAhead={40}>{section.heading}</Text>

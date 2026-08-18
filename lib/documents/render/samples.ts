@@ -245,34 +245,67 @@ function siteScreeningSample(): RenderModel {
   };
 }
 
-// A representative Three-Site Comparison Brief — the comparison grid.
+// A representative Three-Site Comparison Brief. DELIBERATELY sized to span TWO
+// pages so the disclaimer harness exercises the multi-site type's page-2 footer
+// — the exact failure class it must catch. (A 1-page sample never tested it.)
 function comparisonSample(): RenderModel {
+  const rows: string[][] = [
+    ['KOANO verdict', 'ADVANCE (78)', 'ADVANCE (72)', 'HOLD (52)'],
+    ['Risk-adjusted rank', '#1', '#2', '#3'],
+    ['Zoning district', 'M1-4/R7-2', 'R6', 'R6B'],
+    ['Base max floor area', '415,528 sf', '242,250 sf', '7,500 sf'],
+    ['City of Yes affordable max', '605,173 sf', '323,000 sf', '9,750 sf'],
+    ['Unused development rights', '402,010 sf', '167,793 sf', '0 · built out'],
+    ['CD approval ratio', '95%', '95%', '95%'],
+    ['Median filing timeline', '567 d', '362 d', '531 d'],
+    ['Opportunity Zone', 'No', 'No', 'No'],
+    ['Adjacent block unused FAR', '0 sf', '144,498 sf', '110,791 sf'],
+    ['Flood (SFHA)', 'X', 'X', 'AE · SFHA'],
+    ['Open HPD violations', '0', '3', '1'],
+    ['Speculation watch', 'No', 'No', 'No'],
+    ['Permit activity (24mo)', '312', '96', '41'],
+    ['Recorded sales $/sf', '$1,156', '$743', '$612'],
+  ];
   return {
     docTitle: 'Three-Site Comparison Brief',
-    subtitle: '175 3rd Street  ·  517 8th Avenue  ·  47-07 Vernon Blvd',
+    subtitle: '175 3rd Street  ·  70-33 260th Street  ·  47-07 Vernon Blvd',
     letterhead: EMPTY_LETTERHEAD,
     compact: true,
     sections: [
       {
         heading: 'Site Comparison',
         table: {
-          columns: ['Metric', '175 3rd Street', '517 8th Avenue', '47-07 Vernon Blvd'],
-          rows: [
-            ['KOANO verdict', 'ADVANCE (87)', 'ADVANCE (71)', 'HOLD (61)'],
-            ['Risk-adjusted rank', '#1', '#2', '#3'],
-            ['City of Yes affordable max', '605,173 sf', '8,412 sf', '9,750 sf'],
-            ['CD approval ratio', '95%', '95%', '95%'],
-            ['Block unused FAR', '0 sf', '100,666 sf', '110,791 sf'],
-          ],
+          columns: ['Metric', '175 3rd Street', '70-33 260th St', '47-07 Vernon Blvd'],
+          rows,
           caption: 'Identical structure across all sites — every row is present for every site.',
         },
       },
-      { heading: 'Reasoning', paragraphs: ['Applying the selection rule across the sites, 175 3rd Street ranks first on development headroom and entitlement record.'] },
+      {
+        // Deliberately long so this sample spans two pages — the harness then
+        // verifies the disclaimer footer on the comparison type's SECOND page.
+        heading: 'Reasoning',
+        paragraphs: Array.from(
+          { length: 10 },
+          (_, i) =>
+            `Reasoning paragraph ${i + 1}: applying the selection rule across the sites, 175 3rd Street leads on the magnitude of its development headroom and a favorable community-district entitlement record, weighed against a longer median filing timeline, while the remaining sites trade headroom against timeline and flood exposure. This is a screening comparison of public record, not a feasibility study, and carries no financial modelling.`,
+        ),
+      },
     ],
     appendix: {
       overall: 'live',
       overall_note: 'Every figure in this document was fetched live from an authoritative public source at generation time.',
-      rows: [{ block: 'Zoning / PLUTO', source: 'NYC Open Data — MapPLUTO (64uk-42ks)', provenance: 'live', fetched_at: GENERATED_AT }],
+      rows: [
+        { block: 'Zoning / PLUTO', source: 'NYC Open Data — MapPLUTO (64uk-42ks)', provenance: 'live', fetched_at: GENERATED_AT },
+        { block: 'Entitlement track record', source: 'NYC Open Data — DOB Job Application Filings (ic3t-wcy2)', provenance: 'live', fetched_at: GENERATED_AT },
+        { block: 'Assemblage / air rights', source: 'NYC Open Data — MapPLUTO block-level ownership + unused FAR', provenance: 'live', fetched_at: GENERATED_AT },
+        { block: 'Comparable sales', source: 'NYC Open Data — DOF Rolling Sales (usep-8jbt)', provenance: 'live', fetched_at: GENERATED_AT },
+        { block: 'Flood zone', source: 'FEMA National Flood Hazard Layer', provenance: 'live', fetched_at: GENERATED_AT },
+        { block: 'Building permits', source: 'NYC Open Data — DOB permit issuance', provenance: 'live', fetched_at: GENERATED_AT },
+        { block: 'House Price Index', source: 'FHFA HPI', provenance: 'live', fetched_at: GENERATED_AT },
+        { block: 'Opportunity Zone', source: 'IRS / CDFI Opportunity Zones', provenance: 'live', fetched_at: GENERATED_AT },
+        { block: 'Building violations', source: 'NYC Open Data — HPD / ECB / DOB', provenance: 'live', fetched_at: GENERATED_AT },
+        { block: 'Ownership / landlord portfolio', source: 'NYC Open Data — HPD registrations', provenance: 'live', fetched_at: GENERATED_AT },
+      ],
     },
     generatedAt: GENERATED_AT,
   };
