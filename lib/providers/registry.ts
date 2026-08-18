@@ -3,9 +3,11 @@
 // a one-line change here (see each mock provider's swap_note).
 
 import type {
+  AssemblageProvider,
   BuildingViolationsProvider,
   CostarDealsProvider,
   CrimeProvider,
+  EntitlementProvider,
   LandlordPortfolioProvider,
   DemographicsProvider,
   FloodProvider,
@@ -26,6 +28,8 @@ import { nycLandlord } from './real/nyc-landlord';
 import { nycPermits } from './real/nyc-permits';
 import { nycViolations } from './real/nyc-violations';
 import { nycZoning } from './real/nyc-zoning';
+import { nycAssemblage } from './real/nyc-assemblage';
+import { nycDobFilings } from './real/nyc-dob-filings';
 import { irsOpportunity } from './real/irs-opportunity';
 import { censusAcs } from './real/census-acs';
 import { fhfaHpi } from './real/fhfa-hpi';
@@ -51,6 +55,8 @@ export interface ProviderRegistry {
   flood: FloodProvider;
   crime: CrimeProvider;
   searchTrends: SearchTrendsProvider;
+  assemblage: AssemblageProvider;
+  entitlement: EntitlementProvider;
   // representative providers — see each mock's swap_note for the live upgrade
   proformaBenchmark: ProformaBenchmarkProvider;
   mlsComps: MlsCompsProvider;
@@ -71,6 +77,8 @@ export const registry: ProviderRegistry = {
   flood: femaFlood,
   crime: fbiUcr,
   searchTrends: googleTrends,
+  assemblage: nycAssemblage,
+  entitlement: nycDobFilings,
   // representative (mock) providers — one-line swap to live per swap_note
   proformaBenchmark: mockProformaBenchmark,
   mlsComps: nycSalesComps, // LIVE — NYC recorded sales (was mock/mls-comps.ts)

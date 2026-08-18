@@ -7,9 +7,11 @@
 import { registry } from './registry';
 import type {
   AcsDemographics,
+  AssemblageSummary,
   BuildingViolationsSummary,
   CostarDealsSummary,
   CrimeStats,
+  EntitlementSummary,
   FloodInfo,
   LandlordPortfolioSummary,
   FootTrafficInfo,
@@ -60,6 +62,8 @@ export interface SiteDetailResponse {
   foot_traffic?: SiteDetailBlock<FootTrafficInfo>;
   premium_hazard?: SiteDetailBlock<PremiumHazardInfo>;
   costar_deals?: SiteDetailBlock<CostarDealsSummary>;
+  assemblage?: SiteDetailBlock<AssemblageSummary>;
+  entitlement?: SiteDetailBlock<EntitlementSummary>;
 }
 
 export type BlockKey = Exclude<keyof SiteDetailResponse, 'resolved_address'>;
@@ -83,6 +87,8 @@ export const BLOCK_FETCHERS: Record<
   foot_traffic: (a) => registry.footTraffic.getFootTraffic(a),
   premium_hazard: (a) => registry.premiumHazard.getHazards(a),
   costar_deals: (a) => registry.costarDeals.getDeals(a),
+  assemblage: (a) => registry.assemblage.getAssemblage(a),
+  entitlement: (a) => registry.entitlement.getEntitlement(a),
 };
 
 export const VALID_BLOCKS = Object.keys(BLOCK_FETCHERS) as BlockKey[];

@@ -29,7 +29,7 @@ function canGenerate(plan: 'free' | Tier, homeTier: Tier): boolean {
   // -----------------------------------------------------------------------
   console.log('\n[1] Registry integrity');
   const entries = Object.entries(DOCUMENT_TYPES);
-  check('16 document types declared', entries.length === 16, `${entries.length}`);
+  check('18 document types declared', entries.length === 18, `${entries.length}`);
   for (const [id, doc] of entries) {
     check(`${id}: id matches key`, doc.id === id);
     check(`${id}: requiredBlocks all valid`, doc.requiredBlocks.every((b) => (VALID_BLOCKS as string[]).includes(b)));

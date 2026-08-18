@@ -229,6 +229,71 @@ export const DOCUMENT_TYPES: Record<string, DocumentType> = {
     status: 'available',
   },
 
+  // The two build targets: all-live, PDF only, no financial modelling
+  // (screening, not feasibility). No `proforma` block (representative).
+  site_screening_memo: {
+    id: 'site_screening_memo',
+    title: 'Development Site Screening Memo',
+    cluster: 'cluster_4',
+    homeTier: 'development',
+    scope: 'property',
+    requiredBlocks: [
+      'zoning',
+      'opportunity_zone',
+      'assemblage',
+      'entitlement',
+      'permits',
+      'mls_comps',
+      'demographics',
+      'hpi',
+      'flood',
+      'building_violations',
+      'landlord_portfolio',
+    ],
+    formats: ['pdf'],
+    sections: [
+      { id: 'verdict', title: 'Verdict', kind: 'deterministic' },
+      { id: 'site_identity', title: 'Site Identity', kind: 'deterministic' },
+      { id: 'envelope', title: 'As-of-Right Envelope', kind: 'deterministic' },
+      { id: 'entitlement', title: 'Entitlement Risk Read', kind: 'deterministic' },
+      { id: 'assemblage', title: 'Assemblage & Air Rights', kind: 'deterministic' },
+      { id: 'dd_gap', title: 'Due Diligence Gap Register', kind: 'deterministic' },
+      { id: 'proof_points', title: 'Proof Points', kind: 'deterministic' },
+      { id: 'risk_mitigant', title: 'Risk & Mitigant', kind: 'deterministic' },
+      { id: 'reasoning', title: 'Reasoning', kind: 'narrative' }, // the single model call
+      { id: 'provenance', title: 'Sources & Provenance', kind: 'deterministic' },
+    ],
+    status: 'available',
+  },
+
+  three_site_comparison_brief: {
+    id: 'three_site_comparison_brief',
+    title: 'Three-Site Comparison Brief',
+    cluster: 'cluster_4',
+    homeTier: 'development',
+    scope: 'multi_site',
+    requiredBlocks: [
+      'zoning',
+      'opportunity_zone',
+      'assemblage',
+      'entitlement',
+      'permits',
+      'mls_comps',
+      'demographics',
+      'hpi',
+      'flood',
+      'building_violations',
+      'landlord_portfolio',
+    ],
+    formats: ['pdf'],
+    sections: [
+      { id: 'grid', title: 'Comparison Grid', kind: 'deterministic' },
+      { id: 'reasoning', title: 'Reasoning', kind: 'narrative' }, // one call across all sites
+      { id: 'provenance', title: 'Sources & Provenance', kind: 'deterministic' },
+    ],
+    status: 'available',
+  },
+
   // ---- Portfolio (Cluster 5) — homeTier 'portfolio' -----------------------
   ic_memo: {
     id: 'ic_memo',

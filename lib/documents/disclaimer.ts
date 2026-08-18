@@ -35,6 +35,8 @@ const BLOCK_LABELS: Record<BlockKey, string> = {
   foot_traffic: 'Foot traffic',
   premium_hazard: 'Premium hazard',
   costar_deals: 'Commercial deals',
+  assemblage: 'Assemblage / air rights',
+  entitlement: 'Entitlement track record',
 };
 
 export interface ProvenanceAppendixRow {
