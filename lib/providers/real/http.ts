@@ -23,7 +23,12 @@ function socrataHeaders(url: string): Record<string, string> {
 }
 
 async function fetchRaw(url: string, opts: FetchOpts = {}): Promise<Response> {
-  const { timeoutMs = 20000, retries = 1 } = opts;
+  // Default to 3 retries: the pipeline fires all five agents in parallel, so
+  // many Socrata calls hit the shared per-IP throttle at once. One retry wasn't
+  // enough — a throttled call fell back to representative and silently changed
+  // an agent's INPUT between runs, making the verdict nondeterministic even with
+  // temp-0 agents. (Setting NYC_OPEN_DATA_APP_TOKEN removes the throttle in prod.)
+  const { timeoutMs = 20000, retries = 3 } = opts;
   const headers = { ...socrataHeaders(url), ...opts.headers };
   let lastErr: unknown;
   for (let attempt = 0; attempt <= retries; attempt++) {

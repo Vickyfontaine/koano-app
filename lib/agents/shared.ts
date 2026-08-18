@@ -98,17 +98,22 @@ You MUST respond with a single JSON object and nothing else. No markdown fences,
 Schema:
 {
   "verdict": "buy" | "sell" | "hold" | "wait" | "drop",
-  "confidence": <integer 0-100>,
-  "signal_window_months": <integer 1-36>,
+  "conviction": "low" | "medium" | "high",
+  "risk_band": "low" | "moderate" | "high",
+  "window_band": "short" | "medium" | "long",
   "headline": "<one sentence, plain language, cites the strongest fact>",
   "reasoning": [
     { "observation": "<one concrete inference from the data>", "sources": ["<exact source name(s) from the data points you relied on>"] }
   ],
   "minority_signals": [
     { "signal": "<a data point that cuts against your verdict>", "note": "<why it was outweighed>" }
-  ],
-  "risk_score": <integer 0-100, higher = riskier>
+  ]
 }
+Judge BANDS, not numbers. You can reliably tell low from high conviction; you cannot meaningfully tell 62 from 65, so KOANO never asks you to. Report a band and KOANO's code turns it into a figure.
+- verdict: the action your evidence most decisively supports. If the evidence is genuinely mixed or thin, prefer the steadier verdict (hold over buy, wait over sell) — do NOT manufacture a directional call from weak signal.
+- conviction: how decisively the evidence supports your verdict. low = mixed or thin evidence; medium = a clear lean; high = strong, converging evidence.
+- risk_band: the downside/volatility level in the evidence. low / moderate / high.
+- window_band: the horizon over which acting on this makes sense. short (~quarter) / medium (~year) / long (~two years).
 Rules:
 - Every reasoning step MUST cite at least one "source" copied EXACTLY from the provided data points.
 - Never invent facts not present in the data points.
@@ -124,13 +129,44 @@ function extractJson(text: string): string {
   return text.slice(start, end + 1);
 }
 
+// --- coarse bands → deterministic numbers ------------------------------------
+// The model judges a band (which temp-0 reproduces reliably); code turns the
+// band into the figure. This removes the invented precision of a fine integer
+// confidence/risk that wobbled a few points between otherwise-identical runs.
+const CONVICTION_TO_CONFIDENCE: Record<string, number> = { low: 58, medium: 72, high: 86 };
+const RISK_BAND_TO_SCORE: Record<string, number> = { low: 25, moderate: 50, high: 80 };
+const WINDOW_BAND_TO_MONTHS: Record<string, number> = { short: 3, medium: 12, long: 24 };
+
+// Deterministic, conservative tie-break for a boundary verdict. An ACTION
+// verdict (buy/sell/drop) requires at least MEDIUM conviction; a low-conviction
+// action collapses to the steadier verdict (buy→hold, sell/drop→wait). This
+// closes the residual temp-0 boundary flip in code rather than trusting the
+// prompt alone, and resolves conservatively — the same direction as the
+// synthesis margin.
+function tieBreakVerdict(verdict: Verdict, conviction: string): Verdict {
+  if (conviction === 'low') {
+    if (verdict === 'buy') return 'hold';
+    if (verdict === 'sell' || verdict === 'drop') return 'wait';
+  }
+  return verdict;
+}
+
+function oneOf(value: unknown, allowed: readonly string[], fallback: string): string {
+  const s = String(value ?? '').toLowerCase().trim();
+  return allowed.includes(s) ? s : fallback;
+}
+
 export async function callAgentLLM(args: {
   agent: AgentName;
   systemPrompt: string;
   addressLabel: string;
   dataPoints: DataPoint[];
+  // Temperature is EXPLICIT, never the API default (1.0). The five specialist
+  // agents run at 0 so their verdicts are reproducible on identical data; the
+  // synthesis NARRATIVE call passes a higher value since it decides nothing.
+  temperature?: number;
 }): Promise<LlmAgentResponse> {
-  const { agent, systemPrompt, addressLabel, dataPoints } = args;
+  const { agent, systemPrompt, addressLabel, dataPoints, temperature = 0 } = args;
 
   const userPayload = JSON.stringify(
     {
@@ -149,6 +185,7 @@ export async function callAgentLLM(args: {
   const msg = await anthropic().messages.create({
     model: KOANO_RUNTIME_MODEL,
     max_tokens: 2000,
+    temperature,
     system: [
       {
         type: 'text',
@@ -164,29 +201,40 @@ export async function callAgentLLM(args: {
     throw new Error(`Agent ${agent}: no text block in LLM response`);
   }
 
-  const raw = JSON.parse(extractJson(textBlock.text)) as Partial<LlmAgentResponse>;
+  const raw = JSON.parse(extractJson(textBlock.text)) as Record<string, unknown>;
 
   const validVerdicts: Verdict[] = ['buy', 'sell', 'hold', 'wait', 'drop'];
-  if (!raw.verdict || !validVerdicts.includes(raw.verdict)) {
+  const rawVerdict = raw.verdict as Verdict;
+  if (!rawVerdict || !validVerdicts.includes(rawVerdict)) {
     throw new Error(`Agent ${agent}: invalid verdict "${String(raw.verdict)}"`);
   }
-  if (!Array.isArray(raw.reasoning) || raw.reasoning.length === 0) {
+  const rawReasoning = raw.reasoning;
+  if (!Array.isArray(rawReasoning) || rawReasoning.length === 0) {
     throw new Error(`Agent ${agent}: empty reasoning`);
   }
 
+  // Coarse bands → deterministic figures; conservative code tie-break on verdict.
+  const conviction = oneOf(raw.conviction, ['low', 'medium', 'high'], 'medium');
+  const riskBand = oneOf(raw.risk_band, ['low', 'moderate', 'high'], 'moderate');
+  const windowBand = oneOf(raw.window_band, ['short', 'medium', 'long'], 'medium');
+  const verdict = tieBreakVerdict(rawVerdict, conviction);
+
   return {
-    verdict: raw.verdict,
-    confidence: clamp(Number(raw.confidence ?? 50), 0, 100),
-    signal_window_months: clamp(Number(raw.signal_window_months ?? 12), 1, 36),
-    headline: String(raw.headline ?? '').trim() || `${agent} verdict: ${raw.verdict}`,
-    reasoning: raw.reasoning.map((r) => ({
+    verdict,
+    confidence: CONVICTION_TO_CONFIDENCE[conviction],
+    signal_window_months: WINDOW_BAND_TO_MONTHS[windowBand],
+    headline: String(raw.headline ?? '').trim() || `${agent} verdict: ${verdict}`,
+    reasoning: (rawReasoning as Array<{ observation?: unknown; sources?: unknown }>).map((r) => ({
       observation: String(r.observation ?? ''),
       sources: Array.isArray(r.sources) ? r.sources.map(String) : [],
     })),
     minority_signals: Array.isArray(raw.minority_signals)
-      ? raw.minority_signals.map((m) => ({ signal: String(m.signal ?? ''), note: m.note ? String(m.note) : undefined }))
+      ? (raw.minority_signals as Array<{ signal?: unknown; note?: unknown }>).map((m) => ({
+          signal: String(m.signal ?? ''),
+          note: m.note ? String(m.note) : undefined,
+        }))
       : [],
-    risk_score: clamp(Number(raw.risk_score ?? 50), 0, 100),
+    risk_score: RISK_BAND_TO_SCORE[riskBand],
   };
 }
 

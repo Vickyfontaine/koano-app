@@ -27,23 +27,118 @@ import { runDemandSentimentAgent } from './demand-sentiment';
 import { runRiskVolatilityAgent } from './risk-volatility';
 import { runMarketTimingAgent } from './market-timing';
 
-const SYSTEM_PROMPT = `You are KOANO's Synthesis agent. Five specialist agents (market-timing, infrastructure, demand-sentiment, risk-volatility, regulatory-policy) have each delivered a verdict on the same property. You arbitrate them into ONE unified verdict.
+// The synthesis LLM is a NARRATOR only. The verdict, confidence, risk, and
+// window are decided by KOANO's deterministic aggregator (below); the model
+// receives that decision and explains it. It cannot change the verdict —
+// runSynthesis enforces the code verdict and logs any contradiction.
+const NARRATOR_SYSTEM_PROMPT = `You are KOANO's Synthesis narrator. KOANO's deterministic aggregator has ALREADY decided the verdict, confidence, risk score, and signal window from the five specialist agents. You do NOT decide these and MUST NOT change them — you write the arbitration narrative that EXPLAINS the decision.
 
-Arbitration logic:
-1. Consensus amplification — when 4+ specialists agree, confidence rises; unanimous agreement should push confidence high (85+). Split panels cap confidence in the 50s-60s.
-2. Conflict surfacing — every specialist whose verdict cuts against your final call MUST appear in minority_signals with their strongest counter-argument. Never hide disagreement.
-3. Domain weighting — weight the agents whose domain dominates the situation. A site with an active foundation permit and 97% unused FAR is a DEVELOPMENT story: regulatory-policy and infrastructure carry more weight. A finished condo in a stable area is a TIMING story: market-timing and demand carry more weight.
-4. Provenance discipline — specialist inputs marked "representative" are indicative stand-ins, not live market data. Lean harder on the specialists whose evidence is fully live, and say so.
+You are given: each specialist's verdict, confidence, headline, and observations; the confidence-weighted score and thresholds; and the FINAL computed verdict/confidence/risk. Explain, in the arbitration:
+- which specialists carried the most weight (higher confidence weighs more) and which cut against the call;
+- where the panel agrees and where it conflicts;
+- how the confidence-weighted score resolved to this verdict against the thresholds;
+- lean on specialists whose evidence is fully live over those marked representative, and say so.
 
 Output rules:
-- Your "sources" in each reasoning step must be the exact agent labels provided (e.g. "regulatory-policy agent").
-- Your reasoning steps are the ARBITRATION: which agents you weighted up/down and why, where they agree, where they conflict, and how you resolved it.
-- headline: one plain-language sentence a homeowner could understand, citing the single strongest fact.
-- risk_score: synthesize across the panel, anchored on the risk-volatility agent but adjusted for what the others found.
-- signal_window_months: the window in which acting on this verdict makes sense.`;
+- Your "verdict" field MUST equal the given final verdict exactly. Never state a different verdict, in the field or the prose.
+- reasoning steps: the arbitration story; "sources" must be exact agent labels (e.g. "regulatory-policy agent").
+- headline: one plain sentence a homeowner understands, citing the single strongest fact, consistent with the final verdict.
+- Never invent figures. Do not restate confidence/risk numbers other than the given ones.`;
+
+// --- deterministic aggregation ------------------------------------------------
+
+// Position of each verdict on the act↔avoid axis.
+const DIRECTION: Record<Verdict, number> = { buy: 2, hold: 0, wait: -1, sell: -2, drop: -2 };
+
+// Score→verdict bands. Boundaries resolve DOWN (to the more conservative
+// verdict); the band widths are the margin that stops a single agent's
+// confidence-weighted move from flip-flopping the category.
+const THRESHOLDS = { buy: 1.0, hold: -0.3, wait: -1.2 };
+function verdictFromScore(s: number): Verdict {
+  if (s >= THRESHOLDS.buy) return 'buy';
+  if (s >= THRESHOLDS.hold) return 'hold';
+  if (s >= THRESHOLDS.wait) return 'wait';
+  return 'sell';
+}
+
+export interface AgentContribution {
+  agent: string;
+  verdict: Verdict;
+  confidence: number;
+  direction: number; // DIRECTION[verdict]
+  weight: number; // = confidence
+  contribution: number; // confidence × direction
+}
+
+export interface WeightingBreakdown {
+  method: string; // methodology marker — distinguishes this era from pre-fix rows
+  agents: AgentContribution[];
+  total_weight: number;
+  aggregate_score: number; // confidence-weighted S
+  thresholds: { buy: number; hold: number; wait: number };
+  chosen_verdict: Verdict;
+}
+
+interface Aggregate {
+  breakdown: WeightingBreakdown;
+  verdict: Verdict;
+  confidence: number;
+  risk_score: number;
+  signal_window_months: number;
+  overall_provenance: Provenance;
+}
+
+// Pure function of the agent outputs — identical inputs give identical results.
+// Exported so the determinism harness can prove it without any LLM call.
+export function aggregate(agents: AgentVerdict[]): Aggregate {
+  const contribs: AgentContribution[] = agents.map((a) => ({
+    agent: a.agent,
+    verdict: a.verdict,
+    confidence: a.confidence,
+    direction: DIRECTION[a.verdict],
+    weight: a.confidence,
+    contribution: a.confidence * DIRECTION[a.verdict],
+  }));
+  const totalWeight = contribs.reduce((s, c) => s + c.weight, 0) || 1;
+  const score = contribs.reduce((s, c) => s + c.contribution, 0) / totalWeight;
+  const verdict = verdictFromScore(score);
+
+  const overall_provenance = weakestProvenance(agents.map((a) => ({ provenance: a.overall_provenance })));
+  const matchWeight = contribs.filter((c) => c.verdict === verdict).reduce((s, c) => s + c.weight, 0);
+  const agreementFrac = matchWeight / totalWeight;
+  const weightedAvgConf = contribs.reduce((s, c) => s + c.confidence * c.weight, 0) / totalWeight;
+  const cap = overall_provenance === 'representative' ? 74 : 95;
+  const confidence = Math.min(cap, clamp(20 + 55 * agreementFrac + 0.2 * weightedAvgConf, 40, 95));
+
+  // Risk anchored on the risk-volatility specialist, tempered by the panel mean.
+  const rv = agents.find((a) => a.agent === 'risk-volatility');
+  const avgRisk = agents.reduce((s, a) => s + a.risk_score, 0) / agents.length;
+  const risk_score = clamp(rv ? 0.5 * rv.risk_score + 0.5 * avgRisk : avgRisk, 0, 100);
+
+  // Signal window: the panel median (deterministic).
+  const windows = agents.map((a) => a.signal_window_months).sort((x, y) => x - y);
+  const signal_window_months = windows[Math.floor(windows.length / 2)];
+
+  return {
+    breakdown: {
+      method: 'confidence-weighted v1',
+      agents: contribs,
+      total_weight: totalWeight,
+      aggregate_score: Math.round(score * 100) / 100,
+      thresholds: THRESHOLDS,
+      chosen_verdict: verdict,
+    },
+    verdict,
+    confidence,
+    risk_score,
+    signal_window_months,
+    overall_provenance,
+  };
+}
 
 export interface SynthesisResult extends KoanoVerdict {
   overall_provenance: Provenance; // weakest provenance across ALL agent inputs
+  weighting_breakdown: WeightingBreakdown; // the scored math behind the verdict — shown to the user
   agent_summaries: {
     agent: string;
     verdict: string;
@@ -58,25 +153,20 @@ export async function runSynthesis(
   addr: ResolvedAddress,
   agents: AgentVerdict[]
 ): Promise<SynthesisResult> {
-  // --- build the synthesis input: one provenance-tagged block per specialist ---
+  // --- 1. DETERMINISTIC decision: verdict, confidence, risk, window ---
+  const agg = aggregate(agents);
+
+  // --- 2. NARRATOR: the model explains the decision; it cannot change it ---
   const dataPoints = agents.flatMap((a) => {
     const source = `${a.agent} agent`;
     const p = a.overall_provenance;
     return [
       { label: `${a.agent}: verdict`, value: a.verdict, provenance: p, source },
       { label: `${a.agent}: confidence`, value: a.confidence, provenance: p, source },
-      { label: `${a.agent}: risk_score`, value: a.risk_score, provenance: p, source },
-      { label: `${a.agent}: signal_window_months`, value: a.signal_window_months, provenance: p, source },
       { label: `${a.agent}: headline`, value: a.headline, provenance: p, source },
       {
         label: `${a.agent}: key_observations`,
         value: a.reasoning_chain.map((r) => r.observation).join(' | '),
-        provenance: p,
-        source,
-      },
-      {
-        label: `${a.agent}: minority_signals`,
-        value: a.minority_signals.map((m) => m.signal).join(' | ') || 'none',
         provenance: p,
         source,
       },
@@ -88,33 +178,38 @@ export async function runSynthesis(
       },
     ];
   });
-
-  // consensus stats, computed in code, handed to the arbiter
-  const verdictCounts = new Map<string, number>();
-  for (const a of agents) verdictCounts.set(a.verdict, (verdictCounts.get(a.verdict) ?? 0) + 1);
-  const consensusEntry = Array.from(verdictCounts.entries()).sort((x, y) => y[1] - x[1])[0];
-  dataPoints.push({
-    label: 'panel_consensus',
-    value: `${consensusEntry[1]} of ${agents.length} specialists say "${consensusEntry[0]}" (full split: ${Array.from(verdictCounts.entries()).map(([v, n]) => `${v}=${n}`).join(', ')})`,
-    provenance: weakestProvenance(agents.map((a) => ({ provenance: a.overall_provenance }))),
-    source: 'KOANO consensus math',
-  });
+  dataPoints.push(
+    { label: 'COMPUTED_verdict (fixed)', value: agg.verdict, provenance: agg.overall_provenance, source: 'KOANO aggregator' },
+    { label: 'COMPUTED_confidence (fixed)', value: agg.confidence, provenance: agg.overall_provenance, source: 'KOANO aggregator' },
+    { label: 'COMPUTED_risk_score (fixed)', value: agg.risk_score, provenance: agg.overall_provenance, source: 'KOANO aggregator' },
+    {
+      label: 'weighting_breakdown',
+      value: agg.breakdown.agents.map((c) => `${c.agent} ${c.verdict}@${c.confidence} (dir ${c.direction}, contrib ${c.contribution})`).join('; ') +
+        ` | weighted score ${agg.breakdown.aggregate_score} vs thresholds buy≥${THRESHOLDS.buy}, hold≥${THRESHOLDS.hold}, wait≥${THRESHOLDS.wait}`,
+      provenance: agg.overall_provenance,
+      source: 'KOANO aggregator',
+    }
+  );
 
   const llm = await callAgentLLM({
     agent: 'synthesis',
-    systemPrompt: SYSTEM_PROMPT,
+    systemPrompt: NARRATOR_SYSTEM_PROMPT,
     addressLabel: addr.normalized || addr.input,
     dataPoints,
+    temperature: 0.4, // narrator only — decides nothing, so warmth here is safe
   });
 
-  // --- consensus amplification guardrail (deterministic, in code) ---
-  const agreeing = agents.filter((a) => a.verdict === llm.verdict).length;
-  const avgAgentConfidence = agents.reduce((s, a) => s + a.confidence, 0) / agents.length;
-  let confidence = llm.confidence;
-  if (agreeing >= 4) confidence = clamp(Math.max(confidence, avgAgentConfidence + 12), 0, 95);
-  else if (agreeing <= 1) confidence = clamp(Math.min(confidence, 65), 0, 100);
+  // --- 3. CONTRADICTION GUARD: the code verdict is authoritative; log if the
+  //         narrator ever states a different one (silent contradiction between a
+  //         verdict and the prose explaining it would be worse than either). ---
+  if (llm.verdict !== agg.verdict) {
+    console.warn(
+      `[synthesis] contradiction guard fired: narrator stated "${llm.verdict}" but the computed verdict is "${agg.verdict}" (score ${agg.breakdown.aggregate_score}). Code verdict wins.`
+    );
+  }
 
-  // --- assemble the full reasoning chain: all five specialists, then synthesis ---
+  // --- 4. reasoning chain: 5 specialists → the deterministic "verdict math"
+  //         step (visible + persisted) → the narrator's arbitration prose ---
   const provenanceByAgentSource = new Map<string, Provenance>(
     agents.map((a) => [`${a.agent} agent`, a.overall_provenance])
   );
@@ -124,6 +219,16 @@ export async function runSynthesis(
       reasoning_chain.push({ ...step, step: reasoning_chain.length + 1 });
     }
   }
+  reasoning_chain.push({
+    step: reasoning_chain.length + 1,
+    agent: 'synthesis',
+    observation:
+      `Verdict math (confidence-weighted v1): ` +
+      agg.breakdown.agents.map((c) => `${c.agent} ${c.verdict}@${c.confidence}→${c.contribution >= 0 ? '+' : ''}${c.contribution}`).join(', ') +
+      `. Weighted score ${agg.breakdown.aggregate_score} (buy≥${THRESHOLDS.buy}, hold≥${THRESHOLDS.hold}, wait≥${THRESHOLDS.wait}) → ${agg.verdict.toUpperCase()} at confidence ${agg.confidence}.`,
+    sources: agents.map((a) => `${a.agent} agent`),
+    provenance: agg.overall_provenance,
+  });
   for (const r of llm.reasoning) {
     const cited = r.sources.filter((s) => provenanceByAgentSource.has(s));
     reasoning_chain.push({
@@ -133,21 +238,21 @@ export async function runSynthesis(
       sources: r.sources,
       provenance:
         cited.length === 0
-          ? weakestProvenance(agents.map((a) => ({ provenance: a.overall_provenance })))
+          ? agg.overall_provenance
           : cited.some((s) => provenanceByAgentSource.get(s) === 'representative')
             ? 'representative'
             : 'live',
     });
   }
 
-  // --- conflict surfacing: LLM signals + a deterministic entry per dissenting agent ---
+  // --- conflict surfacing: narrator notes + a deterministic entry per dissenter ---
   const minority_signals: MinoritySignal[] = llm.minority_signals.map((m) => ({
     agent: 'synthesis',
     signal: m.signal,
     note: m.note ?? null,
   }));
   for (const a of agents) {
-    if (a.verdict !== llm.verdict) {
+    if (a.verdict !== agg.verdict) {
       minority_signals.push({
         agent: a.agent,
         signal: `${a.agent} dissented with "${a.verdict}" (confidence ${a.confidence}): ${a.headline}`,
@@ -159,16 +264,17 @@ export async function runSynthesis(
   const top_data_sources = Array.from(new Set(agents.flatMap((a) => a.top_data_sources)));
 
   return {
-    verdict: llm.verdict,
-    confidence,
-    signal_window_months: llm.signal_window_months,
+    verdict: agg.verdict,
+    confidence: agg.confidence,
+    signal_window_months: agg.signal_window_months,
     headline: llm.headline,
     reasoning_chain,
     minority_signals,
     top_data_sources,
-    risk_score: llm.risk_score,
+    risk_score: agg.risk_score,
     generated_at: new Date().toISOString(),
-    overall_provenance: weakestProvenance(agents.map((a) => ({ provenance: a.overall_provenance }))),
+    overall_provenance: agg.overall_provenance,
+    weighting_breakdown: agg.breakdown,
     agent_summaries: agents.map((a) => ({
       agent: a.agent,
       verdict: a.verdict,
