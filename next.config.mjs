@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Lets the pre-push build gate (scripts/prepush.sh) build to an isolated dir
+  // so it never corrupts a running `next dev` server's .next. Defaults to .next.
+  distDir: process.env.KOANO_DIST_DIR || '.next',
   async redirects() {
     return [
       // Cluster 1 restructure: Homeowners → Community

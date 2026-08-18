@@ -1,0 +1,7 @@
+#!/bin/sh
+# KOANO enforced pre-push build gate (see scripts/prepush.sh).
+# Blocks `git push` if the full production build fails.
+#
+# Activate once per clone:
+#   git config core.hooksPath .githooks
+exec npm run --silent prepush

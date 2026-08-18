@@ -570,6 +570,11 @@ Reflects what is done and the order for what remains. Each step is verified befo
 - Runtime agent calls always use prompt caching on the system prompt.
 - Build and verify one slice before replicating.
 
+### Release discipline
+- Before ANY `git push`, run a full production build (`next build`), not just `tsc` and the harnesses. `tsc` and the doc harnesses do NOT catch ESLint errors (e.g. `no-unused-vars`), which Vercel's build fails on — that is how a broken deploy shipped once. The build is the gate.
+- This is enforced, not remembered: a git pre-push hook (`.githooks/pre-push` → `npm run prepush` → `scripts/prepush.sh`) runs the full build and blocks the push on failure. The build goes to an isolated dir so it never corrupts a running `next dev` server. One-time per clone: `git config core.hooksPath .githooks`.
+- Never bypass the gate (`--no-verify`) to push a red build. Fix the build first.
+
 ### Visual
 - No dark section backgrounds anywhere. All sections white or pale-wash.
 - `--near-black` is a text color, never a section background.

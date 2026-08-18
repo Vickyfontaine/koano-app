@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "prepush": "sh scripts/prepush.sh",
     "test:disclaimer": "tsx scripts/test-disclaimer-regression.ts",
     "test:docs": "tsx scripts/test-document-engine.ts && tsx scripts/test-render.ts && tsx scripts/test-tax-appeal.ts && tsx scripts/test-disclaimer-regression.ts"
   },

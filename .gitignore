@@ -35,5 +35,11 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# generated sample documents (from scripts/verify-documents-live.ts) — regenerable, never committed
+# isolated build dirs used by the pre-push gate / out-of-band verification builds
+/.next-prepush
+/.next-verify
+
+# generated sample/review documents — regenerable, never committed
 /live-tax-appeal-*.pdf
+/screening-memo-*.pdf
+/comparison-brief-*.pdf
