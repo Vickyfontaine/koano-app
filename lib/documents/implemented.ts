@@ -10,6 +10,9 @@
 
 export const IMPLEMENTED_DOC_TYPES = [
   'tax_appeal_packet',
+  'property_intelligence_report',
+  'violation_ownership_record',
+  'permit_history_report',
   'site_screening_memo',
   'three_site_comparison_brief',
 ] as const;

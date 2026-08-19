@@ -311,9 +311,242 @@ function comparisonSample(): RenderModel {
   };
 }
 
+// Property Intelligence Report — identity band, value + context tables, and the
+// synthesized trajectory narrative. All-live provenance.
+function propertyIntelligenceSample(): RenderModel {
+  return {
+    docTitle: 'Property Intelligence Report',
+    subtitle: '1318 Clay Avenue, Bronx, NY',
+    letterhead: EMPTY_LETTERHEAD,
+    sections: [
+      {
+        heading: 'What This Property Is',
+        band: {
+          items: [
+            { label: 'Address', value: '1318 Clay Avenue, Bronx' },
+            { label: 'BBL', value: '2028870196' },
+            { label: 'Building class', value: 'C1' },
+            { label: 'Year built', value: '1910' },
+            { label: 'Residential units', value: '20' },
+            { label: 'Opportunity Zone', value: 'Yes' },
+          ],
+        },
+      },
+      {
+        heading: 'What It Is Worth (Indicative)',
+        provenanceNote: { provenance: 'live', text: 'Indicative value = median recorded $/sq ft × PLUTO building area. Not an appraisal.' },
+        table: {
+          columns: ['Field', 'Value'],
+          rows: [
+            ['Indicative market value', '$2,850,000'],
+            ['Median recorded sale $/sq ft', '$168'],
+            ['Building area', '16,964 sq ft'],
+            ['Recorded sales in scope', '31'],
+            ['Local price trend', 'flat'],
+          ],
+          caption: 'Recorded sales; recorded sales have no days-on-market.',
+        },
+      },
+      {
+        heading: 'Where the Neighborhood Is Heading',
+        table: {
+          columns: ['Indicator', 'Reading'],
+          rows: [
+            ['Regional House Price Index (YoY)', '+4.2% — New York-Newark-Jersey City'],
+            ['Area permits (last 24 months)', '126'],
+            ['Median household income (tract)', '$41,300'],
+          ],
+          caption: 'Demographics: ACS 5-year 2023.',
+        },
+      },
+      {
+        heading: 'Public Record — What to Watch',
+        table: {
+          columns: ['Field', 'Value'],
+          rows: [
+            ['Open HPD violations', '40'],
+            ['HPD-registered (3+ units)', 'Yes'],
+            ['FEMA flood zone', 'X'],
+          ],
+          caption: 'For the complete, citable detail, see the Violation & Ownership Record.',
+        },
+      },
+      {
+        heading: 'Neighborhood Trajectory',
+        paragraphs: [
+          'The indicative value and a flat local price trend sit against a regional index still rising modestly year over year, so the property reads as steady rather than accelerating. '.repeat(2),
+          'That steadiness is qualified by an open-violation load a buyer would need to reconcile against the price story, while the flood read is benign. '.repeat(2),
+        ],
+      },
+    ],
+    appendix: {
+      overall: 'live',
+      overall_note: 'Every figure in this document was fetched live from an authoritative public source at generation time.',
+      rows: [
+        { block: 'Zoning / PLUTO', source: 'NYC Open Data — MapPLUTO (64uk-42ks)', provenance: 'live', fetched_at: GENERATED_AT },
+        { block: 'Comparable sales', source: 'NYC Open Data — DOF Rolling Sales (usep-8jbt)', provenance: 'live', fetched_at: GENERATED_AT },
+        { block: 'Building violations', source: 'NYC Open Data — HPD / ECB / DOB', provenance: 'live', fetched_at: GENERATED_AT },
+      ],
+    },
+    generatedAt: GENERATED_AT,
+  };
+}
+
+// Violation & Ownership Record — DELIBERATELY sized with a long full-record
+// table so the sample spans multiple pages, exercising the dense evidentiary
+// type's continuation-page footer (its whole point is completeness at length).
+function violationRecordSample(): RenderModel {
+  const record = Array.from({ length: 60 }, (_, i) => [
+    `2026-0${(i % 9) + 1}-${String((i % 27) + 1).padStart(2, '0')}`,
+    (['HPD', 'ECB', 'DOB'] as const)[i % 3],
+    `VID-${100000 + i}`,
+    i % 4 === 0 ? 'Open' : 'Closed',
+    `Class ${['A', 'B', 'C'][i % 3]} — § 27-20${(i % 90) + 10} sample violation description text ${i}`,
+  ]);
+  return {
+    docTitle: 'Violation & Ownership Record',
+    subtitle: '1318 Clay Avenue, Bronx, NY',
+    letterhead: EMPTY_LETTERHEAD,
+    compact: true,
+    sections: [
+      {
+        heading: 'Building Identity',
+        band: {
+          items: [
+            { label: 'Address', value: '1318 Clay Avenue, Bronx' },
+            { label: 'BBL', value: '2028870196' },
+            { label: 'BIN', value: '2009314' },
+            { label: 'Residential units', value: '20' },
+          ],
+        },
+      },
+      {
+        heading: 'Coverage & How to Read This Record',
+        provenanceNote: { provenance: 'live', text: 'HPD, ECB, and DOB records pulled live from NYC Open Data.' },
+        paragraphs: [
+          'This building is registered with HPD as a multiple dwelling (3 or more residential units), so HPD Housing Maintenance Code violations are within coverage.',
+          'Scope: HPD boroid/block/lot + ECB/DOB by BIN.',
+        ],
+      },
+      {
+        heading: 'Registered Ownership',
+        table: {
+          columns: ['Field', 'Value'],
+          rows: [
+            ['Registered owner', 'CLAY AVENUE HOLDINGS LLC'],
+            ['Owner type', 'CorporateOwner'],
+            ['Managing agent', 'SAMPLE MGMT CO'],
+            ['On NYC speculation watch list', 'No'],
+          ],
+          caption: 'Source: NYC HPD Multiple Dwelling Registrations. Exact-entity match.',
+        },
+      },
+      {
+        heading: 'Violation Summary',
+        table: {
+          columns: ['Agency', 'Open / Active', 'Total', 'Detail'],
+          rows: [
+            ['HPD (Housing Maintenance Code)', '40', '75', 'Class A: 12, Class B: 20, Class C: 8'],
+            ['ECB (Environmental Control Board)', '1', '1', 'most recent 2024-06-01'],
+            ['DOB complaints', '0', '2', 'most recent 2019-03-01'],
+          ],
+          caption: 'Open/Active are currently-unresolved; Total includes closed history.',
+        },
+      },
+      {
+        heading: 'Full Violation Record',
+        table: {
+          columns: ['Date', 'Agency', 'Violation ID', 'Status', 'Description'],
+          rows: record,
+          caption: 'Every recorded HPD, ECB, and DOB violation for this building, newest first (60 records). Each row is citable by its violation ID.',
+        },
+      },
+    ],
+    appendix: {
+      overall: 'live',
+      overall_note: 'Every figure in this document was fetched live from an authoritative public source at generation time.',
+      rows: [
+        { block: 'Building violations', source: 'NYC Open Data — HPD / ECB / DOB', provenance: 'live', fetched_at: GENERATED_AT },
+        { block: 'Ownership / landlord portfolio', source: 'NYC Open Data — HPD registrations', provenance: 'live', fetched_at: GENERATED_AT },
+        { block: 'Zoning / PLUTO', source: 'NYC Open Data — MapPLUTO (64uk-42ks)', provenance: 'live', fetched_at: GENERATED_AT },
+      ],
+    },
+    generatedAt: GENERATED_AT,
+  };
+}
+
+// Permit History Report — chronological subject history with EXPIRED flags and
+// the neighborhood-activity context section.
+function permitHistorySample(): RenderModel {
+  return {
+    docTitle: 'Permit History Report',
+    subtitle: '1318 Clay Avenue, Bronx, NY',
+    letterhead: EMPTY_LETTERHEAD,
+    compact: true,
+    sections: [
+      {
+        heading: 'Building Identity',
+        band: {
+          items: [
+            { label: 'Address', value: '1318 Clay Avenue, Bronx' },
+            { label: 'BBL', value: '2028870196' },
+            { label: 'BIN', value: '2009314' },
+            { label: 'Year built', value: '1910' },
+          ],
+        },
+      },
+      {
+        heading: 'Subject Building Permit History',
+        provenanceNote: { provenance: 'live', text: 'Queried live from NYC DOB records at generation time.' },
+        table: {
+          columns: ['Issued', 'Job / work type', 'Status', 'Expires', 'Source'],
+          rows: [
+            ['2018-03-16', 'A2 / PL', 'EXPIRED', '2019-03-16', 'DOB legacy'],
+            ['2017-09-29', 'A2 / OT', 'EXPIRED', '2018-03-27', 'DOB legacy'],
+          ],
+          caption: 'All DOB permits on record for this building, newest first (2 permits).',
+        },
+      },
+      {
+        heading: 'Open & Expired Permits — Why It Matters',
+        paragraphs: [
+          'This building has 0 open (active) permits and 2 expired permits on record.',
+          'An EXPIRED permit means DOB-authorized work was not signed off before the permit lapsed; a title company or expeditor should reconcile these against the actual condition of the building.',
+          'History merges DOB NOW and legacy DOB Permit Issuance; a short history is a record of what was filed, not proof no other work occurred.',
+        ],
+      },
+      {
+        heading: 'Neighborhood Permit Activity (last 24 months)',
+        table: {
+          columns: ['Metric', 'Count'],
+          rows: [
+            ['Total permits issued in the area', '126'],
+            ['New-building permits', '3'],
+            ['Demolition permits', '1'],
+            ['Alteration / construction permits', '88'],
+          ],
+          caption: 'Area context, not this building: census tract 017702, Bronx.',
+        },
+      },
+    ],
+    appendix: {
+      overall: 'live',
+      overall_note: 'Every figure in this document was fetched live from an authoritative public source at generation time.',
+      rows: [
+        { block: 'Building permits', source: 'NYC Open Data — DOB NOW (rbx6-tga4) + legacy DOB Permit Issuance (ipu4-2q9a)', provenance: 'live', fetched_at: GENERATED_AT },
+        { block: 'Zoning / PLUTO', source: 'NYC Open Data — MapPLUTO (64uk-42ks)', provenance: 'live', fetched_at: GENERATED_AT },
+      ],
+    },
+    generatedAt: GENERATED_AT,
+  };
+}
+
 // One representative model per implemented document type.
 export const SAMPLE_MODELS: Record<string, RenderModel> = {
   tax_appeal_packet: taxAppealSample(),
+  property_intelligence_report: propertyIntelligenceSample(),
+  violation_ownership_record: violationRecordSample(),
+  permit_history_report: permitHistorySample(),
   site_screening_memo: siteScreeningSample(),
   three_site_comparison_brief: comparisonSample(),
 };

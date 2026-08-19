@@ -39,6 +39,25 @@ import {
   generateComparisonReasoning,
   type ComparisonSite,
 } from '../../../../lib/documents/builders/site-comparison';
+import {
+  extractPropertyIntelligenceFacts,
+  deterministicTrajectory,
+  generateTrajectory,
+  buildPropertyIntelligenceModel,
+  propertyIntelligenceAppendix,
+} from '../../../../lib/documents/builders/property-intelligence';
+import {
+  extractViolationRecordFacts,
+  buildViolationRecordModel,
+} from '../../../../lib/documents/builders/violation-record';
+import {
+  extractPermitHistoryFacts,
+  buildPermitHistoryModel,
+} from '../../../../lib/documents/builders/permit-history';
+
+// Evidentiary Community documents: fully deterministic (no model call), so they
+// always build from the deterministic path and never spend a content generation.
+const DETERMINISTIC_DOC_TYPES = new Set(['violation_ownership_record', 'permit_history_report']);
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -110,7 +129,13 @@ export async function POST(req: Request) {
     );
   }
 
-  const buildSource: BuildSource = body.buildSource === 'verdict' ? 'verdict' : 'fresh';
+  // Evidentiary docs are deterministic → force the verdict path so the guard
+  // never meters a content generation for them (there is no model call to meter).
+  const buildSource: BuildSource = DETERMINISTIC_DOC_TYPES.has(doc.id)
+    ? 'verdict'
+    : body.buildSource === 'verdict'
+      ? 'verdict'
+      : 'fresh';
   const verdictId = typeof body.verdictId === 'string' ? body.verdictId : null;
 
   // Guard: tier gate → doc cap → content meter (fresh only). Fails closed.
@@ -155,6 +180,52 @@ export async function POST(req: Request) {
       addressInput = r.data.resolved_address.input;
       bbl = r.data.resolved_address.bbl;
       overallProvenance = model.appendix.overall;
+    } else if (doc.id === 'property_intelligence_report') {
+      const r = await assembleDocumentData(address, doc.requiredBlocks);
+      if (!r.ok) return NextResponse.json({ error: r.error }, { status: r.status });
+      const ex = extractPropertyIntelligenceFacts(r.data);
+      if (!ex.ok) return NextResponse.json({ error: ex.error }, { status: 422 });
+      const trajectory =
+        buildSource === 'fresh' ? await generateTrajectory(ex.facts) : deterministicTrajectory(ex.facts);
+      const appendix = propertyIntelligenceAppendix(r.data, ex.facts.demoLive);
+      model = buildPropertyIntelligenceModel({
+        facts: ex.facts,
+        letterhead,
+        trajectory,
+        appendix,
+        generatedAt,
+      });
+      addressInput = r.data.resolved_address.input;
+      bbl = r.data.resolved_address.bbl;
+      overallProvenance = appendix.overall;
+    } else if (doc.id === 'violation_ownership_record') {
+      const r = await assembleDocumentData(address, doc.requiredBlocks);
+      if (!r.ok) return NextResponse.json({ error: r.error }, { status: r.status });
+      const ex = extractViolationRecordFacts(r.data);
+      if (!ex.ok) return NextResponse.json({ error: ex.error }, { status: 422 });
+      model = buildViolationRecordModel({
+        facts: ex.facts,
+        letterhead,
+        appendix: buildProvenanceAppendix(r.data),
+        generatedAt,
+      });
+      addressInput = r.data.resolved_address.input;
+      bbl = r.data.resolved_address.bbl;
+      overallProvenance = r.data.overall_provenance;
+    } else if (doc.id === 'permit_history_report') {
+      const r = await assembleDocumentData(address, doc.requiredBlocks);
+      if (!r.ok) return NextResponse.json({ error: r.error }, { status: r.status });
+      const ex = extractPermitHistoryFacts(r.data);
+      if (!ex.ok) return NextResponse.json({ error: ex.error }, { status: 422 });
+      model = buildPermitHistoryModel({
+        facts: ex.facts,
+        letterhead,
+        appendix: buildProvenanceAppendix(r.data),
+        generatedAt,
+      });
+      addressInput = r.data.resolved_address.input;
+      bbl = r.data.resolved_address.bbl;
+      overallProvenance = r.data.overall_provenance;
     } else {
       // tax_appeal_packet
       const r = await assembleDocumentData(address, doc.requiredBlocks);

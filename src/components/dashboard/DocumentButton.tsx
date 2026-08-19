@@ -22,6 +22,9 @@ interface DocumentButtonProps {
   addresses?: string[]; // multi_site (comparison brief) — up to 3
   formats?: DocumentFormat[]; // default ['pdf']
   hasRecentVerdict?: boolean; // when true, default to reusing the last analysis
+  // Evidentiary docs are fully deterministic — there is no fresh-vs-reuse choice
+  // to make, so hide the source selector entirely and always build deterministic.
+  singleAction?: boolean;
   id?: string;
 }
 
@@ -38,10 +41,14 @@ export default function DocumentButton({
   addresses,
   formats = ["pdf"],
   hasRecentVerdict = false,
+  singleAction = false,
   id,
 }: DocumentButtonProps) {
   const isMulti = Array.isArray(addresses) && addresses.length > 0;
-  const [source, setSource] = useState<BuildSource>(hasRecentVerdict ? "verdict" : "fresh");
+  // Evidentiary (singleAction) docs always build deterministically from record.
+  const [source, setSource] = useState<BuildSource>(
+    singleAction ? "verdict" : hasRecentVerdict ? "verdict" : "fresh",
+  );
   const [format, setFormat] = useState<DocumentFormat>(formats[0]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -114,12 +121,14 @@ export default function DocumentButton({
           {title}
         </h3>
         <p style={{ fontSize: "12px", color: "var(--ink-muted)", margin: 0 }}>
-          A professional, provenance-labeled document for the analyzed address. Every figure carries its
-          source; the disclaimer footer is on every page.
+          {singleAction
+            ? "A complete, provenance-labeled record built directly from live public data. Every figure carries its source; the disclaimer footer is on every page."
+            : "A professional, provenance-labeled document for the analyzed address. Every figure carries its source; the disclaimer footer is on every page."}
         </p>
       </div>
 
-      {/* Source selector */}
+      {/* Source selector — hidden for deterministic (single-action) documents */}
+      {!singleAction && (
       <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
         <label style={radioLabel}>
           <input
@@ -155,6 +164,7 @@ export default function DocumentButton({
           </span>
         </label>
       </div>
+      )}
 
       {/* Format selector (only when more than one) */}
       {formats.length > 1 && (
@@ -196,7 +206,7 @@ export default function DocumentButton({
         <button
           type="button"
           onClick={generate}
-          disabled={busy || (source === "verdict" && !hasRecentVerdict)}
+          disabled={busy || (!singleAction && source === "verdict" && !hasRecentVerdict)}
           style={{
             border: "none",
             borderRadius: "100px",
@@ -206,7 +216,7 @@ export default function DocumentButton({
             cursor: busy ? "default" : "pointer",
             background: busy ? "var(--sky)" : "var(--brand-blue)",
             color: "var(--near-black)",
-            opacity: source === "verdict" && !hasRecentVerdict ? 0.5 : 1,
+            opacity: !singleAction && source === "verdict" && !hasRecentVerdict ? 0.5 : 1,
           }}
         >
           {busy ? "Generating…" : `Generate ${format.toUpperCase()}  ↗`}

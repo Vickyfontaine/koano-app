@@ -43,3 +43,6 @@ next-env.d.ts
 /live-tax-appeal-*.pdf
 /screening-memo-*.pdf
 /comparison-brief-*.pdf
+
+# generated demo documents (regenerable via scripts/gen-community-docs.ts)
+koano-*.pdf

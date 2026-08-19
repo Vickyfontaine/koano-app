@@ -60,6 +60,11 @@ export interface PermitRecord {
   issuance_date: string;
   address: string;
   borough: string;
+  // Optional (populated for the all_permits history, where the legacy DOB
+  // Permit Issuance dataset carries an expiry): lets the Permit History Report
+  // flag expired vs open permits. Absent on the 24-month recent_permits.
+  expiration_date?: string | null;
+  dataset?: 'DOB NOW' | 'DOB legacy'; // which source this record came from
 }
 
 export interface PermitsSummary {
@@ -70,6 +75,12 @@ export interface PermitsSummary {
   demolition_permits: number;
   alteration_permits: number;
   recent_permits: PermitRecord[];
+  // UI ONLY — never serialize into an agent prompt (same contract as
+  // ViolationsSummary.all_items). The FULL subject-BBL permit history (all
+  // available dates in DOB NOW, ≤300) for the chronological Permit History
+  // Report. Empty is a coverage fact, not "no work ever" (see all_permits_note).
+  all_permits: PermitRecord[];
+  all_permits_note: string; // DOB NOW coverage caveat for the history report
 }
 
 export interface PermitsProvider {
@@ -297,9 +308,10 @@ export interface BuildingViolationsSummary {
     most_recent: string | null;
     top_categories: string[]; // DOB category codes
   };
-  // UI ONLY — never serialize recent_items into an agent prompt. Agents get
-  // the summary counts above; raw rows would 10x the token cost per run.
-  recent_items: ViolationRecentItem[];
+  // UI ONLY — never serialize these into an agent prompt. Agents get the summary
+  // counts above; raw rows would 10x the token cost per run.
+  recent_items: ViolationRecentItem[]; // short preview for dashboard panels
+  all_items: ViolationRecentItem[]; // FULL list (HPD+ECB+DOB, ≤250) for the evidentiary Violation & Ownership Record
 }
 
 export interface BuildingViolationsProvider {

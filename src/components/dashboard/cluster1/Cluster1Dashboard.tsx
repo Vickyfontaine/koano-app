@@ -164,14 +164,69 @@ export default function Cluster1Dashboard() {
 
           <AlertsPanel detail={detail} detailError={detailError} id="c1-alerts" />
 
-          <DocumentButton
-            docType="tax_appeal_packet"
-            title="Property Tax Appeal Evidence Packet"
-            address={result.resolved_address.normalized || result.resolved_address.input}
-            formats={["pdf"]}
-            hasRecentVerdict={true}
-            id="c1-tax-appeal-doc"
-          />
+          {/* Downloadable documents — the Community document set, all built
+              from the analyzed address on live NYC public data. */}
+          <div id="c1-documents" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            <div>
+              <span className="section-number">{c.number}.D</span>
+              <h2
+                style={{
+                  fontSize: "22px",
+                  fontWeight: 700,
+                  letterSpacing: "-0.02em",
+                  color: "var(--ink-primary)",
+                  margin: "8px 0 2px",
+                }}
+              >
+                Downloadable documents
+              </h2>
+              <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
+                Provenance-labeled PDFs for{" "}
+                {result.resolved_address.normalized || result.resolved_address.input}. Every figure
+                carries its source; the disclaimer footer is on every page.
+              </p>
+            </div>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+                gap: "16px",
+              }}
+            >
+              <DocumentButton
+                docType="property_intelligence_report"
+                title="Property Intelligence Report"
+                address={result.resolved_address.normalized || result.resolved_address.input}
+                formats={["pdf"]}
+                hasRecentVerdict={true}
+                id="c1-property-intel-doc"
+              />
+              <DocumentButton
+                docType="violation_ownership_record"
+                title="Violation & Ownership Record"
+                address={result.resolved_address.normalized || result.resolved_address.input}
+                formats={["pdf"]}
+                singleAction={true}
+                id="c1-violation-record-doc"
+              />
+              <DocumentButton
+                docType="permit_history_report"
+                title="Permit History Report"
+                address={result.resolved_address.normalized || result.resolved_address.input}
+                formats={["pdf"]}
+                singleAction={true}
+                id="c1-permit-history-doc"
+              />
+              <DocumentButton
+                docType="tax_appeal_packet"
+                title="Property Tax Appeal Evidence Packet"
+                address={result.resolved_address.normalized || result.resolved_address.input}
+                formats={["pdf"]}
+                hasRecentVerdict={true}
+                id="c1-tax-appeal-doc"
+              />
+            </div>
+          </div>
 
           <ReasoningChain
             reasoningChain={result.verdict.reasoning_chain}

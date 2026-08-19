@@ -45,6 +45,7 @@ interface DobComplaintRow {
   status?: string;
   date_entered?: string; // MM/DD/YYYY
   complaint_category?: string;
+  complaint_number?: string;
 }
 
 // bbl "2028870196" → { boroid: 2, block: 2887, lot: 196 }
@@ -97,6 +98,7 @@ const REPRESENTATIVE_FALLBACK: BuildingViolationsSummary = {
   ecb: { total: 6, active: 1, active_by_severity: { 'CLASS - 2': 1 }, most_recent_issue: null },
   dob_complaints: { total: 10, active: 1, last_24mo: 3, most_recent: null, top_categories: [] },
   recent_items: [],
+  all_items: [],
 };
 
 export const nycViolations: BuildingViolationsProvider = {
@@ -136,7 +138,10 @@ export const nycViolations: BuildingViolationsProvider = {
           : Promise.resolve([]),
         hpdWhere
           ? fetchJson<HpdRow[]>(
-              `${HPD_VIOLATIONS}?$where=${hpdWhere}&$select=class,violationstatus,inspectiondate,novdescription,violationid&$order=inspectiondate DESC&$limit=5`,
+              // Full HPD list WITH violation ids for the evidentiary document
+              // (recent_items is a preview of this; all_items is the whole set).
+              `${HPD_VIOLATIONS}?$where=${hpdWhere}&$select=class,violationstatus,inspectiondate,novdescription,violationid&$order=inspectiondate DESC&$limit=300`,
+              { timeoutMs: 30000 },
             )
           : Promise.resolve([]),
         hpdWhere
@@ -150,7 +155,7 @@ export const nycViolations: BuildingViolationsProvider = {
           : Promise.resolve([]),
         bin
           ? fetchJson<DobComplaintRow[]>(
-              `${DOB_COMPLAINTS}?$where=${encodeURIComponent(`bin='${bin}'`)}&$select=status,date_entered,complaint_category&$limit=2000`,
+              `${DOB_COMPLAINTS}?$where=${encodeURIComponent(`bin='${bin}'`)}&$select=status,date_entered,complaint_category,complaint_number&$limit=2000`,
               { timeoutMs: 30000 },
             )
           : Promise.resolve([]),
@@ -217,8 +222,12 @@ export const nycViolations: BuildingViolationsProvider = {
         .slice(0, 3)
         .map(([c]) => c);
 
-      // --- recent items (UI ONLY — never into agent prompts) ---
-      const recent: ViolationRecentItem[] = [
+      // --- item list (UI + document ONLY — never into agent prompts) ---
+      // all_items is the FULL, citable record for the Violation & Ownership
+      // Record: every HPD/ECB/DOB item with its id, sorted newest-first, capped
+      // at 250 as a safety valve for extreme cases. recent_items is a preview.
+      const MAX_ALL_ITEMS = 250;
+      const allItems: ViolationRecentItem[] = [
         ...hpdRecent.map((r): ViolationRecentItem => ({
           source: 'HPD',
           date: r.inspectiondate?.slice(0, 10) ?? '',
@@ -226,21 +235,25 @@ export const nycViolations: BuildingViolationsProvider = {
           status: r.violationstatus ?? '',
           violation_id: r.violationid ?? null,
         })),
-        ...ecbRows
-          .filter((r) => ecbDateToIso(r.issue_date))
-          .sort((a, b) => (b.issue_date ?? '').localeCompare(a.issue_date ?? ''))
-          .slice(0, 3)
-          .map((r): ViolationRecentItem => ({
-            source: 'ECB',
-            date: ecbDateToIso(r.issue_date) ?? '',
-            label: `${r.severity ?? ''} ${r.violation_type ?? ''} — ${(r.violation_description ?? '').slice(0, 120)}`.trim(),
-            status: r.ecb_violation_status ?? '',
-            violation_id: r.ecb_violation_number ?? null,
-          })),
+        ...ecbRows.map((r): ViolationRecentItem => ({
+          source: 'ECB',
+          date: ecbDateToIso(r.issue_date) ?? '',
+          label: `${r.severity ?? ''} ${r.violation_type ?? ''} — ${(r.violation_description ?? '').slice(0, 120)}`.trim(),
+          status: r.ecb_violation_status ?? '',
+          violation_id: r.ecb_violation_number ?? null,
+        })),
+        ...dobRows.map((r): ViolationRecentItem => ({
+          source: 'DOB',
+          date: dobDateToIso(r.date_entered) ?? '',
+          label: `Complaint — ${r.complaint_category ?? 'uncategorized'}`,
+          status: r.status ?? '',
+          violation_id: r.complaint_number ?? null,
+        })),
       ]
         .filter((r) => r.date)
         .sort((a, b) => b.date.localeCompare(a.date))
-        .slice(0, 8);
+        .slice(0, MAX_ALL_ITEMS);
+      const recent = allItems.slice(0, 8);
 
       const binNote = bin
         ? `DOB complaints by BIN ${bin}`
@@ -274,6 +287,7 @@ export const nycViolations: BuildingViolationsProvider = {
           top_categories: topCategories,
         },
         recent_items: recent,
+        all_items: allItems,
       };
 
       return {
