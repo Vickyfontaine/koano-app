@@ -6,6 +6,7 @@
 
 import Anthropic from '@anthropic-ai/sdk';
 import type { DataPoint, Provenance } from '../providers/types';
+import { buildAllowedTokens, groundObservation, WITHHELD_OBSERVATION } from './grounding';
 
 // Sonnet-class runtime model. Single source of truth for every agent call.
 // NOTE: CLAUDE.md v4 specifies claude-sonnet-4-20250514, but that model reached
@@ -28,6 +29,10 @@ export interface ReasoningStep {
   observation: string;
   sources: string[]; // provider source names cited for this step
   provenance: Provenance; // weakest provenance among cited sources
+  // True when the grounding gate removed this observation because a claim in it
+  // could not be traced to a cited source. The step stays in the chain (visibly
+  // incomplete) rather than being silently dropped.
+  withheld?: boolean;
 }
 
 export interface MinoritySignal {
@@ -88,7 +93,7 @@ export interface LlmAgentResponse {
   confidence: number;
   signal_window_months: number;
   headline: string;
-  reasoning: { observation: string; sources: string[] }[];
+  reasoning: { observation: string; sources: string[]; withheld?: boolean }[];
   minority_signals: { signal: string; note?: string }[];
   risk_score: number;
 }
@@ -117,6 +122,8 @@ Judge BANDS, not numbers. You can reliably tell low from high conviction; you ca
 Rules:
 - Every reasoning step MUST cite at least one "source" copied EXACTLY from the provided data points.
 - Never invent facts not present in the data points.
+- GROUNDING (critical): a citation is only valid if the CLAIM comes from that source's data — not just the source name. When a data point gives you a code, abbreviation, ID, or flag (a special-district letter, a zoning code, a building-class code, a boolean), you may state that value and cite its source, but you MUST NOT expand it into a name, place, program, statute, year, designation, or obligation unless another data point literally supplies that detail. Example of the forbidden move: a datum "special_district = G" does NOT license "the Gowanus Special District, adopted 2021, with Mandatory Inclusionary Housing and Superfund remediation obligations" — that is general knowledge, not sourced data. State "special district G (per the zoning source)" and stop.
+- You MAY state documented STANDARD DEFINITIONS of codes (e.g. HPD class C = immediately hazardous; FEMA zone X = outside the Special Flood Hazard Area; a manufacturing/residential zoning family). These are fixed definitions, not property-specific claims. Do not go beyond them.
 - If a data point is marked provenance "representative", treat it as indicative only and say so in the observation.
 - 3 to 6 reasoning steps. minority_signals may be empty.`;
 
@@ -182,52 +189,104 @@ export async function callAgentLLM(args: {
     2
   );
 
-  const msg = await anthropic().messages.create({
-    model: KOANO_RUNTIME_MODEL,
-    max_tokens: 2000,
-    temperature,
-    system: [
-      {
-        type: 'text',
-        text: systemPrompt + '\n' + RESPONSE_FORMAT_INSTRUCTIONS,
-        cache_control: { type: 'ephemeral' }, // prompt caching on the system prompt
-      },
-    ],
-    messages: [{ role: 'user', content: userPayload }],
-  });
-
-  const textBlock = msg.content.find((b) => b.type === 'text');
-  if (!textBlock || textBlock.type !== 'text') {
-    throw new Error(`Agent ${agent}: no text block in LLM response`);
+  // One model call + parse. Reused for the grounding retry.
+  async function runModel(messages: Anthropic.MessageParam[]): Promise<{ text: string; raw: Record<string, unknown> }> {
+    const msg = await anthropic().messages.create({
+      model: KOANO_RUNTIME_MODEL,
+      max_tokens: 2000,
+      temperature,
+      system: [
+        {
+          type: 'text',
+          text: systemPrompt + '\n' + RESPONSE_FORMAT_INSTRUCTIONS,
+          cache_control: { type: 'ephemeral' }, // prompt caching on the system prompt
+        },
+      ],
+      messages,
+    });
+    const tb = msg.content.find((b) => b.type === 'text');
+    if (!tb || tb.type !== 'text') throw new Error(`Agent ${agent}: no text block in LLM response`);
+    return { text: tb.text, raw: JSON.parse(extractJson(tb.text)) as Record<string, unknown> };
   }
 
-  const raw = JSON.parse(extractJson(textBlock.text)) as Record<string, unknown>;
+  const first = await runModel([{ role: 'user', content: userPayload }]);
+  const raw = first.raw;
 
   const validVerdicts: Verdict[] = ['buy', 'sell', 'hold', 'wait', 'drop'];
   const rawVerdict = raw.verdict as Verdict;
   if (!rawVerdict || !validVerdicts.includes(rawVerdict)) {
     throw new Error(`Agent ${agent}: invalid verdict "${String(raw.verdict)}"`);
   }
-  const rawReasoning = raw.reasoning;
-  if (!Array.isArray(rawReasoning) || rawReasoning.length === 0) {
+  if (!Array.isArray(raw.reasoning) || raw.reasoning.length === 0) {
     throw new Error(`Agent ${agent}: empty reasoning`);
   }
 
+  const toItems = (arr: unknown): { observation: string; sources: string[] }[] =>
+    (Array.isArray(arr) ? arr : []).map((r) => ({
+      observation: String((r as { observation?: unknown }).observation ?? ''),
+      sources: Array.isArray((r as { sources?: unknown }).sources)
+        ? ((r as { sources: unknown[] }).sources).map(String)
+        : [],
+    }));
+
   // Coarse bands → deterministic figures; conservative code tie-break on verdict.
+  // Decision fields come from the FIRST response; grounding only cleans the prose.
   const conviction = oneOf(raw.conviction, ['low', 'medium', 'high'], 'medium');
   const riskBand = oneOf(raw.risk_band, ['low', 'moderate', 'high'], 'moderate');
   const windowBand = oneOf(raw.window_band, ['short', 'medium', 'long'], 'medium');
   const verdict = tieBreakVerdict(rawVerdict, conviction);
+  const safeHeadline = `${agent} verdict: ${verdict}`;
+
+  // --- GROUNDING GATE (Option A) ---------------------------------------------
+  // Every specific claim in an observation OR the headline must trace to a value
+  // the agent received (or a standard definition). If not: re-prompt ONCE with
+  // the exact untraceable terms; anything still ungrounded is WITHHELD (visibly,
+  // never dropped) so the reasoning chain is honestly incomplete rather than
+  // wrong. The headline is gated too — it is the most-rendered surface and it
+  // seeds the synthesis narrator's allowed vocabulary.
+  const allowed = buildAllowedTokens(dataPoints, addressLabel);
+  const firstItems = toItems(raw.reasoning);
+  const firstHeadline = String(raw.headline ?? '').trim();
+  const firstGround = firstItems.map((it) => groundObservation(it.observation, allowed));
+  const firstHeadlineOk = groundObservation(firstHeadline, allowed).grounded;
+
+  let reasoning: LlmAgentResponse['reasoning'];
+  let headline: string;
+  if (firstGround.every((g) => g.grounded) && firstHeadlineOk) {
+    reasoning = firstItems;
+    headline = firstHeadline || safeHeadline;
+  } else {
+    const terms = Array.from(
+      new Set([...firstGround.flatMap((g) => g.ungrounded), ...groundObservation(firstHeadline, allowed).ungrounded]),
+    );
+    console.warn(`[grounding] ${agent}: untraceable ${JSON.stringify(terms)} — re-prompting once`);
+    const correction =
+      `Some claims in your response could not be traced to the provided data points: ${terms
+        .map((t) => `"${t}"`)
+        .join(', ')}. These read as general knowledge, not sourced facts. Rewrite your reasoning AND headline using ONLY what the data points state — for any coded field (a district letter, zoning code, class, flag), state the code and its value as given and do NOT expand it into names, places, years, programs, or obligations. Return the same JSON object.`;
+    const second = await runModel([
+      { role: 'user', content: userPayload },
+      { role: 'assistant', content: first.text },
+      { role: 'user', content: correction },
+    ]);
+    const secondItems = toItems(second.raw.reasoning);
+    const base = secondItems.length > 0 ? secondItems : firstItems;
+    reasoning = base.map((it) => {
+      if (groundObservation(it.observation, allowed).grounded) return it;
+      console.warn(`[grounding] ${agent}: WITHHELD an observation that stayed untraceable after retry`);
+      return { observation: WITHHELD_OBSERVATION, sources: [], withheld: true };
+    });
+    const retryHeadline = String(second.raw.headline ?? '').trim();
+    headline = retryHeadline && groundObservation(retryHeadline, allowed).grounded ? retryHeadline : safeHeadline;
+    if (headline === safeHeadline) console.warn(`[grounding] ${agent}: headline fell back (untraceable after retry)`);
+  }
 
   return {
     verdict,
     confidence: CONVICTION_TO_CONFIDENCE[conviction],
     signal_window_months: WINDOW_BAND_TO_MONTHS[windowBand],
-    headline: String(raw.headline ?? '').trim() || `${agent} verdict: ${verdict}`,
-    reasoning: (rawReasoning as Array<{ observation?: unknown; sources?: unknown }>).map((r) => ({
-      observation: String(r.observation ?? ''),
-      sources: Array.isArray(r.sources) ? r.sources.map(String) : [],
-    })),
+    headline,
+    reasoning,
     minority_signals: Array.isArray(raw.minority_signals)
       ? (raw.minority_signals as Array<{ signal?: unknown; note?: unknown }>).map((m) => ({
           signal: String(m.signal ?? ''),
@@ -271,6 +330,7 @@ export function assembleAgentVerdict(args: {
       observation: r.observation,
       sources: r.sources,
       provenance: stepProvenance,
+      ...(r.withheld ? { withheld: true } : {}),
     };
   });
 
