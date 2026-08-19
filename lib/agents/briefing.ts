@@ -9,11 +9,18 @@
 import { registry } from '../providers/registry';
 import type { DataPoint, Provenance } from '../providers/types';
 import { getAnthropicClient, KOANO_RUNTIME_MODEL, weakestProvenance } from './shared';
+import { buildAllowedTokens, groundObservation } from './grounding';
+
+// Shown in place of a briefing line that reproduces a claim not traceable to the
+// portfolio data (the last model call in the product behind the grounding gate).
+const WITHHELD_BRIEFING_LINE =
+  '[A statement was withheld from this briefing because it could not be traced to the portfolio data.]';
 
 const SYSTEM_PROMPT = `You are KOANO's portfolio briefing writer for institutional real estate teams (REITs, funds, C-suite). Write a Monday-morning portfolio briefing from the provided data.
 
 Rules:
 - Use ONLY the provided data points. Never invent holdings, transactions, valuations, or events not present in the data.
+- GROUNDING (critical): do NOT name a place, neighborhood, program, statute, year, or designation that is not present in the data points. In particular, do not expand a coded value (a special-district letter, a zoning code) into a named district or program from general knowledge, and do not repeat such an expansion even if it appears inside a verdict headline you were given — reference the property by its address and the figures you were given.
 - Cite concrete figures (scores, counts, percentages, zones) with their subject property.
 - Data points marked provenance "representative" are indicative stand-ins, not live market data — say "indicative" when using them.
 - Decision-support language only: "the data shows", "worth reviewing", "flag for diligence". NEVER "you should buy/sell", never guarantees or predictions beyond the data.
@@ -129,40 +136,76 @@ export async function generateBriefing(properties: BriefingProperty[]): Promise<
     throw new Error('No data available to write a briefing from');
   }
 
-  const msg = await getAnthropicClient().messages.create({
-    model: KOANO_RUNTIME_MODEL,
-    max_tokens: 1200,
-    system: [
-      {
-        type: 'text',
-        text: SYSTEM_PROMPT,
-        cache_control: { type: 'ephemeral' }, // prompt caching on the system prompt
-      },
-    ],
-    messages: [
-      {
-        role: 'user',
-        content: JSON.stringify(
-          {
-            portfolio_size: properties.length,
-            properties_in_briefing: covered.length,
-            data_points: dataPoints.map((d) => ({
-              label: d.label,
-              value: d.value,
-              provenance: d.provenance,
-              source: d.source,
-            })),
-          },
-          null,
-          2,
-        ),
-      },
-    ],
-  });
+  const userPayload = JSON.stringify(
+    {
+      portfolio_size: properties.length,
+      properties_in_briefing: covered.length,
+      data_points: dataPoints.map((d) => ({ label: d.label, value: d.value, provenance: d.provenance, source: d.source })),
+    },
+    null,
+    2,
+  );
 
-  const textBlock = msg.content.find((b) => b.type === 'text');
-  if (!textBlock || textBlock.type !== 'text' || !textBlock.text.trim()) {
-    throw new Error('Briefing generation returned no text');
+  async function runModel(messages: { role: 'user' | 'assistant'; content: string }[]): Promise<string> {
+    const msg = await getAnthropicClient().messages.create({
+      model: KOANO_RUNTIME_MODEL,
+      max_tokens: 1200,
+      system: [{ type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }],
+      messages,
+    });
+    const tb = msg.content.find((b) => b.type === 'text');
+    if (!tb || tb.type !== 'text' || !tb.text.trim()) throw new Error('Briefing generation returned no text');
+    return tb.text.trim();
+  }
+
+  // --- GROUNDING GATE ---------------------------------------------------------
+  // The briefing is the last model call in the product; it demonstrably
+  // reproduces verdict headlines into prose, so it runs the same detector as the
+  // agents and document narratives: every specific claim must trace to a
+  // portfolio data point. On a miss, re-prompt once, then WITHHOLD the offending
+  // line visibly (never silently) — the exposure that produced the Superfund claim.
+  const allowed = buildAllowedTokens(dataPoints, covered.map((p) => p.address).join(' '));
+  // Structural headers are not claims — skip them (they are all-caps and would
+  // otherwise read as acronyms). Ground only content lines.
+  const HEADERS = new Set(['PORTFOLIO SUMMARY', 'PROPERTY NOTES', 'RISK WATCH', 'THE WEEK AHEAD']);
+  const isContent = (line: string): boolean => {
+    const t = line.trim();
+    return t.length > 0 && !HEADERS.has(t.toUpperCase());
+  };
+  const ungroundedTermsIn = (text: string): string[] =>
+    Array.from(
+      new Set(
+        text
+          .split('\n')
+          .filter(isContent)
+          .flatMap((l) => groundObservation(l.trim(), allowed).ungrounded),
+      ),
+    );
+
+  const firstText = await runModel([{ role: 'user', content: userPayload }]);
+  let briefingText = firstText;
+  const firstBad = ungroundedTermsIn(firstText);
+  if (firstBad.length > 0) {
+    console.warn(`[grounding] briefing: untraceable ${JSON.stringify(firstBad)} — re-prompting once`);
+    const correction =
+      `Some statements could not be traced to the provided data points: ${firstBad
+        .map((t) => `"${t}"`)
+        .join(', ')}. These read as general knowledge, not sourced facts. Rewrite using ONLY the data points — do not name a place, program, statute, year, or designation that is not present in the data. Keep the exact four section headers. Return the briefing text only.`;
+    const secondText = await runModel([
+      { role: 'user', content: userPayload },
+      { role: 'assistant', content: firstText },
+      { role: 'user', content: correction },
+    ]);
+    // Withhold any CONTENT line still ungrounded; headers and clean lines pass.
+    briefingText = secondText
+      .split('\n')
+      .map((line) => {
+        if (!isContent(line)) return line;
+        if (groundObservation(line.trim(), allowed).grounded) return line;
+        console.warn('[grounding] briefing: WITHHELD a line that stayed untraceable after retry');
+        return WITHHELD_BRIEFING_LINE;
+      })
+      .join('\n');
   }
 
   // Weakest provenance per source (a source is representative if ANY of its
@@ -174,7 +217,7 @@ export async function generateBriefing(properties: BriefingProperty[]): Promise<
   }
 
   return {
-    briefing: textBlock.text.trim(),
+    briefing: briefingText,
     overall_provenance: weakestProvenance(dataPoints),
     sources: Array.from(new Set(dataPoints.map((d) => d.source))),
     source_provenance: Array.from(bySource, ([source, provenance]) => ({ source, provenance })),
