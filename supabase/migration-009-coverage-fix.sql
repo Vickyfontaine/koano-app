@@ -13,8 +13,14 @@
 --     that week's NET-NEW recorded sales (the genesis week holds the whole
 --     window; later weeks hold only newly-recorded sales) — a re-run adds nothing.
 -- Column renamed rows_written -> rows_present to say what it now means.
+--
+-- NOTE: Postgres will not RENAME a view column under `create or replace view`
+-- (ERROR 42P16), so we DROP first. Safe: nothing in the DB depends on this view
+-- (no dependent views/rules/functions); the only consumers are app-side
+-- `select *` queries that resolve columns at query time.
 
-create or replace view public.archive_coverage as
+drop view if exists public.archive_coverage;
+create view public.archive_coverage as
 with bounds as (
   select
     coalesce(min(run_week), date_trunc('week', now())::date) as first_week,

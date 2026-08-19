@@ -12,7 +12,11 @@
 --     are deliberately NOT in this weekly view — a week without a zoning bump is
 --     not a gap. A cadence-aware freshness check for those is a later task.
 
-create or replace view public.archive_coverage as
+-- DROP first (same reason as migration-009): a `create or replace view` cannot
+-- change the column set, and this view is created idempotently across migrations.
+-- Nothing in the DB depends on it, so a drop breaks nothing.
+drop view if exists public.archive_coverage;
+create view public.archive_coverage as
 with bounds as (
   select
     coalesce(min(run_week), date_trunc('week', now())::date) as first_week,
