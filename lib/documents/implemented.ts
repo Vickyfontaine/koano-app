@@ -16,6 +16,8 @@ export const IMPLEMENTED_DOC_TYPES = [
   'site_screening_memo',
   'three_site_comparison_brief',
   'ic_memo',
+  'monday_briefing_pdf',
+  'asset_one_pager',
 ] as const;
 
 export type ImplementedDocType = (typeof IMPLEMENTED_DOC_TYPES)[number];

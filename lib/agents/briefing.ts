@@ -43,6 +43,11 @@ export interface BriefingResult {
   briefing: string;
   overall_provenance: Provenance;
   sources: string[];
+  // Per-source provenance (weakest across that source's data points), so a
+  // consumer (the Monday Briefing PDF) can build an honest provenance appendix.
+  // The verdict IS one of these sources ("KOANO verdict audit trail"), so the
+  // rollup already accounts for both data and verdict provenance.
+  source_provenance: { source: string; provenance: Provenance }[];
   properties_covered: number;
   generated_at: string;
 }
@@ -160,10 +165,19 @@ export async function generateBriefing(properties: BriefingProperty[]): Promise<
     throw new Error('Briefing generation returned no text');
   }
 
+  // Weakest provenance per source (a source is representative if ANY of its
+  // points are), preserving first-seen order.
+  const bySource = new Map<string, Provenance>();
+  for (const d of dataPoints) {
+    const prev = bySource.get(d.source);
+    bySource.set(d.source, prev === 'representative' || d.provenance === 'representative' ? 'representative' : d.provenance);
+  }
+
   return {
     briefing: textBlock.text.trim(),
     overall_provenance: weakestProvenance(dataPoints),
     sources: Array.from(new Set(dataPoints.map((d) => d.source))),
+    source_provenance: Array.from(bySource, ([source, provenance]) => ({ source, provenance })),
     properties_covered: covered.length,
     generated_at: new Date().toISOString(),
   };

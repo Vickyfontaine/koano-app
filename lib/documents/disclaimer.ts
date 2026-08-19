@@ -7,7 +7,7 @@
 // The renderer (Slice 3) paints these; this module is their format-agnostic
 // source of truth.
 
-import type { BlockKey } from '../providers/blocks';
+import type { BlockKey, SiteDetailBlock } from '../providers/blocks';
 import type { Provenance } from '../providers/types';
 import type { DocumentData } from './types';
 
@@ -85,4 +85,58 @@ export function buildProvenanceAppendix(data: DocumentData): ProvenanceAppendix 
       : 'This document contains one or more representative figures (labeled below). It is not fully live: any figure marked representative is a plausible stand-in for a paid data source that is not yet integrated.';
 
   return { overall: data.overall_provenance, overall_note, rows };
+}
+
+// Shared appendix builder for documents that (optionally) drop non-live
+// demographics and (optionally) account for the KOANO VERDICT as its own
+// provenance source. Overall provenance is the weakest of the rendered blocks
+// AND the verdict — so a live-data document built on a representative verdict is
+// honestly a representative document. Used by the IC memo, the asset one-pager,
+// and (verdict omitted) the property intelligence report, so the three cannot
+// drift apart.
+export function appendixWithVerdict(
+  data: DocumentData,
+  opts?: {
+    dropDemographicsIfNotLive?: boolean;
+    demoLive?: boolean;
+    verdict?: { provenance: Provenance; generatedAt: string };
+  },
+): ProvenanceAppendix {
+  const dropDemo = !!opts?.dropDemographicsIfNotLive && opts?.demoLive === false;
+  const blocks: Partial<Record<BlockKey, SiteDetailBlock<unknown>>> = {};
+  for (const key of Object.keys(data.blocks) as BlockKey[]) {
+    if (key === 'demographics' && dropDemo) continue;
+    const blk = data.blocks[key];
+    if (blk) blocks[key] = blk;
+  }
+  const blockOverall: Provenance = Object.values(blocks).some((b) => b && b.provenance === 'representative')
+    ? 'representative'
+    : 'live';
+  const base = buildProvenanceAppendix({ ...data, blocks, overall_provenance: blockOverall });
+
+  // No verdict → the plain block-only appendix (property intelligence report).
+  if (!opts?.verdict) return base;
+
+  const rows: ProvenanceAppendixRow[] = [
+    ...base.rows,
+    {
+      block: 'KOANO verdict',
+      source: 'KOANO synthesis engine (confidence-weighted v1)',
+      provenance: opts.verdict.provenance,
+      fetched_at: opts.verdict.generatedAt,
+    },
+  ];
+  const overall: Provenance =
+    blockOverall === 'representative' || opts.verdict.provenance === 'representative' ? 'representative' : 'live';
+  const overall_note =
+    overall === 'live'
+      ? 'Every rendered figure AND the underlying KOANO verdict were derived from live, authoritative public data at generation time.'
+      : `This document is NOT fully live. ${
+          opts.verdict.provenance === 'representative'
+            ? 'The underlying KOANO verdict drew on one or more representative agent inputs (a plausible stand-in for a paid source not yet integrated). '
+            : ''
+        }${
+          blockOverall === 'representative' ? 'One or more rendered figures are representative. ' : ''
+        }Any representative input is labeled below.`;
+  return { overall, overall_note, rows };
 }

@@ -674,6 +674,102 @@ function icMemoSample(): RenderModel {
   };
 }
 
+// Asset One-Pager — compact, single page, condensed (compactProvenance)
+// appendix. Exercises the verdict headline, identity band, and the inline
+// provenance list that keeps the mandatory appendix on one page.
+function assetOnePagerSample(): RenderModel {
+  return {
+    docTitle: 'Asset One-Pager',
+    subtitle: '175 3rd Street, Brooklyn, NY',
+    letterhead: EMPTY_LETTERHEAD,
+    compact: true,
+    compactProvenance: true,
+    sections: [
+      { verdict: { decision: 'HOLD', tone: 'warning', confidence: 67, rationale: 'Balanced signals: price momentum against unresolved regulatory context.' } },
+      {
+        heading: 'Property & Envelope',
+        band: {
+          items: [
+            { label: 'Address', value: '175 3rd Street, Brooklyn' },
+            { label: 'BBL', value: '3009720058' },
+            { label: 'Class / year', value: 'K4 / 1931' },
+            { label: 'Zoning', value: 'M1-4/R7-2' },
+            { label: 'Lot / building area', value: '120,793 / 13,518 sq ft' },
+            { label: 'Opportunity Zone', value: 'No' },
+          ],
+        },
+      },
+      {
+        heading: 'Key Market Indicators',
+        table: {
+          columns: ['Indicator', 'Reading'],
+          rows: [
+            ['House Price Index (YoY / 5-yr)', '+5.6% / +45.0% — New York-Jersey City'],
+            ['Recorded sale $/sq ft (median)', '$1,156'],
+            ['Recorded sales in scope / trend', '141 / rising'],
+          ],
+          caption: 'Recorded residential sales (NYC DOF) — not institutional CRE transactions.',
+        },
+      },
+      {
+        heading: 'Top Risks',
+        table: {
+          columns: ['Risk', 'Reading'],
+          rows: [
+            ['KOANO risk score', '50 / 100'],
+            ['FEMA flood zone', 'X (outside SFHA)'],
+            ['Open violations (HPD / ECB / DOB)', '0 / 0 / 0'],
+          ],
+        },
+      },
+      {
+        heading: 'Current Status',
+        paragraphs: ['KOANO verdict HOLD at confidence 67/100, generated 2026-01-01 (0 days ago). Decision support built on public record, not a decision.'],
+      },
+    ],
+    appendix: {
+      overall: 'live',
+      overall_note: 'Every rendered figure AND the underlying KOANO verdict were derived from live, authoritative public data at generation time.',
+      rows: [
+        { block: 'Zoning / PLUTO', source: 'NYC Open Data — MapPLUTO (64uk-42ks)', provenance: 'live', fetched_at: GENERATED_AT },
+        { block: 'Comparable sales', source: 'NYC Open Data — DOF Rolling Sales (usep-8jbt)', provenance: 'live', fetched_at: GENERATED_AT },
+        { block: 'House Price Index', source: 'FHFA HPI', provenance: 'live', fetched_at: GENERATED_AT },
+        { block: 'Flood zone', source: 'FEMA NFHL', provenance: 'live', fetched_at: GENERATED_AT },
+        { block: 'Building violations', source: 'NYC Open Data — HPD / ECB / DOB', provenance: 'live', fetched_at: GENERATED_AT },
+        { block: 'KOANO verdict', source: 'KOANO synthesis engine (confidence-weighted v1)', provenance: 'live', fetched_at: GENERATED_AT },
+      ],
+    },
+    generatedAt: GENERATED_AT,
+  };
+}
+
+// Monday Portfolio Briefing PDF — the four parsed sections + condensed appendix.
+function mondayBriefingSample(): RenderModel {
+  return {
+    docTitle: 'Monday Portfolio Briefing',
+    subtitle: 'Portfolio of 2 properties',
+    letterhead: EMPTY_LETTERHEAD,
+    compactProvenance: true,
+    sections: [
+      { heading: 'Portfolio Summary', paragraphs: ['The portfolio of two tracked properties carries one HOLD and one BUY verdict as of the latest analyses. '.repeat(2)] },
+      { heading: 'Property Notes', paragraphs: ['175 3rd Street, Brooklyn — HOLD at confidence 67; 312 permits in the surrounding tract over 24 months; flood zone X.', '47-07 Vernon Blvd, Queens — BUY at confidence 74; active permit environment; worth reviewing the latest recorded sales.'] },
+      { heading: 'Risk Watch', paragraphs: ['No properties sit inside a Special Flood Hazard Area on current FEMA maps. Worth reviewing where verdict confidence was low.'] },
+      { heading: 'The Week Ahead', paragraphs: ['Re-run analysis on any property whose verdict predates the last month. Flag the Vernon Blvd flood designation for diligence.'] },
+    ],
+    appendix: {
+      overall: 'live',
+      overall_note: 'Every input to this briefing was fetched live from an authoritative public source at generation time.',
+      rows: [
+        { block: 'KOANO verdict audit trail', source: 'KOANO verdict audit trail', provenance: 'live', fetched_at: GENERATED_AT },
+        { block: 'NYC DOB permits', source: 'NYC Open Data — DOB permits', provenance: 'live', fetched_at: GENERATED_AT },
+        { block: 'FEMA flood', source: 'FEMA National Flood Hazard Layer', provenance: 'live', fetched_at: GENERATED_AT },
+        { block: 'FHFA HPI', source: 'FHFA House Price Index', provenance: 'live', fetched_at: GENERATED_AT },
+      ],
+    },
+    generatedAt: GENERATED_AT,
+  };
+}
+
 // One representative model per implemented document type.
 export const SAMPLE_MODELS: Record<string, RenderModel> = {
   tax_appeal_packet: taxAppealSample(),
@@ -683,4 +779,6 @@ export const SAMPLE_MODELS: Record<string, RenderModel> = {
   site_screening_memo: siteScreeningSample(),
   three_site_comparison_brief: comparisonSample(),
   ic_memo: icMemoSample(),
+  monday_briefing_pdf: mondayBriefingSample(),
+  asset_one_pager: assetOnePagerSample(),
 };

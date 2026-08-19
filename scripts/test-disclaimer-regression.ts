@@ -53,10 +53,11 @@ function docxFooterText(buf: Buffer, tag: string): string {
   return text;
 }
 
-async function assertPdfEveryPage(label: string, model: RenderModel, opts?: { minPages?: number }) {
+async function assertPdfEveryPage(label: string, model: RenderModel, opts?: { minPages?: number; exactPages?: number }) {
   const buf = await renderPdf(model);
   const cov = await pdfDisclaimerCoverage(buf);
   if (opts?.minPages) check(`${label}: PDF is multi-page (>${opts.minPages - 1})`, cov.pages >= opts.minPages, `${cov.pages} pages`);
+  if (opts?.exactPages) check(`${label}: PDF is exactly ${opts.exactPages} page(s)`, cov.pages === opts.exactPages, `${cov.pages} pages`);
   check(`${label}: disclaimer on EVERY PDF page`, cov.withDisclaimer === cov.pages && cov.pages > 0, `${cov.withDisclaimer}/${cov.pages}`);
 }
 
@@ -85,7 +86,10 @@ async function assertDocxFooter(label: string, model: RenderModel, tag: string) 
     // Long-form (IC memo) samples MUST span several pages so the title page, TOC,
     // and continuation-page footer + page numbers are all exercised.
     const minPages = doc?.scope === 'multi_site' ? 2 : model.longForm ? 6 : undefined;
-    await assertPdfEveryPage(type, model, minPages ? { minPages } : undefined);
+    // The asset one-pager is STRICTLY one page — assert it, so a future edit that
+    // pushes it to two pages fails here rather than shipping.
+    const exactPages = type === 'asset_one_pager' ? 1 : undefined;
+    await assertPdfEveryPage(type, model, { ...(minPages ? { minPages } : {}), ...(exactPages ? { exactPages } : {}) });
     if (doc && doc.formats.includes('docx')) {
       await assertDocxFooter(type, model, type);
     }

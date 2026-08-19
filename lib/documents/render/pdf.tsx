@@ -90,6 +90,7 @@ function makeStyles(compact: boolean) {
     appSource: { flex: 2, fontSize: p(8.5, 8), color: INK_MUTED },
     appProv: { flex: 0.8, fontSize: p(8.5, 8) },
     appNote: { fontSize: 8.5, color: INK_SECONDARY, marginTop: p(8, 4), marginBottom: p(4, 2), lineHeight: 1.4 },
+    provCompact: { fontSize: 8, color: INK_MUTED, lineHeight: 1.5 },
     swapNote: { fontSize: 7.5, color: INK_FAINT, marginTop: 1 },
     // footer (fixed on every page)
     footer: {
@@ -378,6 +379,29 @@ function Section({ section, s, sink }: { section: RenderSection; s: Styles; sink
 
 function ProvenanceAppendixSection({ model, s }: { model: RenderModel; s: Styles }) {
   const a = model.appendix;
+
+  // Condensed appendix (one-pager): the mandatory appendix stays fully present
+  // — every source + the verdict + the overall rollup — but as a compact inline
+  // list rather than a table, so a strictly-one-page document never has to trim
+  // content to make room for it.
+  if (model.compactProvenance) {
+    return (
+      <View style={s.section} wrap={false}>
+        <Text style={s.heading}>Sources & Provenance</Text>
+        <Text style={s.appNote}>{a.overall_note}</Text>
+        <Text style={s.provCompact}>
+          {a.rows.map((r, i) => (
+            <Text key={i}>
+              {i > 0 ? '   ·   ' : ''}
+              <Text>{r.block} </Text>
+              <Text style={{ color: provColor(r.provenance) }}>({r.provenance})</Text>
+            </Text>
+          ))}
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <View style={s.section}>
       <Text style={s.heading}>Sources & Provenance</Text>

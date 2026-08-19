@@ -100,4 +100,9 @@ export interface RenderModel {
   // memo built on a representative verdict is honestly a representative document.
   documentProvenance?: Provenance;
   documentProvenanceNote?: string;
+  // Render the provenance appendix as a condensed inline block (overall note +
+  // a single wrapped "source (provenance)" list) instead of a full table. Used
+  // by the strictly-one-page asset one-pager so the mandatory appendix fits
+  // without ever trimming content. The appendix is still fully present.
+  compactProvenance?: boolean;
 }

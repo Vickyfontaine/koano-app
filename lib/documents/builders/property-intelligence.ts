@@ -30,11 +30,10 @@ import type {
   AcsDemographics,
   HpiTrend,
 } from '../../providers/types';
-import type { SiteDetailBlock, BlockKey } from '../../providers/blocks';
-import type { Provenance } from '../../providers/types';
+import type { SiteDetailBlock } from '../../providers/blocks';
 import type { DocumentData, Letterhead } from '../types';
 import type { RenderModel, RenderSection } from '../render/model';
-import { buildProvenanceAppendix, type ProvenanceAppendix } from '../disclaimer';
+import { appendixWithVerdict, type ProvenanceAppendix } from '../disclaimer';
 import { getAnthropicClient, KOANO_RUNTIME_MODEL } from '../../agents/shared';
 
 function fmtMoney(n: number | null | undefined): string {
@@ -158,16 +157,9 @@ export function extractPropertyIntelligenceFacts(
 // representative. The drop is already surfaced visibly in the context section's
 // trimNote, so nothing is hidden. Every other block is all-live NYC data.
 export function propertyIntelligenceAppendix(data: DocumentData, demoLive: boolean): ProvenanceAppendix {
-  const blocks: Partial<Record<BlockKey, SiteDetailBlock<unknown>>> = {};
-  for (const key of Object.keys(data.blocks) as BlockKey[]) {
-    if (key === 'demographics' && !demoLive) continue;
-    const blk = data.blocks[key];
-    if (blk) blocks[key] = blk;
-  }
-  const overall: Provenance = Object.values(blocks).some((b) => b && b.provenance === 'representative')
-    ? 'representative'
-    : 'live';
-  return buildProvenanceAppendix({ ...data, blocks, overall_provenance: overall });
+  // No verdict in this document → the shared helper returns a block-only
+  // appendix, dropping non-live demographics (the one best-effort block).
+  return appendixWithVerdict(data, { dropDemographicsIfNotLive: true, demoLive });
 }
 
 // Compact fact payload for the trajectory model call.

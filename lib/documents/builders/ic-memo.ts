@@ -24,10 +24,10 @@ import type {
   EntitlementSummary,
   Provenance,
 } from '../../providers/types';
-import type { SiteDetailBlock, BlockKey } from '../../providers/blocks';
+import type { SiteDetailBlock } from '../../providers/blocks';
 import type { DocumentData, Letterhead } from '../types';
 import type { RenderModel, RenderSection } from '../render/model';
-import { buildProvenanceAppendix, type ProvenanceAppendix } from '../disclaimer';
+import { appendixWithVerdict, type ProvenanceAppendix } from '../disclaimer';
 import { getAnthropicClient, KOANO_RUNTIME_MODEL } from '../../agents/shared';
 import type { ReasoningStep } from '../../agents/shared';
 import type { WeightingBreakdown } from '../../agents/synthesis';
@@ -155,40 +155,11 @@ export function icMemoAppendix(
   verdictProvenance: Provenance,
   verdictGeneratedAt: string,
 ): ProvenanceAppendix {
-  const blocks: Partial<Record<BlockKey, SiteDetailBlock<unknown>>> = {};
-  for (const key of Object.keys(data.blocks) as BlockKey[]) {
-    if (key === 'demographics' && !demoLive) continue;
-    const blk = data.blocks[key];
-    if (blk) blocks[key] = blk;
-  }
-  const blockOverall: Provenance = Object.values(blocks).some((b) => b && b.provenance === 'representative')
-    ? 'representative'
-    : 'live';
-  const base = buildProvenanceAppendix({ ...data, blocks, overall_provenance: blockOverall });
-
-  // The verdict as its own labeled source row.
-  const rows = [
-    ...base.rows,
-    {
-      block: 'KOANO verdict',
-      source: 'KOANO synthesis engine (confidence-weighted v1)',
-      provenance: verdictProvenance,
-      fetched_at: verdictGeneratedAt,
-    },
-  ];
-  const overall: Provenance =
-    blockOverall === 'representative' || verdictProvenance === 'representative' ? 'representative' : 'live';
-  const overall_note =
-    overall === 'live'
-      ? 'Every rendered figure AND the underlying KOANO verdict were derived from live, authoritative public data at generation time.'
-      : `This memo is NOT fully live. ${
-          verdictProvenance === 'representative'
-            ? 'The underlying KOANO verdict drew on one or more representative agent inputs (a plausible stand-in for a paid source not yet integrated). '
-            : ''
-        }${
-          blockOverall === 'representative' ? 'One or more rendered figures are representative. ' : ''
-        }Any representative input is labeled below.`;
-  return { overall, overall_note, rows };
+  return appendixWithVerdict(data, {
+    dropDemographicsIfNotLive: true,
+    demoLive,
+    verdict: { provenance: verdictProvenance, generatedAt: verdictGeneratedAt },
+  });
 }
 
 // --- executive summary (the single, optional narrative call) ---

@@ -14,7 +14,7 @@ import { getDocumentType } from '../../../../lib/documents/registry';
 import { IMPLEMENTED_DOC_TYPE_SET } from '../../../../lib/documents/implemented';
 import { guardDocument } from '../../../../lib/documents/guard';
 import { assembleDocumentData, getLetterhead } from '../../../../lib/documents/assembler';
-import { buildProvenanceAppendix } from '../../../../lib/documents/disclaimer';
+import { buildProvenanceAppendix, appendixWithVerdict } from '../../../../lib/documents/disclaimer';
 import { renderPdf } from '../../../../lib/documents/render/pdf';
 import { renderDocx } from '../../../../lib/documents/render/docx';
 import type { RenderModel } from '../../../../lib/documents/render/model';
@@ -64,6 +64,39 @@ import {
 } from '../../../../lib/documents/builders/ic-memo';
 import { breakdownFromSummaries, type AgentSummary } from '../../../../lib/agents/synthesis';
 import type { Verdict, ReasoningStep } from '../../../../lib/agents/shared';
+import { extractOnePagerFacts, buildOnePagerModel } from '../../../../lib/documents/builders/asset-one-pager';
+import { buildMondayBriefingModel } from '../../../../lib/documents/builders/monday-briefing';
+import { generateBriefing, type BriefingProperty } from '../../../../lib/agents/briefing';
+
+// Load the user's tracked portfolio (properties + each one's latest verdict),
+// mirroring /api/briefing so the Monday Briefing PDF is the same briefing.
+async function loadPortfolio(userId: string): Promise<BriefingProperty[]> {
+  const db = supabaseAdmin();
+  const [propsRes, verdictsRes] = await Promise.all([
+    db.from('properties').select('address_normalized, address_input, bbl').eq('clerk_user_id', userId).order('created_at', { ascending: true }),
+    db.from('verdicts').select('bbl, address_normalized, verdict, confidence, risk_score, overall_provenance, headline, created_at').eq('clerk_user_id', userId).order('created_at', { ascending: false }).limit(200),
+  ]);
+  const verdicts = verdictsRes.data ?? [];
+  return (propsRes.data ?? []).map((p) => {
+    const latest = verdicts.find(
+      (v) => (p.bbl && v.bbl === p.bbl) || (p.address_normalized && v.address_normalized === p.address_normalized),
+    );
+    return {
+      address: p.address_normalized ?? p.address_input,
+      bbl: p.bbl,
+      latest_verdict: latest
+        ? {
+            verdict: latest.verdict,
+            confidence: latest.confidence,
+            risk_score: latest.risk_score,
+            overall_provenance: latest.overall_provenance,
+            headline: latest.headline,
+            created_at: latest.created_at,
+          }
+        : null,
+    };
+  });
+}
 
 // Load the user's most recent stored verdict for a resolved address (by BBL,
 // falling back to the normalized string). The IC memo reuses this verdict — the
@@ -117,9 +150,18 @@ async function loadLatestVerdict(
   };
 }
 
-// Evidentiary Community documents: fully deterministic (no model call), so they
-// always build from the deterministic path and never spend a content generation.
-const DETERMINISTIC_DOC_TYPES = new Set(['violation_ownership_record', 'permit_history_report']);
+// Deterministic documents (no model call) → always the verdict path, never a
+// content charge. Evidentiary Community docs + the deterministic asset one-pager.
+const DETERMINISTIC_DOC_TYPES = new Set([
+  'violation_ownership_record',
+  'permit_history_report',
+  'asset_one_pager',
+]);
+
+// Always-generate documents: they inherently make one narrative call every time
+// (no stored artifact to reuse), so force the fresh path so the guard meters the
+// generation. The Monday Briefing PDF reruns generateBriefing each export.
+const ALWAYS_GENERATE_DOC_TYPES = new Set(['monday_briefing_pdf']);
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -157,11 +199,14 @@ export async function POST(req: Request) {
   const doc = getDocumentType(docTypeId);
   if (!doc) return NextResponse.json({ error: `Unknown document type "${docTypeId}"` }, { status: 404 });
 
-  // Address requirement is scope-aware: multi_site takes up to 3 addresses.
+  // Address requirement is scope-aware: multi_site takes up to 3 addresses;
+  // portfolio operates on the user's tracked properties and needs no address.
   if (doc.scope === 'multi_site') {
     if (addresses.length === 0) {
       return NextResponse.json({ error: '"addresses" (1–3) is required for this document' }, { status: 400 });
     }
+  } else if (doc.scope === 'portfolio') {
+    // no address required
   } else if (!address) {
     return NextResponse.json({ error: '"address" is required' }, { status: 400 });
   }
@@ -191,13 +236,15 @@ export async function POST(req: Request) {
     );
   }
 
-  // Evidentiary docs are deterministic → force the verdict path so the guard
-  // never meters a content generation for them (there is no model call to meter).
+  // Deterministic docs force the verdict path (no charge); always-generate docs
+  // force fresh (so the one narrative call is metered); otherwise honor the body.
   const buildSource: BuildSource = DETERMINISTIC_DOC_TYPES.has(doc.id)
     ? 'verdict'
-    : body.buildSource === 'verdict'
-      ? 'verdict'
-      : 'fresh';
+    : ALWAYS_GENERATE_DOC_TYPES.has(doc.id)
+      ? 'fresh'
+      : body.buildSource === 'verdict'
+        ? 'verdict'
+        : 'fresh';
   const verdictId = typeof body.verdictId === 'string' ? body.verdictId : null;
 
   // Guard: tier gate → doc cap → content meter (fresh only). Fails closed.
@@ -302,6 +349,45 @@ export async function POST(req: Request) {
         storedVerdict.verdictGeneratedAt,
       );
       model = buildIcMemoModel({ facts: ex.facts, letterhead, execSummary, appendix, generatedAt });
+      addressInput = r.data.resolved_address.input;
+      bbl = r.data.resolved_address.bbl;
+      overallProvenance = appendix.overall;
+    } else if (doc.id === 'monday_briefing_pdf') {
+      const portfolio = await loadPortfolio(userId);
+      if (portfolio.length === 0) {
+        return NextResponse.json(
+          { error: 'No properties in your portfolio yet. Add properties first.' },
+          { status: 422 },
+        );
+      }
+      const result = await generateBriefing(portfolio); // the single narrative call
+      model = buildMondayBriefingModel({ result, portfolioSize: portfolio.length, letterhead, generatedAt });
+      addressInput = `Portfolio (${portfolio.length} propert${portfolio.length === 1 ? 'y' : 'ies'})`;
+      bbl = null;
+      overallProvenance = result.overall_provenance;
+    } else if (doc.id === 'asset_one_pager') {
+      const r = await assembleDocumentData(address, doc.requiredBlocks);
+      if (!r.ok) return NextResponse.json({ error: r.error }, { status: r.status });
+      const storedVerdict = await loadLatestVerdict(
+        userId,
+        r.data.resolved_address.bbl,
+        r.data.resolved_address.normalized,
+      );
+      if (!storedVerdict) {
+        return NextResponse.json(
+          {
+            error:
+              'The one-pager is built from a completed KOANO analysis, and none exists for this property yet. Run the analysis first, then generate the one-pager.',
+          },
+          { status: 422 },
+        );
+      }
+      const ex = extractOnePagerFacts(r.data, storedVerdict);
+      if (!ex.ok) return NextResponse.json({ error: ex.error }, { status: 422 });
+      const appendix = appendixWithVerdict(r.data, {
+        verdict: { provenance: storedVerdict.overall_provenance, generatedAt: storedVerdict.verdictGeneratedAt },
+      });
+      model = buildOnePagerModel({ facts: ex.facts, letterhead, appendix, generatedAt });
       addressInput = r.data.resolved_address.input;
       bbl = r.data.resolved_address.bbl;
       overallProvenance = appendix.overall;

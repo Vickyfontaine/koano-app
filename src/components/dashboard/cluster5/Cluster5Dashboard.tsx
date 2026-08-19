@@ -16,6 +16,7 @@ import VerdictHistory from "../VerdictHistory";
 import PortfolioOverview from "./PortfolioOverview";
 import MondayBriefing from "./MondayBriefing";
 import RiskMonitor from "./RiskMonitor";
+import DocumentButton from "../DocumentButton";
 import type { PortfolioProperty } from "@/app/api/properties/route";
 
 export default function Cluster5Dashboard() {
@@ -171,6 +172,81 @@ export default function Cluster5Dashboard() {
       )}
 
       <MondayBriefing hasProperties={!!properties && properties.length > 0} id="c5-briefing" />
+
+      {/* Downloadable documents — portfolio briefing PDF + per-asset one-pager,
+          matching the Cluster 1 grouped pattern. */}
+      <div id="c5-documents" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+        <div>
+          <span className="section-number">{c.number}.D</span>
+          <h2
+            style={{
+              fontSize: "22px",
+              fontWeight: 700,
+              letterSpacing: "-0.02em",
+              color: "var(--ink-primary)",
+              margin: "8px 0 2px",
+            }}
+          >
+            Downloadable documents
+          </h2>
+          <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
+            Provenance-labeled PDFs. Every figure carries its source; the disclaimer footer is on
+            every page.
+          </p>
+        </div>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+            gap: "16px",
+          }}
+        >
+          {properties && properties.length > 0 ? (
+            <DocumentButton
+              docType="monday_briefing_pdf"
+              title="Monday Portfolio Briefing (PDF)"
+              formats={["pdf"]}
+              singleAction={true}
+              id="c5-briefing-doc"
+            />
+          ) : (
+            <div
+              style={{
+                border: "1px dashed var(--border)",
+                borderRadius: "16px",
+                padding: "20px",
+                fontSize: "13px",
+                color: "var(--ink-faint)",
+              }}
+            >
+              Add properties to your portfolio to generate the Monday Briefing PDF.
+            </div>
+          )}
+          {status === "done" && result ? (
+            <DocumentButton
+              docType="asset_one_pager"
+              title="Asset One-Pager"
+              address={result.resolved_address.normalized || result.resolved_address.input}
+              formats={["pdf"]}
+              singleAction={true}
+              id="c5-onepager-doc"
+            />
+          ) : (
+            <div
+              style={{
+                border: "1px dashed var(--border)",
+                borderRadius: "16px",
+                padding: "20px",
+                fontSize: "13px",
+                color: "var(--ink-faint)",
+              }}
+            >
+              Analyze a property above to enable its one-pager.
+            </div>
+          )}
+        </div>
+      </div>
+
       <RiskMonitor properties={properties} id="c5-risk" />
       <VerdictHistory id="c5-history" />
     </div>
