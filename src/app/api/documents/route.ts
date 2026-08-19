@@ -67,6 +67,26 @@ import type { Verdict, ReasoningStep } from '../../../../lib/agents/shared';
 import { extractOnePagerFacts, buildOnePagerModel } from '../../../../lib/documents/builders/asset-one-pager';
 import { buildMondayBriefingModel } from '../../../../lib/documents/builders/monday-briefing';
 import { generateBriefing, type BriefingProperty } from '../../../../lib/agents/briefing';
+import { runGroundedNarrative } from '../../../../lib/documents/narrative';
+import { appendixWithVerdict as sharedAppendix } from '../../../../lib/documents/disclaimer';
+import { extractPricingFacts, buildPricingModel } from '../../../../lib/documents/builders/pricing-sheet';
+import { extractNetSheetFacts, buildNetSheetModel } from '../../../../lib/documents/builders/net-sheet';
+import {
+  extractNeighborhoodFacts,
+  neighborhoodDataPoints,
+  neighborhoodFactsForModel,
+  deterministicNeighborhoodNarrative,
+  buildNeighborhoodModel,
+  NEIGHBORHOOD_SYSTEM_PROMPT,
+} from '../../../../lib/documents/builders/client-neighborhood';
+import {
+  extractEntitlementFacts,
+  entitlementDataPoints,
+  entitlementFactsForModel,
+  deterministicEntitlementNarrative,
+  buildEntitlementModel,
+  ENTITLEMENT_SYSTEM_PROMPT,
+} from '../../../../lib/documents/builders/entitlement-memo';
 
 // Load the user's tracked portfolio (properties + each one's latest verdict),
 // mirroring /api/briefing so the Monday Briefing PDF is the same briefing.
@@ -156,6 +176,8 @@ const DETERMINISTIC_DOC_TYPES = new Set([
   'violation_ownership_record',
   'permit_history_report',
   'asset_one_pager',
+  'pricing_recommendation_sheet',
+  'buyer_seller_net_sheet',
 ]);
 
 // Always-generate documents: they inherently make one narrative call every time
@@ -402,6 +424,63 @@ export async function POST(req: Request) {
         appendix: buildProvenanceAppendix(r.data),
         generatedAt,
       });
+      addressInput = r.data.resolved_address.input;
+      bbl = r.data.resolved_address.bbl;
+      overallProvenance = r.data.overall_provenance;
+    } else if (doc.id === 'pricing_recommendation_sheet') {
+      const r = await assembleDocumentData(address, doc.requiredBlocks);
+      if (!r.ok) return NextResponse.json({ error: r.error }, { status: r.status });
+      const ex = extractPricingFacts(r.data);
+      if (!ex.ok) return NextResponse.json({ error: ex.error }, { status: 422 });
+      model = buildPricingModel({ facts: ex.facts, letterhead, appendix: buildProvenanceAppendix(r.data), generatedAt });
+      addressInput = r.data.resolved_address.input;
+      bbl = r.data.resolved_address.bbl;
+      overallProvenance = r.data.overall_provenance;
+    } else if (doc.id === 'buyer_seller_net_sheet') {
+      const r = await assembleDocumentData(address, doc.requiredBlocks);
+      if (!r.ok) return NextResponse.json({ error: r.error }, { status: r.status });
+      const ex = extractNetSheetFacts(r.data);
+      if (!ex.ok) return NextResponse.json({ error: ex.error }, { status: 422 });
+      model = buildNetSheetModel({ facts: ex.facts, letterhead, appendix: buildProvenanceAppendix(r.data), generatedAt });
+      addressInput = r.data.resolved_address.input;
+      bbl = r.data.resolved_address.bbl;
+      overallProvenance = r.data.overall_provenance;
+    } else if (doc.id === 'client_neighborhood_report') {
+      const r = await assembleDocumentData(address, doc.requiredBlocks);
+      if (!r.ok) return NextResponse.json({ error: r.error }, { status: r.status });
+      const ex = extractNeighborhoodFacts(r.data);
+      if (!ex.ok) return NextResponse.json({ error: ex.error }, { status: 422 });
+      const narrative =
+        buildSource === 'fresh'
+          ? await runGroundedNarrative({
+              systemPrompt: NEIGHBORHOOD_SYSTEM_PROMPT,
+              factsPayload: neighborhoodFactsForModel(ex.facts),
+              allowedDataPoints: neighborhoodDataPoints(ex.facts),
+              addressLabel: ex.facts.addressLabel,
+              deterministicFallback: deterministicNeighborhoodNarrative(ex.facts),
+            })
+          : deterministicNeighborhoodNarrative(ex.facts);
+      const appendix = sharedAppendix(r.data, { dropDemographicsIfNotLive: true, demoLive: ex.facts.demoLive });
+      model = buildNeighborhoodModel({ facts: ex.facts, letterhead, narrative, appendix, generatedAt });
+      addressInput = r.data.resolved_address.input;
+      bbl = r.data.resolved_address.bbl;
+      overallProvenance = appendix.overall;
+    } else if (doc.id === 'entitlement_risk_memo') {
+      const r = await assembleDocumentData(address, doc.requiredBlocks);
+      if (!r.ok) return NextResponse.json({ error: r.error }, { status: r.status });
+      const ex = extractEntitlementFacts(r.data);
+      if (!ex.ok) return NextResponse.json({ error: ex.error }, { status: 422 });
+      const narrative =
+        buildSource === 'fresh'
+          ? await runGroundedNarrative({
+              systemPrompt: ENTITLEMENT_SYSTEM_PROMPT,
+              factsPayload: entitlementFactsForModel(ex.facts),
+              allowedDataPoints: entitlementDataPoints(ex.facts),
+              addressLabel: ex.facts.addressLabel,
+              deterministicFallback: deterministicEntitlementNarrative(ex.facts),
+            })
+          : deterministicEntitlementNarrative(ex.facts);
+      model = buildEntitlementModel({ facts: ex.facts, letterhead, narrative, appendix: buildProvenanceAppendix(r.data), generatedAt });
       addressInput = r.data.resolved_address.input;
       bbl = r.data.resolved_address.bbl;
       overallProvenance = r.data.overall_provenance;

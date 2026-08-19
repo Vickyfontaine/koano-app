@@ -338,13 +338,28 @@ export default function SiteComparison() {
                   minoritySignals={r.verdict.minority_signals}
                   agentSummaries={r.verdict.agent_summaries}
                 />
-                <DocumentButton
-                  docType="site_screening_memo"
-                  title="Development Site Screening Memo"
-                  address={r.resolved_address.normalized}
-                  hasRecentVerdict={true}
-                  id={`c4-screening-${slot}`}
-                />
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+                    gap: "16px",
+                  }}
+                >
+                  <DocumentButton
+                    docType="site_screening_memo"
+                    title="Development Site Screening Memo"
+                    address={r.resolved_address.normalized}
+                    hasRecentVerdict={true}
+                    id={`c4-screening-${slot}`}
+                  />
+                  <DocumentButton
+                    docType="entitlement_risk_memo"
+                    title="Entitlement Risk Memo"
+                    address={r.resolved_address.normalized}
+                    hasRecentVerdict={true}
+                    id={`c4-entitlement-${slot}`}
+                  />
+                </div>
               </div>
             );
           })}

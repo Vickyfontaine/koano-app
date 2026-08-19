@@ -770,6 +770,110 @@ function mondayBriefingSample(): RenderModel {
   };
 }
 
+const LIVE_APPENDIX = {
+  overall: 'live' as const,
+  overall_note: 'Every figure in this document was fetched live from an authoritative public source at generation time.',
+  rows: [
+    { block: 'Zoning / PLUTO', source: 'NYC Open Data — MapPLUTO (64uk-42ks)', provenance: 'live' as const, fetched_at: GENERATED_AT },
+    { block: 'Comparable sales', source: 'NYC Open Data — DOF Rolling Sales (usep-8jbt)', provenance: 'live' as const, fetched_at: GENERATED_AT },
+    { block: 'House Price Index', source: 'FHFA HPI', provenance: 'live' as const, fetched_at: GENERATED_AT },
+  ],
+};
+
+function pricingSheetSample(): RenderModel {
+  return {
+    docTitle: 'Pricing Recommendation Sheet',
+    subtitle: '369 6th Street, Brooklyn, NY',
+    letterhead: NAMED_LETTERHEAD,
+    sections: [
+      {
+        heading: 'Recommended Price Band',
+        provenanceNote: { provenance: 'live', text: 'The band is the interquartile spread (25th–75th percentile) of comparable recorded $/sq ft. Not an appraisal or a list price.' },
+        highlight: {
+          figures: [
+            { label: 'Low (25th percentile)', value: '$3,200,000', sub: '$1,010/sq ft' },
+            { label: 'Midpoint (median)', value: '$3,660,000', sub: '$1,156/sq ft', emphasis: true },
+            { label: 'High (75th percentile)', value: '$4,120,000', sub: '$1,301/sq ft' },
+          ],
+        },
+        paragraphs: ['Derivation: 141 qualifying recorded sales reduced to $/sq ft; the 25th/50th/75th percentiles applied to 3,166 sq ft of building area. The interquartile spread excludes outliers on both ends.'],
+      },
+      {
+        heading: 'How These Comparables Were Selected',
+        paragraphs: ['To keep the selection defensible rather than cherry-picked, KOANO applies a fixed rule to NYC DOF recorded sales:', '• Residential recorded sales only (DOF classes 01, 02, 03, 09, 10, 12, 13).', '• A trailing window keyed to the subject ZIP.', '• Sales with a recorded gross square footage.', '• A trimmed median for the central figure.'],
+      },
+      {
+        heading: 'Comparable Recorded Sales',
+        table: { columns: ['Address', 'Sale date', 'Sale price', '$/sq ft', 'Sq ft', 'Class'], rows: Array.from({ length: 6 }, (_, i) => [`${100 + i} Example St`, `2026-0${i + 1}-10`, `$${(3_000_000 + i * 120000).toLocaleString('en-US')}`, `$${1000 + i * 60}`, `${2800 + i * 100}`, '01'], ), caption: '141 qualifying recorded sales in scope.' },
+      },
+    ],
+    appendix: LIVE_APPENDIX,
+    generatedAt: GENERATED_AT,
+  };
+}
+
+function netSheetSample(): RenderModel {
+  return {
+    docTitle: 'Buyer / Seller Net Sheet',
+    subtitle: '369 6th Street, Brooklyn, NY',
+    letterhead: NAMED_LETTERHEAD,
+    sections: [
+      {
+        heading: 'Assumed Sale Price',
+        provenanceNote: { provenance: 'live', text: 'THIS IS A KOANO-DERIVED INDICATIVE VALUE from recorded comparable sales — NOT an appraisal, a listing price, or an accepted offer.' },
+        highlight: { figures: [{ label: 'KOANO indicative value (recorded sales)', value: '$3,660,000', sub: '$1,156/sq ft median × 3,166 sq ft · 141 recorded sales', emphasis: true }] },
+        paragraphs: ['Every line below is estimated FROM this figure. If you have a contract or list price, use that instead.'],
+      },
+      {
+        heading: 'Closing Costs — You Provide These',
+        provenanceNote: { provenance: 'representative', text: 'KOANO does not know these figures. Fill them in from your closing statement, lender, and attorney.' },
+        table: { columns: ['Line item', 'Amount', 'Why KOANO cannot source it'], rows: [['Transfer taxes (NYC RPTT + NY State)', '_____________', 'Rate depends on price band and party.'], ['Title insurance & search', '_____________', 'Set by the title company.'], ['Broker commission', '_____________', 'Negotiated per engagement.'], ['Mortgage payoff (seller)', '_____________', 'From your lender.']], caption: 'These are inputs, not KOANO outputs.' },
+      },
+      { heading: 'Estimated Net', paragraphs: ['Seller net proceeds = sale price − (transfer taxes + title + commission + mortgage payoff + attorney/misc.)', 'KOANO does not compute a net total, because the inputs are yours to supply.'] },
+    ],
+    appendix: { ...LIVE_APPENDIX, rows: LIVE_APPENDIX.rows.slice(0, 2) },
+    generatedAt: GENERATED_AT,
+  };
+}
+
+function neighborhoodSample(): RenderModel {
+  return {
+    docTitle: 'Client Neighborhood Report',
+    subtitle: '369 6th Street, Brooklyn, NY',
+    letterhead: NAMED_LETTERHEAD,
+    sections: [
+      {
+        heading: 'Neighborhood Snapshot',
+        provenanceNote: { provenance: 'live', text: 'Recorded residential sales (NYC DOF), FHFA price index, NYC DOB permits, FEMA flood — all live. Not an appraisal.' },
+        table: { columns: ['Indicator', 'Reading'], rows: [['Recorded home sales — median $/sq ft', '$1,156'], ['Recorded sales in scope / recent trend', '141 / rising'], ['Price index — past year / 5 years', '+5.6% / +45.0% — New York-Jersey City'], ['Building permits nearby (last 24 months)', '312'], ['FEMA flood zone', 'X']] },
+      },
+      { heading: 'Neighborhood Narrative', paragraphs: ['On price: recorded homes here have sold at a median of $1,156 per square foot across 141 recent sales; recent prices are rising. '.repeat(2), 'On flood risk: the property is in FEMA flood zone X, outside the higher-risk Special Flood Hazard Area.'] },
+    ],
+    appendix: LIVE_APPENDIX,
+    generatedAt: GENERATED_AT,
+  };
+}
+
+function entitlementMemoSample(): RenderModel {
+  return {
+    docTitle: 'Entitlement Risk Memo',
+    subtitle: '175 3rd Street, Brooklyn, NY',
+    letterhead: EMPTY_LETTERHEAD,
+    sections: [
+      { heading: 'Zoning & Entitlement Context', band: { items: [{ label: 'Address', value: '175 3rd Street, Brooklyn' }, { label: 'Community district', value: '306' }, { label: 'Zoning district', value: 'M1-4/R7-2' }, { label: 'Unused FAR (headroom)', value: '97%' }, { label: 'Opportunity Zone', value: 'No' }] } },
+      {
+        heading: 'Community District Track Record',
+        provenanceNote: { provenance: 'live', text: 'A DISPOSITION TRACK RECORD from DOB Job Application Filings — not a prediction of any specific project.' },
+        table: { columns: ['Measure', 'Value'], rows: [['Approval ratio (approved / decided)', '95%'], ['Approved', '2,981'], ['Disapproved', '148'], ['Withdrawn', '211'], ['Suspended', '64'], ['In process', '512'], ['Total filings in scope', '3,916'], ['Median filing timeline', '573 days']] },
+      },
+      { heading: 'Subject-Lot Filing History', table: { columns: ['Job', 'Type', 'Status', 'Latest action'], rows: [['302345678', 'NB', 'PERMIT ISSUED', '03/04/2026'], ['302233445', 'DM', 'SIGNED OFF', '07/03/2025']], caption: '2 filing(s) on record for this lot.' } },
+      { heading: 'Risk Assessment', paragraphs: ['Community district 306 shows a 95% approval ratio across 3,916 DOB job filings. These are base-rate context, a disposition track record, not a prediction. '.repeat(2)] },
+    ],
+    appendix: LIVE_APPENDIX,
+    generatedAt: GENERATED_AT,
+  };
+}
+
 // One representative model per implemented document type.
 export const SAMPLE_MODELS: Record<string, RenderModel> = {
   tax_appeal_packet: taxAppealSample(),
@@ -781,4 +885,8 @@ export const SAMPLE_MODELS: Record<string, RenderModel> = {
   ic_memo: icMemoSample(),
   monday_briefing_pdf: mondayBriefingSample(),
   asset_one_pager: assetOnePagerSample(),
+  pricing_recommendation_sheet: pricingSheetSample(),
+  buyer_seller_net_sheet: netSheetSample(),
+  client_neighborhood_report: neighborhoodSample(),
+  entitlement_risk_memo: entitlementMemoSample(),
 };

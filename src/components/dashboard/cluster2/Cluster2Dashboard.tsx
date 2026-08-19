@@ -19,6 +19,7 @@ import MarketVelocityPanel from "./MarketVelocityPanel";
 import CmaBuilder from "./CmaBuilder";
 import PricingPanel from "./PricingPanel";
 import NarrativePanel from "./NarrativePanel";
+import DocumentButton from "../DocumentButton";
 import type { SiteDetailResponse } from "@/app/api/site-detail/route";
 
 const MARKET_BLOCKS = [
@@ -122,6 +123,81 @@ export default function Cluster2Dashboard() {
             id="c2-pricing"
           />
           <NarrativePanel address={subjectAddress} id="c2-narrative" />
+
+          {/* Downloadable documents — grouped, matching the Cluster 1 & 5 pattern */}
+          {subjectAddress && (
+            <div id="c2-documents" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              <div>
+                <span className="section-number">{c.number}.D</span>
+                <h2
+                  style={{
+                    fontSize: "22px",
+                    fontWeight: 700,
+                    letterSpacing: "-0.02em",
+                    color: "var(--ink-primary)",
+                    margin: "8px 0 2px",
+                  }}
+                >
+                  Downloadable documents
+                </h2>
+                <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
+                  Client-ready PDFs for {subjectAddress}, on your letterhead. Every figure carries its
+                  source; the disclaimer footer is on every page.
+                </p>
+              </div>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+                  gap: "16px",
+                }}
+              >
+                <DocumentButton
+                  docType="client_neighborhood_report"
+                  title="Client Neighborhood Report"
+                  address={subjectAddress}
+                  formats={["pdf"]}
+                  id="c2-neighborhood-doc"
+                />
+                <DocumentButton
+                  docType="pricing_recommendation_sheet"
+                  title="Pricing Recommendation Sheet"
+                  address={subjectAddress}
+                  formats={["pdf"]}
+                  singleAction={true}
+                  id="c2-pricing-doc"
+                />
+                <DocumentButton
+                  docType="buyer_seller_net_sheet"
+                  title="Buyer / Seller Net Sheet"
+                  address={subjectAddress}
+                  formats={["pdf"]}
+                  singleAction={true}
+                  id="c2-netsheet-doc"
+                />
+                {/* CMA is a feature gap (listing photos + geocoded comps), not a
+                    data gap — surfaced as a disabled tile, not a broken button. */}
+                <div
+                  style={{
+                    border: "1px dashed var(--border)",
+                    borderRadius: "16px",
+                    padding: "20px",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "6px",
+                  }}
+                >
+                  <h3 style={{ fontSize: "16px", fontWeight: 500, color: "var(--ink-muted)", margin: 0 }}>
+                    Comparative Market Analysis
+                  </h3>
+                  <p style={{ fontSize: "12px", color: "var(--ink-faint)", margin: 0 }}>
+                    Not yet available — the CMA needs listing photos and geocoded comps, which KOANO
+                    does not source today.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Verdict pipeline */}
           {status === "running" && (

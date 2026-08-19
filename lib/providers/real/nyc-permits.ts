@@ -115,8 +115,16 @@ export const nycPermits: PermitsProvider = {
     cutoff.setMonth(cutoff.getMonth() - 24);
     const cutoffStr = `${cutoff.toISOString().slice(0, 10)}T00:00:00.000`;
 
-    // DOB census_tract has no leading zeros: "011901" -> "11901"
-    const dobTract = addr.tract_code ? String(Number(addr.tract_code)) : null;
+    // DOB census_tract drops leading zeros AND the trailing ".00" suffix of a
+    // whole-number tract: tract 119.01 -> "11901", but tract 137.00 -> "137".
+    // String(Number("013700")) = "13700" keeps the trailing zeros, matches
+    // NOTHING, and silently falls the query back to the subject BBL's own count
+    // (which read 0 "neighborhood permits" for whole-number tracts). Split off
+    // the 2-digit suffix and drop it only when it is "00".
+    const dobTract = addr.tract_code
+      ? String(Number(addr.tract_code.slice(0, -2))) +
+        (addr.tract_code.slice(-2) === '00' ? '' : addr.tract_code.slice(-2))
+      : null;
     const boroughWhere = addr.borough ? `upper(borough)=upper('${addr.borough}')` : null;
 
     const subjectUrl =

@@ -18,6 +18,10 @@ export const IMPLEMENTED_DOC_TYPES = [
   'ic_memo',
   'monday_briefing_pdf',
   'asset_one_pager',
+  'client_neighborhood_report',
+  'pricing_recommendation_sheet',
+  'buyer_seller_net_sheet',
+  'entitlement_risk_memo',
 ] as const;
 
 export type ImplementedDocType = (typeof IMPLEMENTED_DOC_TYPES)[number];
