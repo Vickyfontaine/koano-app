@@ -12,14 +12,30 @@
 import { createHash } from 'crypto';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { fetchJson } from '../providers/real/http';
+import { registry } from '../providers/registry';
+import type {
+  BuildingViolationsSummary,
+  LandlordPortfolioSummary,
+  EntitlementSummary,
+  HpiTrend,
+  ZoningInfo,
+} from '../providers/types';
 
 export const CAPTURE_VERSION = {
   sales: 'sales-incremental@1',
   permitsTract: 'permits-tract@1',
+  entitlementCd: 'entitlement-cd@1',
+  propertyViolations: 'property-violations@1',
+  propertyLandlord: 'property-landlord@1',
+  propertyFilings: 'property-filings@1',
+  hpi: 'hpi-metro@1',
+  zoning: 'zoning-property@1',
 } as const;
 
 const ROLLING_SALES = 'https://data.cityofnewyork.us/resource/usep-8jbt.json';
 const DOB_PERMITS = 'https://data.cityofnewyork.us/resource/rbx6-tga4.json';
+const DOB_FILINGS = 'https://data.cityofnewyork.us/resource/ic3t-wcy2.json';
+const HPI_REF_ADDRESS = '1 Centre Street, New York, NY'; // resolves the NYC metro for HPI
 
 // ISO-week Monday (UTC) for a date — the canonical captured_week / run_week.
 export function isoWeekMonday(d: Date): string {
@@ -200,13 +216,21 @@ export async function captureTractPermits(admin: SupabaseClient, runWeek: string
 // ---------------------------------------------------------------------------
 export async function priorWeekMissing(admin: SupabaseClient, runWeek: string): Promise<string | null> {
   const prior = isoWeekMonday(new Date(new Date(runWeek).getTime() - 7 * 86_400_000));
-  const { data } = await admin
+  const captured = await admin.from('archive_runs').select('id').eq('run_week', prior).eq('status', 'succeeded').limit(1);
+  if (captured.data && captured.data.length > 0) return null; // prior week was captured
+
+  // GENESIS GUARD: a missing prior week is only a real gap if we were ALREADY
+  // archiving before it (a succeeded run earlier than `prior` exists). On first
+  // setup, weeks before the first-ever run had nothing to capture — do NOT alert,
+  // or a spurious gap email on day one teaches the operator to ignore the one
+  // mechanism protecting the asset.
+  const earlier = await admin
     .from('archive_runs')
-    .select('id')
-    .eq('run_week', prior)
+    .select('run_week')
     .eq('status', 'succeeded')
+    .lt('run_week', prior)
     .limit(1);
-  return data && data.length > 0 ? null : prior;
+  return earlier.data && earlier.data.length > 0 ? prior : null;
 }
 
 // Best-effort email on a missed run. Uses Resend's HTTP API (no SDK) when
@@ -231,3 +255,185 @@ export async function sendGapAlert(subject: string, body: string): Promise<void>
     console.error(`[archive] gap-alert email threw: ${e instanceof Error ? e.message : String(e)}`);
   }
 }
+
+// ===========================================================================
+// SLICE 2 — widening the archive additively.
+// ===========================================================================
+
+// The content_hash of the most recent snapshot for a scope — used by the
+// capture-if-changed datasets (zoning version bumps, quarterly HPI) so we snapshot
+// only when the source actually moved, not every week.
+async function lastHash(admin: SupabaseClient, dataset: string, scopeType: string, scopeKey: string): Promise<string | null> {
+  const { data } = await admin
+    .from('archive_snapshots')
+    .select('content_hash')
+    .eq('dataset', dataset).eq('scope_type', scopeType).eq('scope_key', scopeKey)
+    .order('captured_week', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return (data?.content_hash as string) ?? null;
+}
+
+export interface TrackedProperty { address: string; bbl: string | null }
+
+export async function loadTrackedProperties(admin: SupabaseClient): Promise<TrackedProperty[]> {
+  const { data } = await admin.from('properties').select('address_normalized, address_input, bbl');
+  const seen = new Set<string>();
+  const out: TrackedProperty[] = [];
+  for (const p of data ?? []) {
+    const address = (p.address_normalized as string) ?? (p.address_input as string);
+    const key = (p.bbl as string) ?? address;
+    if (!address || seen.has(key)) continue;
+    seen.add(key);
+    out.push({ address, bbl: (p.bbl as string) ?? null });
+  }
+  return out;
+}
+
+// --- CD ENTITLEMENT (weekly, all NYC community districts) -------------------
+// Disposition mix + approval ratio per CD, from DOB Job Application Filings.
+// NOTE: median filing timeline is NOT captured at CD scale — Socrata has no
+// median aggregate, and pulling every filing weekly to compute it is not worth
+// it. The per-property filings snapshot carries subject timelines where it matters.
+function entitlementBucket(s: string): 'approved' | 'disapproved' | 'withdrawn' | 'suspended' | 'in_process' | 'other' {
+  const u = (s ?? '').toUpperCase();
+  if (u.includes('DISAPPROVED')) return 'disapproved'; // before APPROVED — DISAPPROVED contains it
+  if (u.includes('WITHDRAWN')) return 'withdrawn';
+  if (u.includes('SUSPENDED')) return 'suspended';
+  if (u.includes('SIGNED OFF') || u.includes('PERMIT ISSUED') || u.includes('APPROVED') || u.includes('COMPLETED') || u.includes('PROCESSED')) return 'approved';
+  if (u.includes('PLAN EXAM') || u.includes('ASSIGNED') || u.includes('PRE-FILING') || u.includes('PENDING') || u.includes('IN PROCESS')) return 'in_process';
+  return 'other';
+}
+
+export async function captureCdEntitlement(admin: SupabaseClient, runWeek: string): Promise<number> {
+  const url = `${DOB_FILINGS}?$select=community___board,job_status_descrp,count(1) as c&$group=community___board,job_status_descrp&$limit=50000`;
+  const rows = await fetchJson<{ community___board?: string; job_status_descrp?: string; c?: string }[]>(url, { timeoutMs: 60000 });
+  const perCd = new Map<string, Record<string, number>>();
+  for (const r of rows) {
+    const cd = r.community___board;
+    if (!cd || cd === '000') continue;
+    const b = entitlementBucket(r.job_status_descrp ?? '');
+    const agg = perCd.get(cd) ?? { approved: 0, disapproved: 0, withdrawn: 0, suspended: 0, in_process: 0, other: 0, total: 0 };
+    agg[b] += Number(r.c ?? 0);
+    agg.total += Number(r.c ?? 0);
+    perCd.set(cd, agg);
+  }
+  const out: Record<string, unknown>[] = [];
+  for (const [cd, agg] of Array.from(perCd.entries())) {
+    const decided = agg.approved + agg.disapproved;
+    const data = {
+      community_district: cd,
+      approved: agg.approved, disapproved: agg.disapproved, withdrawn: agg.withdrawn,
+      suspended: agg.suspended, in_process: agg.in_process, other: agg.other, total: agg.total,
+      approval_ratio_pct: decided > 0 ? Math.round((agg.approved / decided) * 100) : null,
+      median_timeline_days: null, // not aggregatable at CD scale (see note above)
+    };
+    out.push({
+      dataset: 'entitlement_cd', scope_type: 'community_district', scope_key: cd, captured_week: runWeek,
+      source: 'NYC Open Data — DOB Job Application Filings (ic3t-wcy2)', provenance: 'live',
+      capture_version: CAPTURE_VERSION.entitlementCd, data, row_count: agg.total, content_hash: hash(data),
+    });
+  }
+  return chunkedUpsert(admin, 'archive_snapshots', out, 'dataset,scope_type,scope_key,captured_week');
+}
+
+// --- PER-PROPERTY (weekly): violations, landlord/ownership, subject filings;
+//     zoning is capture-if-changed. Geocodes each property once. Only LIVE
+//     provider results are archived (never a representative fallback).
+//     Chunking is designed-for but NOT built (tracked N is small): a future
+//     `offset/limit` on `props` slices this across invocations.
+export interface PropertyCaptureCounts { violations: number; landlord: number; filings: number; zoning: number }
+
+export async function capturePropertySnapshots(admin: SupabaseClient, runWeek: string, props: TrackedProperty[]): Promise<PropertyCaptureCounts> {
+  const violations: Record<string, unknown>[] = [];
+  const landlord: Record<string, unknown>[] = [];
+  const filings: Record<string, unknown>[] = [];
+  const zoning: Record<string, unknown>[] = [];
+
+  for (const p of props) {
+    let geo;
+    try { geo = await registry.geocode.resolve(p.address); } catch { continue; }
+    if (!geo.ok || !geo.data) continue;
+    const bbl = geo.data.bbl ?? p.bbl;
+    if (!bbl) continue;
+    const [v, l, e, z] = await Promise.all([
+      registry.buildingViolations.getViolations(geo.data).catch(() => null),
+      registry.landlordPortfolio.getPortfolio(geo.data).catch(() => null),
+      registry.entitlement.getEntitlement(geo.data).catch(() => null),
+      registry.zoning.getZoning(geo.data).catch(() => null),
+    ]);
+
+    if (v && v.provenance === 'live' && v.data) {
+      const d = v.data as BuildingViolationsSummary;
+      const data = {
+        hpd_open: d.hpd.open, hpd_total: d.hpd.total, hpd_open_by_class: d.hpd.open_by_class,
+        ecb_active: d.ecb.active, ecb_total: d.ecb.total,
+        dob_active: d.dob_complaints.active, dob_total: d.dob_complaints.total,
+        hpd_registered: d.hpd_registered,
+      };
+      violations.push({ dataset: 'violations', scope_type: 'property', scope_key: bbl, captured_week: runWeek, source: v.source, provenance: 'live', capture_version: CAPTURE_VERSION.propertyViolations, data, row_count: d.hpd.total, content_hash: hash(data) });
+    }
+    if (l && l.provenance === 'live' && l.data) {
+      const d = l.data as LandlordPortfolioSummary;
+      const data = {
+        registered_owner: d.registered_owner, owner_type: d.owner_type, management_company: d.management_company,
+        portfolio_building_count: d.portfolio_building_count, portfolio_open_hpd_violations: d.portfolio_open_hpd_violations,
+        portfolio_total_hpd_violations: d.portfolio_total_hpd_violations, on_speculation_watch_list: d.on_speculation_watch_list,
+        hpd_registered: d.hpd_registered,
+      };
+      landlord.push({ dataset: 'landlord', scope_type: 'property', scope_key: bbl, captured_week: runWeek, source: l.source, provenance: 'live', capture_version: CAPTURE_VERSION.propertyLandlord, data, content_hash: hash(data) });
+    }
+    if (e && e.provenance === 'live' && e.data) {
+      const d = e.data as EntitlementSummary;
+      const data = {
+        community_district: d.community_district, subject_filing_count: d.subject_filing_count,
+        subject_recent_items: d.subject_recent_items,
+      };
+      filings.push({ dataset: 'filings', scope_type: 'property', scope_key: bbl, captured_week: runWeek, source: e.source, provenance: 'live', capture_version: CAPTURE_VERSION.propertyFilings, data, row_count: d.subject_filing_count, content_hash: hash(data) });
+    }
+    // ZONING — capture only on a version bump (content change).
+    if (z && z.provenance === 'live' && z.data) {
+      const d = z.data as ZoningInfo;
+      const data = {
+        zoning_district: d.zoning_district, commercial_overlay: d.commercial_overlay, special_district: d.special_district,
+        built_far: d.built_far, max_residential_far: d.max_residential_far, max_affordable_residential_far: d.max_affordable_residential_far,
+        unused_far_pct: d.unused_far_pct, building_class: d.building_class, land_use_code: d.land_use_code,
+        residential_units: d.residential_units, assessed_total_usd: d.assessed_total_usd,
+      };
+      const h = hash(data);
+      if (h !== (await lastHash(admin, 'zoning', 'property', bbl))) {
+        zoning.push({ dataset: 'zoning', scope_type: 'property', scope_key: bbl, captured_week: runWeek, source: z.source, provenance: 'live', capture_version: CAPTURE_VERSION.zoning, data, content_hash: h });
+      }
+    }
+  }
+
+  return {
+    violations: await chunkedUpsert(admin, 'archive_snapshots', violations, 'dataset,scope_type,scope_key,captured_week'),
+    landlord: await chunkedUpsert(admin, 'archive_snapshots', landlord, 'dataset,scope_type,scope_key,captured_week'),
+    filings: await chunkedUpsert(admin, 'archive_snapshots', filings, 'dataset,scope_type,scope_key,captured_week'),
+    zoning: await chunkedUpsert(admin, 'archive_snapshots', zoning, 'dataset,scope_type,scope_key,captured_week'),
+  };
+}
+
+// --- HPI — metro, capture-if-changed (quarterly cadence in practice). ---------
+export async function captureHpiIfChanged(admin: SupabaseClient, runWeek: string): Promise<number> {
+  const geo = await registry.geocode.resolve(HPI_REF_ADDRESS);
+  if (!geo.ok || !geo.data) return 0;
+  const res = await registry.hpi.getHpi(geo.data);
+  if (res.provenance !== 'live' || !res.data) return 0;
+  const d = res.data as HpiTrend;
+  const data = { region: d.region, region_type: d.region_type, latest_period: d.latest_period, latest_index: d.latest_index, yoy_change_pct: d.yoy_change_pct, five_yr_change_pct: d.five_yr_change_pct };
+  const scopeKey = d.region;
+  const h = hash(data);
+  if (h === (await lastHash(admin, 'hpi', 'metro', scopeKey))) return 0; // unchanged quarter
+  return chunkedUpsert(
+    admin, 'archive_snapshots',
+    [{ dataset: 'hpi', scope_type: 'metro', scope_key: scopeKey, captured_week: runWeek, source: res.source, provenance: 'live', capture_version: CAPTURE_VERSION.hpi, data, content_hash: h }],
+    'dataset,scope_type,scope_key,captured_week',
+  );
+}
+
+// ACS (annual, all-NYC-tract) is DEFERRED: it needs the CENSUS_API_KEY (often
+// unset -> representative, which must NOT be archived) and a bulk multi-tract
+// Census query distinct from the per-address provider. Tracked as its own task
+// so we never archive representative demographics.
