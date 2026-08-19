@@ -54,6 +54,68 @@ import {
   extractPermitHistoryFacts,
   buildPermitHistoryModel,
 } from '../../../../lib/documents/builders/permit-history';
+import {
+  extractIcMemoFacts,
+  deterministicExecSummary,
+  generateExecSummary,
+  buildIcMemoModel,
+  icMemoAppendix,
+  type IcMemoVerdict,
+} from '../../../../lib/documents/builders/ic-memo';
+import { breakdownFromSummaries, type AgentSummary } from '../../../../lib/agents/synthesis';
+import type { Verdict, ReasoningStep } from '../../../../lib/agents/shared';
+
+// Load the user's most recent stored verdict for a resolved address (by BBL,
+// falling back to the normalized string). The IC memo reuses this verdict — the
+// committee sees exactly what the analyst brought forward — so a missing verdict
+// is a clean 422, never a silently-run fresh analysis.
+async function loadLatestVerdict(
+  userId: string,
+  bbl: string | null,
+  addressNormalized: string | null,
+): Promise<IcMemoVerdict | null> {
+  const cols =
+    'verdict, confidence, risk_score, signal_window_months, headline, overall_provenance, reasoning_chain, agent_summaries, created_at';
+  const db = supabaseAdmin();
+  let row: Record<string, unknown> | null = null;
+  if (bbl) {
+    const { data } = await db
+      .from('verdicts')
+      .select(cols)
+      .eq('clerk_user_id', userId)
+      .eq('bbl', bbl)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    row = data ?? null;
+  }
+  if (!row && addressNormalized) {
+    const { data } = await db
+      .from('verdicts')
+      .select(cols)
+      .eq('clerk_user_id', userId)
+      .eq('address_normalized', addressNormalized)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    row = data ?? null;
+  }
+  if (!row) return null;
+
+  const summaries = (row.agent_summaries as AgentSummary[]) ?? [];
+  const verdict = row.verdict as Verdict;
+  return {
+    verdict,
+    confidence: row.confidence as number,
+    risk_score: row.risk_score as number,
+    signal_window_months: row.signal_window_months as number,
+    headline: (row.headline as string) ?? '',
+    overall_provenance: row.overall_provenance as IcMemoVerdict['overall_provenance'],
+    reasoning_chain: (row.reasoning_chain as ReasoningStep[]) ?? [],
+    breakdown: breakdownFromSummaries(summaries, verdict),
+    verdictGeneratedAt: row.created_at as string,
+  };
+}
 
 // Evidentiary Community documents: fully deterministic (no model call), so they
 // always build from the deterministic path and never spend a content generation.
@@ -212,6 +274,37 @@ export async function POST(req: Request) {
       addressInput = r.data.resolved_address.input;
       bbl = r.data.resolved_address.bbl;
       overallProvenance = r.data.overall_provenance;
+    } else if (doc.id === 'ic_memo') {
+      const r = await assembleDocumentData(address, doc.requiredBlocks);
+      if (!r.ok) return NextResponse.json({ error: r.error }, { status: r.status });
+      const storedVerdict = await loadLatestVerdict(
+        userId,
+        r.data.resolved_address.bbl,
+        r.data.resolved_address.normalized,
+      );
+      if (!storedVerdict) {
+        return NextResponse.json(
+          {
+            error:
+              'This memo is built from a completed KOANO analysis, and none exists for this property yet. Run the analysis first, then generate the memo.',
+          },
+          { status: 422 },
+        );
+      }
+      const ex = extractIcMemoFacts(r.data, storedVerdict);
+      if (!ex.ok) return NextResponse.json({ error: ex.error }, { status: 422 });
+      const execSummary =
+        buildSource === 'fresh' ? await generateExecSummary(ex.facts) : deterministicExecSummary(ex.facts);
+      const appendix = icMemoAppendix(
+        r.data,
+        ex.facts.demoLive,
+        storedVerdict.overall_provenance,
+        storedVerdict.verdictGeneratedAt,
+      );
+      model = buildIcMemoModel({ facts: ex.facts, letterhead, execSummary, appendix, generatedAt });
+      addressInput = r.data.resolved_address.input;
+      bbl = r.data.resolved_address.bbl;
+      overallProvenance = appendix.overall;
     } else if (doc.id === 'permit_history_report') {
       const r = await assembleDocumentData(address, doc.requiredBlocks);
       if (!r.ok) return NextResponse.json({ error: r.error }, { status: r.status });

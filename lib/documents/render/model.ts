@@ -56,6 +56,17 @@ export interface RenderSection {
   // Optional inline provenance callout under the heading (e.g. a representative
   // figure the reader must not treat as live).
   provenanceNote?: { provenance: Provenance; text: string };
+  // ---- long-form (IC memo) fields; ignored unless RenderModel.longForm ----
+  // Section number printed before the heading and used as the TOC label
+  // (e.g. "1", "6", "A" for exhibits). Sections with a `number` are the ones
+  // the TOC lists and the two-pass page-map audits.
+  number?: string;
+  // A formatted, clearly-labeled empty section the reader completes. `note` is
+  // the one-line "what belongs here" guidance. Renders as a bordered callout,
+  // never as fabricated content.
+  placeholder?: { note: string };
+  // Force a page break before this section (front matter → body → exhibits).
+  pageBreakBefore?: boolean;
 }
 
 export interface RenderModel {
@@ -68,4 +79,25 @@ export interface RenderModel {
   // Dense documents (e.g. the 2-page site screening memo) set compact to tighten
   // spacing and type. Default (airy) is used by single-figure documents.
   compact?: boolean;
+  // ---- long-form document mode (the IC memo) ----
+  // Turns on: a dedicated title page, a Table of Contents (PDF two-pass with a
+  // page-map audit; DOCX native field with updateFields), numbered sections,
+  // placeholder callouts, and part page-breaks. When false/absent, rendering is
+  // byte-identical to before (every existing document type stays unchanged).
+  longForm?: boolean;
+  // Title-page recommendation banner (the stored verdict, shown up front).
+  titleBanner?: { decision: string; tone: 'positive' | 'warning' | 'negative'; confidence: number };
+  // The stored verdict's OWN generation timestamp (ISO), distinct from
+  // generatedAt (when this memo was produced). Shown on the title page and
+  // executive summary so a committee sees how old the underlying analysis is.
+  verdictGeneratedAt?: string;
+  // A visible staleness warning when the verdict predates the memo by more than
+  // the threshold. Supplied by the builder (which owns the day math); the
+  // renderer just paints it prominently on the title page.
+  stalenessBanner?: string | null;
+  // Document-level provenance stated at the TOP (title page). This is the
+  // weakest of the rendered figures AND the underlying verdict — so a live-data
+  // memo built on a representative verdict is honestly a representative document.
+  documentProvenance?: Provenance;
+  documentProvenanceNote?: string;
 }

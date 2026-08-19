@@ -132,10 +132,98 @@ function makeStyles(compact: boolean) {
     hlValue: { fontFamily: PDF_FONT_FAMILY_BOLD, fontSize: p(17, 15), color: INK, marginTop: 3 },
     hlSub: { fontSize: 8.5, color: INK_MUTED, marginTop: 2 },
     trimNote: { fontSize: 8, color: INK_FAINT, fontStyle: 'italic', marginTop: 3 },
+    // ---- long-form (IC memo) ----
+    titlePage: { flexDirection: 'column' },
+    titleSpacerTop: { marginTop: 90 },
+    titleDoc: { fontFamily: PDF_FONT_FAMILY_BOLD, fontSize: 30, color: INK, marginBottom: 6, lineHeight: 1.15 },
+    titleSub: { fontSize: 13, color: INK_SECONDARY, marginBottom: 26 },
+    titleBanner: { borderWidth: 0.5, borderColor: BORDER, borderRadius: 6, padding: 16, marginBottom: 22 },
+    titleBannerLabel: { fontSize: 8, color: INK_MUTED, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 },
+    titleBannerWord: { fontFamily: PDF_FONT_FAMILY_BOLD, fontSize: 24, letterSpacing: 1 },
+    titleBannerConf: { fontSize: 10, color: INK_MUTED, marginTop: 3 },
+    titleDates: { marginBottom: 8 },
+    titleDateLine: { fontSize: 10, color: INK_SECONDARY, marginBottom: 2 },
+    staleBanner: {
+      borderWidth: 0.5,
+      borderColor: '#F59E0B',
+      backgroundColor: '#FFFBEB',
+      borderRadius: 5,
+      padding: 10,
+      marginBottom: 16,
+      fontSize: 9.5,
+      color: '#B45309',
+      lineHeight: 1.4,
+    },
+    docProvRep: {
+      borderWidth: 0.5,
+      borderColor: '#F59E0B',
+      backgroundColor: '#FFFBEB',
+      borderRadius: 5,
+      padding: 10,
+      marginTop: 14,
+      marginBottom: 4,
+      fontSize: 9.5,
+      color: '#B45309',
+      letterSpacing: 0.3,
+    },
+    docProvLive: { fontSize: 9, color: INK_MUTED, marginTop: 14, marginBottom: 4, letterSpacing: 0.3 },
+    titleConfidential: { fontSize: 8, color: INK_FAINT, marginTop: 24, letterSpacing: 0.5, textTransform: 'uppercase' },
+    tocTitle: { fontFamily: PDF_FONT_FAMILY_BOLD, fontSize: 16, color: INK, marginBottom: 14, borderBottomWidth: 0.5, borderBottomColor: BORDER, paddingBottom: 4 },
+    tocRow: { flexDirection: 'row', alignItems: 'flex-end', borderBottomWidth: 0.5, borderBottomColor: BORDER, paddingVertical: 5 },
+    tocNum: { width: 34, fontSize: 10, color: INK_MUTED, fontFamily: PDF_FONT_FAMILY_BOLD },
+    tocLabel: { flex: 1, fontSize: 10.5, color: INK, paddingRight: 8 },
+    tocPage: { fontSize: 10, color: INK_MUTED },
+    numberedHeading: {
+      fontFamily: PDF_FONT_FAMILY_BOLD,
+      fontSize: 14,
+      color: INK,
+      marginBottom: 6,
+      borderBottomWidth: 0.5,
+      borderBottomColor: BORDER,
+      paddingBottom: 3,
+    },
+    placeholderBox: {
+      borderWidth: 0.5,
+      borderColor: INK_FAINT,
+      borderStyle: 'dashed',
+      borderRadius: 5,
+      padding: 12,
+      marginTop: 4,
+    },
+    placeholderTag: { fontSize: 8, color: INK_MUTED, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 5 },
+    placeholderNote: { fontSize: 10, color: INK_SECONDARY, fontStyle: 'italic', lineHeight: 1.4 },
+    captureMarker: { fontSize: 1, height: 1, color: '#FFFFFF' },
   });
 }
 
 type Styles = ReturnType<typeof makeStyles>;
+
+// The built-in PDF fonts (Helvetica) use WinAnsi encoding, which lacks common
+// typographic/math glyphs — an unmapped char renders as garbage (≥ became "e",
+// → became "'") with NO error. Map the known offenders to ASCII for the PDF
+// path only; DOCX keeps the rich Unicode (Word has the glyphs). Applied to every
+// string in the model via a JSON round-trip so nothing can slip through.
+const PDF_GLYPH_MAP: Record<string, string> = {
+  '≥': '>=',
+  '≤': '<=',
+  '→': '->',
+  '←': '<-',
+  '⇒': '=>',
+  '⇐': '<=',
+  '↑': 'up',
+  '↓': 'down',
+  '−': '-', // U+2212 minus
+  '≈': '~',
+  '≠': '!=',
+};
+function sanitizePdfText(s: string): string {
+  return s.replace(/[≥≤→←⇒⇐↑↓−≈≠]/g, (c) => PDF_GLYPH_MAP[c] ?? c);
+}
+function sanitizeModelForPdf(model: RenderModel): RenderModel {
+  return JSON.parse(
+    JSON.stringify(model, (_k, v) => (typeof v === 'string' ? sanitizePdfText(v) : v)),
+  ) as RenderModel;
+}
 
 function provColor(p: 'live' | 'representative'): string {
   return p === 'live' ? '#22C55E' : '#F59E0B';
@@ -220,19 +308,52 @@ function HighlightFigures({ highlight, s }: { highlight: NonNullable<RenderSecti
   );
 }
 
-function Section({ section, s }: { section: RenderSection; s: Styles }) {
+// A zero-height marker whose render callback records the page it lands on. Used
+// by the two-pass long-form TOC: pass 1 fills the sink, pass 2 prints those
+// numbers in the TOC and refills a second sink, and renderPdfAudited asserts the
+// two agree — so a TOC entry can never silently point at the wrong page.
+function PageCapture({ id, sink, s }: { id: string; sink: Record<string, number>; s: Styles }) {
+  return (
+    <Text
+      style={s.captureMarker}
+      render={({ pageNumber }) => {
+        sink[id] = pageNumber;
+        return '';
+      }}
+    />
+  );
+}
+
+function PlaceholderBlock({ note, s }: { note: string; s: Styles }) {
+  return (
+    <View style={s.placeholderBox} wrap={false}>
+      <Text style={s.placeholderTag}>To be completed by the analyst</Text>
+      <Text style={s.placeholderNote}>{note}</Text>
+    </View>
+  );
+}
+
+function Section({ section, s, sink }: { section: RenderSection; s: Styles; sink?: Record<string, number> }) {
   // keepTogether → the whole section moves to the next page rather than
   // splitting mid-table (e.g. the DD register orphaning its first row).
   // IMPORTANT: only ever pass `wrap` when keeping together. Passing
   // wrap={undefined} is coerced to wrap={false} by @react-pdf, which disables
   // pagination for that section and DROPS the fixed footer on continuation
   // pages (the multi-page stress test catches this).
+  const headingText = section.number ? `${section.number}.  ${section.heading}` : section.heading;
+  const headingStyle = section.number ? s.numberedHeading : s.heading;
   return (
-    <View style={s.section} {...(section.keepTogether ? { wrap: false } : {})}>
+    <View
+      style={s.section}
+      {...(section.keepTogether ? { wrap: false } : {})}
+      {...(section.pageBreakBefore ? { break: true } : {})}
+    >
+      {section.number && sink ? <PageCapture id={section.number} sink={sink} s={s} /> : null}
       {section.verdict ? <VerdictHeadline v={section.verdict} s={s} /> : null}
       {section.heading ? (
-        <Text style={s.heading} minPresenceAhead={40}>{section.heading}</Text>
+        <Text style={headingStyle} minPresenceAhead={40} {...(section.number ? { bookmark: { title: headingText as string, fit: true } } : {})}>{headingText}</Text>
       ) : null}
+      {section.placeholder ? <PlaceholderBlock note={section.placeholder.note} s={s} /> : null}
       {section.provenanceNote ? (
         <Text
           style={{
@@ -281,6 +402,71 @@ function ProvenanceAppendixSection({ model, s }: { model: RenderModel; s: Styles
   );
 }
 
+// ---- long-form (IC memo) title page + TOC ----
+
+function TitlePage({ model, s }: { model: RenderModel; s: Styles }) {
+  const memoDate = new Date(model.generatedAt).toISOString().slice(0, 10);
+  const vDate = model.verdictGeneratedAt ? new Date(model.verdictGeneratedAt).toISOString().slice(0, 10) : null;
+  const banner = model.titleBanner;
+  return (
+    <View style={s.titlePage}>
+      <LetterheadBlock lh={model.letterhead} s={s} />
+      <View style={s.titleSpacerTop}>
+        <Text style={s.titleDoc}>{model.docTitle}</Text>
+        {model.subtitle ? <Text style={s.titleSub}>{model.subtitle}</Text> : null}
+        {banner ? (
+          <View style={s.titleBanner}>
+            <Text style={s.titleBannerLabel}>KOANO recommendation</Text>
+            <Text style={{ ...s.titleBannerWord, color: TONE_COLOR[banner.tone] }}>{banner.decision}</Text>
+            <Text style={s.titleBannerConf}>Confidence {banner.confidence} / 100</Text>
+          </View>
+        ) : null}
+        <View style={s.titleDates}>
+          {vDate ? <Text style={s.titleDateLine}>Verdict generated: {vDate}</Text> : null}
+          <Text style={s.titleDateLine}>Memo generated: {memoDate}</Text>
+        </View>
+        {model.stalenessBanner ? <Text style={s.staleBanner}>{model.stalenessBanner}</Text> : null}
+        {model.documentProvenanceNote ? (
+          <Text style={model.documentProvenance === 'representative' ? s.docProvRep : s.docProvLive}>
+            {model.documentProvenanceNote}
+          </Text>
+        ) : null}
+        <Text style={s.titleConfidential}>Confidential — decision support, not a decision</Text>
+      </View>
+    </View>
+  );
+}
+
+interface TocEntry {
+  id: string;
+  number: string;
+  label: string;
+}
+
+function tocEntries(model: RenderModel): TocEntry[] {
+  const entries: TocEntry[] = [];
+  for (const sec of model.sections) {
+    if (sec.number && sec.heading) entries.push({ id: sec.number, number: sec.number, label: sec.heading });
+  }
+  entries.push({ id: 'prov', number: '', label: 'Sources & Provenance' });
+  return entries;
+}
+
+function TocPage({ model, tocMap, s }: { model: RenderModel; tocMap: Record<string, number> | null; s: Styles }) {
+  return (
+    <View break>
+      <Text style={s.tocTitle}>Table of Contents</Text>
+      {tocEntries(model).map((e) => (
+        <View key={e.id} style={s.tocRow}>
+          <Text style={s.tocNum}>{e.number}</Text>
+          <Text style={s.tocLabel}>{e.label}</Text>
+          <Text style={s.tocPage}>{tocMap && tocMap[e.id] ? String(tocMap[e.id]) : ''}</Text>
+        </View>
+      ))}
+    </View>
+  );
+}
+
 // The fixed footer: disclaimer verbatim on EVERY page + page numbers.
 function Footer({ s }: { s: Styles }) {
   return (
@@ -294,9 +480,37 @@ function Footer({ s }: { s: Styles }) {
   );
 }
 
-function KoanoPdf({ model }: { model: RenderModel }) {
+function KoanoPdf({
+  model,
+  sink,
+  tocMap,
+}: {
+  model: RenderModel;
+  sink?: Record<string, number>;
+  tocMap?: Record<string, number> | null;
+}) {
   const s = makeStyles(!!model.compact);
   const generated = new Date(model.generatedAt).toISOString().slice(0, 10);
+
+  if (model.longForm) {
+    return (
+      <Document title={model.docTitle} author="KOANO">
+        <Page size="A4" style={s.page}>
+          <TitlePage model={model} s={s} />
+          <TocPage model={model} tocMap={tocMap ?? null} s={s} />
+          {model.sections.map((section, i) => (
+            <Section key={i} section={section} s={s} sink={sink} />
+          ))}
+          <View break style={s.section}>
+            {sink ? <PageCapture id="prov" sink={sink} s={s} /> : null}
+            <ProvenanceAppendixSection model={model} s={s} />
+          </View>
+          <Footer s={s} />
+        </Page>
+      </Document>
+    );
+  }
+
   return (
     <Document title={model.docTitle} author="KOANO">
       <Page size="A4" style={s.page}>
@@ -317,8 +531,48 @@ function KoanoPdf({ model }: { model: RenderModel }) {
   );
 }
 
-// Render a RenderModel to a PDF buffer. Node runtime only.
+// The two-pass TOC page-map audit. `claimed` is what the TOC printed (pass-1
+// page map); `actual` is where each numbered section really landed in the final
+// render (pass-2 page map). They MUST agree — a divergence means a TOC entry
+// silently points at the wrong page (the same silent-failure class as a dropped
+// disclaimer), so we throw loudly rather than ship it.
+export function auditTocPages(claimed: Record<string, number>, actual: Record<string, number>): void {
+  const mismatches: string[] = [];
+  for (const id of Object.keys(actual)) {
+    if (claimed[id] !== actual[id]) {
+      mismatches.push(`"${id}": TOC says p${claimed[id] ?? '—'} but section starts on p${actual[id]}`);
+    }
+  }
+  // Also catch a section that never got a claimed page at all.
+  for (const id of Object.keys(actual)) {
+    if (!(id in claimed)) mismatches.push(`"${id}": missing from the TOC page map`);
+  }
+  if (mismatches.length > 0) {
+    throw new Error(`Long-form TOC page-map audit FAILED — ${mismatches.join('; ')}`);
+  }
+}
+
+// Long-form render + audit, exposed for the harness. Renders twice: pass 1 fills
+// the page map, pass 2 prints it in the TOC and captures the actual pages, then
+// audits. Returns the final buffer plus both maps.
+export async function renderPdfAudited(
+  model: RenderModel,
+): Promise<{ buffer: Buffer; tocPageMap: Record<string, number>; actualPageMap: Record<string, number> }> {
+  registerPdfFonts();
+  const safe = sanitizeModelForPdf(model);
+  const tocPageMap: Record<string, number> = {};
+  await renderToBuffer(<KoanoPdf model={safe} sink={tocPageMap} tocMap={null} />);
+  const actualPageMap: Record<string, number> = {};
+  const buffer = await renderToBuffer(<KoanoPdf model={safe} sink={actualPageMap} tocMap={tocPageMap} />);
+  auditTocPages(tocPageMap, actualPageMap);
+  return { buffer, tocPageMap, actualPageMap };
+}
+
+// Render a RenderModel to a PDF buffer. Node runtime only. Long-form documents
+// go through the two-pass audited path; everything else renders single-pass
+// exactly as before.
 export async function renderPdf(model: RenderModel): Promise<Buffer> {
   registerPdfFonts();
-  return renderToBuffer(<KoanoPdf model={model} />);
+  if (model.longForm) return (await renderPdfAudited(model)).buffer;
+  return renderToBuffer(<KoanoPdf model={sanitizeModelForPdf(model)} />);
 }

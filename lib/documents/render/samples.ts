@@ -8,7 +8,7 @@
 // disclaimer-on-every-page coverage. When you build a new type, add its sample
 // here (deterministic — no live data, no model call).
 
-import type { RenderModel } from './model';
+import type { RenderModel, RenderSection } from './model';
 import type { Letterhead } from '../types';
 
 // Fixed timestamp so renders are deterministic (no Date.now()).
@@ -541,6 +541,139 @@ function permitHistorySample(): RenderModel {
   };
 }
 
+// Investment Committee Memo — the long-form type. Exercises the title page,
+// the two-pass audited TOC, numbered sections, a placeholder, the exhibits with
+// a page-spanning comps table, AND the staleness banner (verdict > 30 days old).
+// Deliberately long so it spans many pages, testing the disclaimer + page-number
+// footer on every page including continuation pages.
+function icMemoSample(): RenderModel {
+  const comps = Array.from({ length: 40 }, (_, i) => [
+    `${100 + i} Example Street`,
+    `2025-0${(i % 9) + 1}-15`,
+    `$${(850000 + i * 15000).toLocaleString('en-US')}`,
+    `$${(600 + i * 7).toLocaleString('en-US')}`,
+    `${(1200 + i * 40).toLocaleString('en-US')}`,
+    'C0',
+  ]);
+  const placeholders: RenderSection[] = [
+    { number: '6', heading: 'Financial Analysis, Returns & Sensitivity', placeholder: { note: 'Underwriting model, yields, IRR/equity multiple, and a sensitivity table. KOANO does not source deal financials.' } },
+    { number: '7', heading: 'Business Plan', placeholder: { note: 'Acquisition basis, capital plan, lease-up/reposition strategy, operating assumptions.' } },
+    { number: '8', heading: 'Exit Strategy', placeholder: { note: 'Hold period, exit route, target exit pricing, buyer universe.' } },
+    { number: '9', heading: 'Key Terms', placeholder: { note: 'Structure, price, financing, closing conditions, contingencies.' } },
+  ];
+  return {
+    docTitle: 'Investment Committee Memo',
+    subtitle: '175 3rd Street, Brooklyn, NY',
+    letterhead: NAMED_LETTERHEAD,
+    longForm: true,
+    titleBanner: { decision: 'BUY', tone: 'positive', confidence: 74 },
+    verdictGeneratedAt: '2025-11-20T00:00:00.000Z', // > 30 days before GENERATED_AT → staleness banner
+    stalenessBanner:
+      'STALENESS NOTICE: the underlying KOANO verdict is 42 days old. The market data in this memo was fetched at generation time, but the verdict reflects conditions as of the verdict date. Re-run the analysis before relying on the recommendation.',
+    sections: [
+      {
+        number: '1',
+        heading: 'Executive Summary & Recommendation',
+        pageBreakBefore: true,
+        provenanceNote: { provenance: 'live', text: 'Built from a stored KOANO verdict generated 2025-11-20 (42 days before this memo). Verdict provenance: live.' },
+        paragraphs: [
+          "KOANO's recommendation for 175 3rd Street is to advance to underwriting. The engine returns a BUY verdict at confidence 74/100, with a confidence-weighted panel score of 1.12 against thresholds. ".repeat(2),
+          'This memo is decision-support built on public record. KOANO cannot source deal financials; those sections are scaffolded for the analyst. '.repeat(2),
+        ],
+      },
+      {
+        number: '2',
+        heading: 'Property Description',
+        table: {
+          columns: ['Field', 'Value'],
+          rows: [
+            ['Address', '175 3rd Street, Brooklyn'],
+            ['BBL', '3009720058'],
+            ['Zoning district', 'M1-4/R7-2'],
+            ['Building class / land use', 'K4 / 05'],
+            ['Lot area / building area', '120,793 sq ft / 13,518 sq ft'],
+            ['Year built / residential units', '1931 / 0'],
+            ['Assessed total / land (DOF)', '$4,185,900 / $3,261,600'],
+          ],
+          caption: 'Source: NYC DOF assessment roll via MapPLUTO (live).',
+        },
+      },
+      {
+        number: '3',
+        heading: 'Market & Submarket Analysis',
+        table: {
+          columns: ['Indicator', 'Reading'],
+          rows: [
+            ['House Price Index — YoY', '+5.6% (New York-Jersey City-White Plains)'],
+            ['Recorded sale $/sq ft (median)', '$1,156'],
+            ['Neighborhood permits (24 months)', '312'],
+            ['Opportunity Zone', 'No'],
+          ],
+        },
+      },
+      {
+        number: '4',
+        heading: 'Risk Factors & Mitigants',
+        table: {
+          columns: ['Risk factor', 'Mitigant / note'],
+          rows: [
+            ['Building violations — HPD 0 open of 3', 'Quantify remediation cost in diligence.'],
+            ['Flood — FEMA zone X', 'Outside SFHA — limited flood exposure.'],
+          ],
+          caption: 'Public-record risk read; not a substitute for third-party diligence.',
+        },
+      },
+      {
+        number: '5',
+        heading: 'Comparable Sales',
+        provenanceNote: { provenance: 'live', text: 'RESIDENTIAL recorded sales from NYC DOF Rolling Sales — NOT institutional CRE transactions.' },
+        paragraphs: ['144 qualifying residential recorded sales are in scope, at a median of $1,156/sq ft. The full comparable set is in Exhibit A.'],
+      },
+      ...placeholders,
+      {
+        number: 'A',
+        heading: 'Exhibit A — Comparable Recorded Sales (Full Set)',
+        pageBreakBefore: true,
+        provenanceNote: { provenance: 'live', text: 'Residential recorded sales (NYC DOF Rolling Sales). Not institutional CRE comps.' },
+        table: {
+          columns: ['Address', 'Sale date', 'Sale price', '$/sq ft', 'Sq ft', 'Class'],
+          rows: comps,
+          caption: '144 sales in scope.',
+        },
+      },
+      {
+        number: 'B',
+        heading: 'Exhibit B — Verdict Math',
+        paragraphs: ["KOANO's verdict is a confidence-weighted vote across five specialist agents (method: confidence-weighted v1)."],
+        table: {
+          columns: ['Agent', 'Verdict', 'Confidence (weight)', 'Direction', 'Contribution'],
+          rows: [
+            ['market-timing', 'hold', '72', '0', '+0'],
+            ['infrastructure', 'buy', '86', '2', '+172'],
+            ['demand-sentiment', 'buy', '72', '2', '+144'],
+            ['risk-volatility', 'hold', '72', '0', '+0'],
+            ['regulatory-policy', 'buy', '86', '2', '+172'],
+            ['— Weighted score —', '', '388', '', '1.26'],
+          ],
+          caption: 'Weighted score 1.26 vs thresholds: buy ≥ 1, hold ≥ -0.3, wait ≥ -1.2 → BUY at confidence 74/100.',
+        },
+      },
+    ],
+    appendix: {
+      overall: 'live',
+      overall_note: 'Every figure in this document was fetched live from an authoritative public source at generation time.',
+      rows: [
+        { block: 'Zoning / PLUTO', source: 'NYC Open Data — MapPLUTO (64uk-42ks)', provenance: 'live', fetched_at: GENERATED_AT },
+        { block: 'Comparable sales', source: 'NYC Open Data — DOF Rolling Sales (usep-8jbt)', provenance: 'live', fetched_at: GENERATED_AT },
+        { block: 'House Price Index', source: 'FHFA HPI', provenance: 'live', fetched_at: GENERATED_AT },
+        { block: 'Building violations', source: 'NYC Open Data — HPD / ECB / DOB', provenance: 'live', fetched_at: GENERATED_AT },
+        { block: 'Flood zone', source: 'FEMA National Flood Hazard Layer', provenance: 'live', fetched_at: GENERATED_AT },
+      ],
+    },
+    generatedAt: GENERATED_AT,
+  };
+}
+
 // One representative model per implemented document type.
 export const SAMPLE_MODELS: Record<string, RenderModel> = {
   tax_appeal_packet: taxAppealSample(),
@@ -549,4 +682,5 @@ export const SAMPLE_MODELS: Record<string, RenderModel> = {
   permit_history_report: permitHistorySample(),
   site_screening_memo: siteScreeningSample(),
   three_site_comparison_brief: comparisonSample(),
+  ic_memo: icMemoSample(),
 };

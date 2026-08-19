@@ -15,6 +15,7 @@ export const IMPLEMENTED_DOC_TYPES = [
   'permit_history_report',
   'site_screening_memo',
   'three_site_comparison_brief',
+  'ic_memo',
 ] as const;
 
 export type ImplementedDocType = (typeof IMPLEMENTED_DOC_TYPES)[number];

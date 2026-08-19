@@ -17,7 +17,7 @@ import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { IMPLEMENTED_DOC_TYPES } from '../lib/documents/implemented';
 import { SAMPLE_MODELS, STRESS_MODEL } from '../lib/documents/render/samples';
 import { getDocumentType } from '../lib/documents/registry';
-import { renderPdf } from '../lib/documents/render/pdf';
+import { renderPdf, renderPdfAudited } from '../lib/documents/render/pdf';
 import { renderDocx } from '../lib/documents/render/docx';
 import type { RenderModel } from '../lib/documents/render/model';
 
@@ -82,7 +82,9 @@ async function assertDocxFooter(label: string, model: RenderModel, tag: string) 
     const doc = getDocumentType(type);
     // multi_site samples MUST span ≥2 pages so the page-2 footer is actually
     // tested for that type (a 1-page sample silently skips the pagination path).
-    const minPages = doc?.scope === 'multi_site' ? 2 : undefined;
+    // Long-form (IC memo) samples MUST span several pages so the title page, TOC,
+    // and continuation-page footer + page numbers are all exercised.
+    const minPages = doc?.scope === 'multi_site' ? 2 : model.longForm ? 6 : undefined;
     await assertPdfEveryPage(type, model, minPages ? { minPages } : undefined);
     if (doc && doc.formats.includes('docx')) {
       await assertDocxFooter(type, model, type);
@@ -92,6 +94,26 @@ async function assertDocxFooter(label: string, model: RenderModel, tag: string) 
   console.log('\n[3] Stress — pagination + page-spanning table (PDF & DOCX)');
   await assertPdfEveryPage('stress', STRESS_MODEL, { minPages: 2 });
   await assertDocxFooter('stress', STRESS_MODEL, 'stress');
+
+  console.log('\n[4] Long-form TOC page-map audit (the numbers must match the pages)');
+  for (const type of IMPLEMENTED_DOC_TYPES) {
+    const model = SAMPLE_MODELS[type];
+    if (!model?.longForm) continue;
+    try {
+      const { tocPageMap, actualPageMap } = await renderPdfAudited(model);
+      const ids = Object.keys(actualPageMap);
+      const nonEmpty = ids.length > 0;
+      const allMatch = ids.every((id) => tocPageMap[id] === actualPageMap[id]);
+      check(`${type}: TOC has entries to audit`, nonEmpty, `${ids.length} numbered targets`);
+      check(
+        `${type}: every TOC page number matches the section's actual start page`,
+        nonEmpty && allMatch,
+        ids.map((id) => `${id}→p${actualPageMap[id]}`).join(' '),
+      );
+    } catch (e) {
+      check(`${type}: TOC page-map audit`, false, e instanceof Error ? e.message : String(e));
+    }
+  }
 
   console.log(`\n${failures === 0 ? '✓ ALL DISCLAIMER CHECKS PASSED' : `✗ ${failures} CHECK(S) FAILED`}\n`);
   process.exit(failures === 0 ? 0 : 1);

@@ -139,14 +139,50 @@ export function aggregate(agents: AgentVerdict[]): Aggregate {
 export interface SynthesisResult extends KoanoVerdict {
   overall_provenance: Provenance; // weakest provenance across ALL agent inputs
   weighting_breakdown: WeightingBreakdown; // the scored math behind the verdict — shown to the user
-  agent_summaries: {
-    agent: string;
-    verdict: string;
-    confidence: number;
-    risk_score: number;
-    overall_provenance: Provenance;
-    headline: string;
-  }[];
+  agent_summaries: AgentSummary[];
+}
+
+export interface AgentSummary {
+  agent: string;
+  verdict: string;
+  confidence: number;
+  risk_score: number;
+  overall_provenance: Provenance;
+  headline: string;
+}
+
+// Reconstruct the confidence-weighted breakdown from the fields a persisted
+// verdict already stores (agent_summaries: agent + verdict + confidence). The
+// verdicts table does not persist weighting_breakdown, but it is a PURE function
+// of these stored fields, so a document (e.g. the IC memo) can rebuild the exact
+// math the analyst saw with zero model calls and no schema migration. Uses the
+// SAME DIRECTION/THRESHOLDS constants as aggregate() — one source of truth.
+export function breakdownFromSummaries(
+  summaries: AgentSummary[],
+  chosenVerdict: Verdict,
+): WeightingBreakdown {
+  const agents: AgentContribution[] = summaries.map((sm) => {
+    const v = sm.verdict as Verdict;
+    const direction = DIRECTION[v] ?? 0;
+    return {
+      agent: sm.agent,
+      verdict: v,
+      confidence: sm.confidence,
+      direction,
+      weight: sm.confidence,
+      contribution: sm.confidence * direction,
+    };
+  });
+  const total_weight = agents.reduce((s, c) => s + c.weight, 0) || 1;
+  const score = agents.reduce((s, c) => s + c.contribution, 0) / total_weight;
+  return {
+    method: 'confidence-weighted v1',
+    agents,
+    total_weight,
+    aggregate_score: Math.round(score * 100) / 100,
+    thresholds: THRESHOLDS,
+    chosen_verdict: chosenVerdict,
+  };
 }
 
 export async function runSynthesis(
