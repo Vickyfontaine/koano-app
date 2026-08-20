@@ -84,9 +84,10 @@ export async function POST(req: Request) {
     record('disaster_history', c.disaster);
     record('mortgage_demand', c.hmda);
     record('employment', c.qcew);
+    record('comp_zip', c.compZip);
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    for (const n of ['violations', 'landlord', 'filings', 'zoning', 'contamination', 'disaster_history', 'mortgage_demand', 'employment']) datasets[n] = { written: 0, error: msg };
+    for (const n of ['violations', 'landlord', 'filings', 'zoning', 'contamination', 'disaster_history', 'mortgage_demand', 'employment', 'comp_zip']) datasets[n] = { written: 0, error: msg };
   }
 
   // Calibration scan (Slice 3) — DOWNSTREAM of the archive, not an archive

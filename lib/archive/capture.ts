@@ -21,9 +21,33 @@ import type {
   EntitlementSummary,
   HpiTrend,
   LandlordPortfolioSummary,
+  MlsCompsSummary,
   MortgageDemandInfo,
   ZoningInfo,
 } from '../providers/types';
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+// Whole weeks since the epoch, for deterministic round-robin scheduling.
+function weekIndex(runWeek: string): number {
+  return Math.floor(Date.parse(`${runWeek}T00:00:00Z`) / (7 * 86_400_000));
+}
+
+// EPA FRS enforces ~12 requests/minute and getContamination makes 2 requests
+// (SEMS + ACRES). We therefore (a) only re-check a rotating WINDOW of properties
+// each week — contamination changes slowly, so a ~monthly rotation loses nothing
+// — and (b) space the calls out. This keeps a growing fleet under the limit
+// without a dedicated job. Beyond ~a few hundred tracked properties, raise the
+// window/spacing or move contamination to its own throttled worker.
+const CONTAMINATION_MAX_PER_RUN = 6; // ≤12 FRS requests/run
+// getContamination fires 2 FRS requests (SEMS+ACRES); 15s between calls ≈ 8
+// req/min — comfortably under the 12/min limit with headroom for a shared IP.
+const CONTAMINATION_SPACING_MS = 15_000;
+// A per-ZIP comp snapshot needs enough recorded sales for the median to mean
+// something; below this we don't archive it (and the diff has nothing to fire).
+const COMP_ZIP_MIN_SALES = 5;
 
 export const CAPTURE_VERSION = {
   sales: 'sales-incremental@1',
@@ -34,12 +58,16 @@ export const CAPTURE_VERSION = {
   propertyFilings: 'property-filings@1',
   hpi: 'hpi-metro@1',
   zoning: 'zoning-property@1',
-  // Phase 1 national providers (Slice 5): EPA proximity per-property (weekly);
-  // disaster/HMDA/QCEW at county grain (capture-if-changed).
-  contamination: 'contamination-property@1',
+  // Phase 1 national providers (Slice 5): EPA proximity per-property; disaster/
+  // HMDA/QCEW at county grain (capture-if-changed). contamination bumped to @2
+  // when it moved to a rotating window (Phase 2 Slice 2) — the cadence changed.
+  contamination: 'contamination-property@2',
   disasterHistory: 'disaster-county@1',
   mortgageDemand: 'hmda-county@1',
   employment: 'qcew-county@1',
+  // Phase 2 Slice 2: per-ZIP comp median (capture-if-changed) — the monitoring
+  // diff source for tract/ZIP comp price movement.
+  compZip: 'comp-zip@1',
 } as const;
 
 const ROLLING_SALES = 'https://data.cityofnewyork.us/resource/usep-8jbt.json';
@@ -352,7 +380,7 @@ export async function captureCdEntitlement(admin: SupabaseClient, runWeek: strin
 //     provider results are archived (never a representative fallback).
 //     Chunking is designed-for but NOT built (tracked N is small): a future
 //     `offset/limit` on `props` slices this across invocations.
-export interface PropertyCaptureCounts { violations: number; landlord: number; filings: number; zoning: number; contamination: number; disaster: number; hmda: number; qcew: number }
+export interface PropertyCaptureCounts { violations: number; landlord: number; filings: number; zoning: number; contamination: number; disaster: number; hmda: number; qcew: number; compZip: number }
 
 export async function capturePropertySnapshots(admin: SupabaseClient, runWeek: string, props: TrackedProperty[]): Promise<PropertyCaptureCounts> {
   const violations: Record<string, unknown>[] = [];
@@ -360,10 +388,13 @@ export async function capturePropertySnapshots(admin: SupabaseClient, runWeek: s
   const filings: Record<string, unknown>[] = [];
   const zoning: Record<string, unknown>[] = [];
   const contamination: Record<string, unknown>[] = [];
-  // County-level datasets are deduped across properties and captured after the
-  // loop (many tracked properties share a county). Collected here as resolved
-  // addresses keyed by county FIPS.
-  const countyByFips = new Map<string, { addr: import('../providers/types').ResolvedAddress }>();
+  type Addr = import('../providers/types').ResolvedAddress;
+  // County datasets, contamination, and comps are deduped/scheduled across
+  // properties and captured AFTER the main loop (many properties share a county
+  // or ZIP; contamination is rate-limited). Collected here.
+  const countyByFips = new Map<string, { addr: Addr }>();
+  const resolved: { bbl: string; addr: Addr }[] = [];
+  const zipByCode = new Map<string, Addr>();
 
   for (const p of props) {
     let geo;
@@ -374,26 +405,17 @@ export async function capturePropertySnapshots(admin: SupabaseClient, runWeek: s
     if (geo.data.state_fips && geo.data.county_fips) {
       countyByFips.set(`${geo.data.state_fips}${geo.data.county_fips}`, { addr: geo.data });
     }
-    // EPA contamination proximity — 2 FRS calls/property. The FRS enforces
-    // 12 req/min; with a small tracked N this stays under, but a larger fleet
-    // needs throttling/chunking here (designed-for, not built).
-    const [v, l, e, z, cont] = await Promise.all([
+    // Kept for the post-loop windowed contamination pass and per-ZIP comp
+    // snapshot (both scheduled/deduped, not fetched inside this per-property loop).
+    resolved.push({ bbl, addr: geo.data });
+    if (geo.data.zip) zipByCode.set(geo.data.zip, geo.data);
+
+    const [v, l, e, z] = await Promise.all([
       registry.buildingViolations.getViolations(geo.data).catch(() => null),
       registry.landlordPortfolio.getPortfolio(geo.data).catch(() => null),
       registry.entitlement.getEntitlement(geo.data).catch(() => null),
       registry.zoning.getZoning(geo.data).catch(() => null),
-      registry.contamination.getContamination(geo.data).catch(() => null),
     ]);
-
-    if (cont && cont.provenance === 'live' && cont.data) {
-      const d = cont.data as ContaminationInfo;
-      const data = {
-        radius_mi: d.radius_mi, superfund_sites_within_radius: d.superfund_sites_within_radius,
-        brownfield_within_radius: d.brownfield_within_radius, total_cleanup_sites_within_radius: d.total_cleanup_sites_within_radius,
-        nearest_site_name: d.nearest_site_name, nearest_site_distance_mi: d.nearest_site_distance_mi, nearest_site_program: d.nearest_site_program,
-      };
-      contamination.push({ dataset: 'contamination', scope_type: 'property', scope_key: bbl, captured_week: runWeek, source: cont.source, provenance: 'live', capture_version: CAPTURE_VERSION.contamination, data, row_count: d.total_cleanup_sites_within_radius, content_hash: hash(data) });
-    }
 
     if (v && v.provenance === 'live' && v.data) {
       const d = v.data as BuildingViolationsSummary;
@@ -439,6 +461,32 @@ export async function capturePropertySnapshots(admin: SupabaseClient, runWeek: s
     }
   }
 
+  // CONTAMINATION (EPA) — rotating window + spacing so a growing fleet stays
+  // under the FRS 12 req/min limit. Deterministic order (by BBL) so the window
+  // advances predictably; every property is re-checked within ceil(N/MAX) weeks.
+  // Contamination changes slowly, so the coarser cadence loses nothing; the
+  // monitoring diff always compares against the most recent prior snapshot.
+  const ordered = resolved.slice().sort((a, b) => a.bbl.localeCompare(b.bbl));
+  const N = ordered.length;
+  if (N > 0) {
+    const start = (weekIndex(runWeek) * CONTAMINATION_MAX_PER_RUN) % N;
+    const windowCount = Math.min(CONTAMINATION_MAX_PER_RUN, N);
+    for (let k = 0; k < windowCount; k++) {
+      const { bbl, addr } = ordered[(start + k) % N];
+      if (k > 0) await sleep(CONTAMINATION_SPACING_MS); // pace FRS calls
+      const cont = await registry.contamination.getContamination(addr).catch(() => null);
+      if (cont && cont.provenance === 'live' && cont.data) {
+        const d = cont.data as ContaminationInfo;
+        const data = {
+          radius_mi: d.radius_mi, superfund_sites_within_radius: d.superfund_sites_within_radius,
+          brownfield_within_radius: d.brownfield_within_radius, total_cleanup_sites_within_radius: d.total_cleanup_sites_within_radius,
+          nearest_site_name: d.nearest_site_name, nearest_site_distance_mi: d.nearest_site_distance_mi, nearest_site_program: d.nearest_site_program,
+        };
+        contamination.push({ dataset: 'contamination', scope_type: 'property', scope_key: bbl, captured_week: runWeek, source: cont.source, provenance: 'live', capture_version: CAPTURE_VERSION.contamination, data, row_count: d.total_cleanup_sites_within_radius, content_hash: hash(data) });
+      }
+    }
+  }
+
   // County-level national datasets (deduped): disaster history, HMDA lending,
   // QCEW employment. All capture-if-changed — they move slowly (disaster
   // declarations irregular, HMDA annual, QCEW quarterly), so a content-hash
@@ -478,6 +526,23 @@ export async function capturePropertySnapshots(admin: SupabaseClient, runWeek: s
     }
   }
 
+  // PER-ZIP COMP MEDIAN — capture-if-changed. mls-comps is ZIP-keyed, so one
+  // fetch per distinct ZIP (deduped). Archived only when there are enough
+  // recorded sales for the median to be meaningful; the monitoring diff applies
+  // the %-move + sample thresholds on top.
+  const compZip: Record<string, unknown>[] = [];
+  for (const [zip, addr] of Array.from(zipByCode.entries())) {
+    const res = await registry.mlsComps.getComps(addr).catch(() => null);
+    if (!res || res.provenance !== 'live' || !res.data) continue;
+    const d = res.data as MlsCompsSummary;
+    if (d.sales_count < COMP_ZIP_MIN_SALES) continue;
+    const data = { median_price_per_sqft: d.median_price_per_sqft, sales_count: d.sales_count, price_trend: d.price_trend };
+    const h = hash(data);
+    if (h !== (await lastHash(admin, 'comp_zip', 'zip', zip))) {
+      compZip.push({ dataset: 'comp_zip', scope_type: 'zip', scope_key: zip, captured_week: runWeek, source: res.source, provenance: 'live', capture_version: CAPTURE_VERSION.compZip, data, row_count: d.sales_count, content_hash: h });
+    }
+  }
+
   const oc = 'dataset,scope_type,scope_key,captured_week';
   return {
     violations: await chunkedUpsert(admin, 'archive_snapshots', violations, oc),
@@ -488,6 +553,7 @@ export async function capturePropertySnapshots(admin: SupabaseClient, runWeek: s
     disaster: await chunkedUpsert(admin, 'archive_snapshots', disaster, oc),
     hmda: await chunkedUpsert(admin, 'archive_snapshots', hmda, oc),
     qcew: await chunkedUpsert(admin, 'archive_snapshots', qcew, oc),
+    compZip: await chunkedUpsert(admin, 'archive_snapshots', compZip, oc),
   };
 }
 
