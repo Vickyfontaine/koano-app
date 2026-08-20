@@ -21,10 +21,12 @@ import {
   capturePropertySnapshots,
   captureHpiIfChanged,
   loadTrackedProperties,
+  loadMonitoredProperties,
   missedShards,
   sendGapAlert,
 } from '../../../../../lib/archive/capture';
 import { scanVerdictOutcomes } from '../../../../../lib/archive/outcomes';
+import { scanMonitoring } from '../../../../../lib/monitor/scan';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -130,6 +132,27 @@ export async function POST(req: Request) {
     }
   }
 
+  // MONITORING (Phase 2) — deterministic diff on the snapshots THIS shard just
+  // captured, so notifications are fresh. Runs every daily shard for its own
+  // properties. DOWNSTREAM of the archive: isolated so a failure never marks the
+  // archive run partial, and no model call / no verdict allowance is consumed.
+  let monitor: { checked: number; changes: number; notifications: number; error?: string } = { checked: 0, changes: 0, notifications: 0 };
+  try {
+    const monitored = await loadMonitoredProperties(admin);
+    const shardMonitored = sharded ? monitored.filter((p) => p.bbl && propertyShard(p.bbl) === shard) : monitored;
+    const { data: mr } = await admin.from('monitor_runs').insert({ run_week: runWeek, status: 'running' }).select('id').single();
+    const res = await scanMonitoring(admin, runWeek, shardMonitored);
+    monitor = { checked: res.propertiesChecked, changes: res.changesDetected, notifications: res.notificationsCreated };
+    if (mr) {
+      await admin.from('monitor_runs').update({
+        finished_at: new Date().toISOString(), properties_checked: res.propertiesChecked,
+        changes_detected: res.changesDetected, notifications_created: res.notificationsCreated, status: 'succeeded',
+      }).eq('id', mr.id);
+    }
+  } catch (e) {
+    monitor = { checked: 0, changes: 0, notifications: 0, error: e instanceof Error ? e.message : String(e) };
+  }
+
   const anyError = Object.values(datasets).some((d) => d.error);
   const anyBelowFloor = Object.values(datasets).some((d) => d.below_floor);
   const status = anyError || anyBelowFloor ? 'partial' : 'succeeded';
@@ -159,5 +182,5 @@ export async function POST(req: Request) {
     );
   }
 
-  return NextResponse.json({ run_week: runWeek, shard, sharded, status, datasets, outcomes, rows_written: total, shard_gaps: gaps });
+  return NextResponse.json({ run_week: runWeek, shard, sharded, status, datasets, outcomes, monitor, rows_written: total, shard_gaps: gaps });
 }

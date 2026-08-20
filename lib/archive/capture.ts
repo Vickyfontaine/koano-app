@@ -389,6 +389,25 @@ async function lastHash(admin: SupabaseClient, dataset: string, scopeType: strin
 
 export interface TrackedProperty { address: string; bbl: string | null }
 
+// Monitoring needs EVERY property row (one owner each), NOT deduped by BBL like
+// the capture loader — two users watching the same BBL each get their own
+// notifications. Only monitoring_enabled rows.
+export interface MonitoredProperty { id: string; clerk_user_id: string; bbl: string | null; tract_geoid: string | null; zip: string | null }
+
+export async function loadMonitoredProperties(admin: SupabaseClient): Promise<MonitoredProperty[]> {
+  const { data } = await admin
+    .from('properties')
+    .select('id, clerk_user_id, bbl, tract_geoid, zip')
+    .eq('monitoring_enabled', true);
+  return (data ?? []).map((p) => ({
+    id: p.id as string,
+    clerk_user_id: p.clerk_user_id as string,
+    bbl: (p.bbl as string) ?? null,
+    tract_geoid: (p.tract_geoid as string) ?? null,
+    zip: (p.zip as string) ?? null,
+  }));
+}
+
 export async function loadTrackedProperties(admin: SupabaseClient): Promise<TrackedProperty[]> {
   const { data } = await admin.from('properties').select('address_normalized, address_input, bbl');
   const seen = new Set<string>();
@@ -483,7 +502,11 @@ export async function capturePropertySnapshots(admin: SupabaseClient, runWeek: s
     // Kept for the post-loop windowed contamination pass and per-ZIP comp
     // snapshot (both scheduled/deduped, not fetched inside this per-property loop).
     resolved.push({ bbl, addr: geo.data });
-    if (geo.data.zip) zipByCode.set(geo.data.zip, geo.data);
+    if (geo.data.zip) {
+      zipByCode.set(geo.data.zip, geo.data);
+      // Backfill properties.zip (once) so monitoring can fan comp changes by ZIP.
+      await admin.from('properties').update({ zip: geo.data.zip }).eq('bbl', bbl).is('zip', null);
+    }
 
     const [v, l, e, z] = await Promise.all([
       registry.buildingViolations.getViolations(geo.data).catch(() => null),

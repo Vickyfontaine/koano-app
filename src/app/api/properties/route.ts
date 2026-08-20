@@ -133,6 +133,7 @@ export async function POST(req: Request) {
       bbl: addr.bbl,
       bin: addr.bin,
       tract_geoid: addr.tract_geoid,
+      zip: addr.zip,
       latitude: addr.latitude,
       longitude: addr.longitude,
     })
