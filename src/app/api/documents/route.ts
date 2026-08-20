@@ -70,6 +70,9 @@ import { generateBriefing, type BriefingProperty } from '../../../../lib/agents/
 import { runGroundedNarrative } from '../../../../lib/documents/narrative';
 import { appendixWithVerdict as sharedAppendix } from '../../../../lib/documents/disclaimer';
 import { extractPricingFacts, buildPricingModel } from '../../../../lib/documents/builders/pricing-sheet';
+import {
+  extractCmaFacts, buildCmaModel, deterministicCmaNarrative, cmaDataPoints, cmaFactsForModel, CMA_SYSTEM_PROMPT,
+} from '../../../../lib/documents/builders/cma';
 import { extractNetSheetFacts, buildNetSheetModel } from '../../../../lib/documents/builders/net-sheet';
 import {
   extractNeighborhoodFacts,
@@ -436,6 +439,25 @@ export async function POST(req: Request) {
       const ex = extractPricingFacts(r.data);
       if (!ex.ok) return NextResponse.json({ error: ex.error }, { status: 422 });
       model = buildPricingModel({ facts: ex.facts, letterhead, appendix: buildProvenanceAppendix(r.data), generatedAt });
+      addressInput = r.data.resolved_address.input;
+      bbl = r.data.resolved_address.bbl;
+      overallProvenance = r.data.overall_provenance;
+    } else if (doc.id === 'cma') {
+      const r = await assembleDocumentData(address, doc.requiredBlocks);
+      if (!r.ok) return NextResponse.json({ error: r.error }, { status: r.status });
+      const ex = extractCmaFacts(r.data);
+      if (!ex.ok) return NextResponse.json({ error: ex.error }, { status: 422 });
+      const narrative =
+        buildSource === 'fresh'
+          ? await runGroundedNarrative({
+              systemPrompt: CMA_SYSTEM_PROMPT,
+              factsPayload: cmaFactsForModel(ex.facts),
+              allowedDataPoints: cmaDataPoints(ex.facts),
+              addressLabel: ex.facts.addressLabel,
+              deterministicFallback: deterministicCmaNarrative(ex.facts),
+            })
+          : deterministicCmaNarrative(ex.facts);
+      model = buildCmaModel({ facts: ex.facts, letterhead, narrative, appendix: buildProvenanceAppendix(r.data), generatedAt });
       addressInput = r.data.resolved_address.input;
       bbl = r.data.resolved_address.bbl;
       overallProvenance = r.data.overall_provenance;

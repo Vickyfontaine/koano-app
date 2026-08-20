@@ -812,6 +812,39 @@ function pricingSheetSample(): RenderModel {
   };
 }
 
+function cmaSample(): RenderModel {
+  return {
+    docTitle: 'Comparative Market Analysis',
+    subtitle: '369 6th Street, Brooklyn, NY',
+    letterhead: NAMED_LETTERHEAD,
+    sections: [
+      {
+        heading: 'Pricing Recommendation',
+        provenanceNote: { provenance: 'live', text: 'An indicative range from distance-ranked recorded sales, not an appraisal. Midpoint also shown adjusted to today via the regional House Price Index.' },
+        highlight: {
+          figures: [
+            { label: 'Low (25th percentile)', value: '$3,200,000', sub: '$1,010/sq ft' },
+            { label: 'Midpoint (trimmed median)', value: '$3,660,000', sub: '$1,156/sq ft', emphasis: true },
+            { label: 'HPI-adjusted midpoint', value: '$3,780,000', sub: '$1,194/sq ft' },
+          ],
+        },
+        paragraphs: ['The band is the interquartile spread of 107 comparable recorded $/sq ft, ranked by true distance from the subject, applied to 3,166 sq ft. The HPI-adjusted midpoint moves each comp to today via the New York MSA index (+3.1% YoY). Local recorded-sale prices are rising.'],
+      },
+      {
+        heading: 'Comparable Sales',
+        table: {
+          columns: ['Address', 'Dist.', 'Sale date', 'Sale price', '$/sq ft', 'Adj. $/sq ft', 'Sq ft', 'Class'],
+          rows: Array.from({ length: 6 }, (_, i) => [`${100 + i} Example St`, `0.${2 + i} mi`, `2026-0${i + 1}-10`, `$${(3_000_000 + i * 120000).toLocaleString('en-US')}`, `$${1000 + i * 60}`, `$${1030 + i * 60}`, `${2800 + i * 100}`, '01']),
+          caption: '107 qualifying recorded sales, distance-ranked. Recorded sales carry no beds/baths, condition, or days-on-market (those require MLS).',
+        },
+      },
+      { heading: 'Market Narrative', paragraphs: ['The comparable recorded sales place value in a band of $1,010 to $1,301 per square foot, central figure $1,156. Local prices are rising and the New York MSA index moved +3.1% year over year. On financing, 22% of county mortgage applications were denied. This is an indicative range from recorded sales, not an appraisal.'] },
+    ],
+    appendix: LIVE_APPENDIX,
+    generatedAt: GENERATED_AT,
+  };
+}
+
 function netSheetSample(): RenderModel {
   return {
     docTitle: 'Buyer / Seller Net Sheet',
@@ -889,4 +922,5 @@ export const SAMPLE_MODELS: Record<string, RenderModel> = {
   buyer_seller_net_sheet: netSheetSample(),
   client_neighborhood_report: neighborhoodSample(),
   entitlement_risk_memo: entitlementMemoSample(),
+  cma: cmaSample(),
 };

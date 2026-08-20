@@ -126,7 +126,7 @@ export function buildPricingModel(args: {
     paragraphs: [
       'To keep the selection defensible rather than cherry-picked, KOANO applies a fixed rule to NYC DOF recorded sales — the analyst does not hand-pick the set:',
       '• Residential recorded sales only (DOF building classes 01, 02, 03, 09, 10, 12, 13 — one- to three-family homes, condos, co-ops).',
-      '• A trailing window of recent recorded sales, keyed to the subject ZIP for proximity.',
+      '• A trailing window of recent recorded sales, ranked by true distance from the subject (recorded sale → PLUTO centroid), preferring the nearest.',
       '• Sales with a recorded gross square footage (so a $/sq ft can be computed); sales without it are excluded.',
       '• A trimmed median is used for the central figure to damp outliers.',
       `Provider scope note: ${f.scopeNote}`,
