@@ -29,6 +29,7 @@ interface FmrRow {
   'Two-Bedroom'?: number | string;
   'Three-Bedroom'?: number | string;
   'Four-Bedroom'?: number | string;
+  year?: string | number; // HUD nests the fiscal year INSIDE basicdata, not on data
 }
 interface HudFmrResponse {
   data?: {
@@ -94,15 +95,18 @@ export const hudFmr: FairMarketRentProvider = {
       const basic = Array.isArray(d?.basicdata) ? d?.basicdata[0] : d?.basicdata;
       if (!d || !basic) throw new Error('HUD FMR returned no basicdata');
 
+      // HUD nests the fiscal year inside basicdata (data.year is absent); fall
+      // back to data.year for safety.
+      const fy = basic.year ?? d.year ?? null;
       const data: FairMarketRentInfo = {
         area_name: d.area_name ?? d.county_name ?? null,
-        fiscal_year: String(d.year ?? 'unknown'),
+        fiscal_year: fy != null ? String(fy) : 'unknown',
         fmr_studio: num(basic.Efficiency),
         fmr_1br: num(basic['One-Bedroom']),
         fmr_2br: num(basic['Two-Bedroom']),
         fmr_3br: num(basic['Three-Bedroom']),
         fmr_4br: num(basic['Four-Bedroom']),
-        scope_note: `HUD Fair Market Rents FY${d.year ?? '—'} for the county/metro (public domain). ${HUD_DISCLAIMER}`,
+        scope_note: `HUD Fair Market Rents FY${fy ?? '—'} for the county/metro (public domain). ${HUD_DISCLAIMER}`,
       };
 
       return {
