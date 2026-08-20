@@ -582,12 +582,12 @@ Each step verified before the next (Principle 3).
 
 **Remaining / deferred:**
 - HMDA tract-level ingestion (county is live; tract is the immediate fast-follow).
-- Snapshot the national providers into the archive — DONE (Slice 5); user runs migration-013.
+- Snapshot the national providers into the archive — DONE (Slice 5); migration-013 applied and verified (coverage view shows the new datasets).
 - Stripe billing UI; PostHog; SOC 2; enterprise SSO for Cluster 5.
 - Paid-source swaps (pro-forma benchmarks, commercial deals, national MLS comps) — one-line registry changes when funded.
 - Marketing visual pass + 3D render drop-in; embed neural map into /intelligence.
 
-**Pending USER actions (migrations are the user's to run):** apply Supabase migrations in order through 013; seed IRS migration (`scripts/ingest-irs-migration.ts`); set free tokens (`NOAA_CDO_TOKEN`, `HUD_USER_TOKEN`) in `.env.local` AND Vercel (env additions need a redeploy to take effect).
+**Migrations: all applied through 013** (verified — `archive_coverage` shows the new datasets), and IRS migration is seeded (3,120 counties). The ONLY remaining optional action: set free tokens (`NOAA_CDO_TOKEN`, `HUD_USER_TOKEN`) in `.env.local` AND Vercel for the additive climate/rent signals (env additions need a redeploy to take effect). The verdict engine is fully live for NYC without them.
 
 ---
 
