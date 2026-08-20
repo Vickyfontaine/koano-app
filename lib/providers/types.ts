@@ -401,6 +401,47 @@ export interface MigrationProvider {
 }
 
 // ---------------------------------------------------------------------------
+// Market supplements (federal / free) feeding the Market-Timing agent. Additive
+// enrichment — both degrade without dragging: HUD FMR omits when its free token
+// is unset; the mortgage rate falls back to representative only on a live-call
+// failure.
+// ---------------------------------------------------------------------------
+
+// HUD Fair Market Rents — rent benchmark by bedroom for the county/metro. Needs
+// a free HUD_USER_TOKEN (bearer). When unset the provider returns data:null
+// tagged `live` (coverage absence, not representative).
+export interface FairMarketRentInfo {
+  area_name: string | null;
+  fiscal_year: string;
+  fmr_studio: number | null;
+  fmr_1br: number | null;
+  fmr_2br: number | null;
+  fmr_3br: number | null;
+  fmr_4br: number | null;
+  scope_note: string;
+}
+
+export interface FairMarketRentProvider {
+  name: string;
+  getFairMarketRent(addr: ResolvedAddress): Promise<ProviderResult<FairMarketRentInfo>>;
+}
+
+// Mortgage rate (Freddie Mac PMMS) — NATIONAL 30/15-yr weekly average, pulled
+// DIRECTLY from Freddie Mac's published CSV (attribution-only), NOT redistributed
+// via FRED (whose PMMS series is copyright-restricted for commercial use).
+export interface MortgageRateInfo {
+  week: string; // as published, e.g. "8/13/2026"
+  rate_30yr_pct: number | null;
+  rate_15yr_pct: number | null;
+  scope_note: string;
+}
+
+export interface MortgageRateProvider {
+  name: string;
+  getMortgageRate(addr: ResolvedAddress): Promise<ProviderResult<MortgageRateInfo>>;
+}
+
+// ---------------------------------------------------------------------------
 // Building violations (HPD + ECB + DOB complaints) — live NYC Open Data
 // ---------------------------------------------------------------------------
 

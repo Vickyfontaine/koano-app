@@ -12,6 +12,7 @@ import type {
   DisasterHistoryProvider,
   EmploymentProvider,
   EntitlementProvider,
+  FairMarketRentProvider,
   LandlordPortfolioProvider,
   DemographicsProvider,
   FloodProvider,
@@ -20,6 +21,7 @@ import type {
   MigrationProvider,
   MlsCompsProvider,
   MortgageDemandProvider,
+  MortgageRateProvider,
   OpportunityZoneProvider,
   PermitsProvider,
   SeismicProvider,
@@ -46,6 +48,8 @@ import { noaaClimate } from './real/noaa-climate';
 import { cfpbHmda } from './real/cfpb-hmda';
 import { blsQcew } from './real/bls-qcew';
 import { irsMigration } from './real/irs-migration';
+import { hudFmr } from './real/hud-fmr';
+import { freddiePmms } from './real/freddie-pmms';
 import { mockProformaBenchmark } from './mock/proforma-benchmark';
 import { nycSalesComps } from './real/nyc-sales';
 import { mockCostarDeals } from './mock/costar-deals';
@@ -75,6 +79,9 @@ export interface ProviderRegistry {
   mortgageDemand: MortgageDemandProvider;
   employment: EmploymentProvider;
   migration: MigrationProvider;
+  // market supplements (federal / free) feeding Market-Timing
+  fairMarketRent: FairMarketRentProvider;
+  mortgageRate: MortgageRateProvider;
   // representative providers — see each mock's swap_note for the live upgrade
   proformaBenchmark: ProformaBenchmarkProvider;
   mlsComps: MlsCompsProvider;
@@ -103,6 +110,9 @@ export const registry: ProviderRegistry = {
   mortgageDemand: cfpbHmda,
   employment: blsQcew,
   migration: irsMigration,
+  // market supplements — LIVE federal/free feeding Market-Timing
+  fairMarketRent: hudFmr,
+  mortgageRate: freddiePmms,
   // representative (mock) providers — one-line swap to live per swap_note
   proformaBenchmark: mockProformaBenchmark,
   mlsComps: nycSalesComps, // LIVE — NYC recorded sales (was mock/mls-comps.ts)

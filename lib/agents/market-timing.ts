@@ -1,8 +1,9 @@
-// KOANO Market Timing agent — Step 4e.
+// KOANO Market Timing agent — Step 4e (Phase 1: + market supplements).
 // LIVE inputs: house price index (fhfa-hpi) + demographics (census-acs) +
-// comparable recorded sales (nyc-sales, NYC recorded sales). Recorded sales
-// give price movement (price_trend), not days-on-market (an MLS concept).
-// Depends ONLY on the provider registry. Output: AgentVerdict (KoanoVerdict schema).
+// comparable recorded sales (nyc-sales) + the financing/affordability
+// environment — Freddie Mac PMMS mortgage rate and HUD Fair Market Rents.
+// Recorded sales give price movement (price_trend), not days-on-market (an MLS
+// concept). Depends ONLY on the provider registry. Output: AgentVerdict.
 
 import { registry } from '../providers/registry';
 import type { DataPoint, ResolvedAddress } from '../providers/types';
@@ -16,16 +17,20 @@ How to reason:
 - The HPI trend is the macro cycle signal: YoY appreciation vs the 5-year run tells you whether the market is accelerating, cruising, or decelerating. Strong 5-yr + moderating YoY = mid-to-late cycle.
 - Recorded-sales price_trend is the local micro signal: "rising" = recent local sales printing higher $/sqft than the prior period (seller's momentum); "falling" = local softening; "flat" = stable. It reflects actual closed sales, not listings. (Recorded sales do not carry days-on-market; that would require MLS data we do not have.)
 - Comp price-per-sqft vs tract median home value shows whether recent transactions are printing above or below the standing stock — above = market repricing upward. Note the comp coverage from the scope note (ZIP-keyed, NYC 1-3 family skew).
+- Financing environment (Freddie Mac PMMS): the national 30-yr fixed rate is the affordability/timing headwind or tailwind. Elevated rates compress buyer purchasing power and slow transactions regardless of local momentum; falling rates unlock demand. Weigh it against the local price trend.
+- Rent benchmark (HUD Fair Market Rents), when present: rents relative to prices frame buy-vs-rent and investor yield support. If FMR is marked unavailable, simply omit it — do not infer.
 - Timing verdicts: "buy" = early enough in the acceleration to capture appreciation, "hold" = mid-cycle, no urgency either way, "wait" = late-cycle or decelerating (better entry likely ahead), "sell" = peak signals (sell into strength).
 - Treat any data point with provenance "representative" as indicative only — say so explicitly in the observation that uses it.
 - risk_score reflects timing risk: buying at a local top, liquidity drying up, rate sensitivity.
 - signal_window_months = how long your timing read stays valid.`;
 
 export async function runMarketTimingAgent(addr: ResolvedAddress): Promise<AgentVerdict> {
-  const [hpiRes, demoRes, compsRes] = await Promise.all([
+  const [hpiRes, demoRes, compsRes, rateRes, fmrRes] = await Promise.all([
     registry.hpi.getHpi(addr),
     registry.demographics.getDemographics(addr),
     registry.mlsComps.getComps(addr),
+    registry.mortgageRate.getMortgageRate(addr),
+    registry.fairMarketRent.getFairMarketRent(addr),
   ]);
 
   const dataPoints: DataPoint[] = [];
@@ -75,6 +80,29 @@ export async function runMarketTimingAgent(addr: ResolvedAddress): Promise<Agent
     });
   } else {
     dataPoints.push({ label: 'comps_unavailable', value: compsRes.error ?? 'no data', provenance: compsRes.provenance, source: compsRes.source });
+  }
+
+  // Financing environment (national mortgage rate) — Freddie Mac PMMS.
+  if (rateRes.data) {
+    const r = rateRes.data;
+    dataPoints.push(
+      { label: `mortgage_rate_30yr_pct (week ${r.week})`, value: r.rate_30yr_pct, provenance: rateRes.provenance, source: rateRes.source },
+      { label: 'mortgage_rate_15yr_pct', value: r.rate_15yr_pct, provenance: rateRes.provenance, source: rateRes.source }
+    );
+  } else {
+    dataPoints.push({ label: 'mortgage_rate_unavailable', value: rateRes.error ?? 'no data', provenance: rateRes.provenance, source: rateRes.source });
+  }
+
+  // Rent benchmark (HUD FMR) — omitted (coverage note, live) when the free token
+  // is unset, so it never drags provenance.
+  if (fmrRes.data) {
+    const f = fmrRes.data;
+    dataPoints.push(
+      { label: `fmr_2br_usd (FY${f.fiscal_year})`, value: f.fmr_2br, provenance: fmrRes.provenance, source: fmrRes.source },
+      { label: 'fmr_1br_usd', value: f.fmr_1br, provenance: fmrRes.provenance, source: fmrRes.source }
+    );
+  } else {
+    dataPoints.push({ label: 'fair_market_rent_unavailable', value: fmrRes.error ?? 'no data', provenance: fmrRes.provenance, source: fmrRes.source });
   }
 
   const llm = await callAgentLLM({
