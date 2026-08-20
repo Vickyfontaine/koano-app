@@ -9,8 +9,11 @@ import type {
   AcsDemographics,
   AssemblageSummary,
   BuildingViolationsSummary,
+  ClimateInfo,
+  ContaminationInfo,
   CostarDealsSummary,
   CrimeStats,
+  DisasterHistoryInfo,
   EntitlementSummary,
   FloodInfo,
   LandlordPortfolioSummary,
@@ -19,12 +22,12 @@ import type {
   MlsCompsSummary,
   OpportunityZoneInfo,
   PermitsSummary,
-  PremiumHazardInfo,
   ProformaBenchmark,
   ProviderResult,
   Provenance,
   ResolvedAddress,
   SearchTrendsInfo,
+  SeismicInfo,
   ZoningInfo,
 } from './types';
 
@@ -60,7 +63,10 @@ export interface SiteDetailResponse {
   landlord_portfolio?: SiteDetailBlock<LandlordPortfolioSummary>;
   search_trends?: SiteDetailBlock<SearchTrendsInfo>;
   foot_traffic?: SiteDetailBlock<FootTrafficInfo>;
-  premium_hazard?: SiteDetailBlock<PremiumHazardInfo>;
+  contamination?: SiteDetailBlock<ContaminationInfo>;
+  seismic?: SiteDetailBlock<SeismicInfo>;
+  disaster_history?: SiteDetailBlock<DisasterHistoryInfo>;
+  climate?: SiteDetailBlock<ClimateInfo>;
   costar_deals?: SiteDetailBlock<CostarDealsSummary>;
   assemblage?: SiteDetailBlock<AssemblageSummary>;
   entitlement?: SiteDetailBlock<EntitlementSummary>;
@@ -85,7 +91,10 @@ export const BLOCK_FETCHERS: Record<
   landlord_portfolio: (a) => registry.landlordPortfolio.getPortfolio(a),
   search_trends: (a) => registry.searchTrends.getSearchTrends(a),
   foot_traffic: (a) => registry.footTraffic.getFootTraffic(a),
-  premium_hazard: (a) => registry.premiumHazard.getHazards(a),
+  contamination: (a) => registry.contamination.getContamination(a),
+  seismic: (a) => registry.seismic.getSeismic(a),
+  disaster_history: (a) => registry.disasterHistory.getDisasterHistory(a),
+  climate: (a) => registry.climate.getClimate(a),
   costar_deals: (a) => registry.costarDeals.getDeals(a),
   assemblage: (a) => registry.assemblage.getAssemblage(a),
   entitlement: (a) => registry.entitlement.getEntitlement(a),

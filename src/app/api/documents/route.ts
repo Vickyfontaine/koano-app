@@ -233,12 +233,15 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: '"address" is required' }, { status: 400 });
   }
 
-  // Blocked-by-design types (representative-provider dependencies) never ship.
+  // Blocked-by-design types never ship. Two reasons: a representative-provider
+  // dependency (blockedOn set), or a not-yet-wired builder (blockedOn absent).
   if (doc.status === 'blocked') {
     return NextResponse.json(
       {
-        error: `The ${doc.title} is not available yet — it depends on a data source (${doc.blockedOn}) that is representative until funded.`,
-        blocked_on: doc.blockedOn,
+        error: doc.blockedOn
+          ? `The ${doc.title} is not available yet — it depends on a data source (${doc.blockedOn}) that is representative until funded.`
+          : `The ${doc.title} is not available yet.`,
+        blocked_on: doc.blockedOn ?? null,
       },
       { status: 409 },
     );

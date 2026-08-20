@@ -5,8 +5,11 @@
 import type {
   AssemblageProvider,
   BuildingViolationsProvider,
+  ClimateProvider,
+  ContaminationProvider,
   CostarDealsProvider,
   CrimeProvider,
+  DisasterHistoryProvider,
   EntitlementProvider,
   LandlordPortfolioProvider,
   DemographicsProvider,
@@ -17,7 +20,7 @@ import type {
   MlsCompsProvider,
   OpportunityZoneProvider,
   PermitsProvider,
-  PremiumHazardProvider,
+  SeismicProvider,
   ProformaBenchmarkProvider,
   SearchTrendsProvider,
   ZoningProvider,
@@ -36,10 +39,13 @@ import { fhfaHpi } from './real/fhfa-hpi';
 import { femaFlood } from './real/fema-flood';
 import { fbiUcr } from './real/fbi-ucr';
 import { googleTrends } from './real/google-trends';
+import { epaContamination } from './real/epa-superfund';
+import { usgsSeismic } from './real/usgs-seismic';
+import { openFemaDisasters } from './real/openfema-disasters';
+import { noaaClimate } from './real/noaa-climate';
 import { mockProformaBenchmark } from './mock/proforma-benchmark';
 import { nycSalesComps } from './real/nyc-sales';
 import { mockPlacerTraffic } from './mock/placer-traffic';
-import { mockPremiumHazard } from './mock/premium-hazard';
 import { mockCostarDeals } from './mock/costar-deals';
 
 export interface ProviderRegistry {
@@ -57,11 +63,16 @@ export interface ProviderRegistry {
   searchTrends: SearchTrendsProvider;
   assemblage: AssemblageProvider;
   entitlement: EntitlementProvider;
+  // environmental & climate hazard — federal, national, live free (re-base of
+  // the former premium-hazard mock)
+  contamination: ContaminationProvider;
+  seismic: SeismicProvider;
+  disasterHistory: DisasterHistoryProvider;
+  climate: ClimateProvider;
   // representative providers — see each mock's swap_note for the live upgrade
   proformaBenchmark: ProformaBenchmarkProvider;
   mlsComps: MlsCompsProvider;
   footTraffic: FootTrafficProvider;
-  premiumHazard: PremiumHazardProvider;
   costarDeals: CostarDealsProvider;
 }
 
@@ -79,10 +90,14 @@ export const registry: ProviderRegistry = {
   searchTrends: googleTrends,
   assemblage: nycAssemblage,
   entitlement: nycDobFilings,
+  // environmental & climate hazard — LIVE federal (was mock/premium-hazard.ts)
+  contamination: epaContamination,
+  seismic: usgsSeismic,
+  disasterHistory: openFemaDisasters,
+  climate: noaaClimate,
   // representative (mock) providers — one-line swap to live per swap_note
   proformaBenchmark: mockProformaBenchmark,
   mlsComps: nycSalesComps, // LIVE — NYC recorded sales (was mock/mls-comps.ts)
   footTraffic: mockPlacerTraffic,
-  premiumHazard: mockPremiumHazard,
   costarDeals: mockCostarDeals,
 };

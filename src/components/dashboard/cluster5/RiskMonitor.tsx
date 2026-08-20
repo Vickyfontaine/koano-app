@@ -1,13 +1,13 @@
 "use client";
 
-// RiskMonitor — Cluster 5 (Checkpoint 4).
+// RiskMonitor — Cluster 5 (Checkpoint 4; Phase 1: live hazard).
 // Per-property risk table: verdict risk score from the audit trail, live FEMA
-// flood status, and premium hazard factors (representative until Verisk /
-// First Street premium is funded — badged). Point-in-time fetches, refreshable.
+// flood status, and live federal hazard signals — EPA Superfund/brownfield
+// proximity, USGS seismic, and FEMA disaster history. Point-in-time fetches,
+// refreshable.
 
 import React, { useCallback, useEffect, useState } from "react";
 import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
-import { swapIntegrationFor } from "@/components/ui/verdict";
 import { PanelHeader, panelStyle, panelTitle, riskColor } from "../panels";
 import type { PortfolioProperty } from "@/app/api/properties/route";
 import type { SiteDetailResponse } from "@/app/api/site-detail/route";
@@ -44,7 +44,7 @@ export default function RiskMonitor({ properties, id }: RiskMonitorProps) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               address: p.address_normalized ?? p.address_input,
-              blocks: ["flood", "premium_hazard"],
+              blocks: ["flood", "contamination", "seismic", "disaster_history"],
             }),
           });
           const json = await res.json();
@@ -68,8 +68,6 @@ export default function RiskMonitor({ properties, id }: RiskMonitorProps) {
   useEffect(() => {
     void load();
   }, [load]);
-
-  const hazardSwap = swapIntegrationFor(["KOANO representative hazard"]);
 
   return (
     <div style={panelStyle} id={id}>
@@ -104,7 +102,7 @@ export default function RiskMonitor({ properties, id }: RiskMonitorProps) {
           <table style={{ borderCollapse: "collapse", width: "100%", minWidth: "640px" }}>
             <thead>
               <tr>
-                {["Property", "Verdict risk", "FEMA flood", "Flood factor", "Fire factor", "30-yr flood prob."].map(
+                {["Property", "Verdict risk", "FEMA flood", "Superfund ≤2mi", "Seismic (PGA)", "FEMA disasters 10yr"].map(
                   (h) => (
                     <th
                       key={h}
@@ -125,7 +123,9 @@ export default function RiskMonitor({ properties, id }: RiskMonitorProps) {
               {rows.map((r) => {
                 const v = r.property.latest_verdict;
                 const flood = r.detail?.flood;
-                const hazard = r.detail?.premium_hazard;
+                const contamination = r.detail?.contamination;
+                const seismic = r.detail?.seismic;
+                const disaster = r.detail?.disaster_history;
                 return (
                   <tr key={r.property.id}>
                     <td style={{ padding: "10px 12px", fontSize: "13px", color: "var(--ink-secondary)", borderBottom: "1px solid var(--border-light)" }}>
@@ -147,17 +147,24 @@ export default function RiskMonitor({ properties, id }: RiskMonitorProps) {
                         <span style={{ color: "var(--ink-faint)" }}>{r.error ?? "—"}</span>
                       )}
                     </td>
-                    <td style={{ padding: "10px 12px", fontFamily: "'DM Mono', monospace", fontSize: "12px", color: "var(--ink-primary)", borderBottom: "1px solid var(--border-light)" }}>
-                      {hazard?.data ? `${hazard.data.flood_factor_1_to_10}/10` : "—"}
+                    <td style={{ padding: "10px 12px", fontSize: "12px", borderBottom: "1px solid var(--border-light)" }}>
+                      {contamination?.data ? (
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: "'DM Mono', monospace", color: "var(--ink-primary)" }}>
+                          {contamination.data.superfund_sites_within_radius}
+                          <ProvenanceBadge provenance={contamination.provenance} />
+                        </span>
+                      ) : (
+                        r.loading ? <span style={{ color: "var(--ink-faint)" }}>fetching…</span> : "—"
+                      )}
                     </td>
                     <td style={{ padding: "10px 12px", fontFamily: "'DM Mono', monospace", fontSize: "12px", color: "var(--ink-primary)", borderBottom: "1px solid var(--border-light)" }}>
-                      {hazard?.data ? `${hazard.data.fire_factor_1_to_10}/10` : "—"}
+                      {seismic?.data && seismic.data.pga_g != null ? `${seismic.data.pga_g}g` : "—"}
                     </td>
                     <td style={{ padding: "10px 12px", fontSize: "12px", borderBottom: "1px solid var(--border-light)" }}>
-                      {hazard?.data ? (
+                      {disaster?.data ? (
                         <span style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: "'DM Mono', monospace", color: "var(--ink-primary)" }}>
-                          {hazard.data.thirty_yr_flood_probability_pct}%
-                          <ProvenanceBadge provenance={hazard.provenance} />
+                          {disaster.data.declarations_last_10yr}
+                          <ProvenanceBadge provenance={disaster.provenance} />
                         </span>
                       ) : (
                         "—"
@@ -172,8 +179,9 @@ export default function RiskMonitor({ properties, id }: RiskMonitorProps) {
       )}
 
       <p style={{ fontSize: "11px", color: "var(--ink-faint)", margin: 0 }}>
-        Hazard factors are representative. They become live with {hazardSwap ?? "premium hazard"}{" "}
-        integration. Point-in-time fetches; continuous monitoring is a funded-roadmap capability.
+        Hazard signals are live federal data — EPA Superfund/brownfield proximity (2-mile radius),
+        USGS seismic, and FEMA disaster declarations. Point-in-time fetches; continuous monitoring is
+        a funded-roadmap capability.
       </p>
     </div>
   );

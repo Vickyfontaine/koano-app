@@ -20,7 +20,9 @@ export type DocumentFormat = 'pdf' | 'docx';
 // A by-design representative provider a document depends on. While the provider
 // is representative, the document is `blocked` and must not ship. Keyed by the
 // provider's registry key — flipping to live is the same one-line swap.
-export type BlockedOnProvider = 'proformaBenchmark' | 'premiumHazard';
+// (premiumHazard was removed here in Phase 1: hazard is now live federal data, so
+// no document is blocked on it anymore.)
+export type BlockedOnProvider = 'proformaBenchmark';
 
 export type DocumentStatus = 'available' | 'blocked';
 

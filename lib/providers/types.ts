@@ -269,6 +269,89 @@ export interface SearchTrendsProvider {
 }
 
 // ---------------------------------------------------------------------------
+// Environmental & climate hazard (federal, NATIONAL, live free sources).
+// These re-base the Risk & Volatility agent onto authoritative federal data so
+// hazard is genuinely live at any US address — replacing the premium-hazard
+// mock (Verisk/CoreLogic stand-in). They COMPLEMENT the FEMA NFHL flood provider
+// (which is the regulatory flood-zone TODAY): this is broader forward-looking and
+// historical hazard, not the same signal.
+// ---------------------------------------------------------------------------
+
+// EPA — Superfund (SEMS/NPL) + brownfield (ACRES) proximity via the Facility
+// Registry Service radius query. Gives the Risk agent a REAL contamination-
+// proximity datapoint (closing the hallucinated-Superfund gap: the agent no
+// longer guesses a site from a coded field — it is handed the actual sites).
+export interface ContaminationInfo {
+  radius_mi: number; // the search radius used
+  superfund_sites_within_radius: number; // SEMS (Superfund program) sites — NPL and non-NPL
+  brownfield_within_radius: number; // ACRES brownfield sites
+  total_cleanup_sites_within_radius: number;
+  nearest_site_name: string | null;
+  nearest_site_distance_mi: number | null;
+  nearest_site_program: string | null; // "SEMS (Superfund)" | "ACRES (brownfield)"
+  scope_note: string;
+}
+
+export interface ContaminationProvider {
+  name: string;
+  getContamination(addr: ResolvedAddress): Promise<ProviderResult<ContaminationInfo>>;
+}
+
+// USGS — seismic design values (from the building-codes service) + a count of
+// historical earthquakes near the point (FDSN ComCat). Modeled hazard, not a
+// live event feed.
+export interface SeismicInfo {
+  pga_g: number | null; // mapped peak ground acceleration (g)
+  ss_g: number | null; // 0.2s spectral response acceleration (g)
+  s1_g: number | null; // 1.0s spectral response acceleration (g)
+  design_reference: string; // e.g. "ASCE 7-22, Site Class D (default)"
+  historical_quakes_50km_m3plus: number | null; // count, ~since 1970
+  largest_nearby_magnitude: number | null;
+  scope_note: string;
+}
+
+export interface SeismicProvider {
+  name: string;
+  getSeismic(addr: ResolvedAddress): Promise<ProviderResult<SeismicInfo>>;
+}
+
+// OpenFEMA — federally-declared disaster HISTORY for the county (multi-peril,
+// historical frequency). Explicitly complements NFHL: not a regulatory zone, but
+// how often this county has actually been declared a disaster and for what.
+export interface DisasterHistoryInfo {
+  fips_state: string | null;
+  fips_county: string | null;
+  total_declarations: number;
+  declarations_last_10yr: number;
+  distinct_incident_types: string[]; // e.g. ["Flood","Severe Storm","Hurricane"]
+  most_common_incident: string | null;
+  most_recent_declaration: string | null; // "2024-01 — Severe Storm"
+  scope_note: string; // INCLUDES the mandatory FEMA non-endorsement disclaimer
+}
+
+export interface DisasterHistoryProvider {
+  name: string;
+  getDisasterHistory(addr: ResolvedAddress): Promise<ProviderResult<DisasterHistoryInfo>>;
+}
+
+// NOAA NCEI — climate normals (1991–2020) for the nearest station. Requires a
+// free NOAA_CDO_TOKEN; when unset the provider returns data:null tagged `live`
+// (a coverage absence, NOT representative) so it never drags the verdict.
+export interface ClimateInfo {
+  station_id: string | null;
+  station_name: string | null;
+  normals_period: string; // "1991-2020"
+  annual_avg_temp_f: number | null;
+  annual_precip_in: number | null;
+  scope_note: string;
+}
+
+export interface ClimateProvider {
+  name: string;
+  getClimate(addr: ResolvedAddress): Promise<ProviderResult<ClimateInfo>>;
+}
+
+// ---------------------------------------------------------------------------
 // Building violations (HPD + ECB + DOB complaints) — live NYC Open Data
 // ---------------------------------------------------------------------------
 
@@ -410,18 +493,6 @@ export interface FootTrafficInfo {
 export interface FootTrafficProvider {
   name: string;
   getFootTraffic(addr: ResolvedAddress): Promise<ProviderResult<FootTrafficInfo>>;
-}
-
-export interface PremiumHazardInfo {
-  flood_factor_1_to_10: number;
-  fire_factor_1_to_10: number;
-  heat_factor_1_to_10: number;
-  thirty_yr_flood_probability_pct: number;
-}
-
-export interface PremiumHazardProvider {
-  name: string;
-  getHazards(addr: ResolvedAddress): Promise<ProviderResult<PremiumHazardInfo>>;
 }
 
 export interface CostarDeal {

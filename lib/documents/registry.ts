@@ -373,17 +373,18 @@ export const DOCUMENT_TYPES: Record<string, DocumentType> = {
     cluster: 'cluster_5',
     homeTier: 'portfolio',
     scope: 'portfolio',
-    requiredBlocks: ['flood', 'premium_hazard', 'crime'],
+    requiredBlocks: ['flood', 'contamination', 'seismic', 'disaster_history', 'crime'],
     formats: ['pdf'],
     sections: [
       { id: 'cover', title: 'Cover', kind: 'deterministic' },
       { id: 'risk', title: 'Risk Exposure', kind: 'deterministic' },
       { id: 'provenance', title: 'Sources & Provenance', kind: 'deterministic' },
     ],
-    // BLOCKED: premium hazard provider is representative by design.
-    // Do not ship until a premium hazard feed (Verisk/CoreLogic) is funded.
+    // Phase 1 removed the representative-hazard blocker: its required blocks are
+    // now all LIVE (federal EPA/USGS/FEMA + flood + crime). It remains BLOCKED
+    // pending a wired builder/renderer (it is not in IMPLEMENTED_DOC_TYPES) — an
+    // implementation gap, not a data gap. No `blockedOn` provider applies.
     status: 'blocked',
-    blockedOn: 'premiumHazard',
   },
 
   asset_one_pager: {

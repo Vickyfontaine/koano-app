@@ -4,8 +4,9 @@
 // full provenance envelope — the UI badges anything not live.
 // blocks defaults to the Cluster 4 bundle (zoning, permits, opportunity_zone,
 // proforma); other clusters request their own bundles (flood, demographics,
-// hpi, mls_comps, crime, search_trends, foot_traffic, premium_hazard,
-// costar_deals). Fast (~seconds); the verdict pipeline runs separately.
+// hpi, mls_comps, crime, search_trends, foot_traffic, contamination, seismic,
+// disaster_history, climate, costar_deals). Fast (~seconds); the verdict
+// pipeline runs separately.
 
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
