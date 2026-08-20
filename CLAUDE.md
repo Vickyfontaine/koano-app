@@ -360,7 +360,6 @@ interface KoanoVerdict {
   minority_signals: MinoritySignal[];
   overall_provenance: "live" | "representative" | "modeled";  // = weakest input
   risk_score: number;                    // 0–100
-  irr_estimate?: number;                 // Clusters 4 & 5 only
   generated_at: string;
 }
 ```

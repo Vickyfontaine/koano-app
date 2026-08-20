@@ -50,7 +50,6 @@ export interface KoanoVerdict {
   reasoning_chain: ReasoningStep[];
   minority_signals: MinoritySignal[];
   top_data_sources: string[];
-  irr_estimate?: number; // Clusters 4 & 5 only
   risk_score: number; // 0–100
   generated_at: string;
 }

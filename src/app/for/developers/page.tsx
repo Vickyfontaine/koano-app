@@ -63,11 +63,6 @@ const PRO_FORMA_FEATURES = [
     description:
       "Exit cap rate estimates informed by KOANO's 5 agents, not just historical averages.",
   },
-  {
-    title: "IRR projection",
-    description:
-      "Internal rate of return projection with sensitivity table across market scenarios.",
-  },
 ];
 
 export default function DevelopersPage() {

@@ -154,12 +154,6 @@ export default function VerdictCard({ verdict, address }: VerdictCardProps) {
             }
           />
         </div>
-        {typeof verdict.irr_estimate === "number" && (
-          <div>
-            <div style={metricLabel}>IRR estimate</div>
-            <div style={{ ...metricValue, marginTop: "6px" }}>{verdict.irr_estimate}%</div>
-          </div>
-        )}
       </div>
 
       {/* Non-live verdicts carry the full explanatory note (Section 06, rule 4) */}

@@ -73,7 +73,6 @@ const TIERS = [
       "BSA approval rate history by submarket",
       "Community board sentiment & opposition prediction",
       "Pro forma intelligence — land costs, construction benchmarks",
-      "IRR projection with sensitivity table",
     ],
     addOn: "Permitting timeline benchmarks & absorption projections",
     href: "/for/developers",

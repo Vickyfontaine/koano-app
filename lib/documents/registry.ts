@@ -177,24 +177,8 @@ export const DOCUMENT_TYPES: Record<string, DocumentType> = {
   },
 
   // ---- Development (Cluster 4) — homeTier 'development' --------------------
-  site_comparison_report: {
-    id: 'site_comparison_report',
-    title: 'Site Comparison Report',
-    cluster: 'cluster_4',
-    homeTier: 'development',
-    scope: 'multi_site',
-    requiredBlocks: ['zoning', 'permits', 'opportunity_zone', 'flood'],
-    formats: ['pdf'],
-    sections: [
-      { id: 'cover', title: 'Cover', kind: 'deterministic' },
-      { id: 'ranking', title: 'Risk-Adjusted Ranking', kind: 'deterministic' },
-      { id: 'per_site', title: 'Per-Site Detail', kind: 'deterministic' },
-      { id: 'narrative', title: 'Recommendation', kind: 'narrative' },
-      { id: 'provenance', title: 'Sources & Provenance', kind: 'deterministic' },
-    ],
-    status: 'available',
-  },
-
+  // (site_comparison_report deleted Phase 3 — it was a forgotten duplicate of
+  // three_site_comparison_brief, same cluster/tier/scope, never built.)
   entitlement_risk_memo: {
     id: 'entitlement_risk_memo',
     title: 'Entitlement Risk Memo',
@@ -232,21 +216,8 @@ export const DOCUMENT_TYPES: Record<string, DocumentType> = {
     blockedOn: 'proformaBenchmark',
   },
 
-  zoning_far_analysis: {
-    id: 'zoning_far_analysis',
-    title: 'Zoning / FAR Analysis',
-    cluster: 'cluster_4',
-    homeTier: 'development',
-    scope: 'property',
-    requiredBlocks: ['zoning'],
-    formats: ['pdf'],
-    sections: [
-      { id: 'cover', title: 'Cover', kind: 'deterministic' },
-      { id: 'far', title: 'FAR & Buildable Area', kind: 'deterministic' },
-      { id: 'provenance', title: 'Sources & Provenance', kind: 'deterministic' },
-    ],
-    status: 'available',
-  },
+  // (zoning_far_analysis deleted Phase 3 — a redundant subset of the screening
+  // memo's As-of-Right Envelope section, same cluster/tier/scope, never built.)
 
   // The two build targets: all-live, PDF only, no financial modelling
   // (screening, not feasibility). No `proforma` block (representative).
