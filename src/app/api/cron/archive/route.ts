@@ -1,23 +1,27 @@
-// KOANO weekly archive cron (Phase 0, first slice).
-// Captures the irrecoverable public record before it changes/rolls off:
-//   - sales_archive (incremental)   - tract permits (state snapshot).
-// Scheduled by vercel.json (Mon 10:00 UTC). Guarded by CRON_SECRET: Vercel sends
-// `Authorization: Bearer $CRON_SECRET` on cron requests; manual runs must too.
+// KOANO archive cron — DAILY FAN-OUT (Phase 2).
+// Runs daily (vercel.json). Each day handles ONE shard (0=Mon..6=Sun) of the
+// tracked properties, so the per-property capture (~14s/property) never exceeds
+// the 300s function limit as the fleet grows. All seven daily runs in a week
+// write the SAME captured_week (the ISO Monday), so weekly bucketing — and the
+// monitoring diff — is unaffected. The all-NYC datasets (sales/permits/CD/HPI)
+// and the outcome scan run once per week, on shard 0 (Monday).
 //
-// Every run writes an archive_runs row (the failure ledger) so a job that
-// "runs but writes nothing" is visible in archive_coverage rather than silent.
+// A week is complete only when all 7 shards run; a missed day surfaces as a gap
+// (missedShards), never "6 of 7 passed". Guarded by CRON_SECRET.
 
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '../../../../../lib/supabase/server';
 import {
   isoWeekMonday,
+  isoDayShard,
+  propertyShard,
   captureSales,
   captureTractPermits,
   captureCdEntitlement,
   capturePropertySnapshots,
   captureHpiIfChanged,
   loadTrackedProperties,
-  priorWeekMissing,
+  missedShards,
   sendGapAlert,
 } from '../../../../../lib/archive/capture';
 import { scanVerdictOutcomes } from '../../../../../lib/archive/outcomes';
@@ -26,7 +30,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 300;
 
-const RUN_VERSION = 'archive-slice5@1';
+const RUN_VERSION = 'archive-daily@1';
 // Plausibility floors — below these, a "successful" capture almost certainly
 // means the source query silently broke (the exact failure that destroys the
 // thesis). A run under floor is marked `partial` and shows as a gap. Only the
@@ -41,17 +45,32 @@ export async function POST(req: Request) {
   }
 
   const admin = supabaseAdmin();
-  const runWeek = isoWeekMonday(new Date());
+  const now = new Date();
+  const runWeek = isoWeekMonday(now); // same ISO Monday for all 7 daily runs
+  const shard = isoDayShard(now); // 0=Mon..6=Sun — today's property shard
 
-  const { data: runRow, error: runErr } = await admin
+  // Open the run WITH the shard (needs migration-015). If that column isn't there
+  // yet, fall back to a full UNSHARDED run — so deploying the daily cron before
+  // the migration is applied can never cause a silently missed day (the one
+  // unrecoverable failure). Once 015 is applied, sharding takes over automatically.
+  let sharded = true;
+  let ins = await admin
     .from('archive_runs')
-    .insert({ run_week: runWeek, status: 'running', capture_version: RUN_VERSION })
+    .insert({ run_week: runWeek, shard, status: 'running', capture_version: RUN_VERSION })
     .select('id')
     .single();
-  if (runErr || !runRow) {
-    return NextResponse.json({ error: `could not open run: ${runErr?.message}` }, { status: 500 });
+  if (ins.error && /shard/i.test(ins.error.message)) {
+    sharded = false;
+    ins = await admin
+      .from('archive_runs')
+      .insert({ run_week: runWeek, status: 'running', capture_version: RUN_VERSION })
+      .select('id')
+      .single();
   }
-  const runId = runRow.id as string;
+  if (ins.error || !ins.data) {
+    return NextResponse.json({ error: `could not open run: ${ins.error?.message}` }, { status: 500 });
+  }
+  const runId = ins.data.id as string;
 
   // Each dataset in its own try so one failure doesn't abort the others.
   const datasets: Record<string, { written: number; error?: string; below_floor?: boolean }> = {};
@@ -66,16 +85,25 @@ export async function POST(req: Request) {
     try { record(name, await fn()); } catch (e) { datasets[name] = { written: 0, error: e instanceof Error ? e.message : String(e) }; }
   };
 
-  // All-NYC datasets (aggregate queries — cheap).
-  await run('sales', () => captureSales(admin, runWeek));
-  await run('permits', () => captureTractPermits(admin, runWeek));
-  await run('entitlement_cd', () => captureCdEntitlement(admin, runWeek));
-  // Metro HPI — capture-if-changed (0 when the quarter hasn't moved).
-  await run('hpi', () => captureHpiIfChanged(admin, runWeek));
-  // Per-tracked-property (violations / landlord / filings weekly; zoning if-changed).
+  // All-NYC datasets (aggregate queries — cheap) run ONCE per week, on shard 0
+  // (Monday). They aren't per-property, so sharding them daily would just repeat
+  // work; a missed Monday shows as a shard-0 gap. In the unsharded fallback we
+  // run them too (it's a full weekly run).
+  if (!sharded || shard === 0) {
+    await run('sales', () => captureSales(admin, runWeek));
+    await run('permits', () => captureTractPermits(admin, runWeek));
+    await run('entitlement_cd', () => captureCdEntitlement(admin, runWeek));
+    await run('hpi', () => captureHpiIfChanged(admin, runWeek));
+  }
+
+  // Per-tracked-property. Sharded: only TODAY'S shard (all 7 daily runs write the
+  // same captured_week, so a property captured on its weekday lands in this week's
+  // bucket). Unsharded fallback: all properties (safe at small N). County/comp
+  // datasets ride along (deduped).
   try {
-    const props = await loadTrackedProperties(admin);
-    const c = await capturePropertySnapshots(admin, runWeek, props);
+    const allProps = await loadTrackedProperties(admin);
+    const shardProps = sharded ? allProps.filter((p) => propertyShard(p.bbl ?? p.address) === shard) : allProps;
+    const c = await capturePropertySnapshots(admin, runWeek, shardProps);
     record('violations', c.violations);
     record('landlord', c.landlord);
     record('filings', c.filings);
@@ -90,16 +118,16 @@ export async function POST(req: Request) {
     for (const n of ['violations', 'landlord', 'filings', 'zoning', 'contamination', 'disaster_history', 'mortgage_demand', 'employment', 'comp_zip']) datasets[n] = { written: 0, error: msg };
   }
 
-  // Calibration scan (Slice 3) — DOWNSTREAM of the archive, not an archive
-  // dataset: it reads what the snapshots above just captured and records verdict
-  // outcomes. It has no floor and no coverage/gap entry, and a scan failure must
-  // NOT mark the archive run partial (the public record was still captured). We
-  // record it in the run row for observability only.
+  // Calibration scan — DOWNSTREAM of the archive, weekly (shard 0). It reads what
+  // the snapshots captured and records verdict outcomes. No floor, no coverage
+  // entry, and a scan failure must NOT mark the run partial. Observability only.
   let outcomes: { written: number; error?: string } = { written: 0 };
-  try {
-    outcomes = { written: await scanVerdictOutcomes(admin, runWeek) };
-  } catch (e) {
-    outcomes = { written: 0, error: e instanceof Error ? e.message : String(e) };
+  if (!sharded || shard === 0) {
+    try {
+      outcomes = { written: await scanVerdictOutcomes(admin, runWeek) };
+    } catch (e) {
+      outcomes = { written: 0, error: e instanceof Error ? e.message : String(e) };
+    }
   }
 
   const anyError = Object.values(datasets).some((d) => d.error);
@@ -115,20 +143,21 @@ export async function POST(req: Request) {
     .update({ finished_at: new Date().toISOString(), status, datasets: datasetsWithOutcomes, rows_written: total })
     .eq('id', runId);
 
-  // Alert on THIS run failing to fully capture, and on a MISSED prior week.
+  // Alert on THIS run failing to fully capture, and on MISSED shard-days. Shard
+  // gap detection only runs once the daily model is established (migration-015).
   if (status === 'partial') {
     await sendGapAlert(
-      `KOANO archive run ${runWeek} was PARTIAL`,
-      `Datasets: ${JSON.stringify(datasets)}. A capture failed or fell below its plausibility floor — history may be incomplete for this week.`,
+      `KOANO archive run ${runWeek}${sharded ? ` shard ${shard}` : ''} was PARTIAL`,
+      `Datasets: ${JSON.stringify(datasets)}. A capture failed or fell below its plausibility floor — history may be incomplete.`,
     );
   }
-  const missing = await priorWeekMissing(admin, runWeek);
-  if (missing) {
+  const gaps = sharded ? await missedShards(admin, runWeek, shard) : [];
+  for (const gap of gaps) {
     await sendGapAlert(
-      `KOANO archive GAP: week ${missing} was never captured`,
-      `No successful archive run exists for ISO week ${missing}. That week of the public record is permanently missing unless re-captured while the source still holds it.`,
+      `KOANO archive GAP: ${gap.slice(0, 80)}`,
+      `${gap}. That slice of the public record is permanently missing unless re-captured while the source still holds it — re-trigger the cron for the missing shard.`,
     );
   }
 
-  return NextResponse.json({ run_week: runWeek, status, datasets, outcomes, rows_written: total, prior_week_gap: missing });
+  return NextResponse.json({ run_week: runWeek, shard, sharded, status, datasets, outcomes, rows_written: total, shard_gaps: gaps });
 }

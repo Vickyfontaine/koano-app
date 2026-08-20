@@ -35,6 +35,21 @@ function weekIndex(runWeek: string): number {
   return Math.floor(Date.parse(`${runWeek}T00:00:00Z`) / (7 * 86_400_000));
 }
 
+// DAILY FAN-OUT (Phase 2): the cron runs daily; each day handles one shard
+// (0 = Monday … 6 = Sunday) of the tracked properties. All seven daily runs in a
+// week write the SAME captured_week (the ISO Monday), so weekly bucketing — and
+// therefore the monitoring diff — is unaffected. A week is complete only when all
+// 7 shards have run; a missed day is a gap, not "6 of 7 passed".
+export function isoDayShard(d: Date): number {
+  return (d.getUTCDay() + 6) % 7; // JS 0=Sun..6=Sat → ISO 0=Mon..6=Sun
+}
+
+// Stable shard (0–6) for a property, from its BBL/address. Deterministic so a
+// property is always handled on the same weekday.
+export function propertyShard(key: string): number {
+  return parseInt(createHash('sha1').update(key).digest('hex').slice(0, 8), 16) % 7;
+}
+
 // EPA FRS enforces ~12 requests/minute and getContamination makes 2 requests
 // (SEMS + ACRES). We therefore (a) only re-check a rotating WINDOW of properties
 // each week — contamination changes slowly, so a ~monthly rotation loses nothing
@@ -249,26 +264,83 @@ export async function captureTractPermits(admin: SupabaseClient, runWeek: string
 }
 
 // ---------------------------------------------------------------------------
-// Missed-run detection — a silently broken job is the failure that destroys the
-// thesis, so each run checks that the PRIOR week captured successfully.
+// Missed-run detection (DAILY FAN-OUT). A silently broken job is the failure that
+// destroys the thesis. With the daily model a "run" is a (week, shard) slot, and
+// a week is complete only when all 7 shards ran. Each day checks:
+//   (1) the immediately-prior expected slot (yesterday) ran, and
+//   (2) on Monday, that the WHOLE prior week's 7 shards ran — so a missed day
+//       surfaces as a gap rather than passing because 6 of 7 succeeded.
+// Genesis-guarded to the first SHARDED run, so pre-daily weekly runs (shard null)
+// are never falsely flagged and a spurious day-one alert can't happen.
 // ---------------------------------------------------------------------------
-export async function priorWeekMissing(admin: SupabaseClient, runWeek: string): Promise<string | null> {
-  const prior = isoWeekMonday(new Date(new Date(runWeek).getTime() - 7 * 86_400_000));
-  const captured = await admin.from('archive_runs').select('id').eq('run_week', prior).eq('status', 'succeeded').limit(1);
-  if (captured.data && captured.data.length > 0) return null; // prior week was captured
+export function priorMonday(runWeek: string): string {
+  return isoWeekMonday(new Date(new Date(runWeek).getTime() - 7 * 86_400_000));
+}
 
-  // GENESIS GUARD: a missing prior week is only a real gap if we were ALREADY
-  // archiving before it (a succeeded run earlier than `prior` exists). On first
-  // setup, weeks before the first-ever run had nothing to capture — do NOT alert,
-  // or a spurious gap email on day one teaches the operator to ignore the one
-  // mechanism protecting the asset.
-  const earlier = await admin
+// PURE gap logic (unit-tested without a DB). `ran(week, shard)` is a predicate;
+// `genesis` is the first sharded run (or null if the daily model isn't
+// established yet). Genesis-guarded so pre-daily weeks and the first day are
+// never falsely flagged — the daily analog of the first-run-silent guarantee.
+export function computeShardGaps(
+  runWeek: string,
+  todayShard: number,
+  genesis: { week: string; shard: number } | null,
+  ran: (week: string, shard: number) => boolean,
+): string[] {
+  if (!genesis) return [];
+  const afterGenesis = (week: string, shard: number) =>
+    week > genesis.week || (week === genesis.week && shard >= genesis.shard);
+  const gaps: string[] = [];
+
+  // (1) Yesterday's expected slot ran?
+  let pWeek = runWeek;
+  let pShard = todayShard - 1;
+  if (pShard < 0) { pShard = 6; pWeek = priorMonday(runWeek); }
+  if (afterGenesis(pWeek, pShard) && !ran(pWeek, pShard)) {
+    gaps.push(`shard ${pShard} of week ${pWeek} did not run — a day of the public record is uncaptured`);
+  }
+
+  // (2) On Monday, the prior week must be fully complete (all 7 shards) — so a
+  //     missed day surfaces here rather than "6 of 7 passed".
+  if (todayShard === 0) {
+    const prior = priorMonday(runWeek);
+    const missing: number[] = [];
+    for (let s = 0; s <= 6; s++) {
+      if (afterGenesis(prior, s) && !ran(prior, s)) missing.push(s);
+    }
+    if (missing.length > 0) {
+      gaps.push(`week ${prior} is INCOMPLETE — shard(s) ${missing.join(', ')} never ran (${missing.length}/7 days missing); those properties have no snapshot for that week`);
+    }
+  }
+  return gaps;
+}
+
+export async function missedShards(admin: SupabaseClient, runWeek: string, todayShard: number): Promise<string[]> {
+  // Genesis = the earliest succeeded/partial run that CARRIES a shard. If none,
+  // the daily model isn't established yet — nothing can be "missed".
+  const g = await admin
     .from('archive_runs')
-    .select('run_week')
-    .eq('status', 'succeeded')
-    .lt('run_week', prior)
-    .limit(1);
-  return earlier.data && earlier.data.length > 0 ? prior : null;
+    .select('run_week, shard')
+    .in('status', ['succeeded', 'partial'])
+    .not('shard', 'is', null)
+    .order('run_week', { ascending: true })
+    .order('shard', { ascending: true })
+    .limit(1)
+    .maybeSingle();
+  const genesis = g.data ? { week: g.data.run_week as string, shard: (g.data.shard as number) ?? 0 } : null;
+
+  // Ran-set for the only weeks the check touches: current + prior.
+  const prior = priorMonday(runWeek);
+  const rows = await admin
+    .from('archive_runs')
+    .select('run_week, shard')
+    .in('status', ['succeeded', 'partial'])
+    .in('run_week', [runWeek, prior])
+    .not('shard', 'is', null);
+  const ranSet = new Set((rows.data ?? []).map((r) => `${r.run_week}|${r.shard}`));
+  const ran = (week: string, shard: number) => ranSet.has(`${week}|${shard}`);
+
+  return computeShardGaps(runWeek, todayShard, genesis, ran);
 }
 
 // Best-effort email on a missed run. Uses Resend's HTTP API (no SDK) when
@@ -465,10 +537,13 @@ export async function capturePropertySnapshots(admin: SupabaseClient, runWeek: s
   }
 
   // CONTAMINATION (EPA) — rotating window + spacing so a growing fleet stays
-  // under the FRS 12 req/min limit. Deterministic order (by BBL) so the window
-  // advances predictably; every property is re-checked within ceil(N/MAX) weeks.
-  // Contamination changes slowly, so the coarser cadence loses nothing; the
-  // monitoring diff always compares against the most recent prior snapshot.
+  // under the FRS 12 req/min limit. Under the daily fan-out `props` is ONE day's
+  // shard (~N/7 properties), so the per-run window (≤6) covers the whole shard
+  // once the fleet is under ~42; beyond that it rotates within the shard by
+  // weekIndex. Deterministic order (by BBL) so it advances predictably; EPA load
+  // is now spread across all 7 daily runs. Contamination changes slowly, so the
+  // coarser cadence loses nothing; the monitoring diff always compares against
+  // the most recent prior snapshot.
   const ordered = resolved.slice().sort((a, b) => a.bbl.localeCompare(b.bbl));
   const N = ordered.length;
   if (N > 0) {
