@@ -233,6 +233,12 @@ export function detectComp(baseline: CompData | null, current: CompData): RawCha
 // only literal values off the RawChange. Words like "immediately hazardous" are
 // STANDARD DEFINITIONS of a coded field (HPD Class C), not interpretation.
 
+// Thousands separators on displayed numbers ($1,085 not $1085) — every other
+// KOANO surface does this. Formats a verbatim value; does not alter it.
+function fmtNum(v: string | number | boolean | null): string {
+  return typeof v === 'number' && Number.isFinite(v) ? v.toLocaleString('en-US') : String(v);
+}
+
 function violationNewBody(f: Record<string, string | number | boolean>): string {
   const parts: string[] = [];
   if ('class_c_before' in f) parts.push(`Class C (immediately hazardous): ${f.class_c_before} → ${f.class_c_after}`);
@@ -291,7 +297,7 @@ const TEMPLATES: Record<SignalType, (r: RawChange) => { title: string; body: str
   }),
   comp_price: (r) => ({
     title: 'Comp price movement in this ZIP',
-    body: `Median recorded $/sq ft in this ZIP: $${r.before} → $${r.after} (${r.facts.pct_change}%), over ${r.facts.sales_count} recorded sales.`,
+    body: `Median recorded $/sq ft in this ZIP: $${fmtNum(r.before)} → $${fmtNum(r.after)} (${r.facts.pct_change}%), over ${fmtNum(r.facts.sales_count)} recorded sales.`,
   }),
 };
 

@@ -127,7 +127,8 @@ for (const s of samples) {
 
 // (d) Every dynamic value shown is a literal from the RawChange (before/after/facts).
 for (const s of samples) {
-  const body = renderNotification(s).body;
+  // Strip thousands separators — a formatted "$1,085" still shows the literal 1085.
+  const body = renderNotification(s).body.replace(/,/g, '');
   const vals = [s.before, s.after, ...Object.values(s.facts)].filter((v) => v !== '' && v !== null && v !== false && v !== -1).map(String);
   ok(vals.every((v) => body.includes(v)), `${s.signal_type}: body shows only literal RawChange values`);
 }
