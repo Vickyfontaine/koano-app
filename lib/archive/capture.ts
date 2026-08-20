@@ -272,11 +272,14 @@ export async function priorWeekMissing(admin: SupabaseClient, runWeek: string): 
 }
 
 // Best-effort email on a missed run. Uses Resend's HTTP API (no SDK) when
-// configured; otherwise logs LOUDLY so the gap is at least in the logs. Requires
-// RESEND_API_KEY + ARCHIVE_ALERT_FROM + ARCHIVE_ALERT_TO.
+// configured; otherwise logs LOUDLY so the gap is at least in the logs.
+// Sender reuses the verified MONITORING_EMAIL_FROM (falls back to the legacy
+// ARCHIVE_ALERT_FROM); recipient is ARCHIVE_ALERT_TO (the operator's inbox).
+// This is an OPS alert to the operator — distinct from the user-facing
+// monitoring digest, which sends per-user in Phase 2 Slice 5.
 export async function sendGapAlert(subject: string, body: string): Promise<void> {
   const key = process.env.RESEND_API_KEY;
-  const from = process.env.ARCHIVE_ALERT_FROM;
+  const from = process.env.MONITORING_EMAIL_FROM ?? process.env.ARCHIVE_ALERT_FROM;
   const to = process.env.ARCHIVE_ALERT_TO;
   if (!key || !from || !to) {
     console.error(`[archive] GAP ALERT (email not configured): ${subject} — ${body}`);
