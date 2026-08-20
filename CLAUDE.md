@@ -1,5 +1,5 @@
 # KOANO — Master Build Context
-## Version 5.0 | Confidential & Proprietary | 2026
+## Version 5.1 | Confidential & Proprietary | 2026
 
 > This file is the single source of truth for every build session, human or AI.
 > Read it completely before writing a single line of code.
@@ -77,24 +77,25 @@ Build one vertical path through the entire stack (data provider to agent to synt
 
 ## 03 — Current Build State (Honest Inventory)
 
+This inventory is kept current. As of this writing the backend spine, all four dashboards, the archive/calibration layer, and the "every verdict live" work (Phase 1) are all built and verified.
+
 **Built and working:**
 - Marketing site: homepage (all sections), and the pages /for/community, /for/agents, /for/developers, /for/institutions, /intelligence, /pricing, /about, /early-access, /data.
 - Design system: Neue Montreal typography, full color palette as CSS variables, Button and SectionNumber components, Nav, Footer.
-- Neural map: /public/neural-map.html. 143 nodes, D3 v7 force layout combined with Three.js r128 rendering. White background, KOANO blue synthesis hub, magenta agents, blue data sources, sage sub-feeds, curved tube connections, auto-rotate, hover and click interaction. Functionally and cosmetically complete.
+- Neural map: /public/neural-map.html. 143 nodes, D3 v7 + Three.js r128. Functionally and cosmetically complete.
+- **Backend spine (Phase A):** provider registry (`/lib/providers`), all five specialist agents + synthesis (`/lib/agents`), Clerk-protected verdict routes (`/api/agents`, `/api/agents/stream`), Supabase schema with RLS, append-only immutable `verdicts` table.
+- **All four cluster dashboards (Phase B):** Cluster 1 (Community), 2 (Transaction), 4 (Development), 5 (Portfolio) — each on the shared verdict engine, with `ProvenanceBadge` throughout. Shared site-detail block layer (`/lib/providers/blocks.ts`) feeds both dashboards and the document engine.
+- **Document engine:** declarative registry + builders for tax-appeal, site-screening, 3-site comparison, the Community set, CMA, IC memo, Monday briefing, and more. Every page carries the mandatory disclaimer (regression-tested).
+- **Auth + spend control:** Clerk login/signup/onboarding; `lib/koano-guard.ts` (approval gate + per-user rolling limits + global breaker). Stripe Checkout + webhook wired (held pending launch).
+- **Archive & Calibration layer (Phase 0):** weekly Vercel-cron snapshotting of the free public record + a verdict-outcome scanner. See Section 07A.
+- **Live verdicts (Phase 1):** the two agents that consumed mock data (Risk-Volatility, Demand-Sentiment) were re-based onto live federal sources. A NYC address now rolls up `overall_provenance: live`. See Sections 05 and 07.
 
-**Not built (this is the work ahead):**
-- The entire backend. No agents, no synthesis, no provider layer, no API routes exist yet.
-- The Supabase schema (tables not yet created).
-- All four cluster dashboards. None exist.
-- Auth flows (login, signup, onboarding).
-- Stripe billing.
-- Live wiring between frontend and any verdict engine.
+**Not built / deferred:**
+- Paid-source integrations still mocked: pro-forma benchmarks (CoStar-tier) and commercial deals — the only representative providers remaining. Comps are live for NYC (DOF recorded sales); MLS-grade comps outside NYC remain the paid gap.
+- Stripe billing UI (backend wired), PostHog, SOC 2, enterprise SSO.
+- HMDA tract-level (county-level is live; tract is a planned ingestion fast-follow).
 
-**Configured and ready:**
-- Supabase project created; URL and keys in .env.local.
-- Anthropic API key in .env.local.
-- Clerk publishable and secret keys in .env.local.
-- Stripe and Mapbox keys are placeholders, to be added when those features are built.
+**Configured and ready:** Supabase, Anthropic, Clerk keys in .env.local. `CRON_SECRET` set (archive cron). `NYC_OPEN_DATA_APP_TOKEN` set. Free optional tokens (`NOAA_CDO_TOKEN`, `HUD_USER_TOKEN`) add signal but do not gate liveness. Stripe/Mapbox keys are placeholders. See Section 18.
 
 **Note on Community (Cluster 1) and the former Cluster 0:** the former nonprofit tier (previously "Cluster 0") remains removed from KOANO's product scope, and no Cluster 0 functionality may be built. The standalone /community page has been deleted and 308-redirects to /for/community — Cluster 1, now named Community (audience: homeowners, renters, neighbors), which states plainly what it reads today and what is not built yet. Never describe partnerships that do not exist.
 
@@ -125,6 +126,8 @@ Two different models, two different purposes. Do not confuse them.
 
 Runtime agent calls must always use prompt caching for the system prompt and any static schema or context, so repeated calls only pay for the unique query.
 
+**Runtime model constant (authoritative):** `KOANO_RUNTIME_MODEL = 'claude-sonnet-4-6'` in `lib/agents/shared.ts`. This is an approved deviation: the earlier `claude-sonnet-4-20250514` reached end-of-life 2026-06-15. All five agents + synthesis + narrative/briefing generation call this constant. Specialist agents run at temperature 0 (reproducible verdicts on identical data); code turns the model's coarse bands into figures (never asks it for a precise confidence number).
+
 ---
 
 ## 05 — Provider Interface Architecture (The Spine)
@@ -133,27 +136,27 @@ This is the most important engineering decision in KOANO. Get it right once and 
 
 ### Structure
 
+Current registry (Phase 1). Every NYC provider degrades a null BBL (a non-NYC address) to a labeled representative/coverage result, never a live zero. `blocks.ts` is the shared block layer both site-detail and the document engine consume — one data path, never two.
+
 ```
 /lib/providers/
   types.ts        ← all provider interfaces + the wrapped-result type
   registry.ts     ← single config mapping each interface to its active impl
+  blocks.ts       ← shared "fetch these named facts" layer (dashboards + documents)
   real/
-    nyc-permits.ts        (live)
-    nyc-zoning.ts         (live)
-    irs-opportunity.ts    (live)
-    census-acs.ts         (live)
-    fhfa-hpi.ts           (live)
-    fema-flood.ts         (live)
-    fbi-ucr.ts            (live)
-    google-trends.ts      (live)
-    first-street-free.ts  (live, free tier)
+    geocode.ts            (live) — NYC GeoSearch + US Census onelineaddress fallback (national)
+    nyc-permits.ts, nyc-zoning.ts, nyc-violations.ts, nyc-landlord.ts,
+    nyc-dob-filings.ts, nyc-assemblage.ts, nyc-sales.ts   (live, NYC)
+    irs-opportunity.ts, census-acs.ts, fhfa-hpi.ts, fema-flood.ts, fbi-ucr.ts (live)
+    epa-superfund.ts, usgs-seismic.ts, openfema-disasters.ts, noaa-climate.ts   (live, national — Phase 1 hazard)
+    cfpb-hmda.ts, bls-qcew.ts, irs-migration.ts   (live, national — Phase 1 demand; IRS self-hosted)
+    hud-fmr.ts, freddie-pmms.ts   (live, national — Phase 1 market supplements)
   mock/
-    proforma-benchmark.ts (representative)
-    mls-comps.ts          (representative)
-    placer-traffic.ts     (representative)
-    premium-hazard.ts     (representative)
-    costar-deals.ts       (representative)
+    proforma-benchmark.ts (representative → CoStar-tier)
+    costar-deals.ts       (representative → CoStar/RCA)
 ```
+
+RETIRED mocks (deleted, git-preserved): `mls-comps.ts` (→ live nyc-sales), `premium-hazard.ts` (→ live EPA/USGS/FEMA/NOAA), `placer-traffic.ts` (foot traffic, → live HMDA/QCEW), and `google-trends.ts` (search interest, → live HMDA/QCEW). Only pro-forma benchmarks and commercial deals remain representative.
 
 ### The wrapped result type
 
@@ -189,6 +192,10 @@ export const providers = {
 
 If a live provider call fails at runtime, it must fall back to a clearly-labeled `representative` response, never a silent fabrication and never an unlabeled value. A failed live call that pretends to be live is a Principle 2 violation.
 
+**The omission rule (Phase 1, load-bearing).** Distinguish a *runtime failure* from a *missing free credential / unseeded store*. A runtime failure of a call that was attempted → labeled `representative` (above). But when a provider CANNOT even attempt a live call because an optional free token is unset (NOAA_CDO_TOKEN, HUD_USER_TOKEN) or a self-hosted table is unseeded (IRS migration), it returns `data: null` tagged `live`, and the agent emits only a coverage note — it never fabricates a representative value. Omission is more honest than a plausible stand-in, and it means an unset optional token never drags a verdict to `representative`. This is what lets a NYC verdict roll up fully live on the always-available keyless sources, with optional tokens adding signal on top.
+
+**Non-NYC / null-BBL guard.** The geocoder resolves any US address (NYC GeoSearch, else US Census onelineaddress), but NYC GeoSearch fuzzy-matches non-NYC inputs to the nearest NYC lot at full confidence — so a NYC match is accepted only when the national geocoder agrees on location within 2 km; otherwise bbl/bin/borough are set EXPLICITLY null. Every NYC-specific provider must treat a null BBL as out-of-coverage (labeled representative), never query a NYC dataset with an empty key and return a live zero that reads as "no violations / no sales". This failure class has bitten the project before; it is now closed and must stay closed.
+
 ---
 
 ## 06 — Provenance System (The Integrity Layer)
@@ -219,15 +226,19 @@ Sophisticated buyers (developers, REIT analysts, brokers) will test exactly the 
 
 Each agent is a module in /lib/agents/. Each depends only on provider interfaces from the registry, never on a data source directly. Each returns output strictly matching the Verdict schema (Section 09), with per-datapoint provenance, and a reasoning chain that cites its providers. Each runtime call uses the cost-effective runtime model with prompt caching.
 
-### Agent data reality (what is live vs representative today)
+### Agent data reality (post-Phase 1 — every verdict rolls up LIVE for a NYC address)
 
-| Agent | File | Live free sources (today) | Representative until funded |
-|---|---|---|---|
-| Market Timing | market-timing.ts | FHFA House Price Index, Redfin Data Center, Census ACS | MLS comps, paid AVM |
-| Infrastructure Pipeline | infrastructure.ts | NYC DOB permits (NYC Open Data), DOT project data | National permit aggregation (Shovels.ai) |
-| Demand Sentiment | demand-sentiment.ts | Google Trends, Census demographics | Foot traffic (Placer.ai), SafeGraph |
-| Risk & Volatility | risk-volatility.ts | FBI UCR crime, FEMA flood, First Street free tier | Premium hazard (Verisk, CoreLogic) |
-| Regulatory & Policy | regulatory-policy.ts | NYC zoning/PLUTO, IRS Opportunity Zones, SEC EDGAR | Community board sentiment (paid/manual) |
+Phase 1 re-based the two mock-consuming agents onto live federal data. A NYC address now produces a verdict with `overall_provenance: live` (verified end-to-end). NONE of the five agents consumes a representative provider anymore. (The remaining mocks — pro-forma benchmarks, commercial deals — feed documents/dashboards, never the verdict pipeline.)
+
+| Agent | File | Live sources (now) |
+|---|---|---|
+| Market Timing | market-timing.ts | FHFA HPI, Census ACS, NYC DOF recorded-sales comps, **Freddie Mac PMMS mortgage rate**, **HUD Fair Market Rents** (token) |
+| Infrastructure Pipeline | infrastructure.ts | NYC DOB permits (NYC Open Data) |
+| Demand Sentiment | demand-sentiment.ts | Census ACS, **CFPB HMDA** (mortgage lending), **BLS QCEW** (employment/wages), **IRS SOI migration** (self-hosted) |
+| Risk & Volatility | risk-volatility.ts | FBI UCR / NYPD crime, FEMA NFHL flood, HPD/ECB/DOB violations, **EPA Superfund/brownfield proximity**, **USGS seismic**, **OpenFEMA disaster history**, **NOAA climate normals** (token) |
+| Regulatory & Policy | regulatory-policy.ts | NYC zoning/PLUTO, IRS Opportunity Zones, HPD landlord registrations |
+
+Notes: EPA contamination proximity replaced a coded-field guess and closed a real hallucination defect (the agent now cites actual nearby Superfund sites). OpenFEMA disaster history COMPLEMENTS the NFHL flood zone (historical multi-peril frequency vs current regulatory zone) — it must not be described as duplicating it. Mortgage rate is pulled DIRECT from Freddie Mac's PMMS CSV (attribution-only), never via FRED — FRED classifies the PMMS series as copyright-restricted for commercial redistribution (a First-Street-class trap). Foot-traffic (Placer) and search-interest (Google Trends) were retired: they are not free at any usable grain, and mortgage lending + employment + migration are strictly better housing-demand signals.
 
 ### The synthesis agent
 
@@ -241,9 +252,31 @@ Responsibilities:
 
 Agents run in parallel via Promise.all. Synthesis runs on their collected outputs.
 
-### Geographic scope at this stage
+### Geographic scope
 
-Live data is deepest for New York City, because NYC publishes permits, zoning (PLUTO), and violations as free open data. Build and demo against real NYC addresses. Addresses outside NYC fall back to representative data for the NYC-specific sources, clearly labeled. Long Island City, Bushwick, and similar actively-developing areas make the strongest live demos.
+Live data is deepest for New York City (free permits, PLUTO zoning, violations). Build and demo against real NYC addresses — Long Island City, Bushwick, Gowanus make the strongest live demos. A NYC address rolls up fully live.
+
+The geocoder now resolves ANY US address (Census fallback), so the national agents (Risk-Volatility, Demand-Sentiment) and the national macro sources (HPI, demographics, flood, OZ, hazard, lending, employment) run genuinely live anywhere. But a non-NYC address still rolls up `representative` OVERALL, because comparable sales (NYC DOF-only; national MLS is the paid gap) and the NYC-municipal layer (permits, zoning, violations, landlord, entitlement) fall back to representative outside NYC. That is the honest, correct result — Phase 1 made non-NYC hazard + demand + macro live, not the comps/municipal layer, which have no free national equivalent.
+
+---
+
+## 07A — Archive & Calibration Layer (Phase 0)
+
+The single highest-strategic-value subsystem. Premise: NYC Open Data gives current state, not history — nobody stores the time series. If KOANO snapshots the free public record weekly, it accrues a longitudinal dataset no competitor can retroactively acquire (an acquisition asset). Separately, recording verdict outcomes from now enables calibration/backtest later.
+
+**LOCKED, irreversible decisions (never change):** weekly cadence; grain = all-NYC tracts + community districts + per-tracked-property (+ county for national datasets); generous JSONB payloads (capture fields NOW — past rows can't gain them); **live-only provenance (never archive representative/mock data)**; unique key `(dataset, scope_type, scope_key, captured_week)`; monthly RANGE partitioning on `captured_week`; tract `scope_key = 'BOROUGH:dob_census_tract'` (lossless — DOB strips GEOID tract codes irreversibly, so a GEOID crosswalk is deferred); `capture_version` on every row (like `verdicts.method`).
+
+**Schema (`supabase/` migrations 008–013, run by the user):**
+- `archive_snapshots` — partitioned monthly, state snapshots. Datasets: permits (tract), entitlement_cd (community district), violations/landlord/filings/zoning/contamination (per-property), disaster_history/mortgage_demand/employment (county), hpi (metro).
+- `sales_archive` — incremental accumulation, dedup by `natural_key` (DOF Rolling Sales rolls off ~13 months, so this must accumulate).
+- `archive_runs` — the failure ledger; every run writes a row so a job that "runs but writes nothing" is visible, not silent.
+- `archive_coverage` — a VIEW making gaps queryable: for every ISO week × dataset, `rows_present` (counted from the real tables — NOT a run's self-report, so a double-run can't masquerade as healthy) and `is_gap`. The displayed number IS the integrity check.
+- `verdict_outcomes` — the calibration table. Records only PUBLICLY-OBSERVABLE outcomes (sale, violation_resolution, ownership_change, permit_disposition) with a directional +1/0/−1 marker. Realized return/IRR/rents/occupancy are private — never recorded or modeled. Metric = directional public-signal calibration by confidence bucket, not accuracy vs unseen ground truth.
+- `irs_migration` — self-hosted county migration (no IRS API; ingested once from bulk CSVs via `scripts/ingest-irs-migration.ts`).
+
+**Mechanics:** `/api/cron/archive` (guarded by `CRON_SECRET`; Vercel sends `Authorization: Bearer $CRON_SECRET`), scheduled Mon 10:00 UTC in `vercel.json`. `/api/archive/health` reads the coverage view + last run. Capture logic in `lib/archive/capture.ts`; the weekly outcome scanner in `lib/archive/outcomes.ts`. Append-only by CONVENTION (upsert `ignoreDuplicates`; no delete trigger, unlike `verdicts`, so partition maintenance + the self-test harness can run). Non-weekly datasets (hpi, zoning, disaster/HMDA/QCEW) are **capture-if-changed** (content-hash dedupe) — a no-change week is not a gap, so they are deliberately excluded from the weekly coverage view. Socrata `$group` aggregates snapshot all NYC tracts/CDs in ~5 requests, not thousands of calls.
+
+**Integrity harness:** `npm run test:archive` verifies a snapshot round-trips AND that `archive_coverage` reports a synthetic gap — the failure mode that destroys the thesis is a job that appears to run and writes nothing. The missed-run alert (email via Resend if configured, else loud console.error) is suppressed for weeks before the first-ever successful run (a spurious first-setup alert would teach the operator to ignore the one mechanism protecting the asset).
 
 ---
 
@@ -446,21 +479,28 @@ Glassmorphism only renders over a textured/image/video/3D background. On flat wh
     /portfolio/page.tsx         ← Cluster 5
     /reasoning/[id]/page.tsx    ← full reasoning chain view
   /api
-    /agents/route.ts            ← Clerk-protected verdict endpoint
+    /agents/route.ts            ← Clerk-protected verdict endpoint (+ /agents/stream NDJSON)
+    /site-detail/route.ts       ← raw provider blocks (no LLM) for dashboards + documents
+    /documents/route.ts         ← document generation (gated by IMPLEMENTED_DOC_TYPES)
+    /narrative, /briefing, /properties, /verdicts, /profile, /stripe/*
+    /cron/archive/route.ts      ← weekly snapshot cron (CRON_SECRET); /archive/health
 
 /components
   /ui        (Button, SectionNumber, VerdictCard, ReasoningChain, ProvenanceBadge, GlassCard)
   /marketing (Nav, Footer, HeroSection, ClustersSection, AgentsSection, ...)
-  /dashboard (Sidebar, ClusterBadge, SiteComparison, PortfolioView, ...)
+  /dashboard (cluster1..5/, clusters.ts metadata, panels.tsx, DashboardShell, Sidebar)
 
 /lib
-  /providers (types.ts, registry.ts, real/, mock/)
-  /agents    (market-timing, infrastructure, demand-sentiment, risk-volatility, regulatory-policy, synthesis)
-  /supabase  (client.ts, server.ts)
-  /stripe    (checkout.ts)      ← deferred
+  /providers (types.ts, registry.ts, blocks.ts, real/, mock/)
+  /agents    (5 specialists + synthesis, shared.ts, grounding.ts, narrative.ts, briefing.ts)
+  /archive   (capture.ts, outcomes.ts)   ← Phase 0
+  /documents (registry.ts, types.ts, implemented.ts, builders/, render/, disclaimer.ts)
+  /supabase  (client.ts, server.ts, verdicts.ts)
+  koano-guard.ts   ← approval gate + spend limits + global breaker
+  /stripe    (client.ts)        ← backend wired, UI deferred
 
 /supabase
-  schema.sql
+  schema.sql + migration-002 … migration-013 (run by the user, in order)
 
 /styles
   globals.css
@@ -521,13 +561,13 @@ Copy placeholders (render as italic `--ink-faint` inside a `--pale-wash` dashed-
 
 ## 14 — Data Sources
 
-### Live free sources (real, in use today)
-Census ACS, BLS, FHFA House Price Index, Redfin Data Center, Freddie Mac, FBI UCR, FEMA / OpenFEMA, NOAA, EPA, IRS Opportunity Zones, HUD USER, SEC EDGAR, First Street (free tier), Google Trends, OpenStreetMap, NYC Open Data (DOB permits, PLUTO zoning, violations, 311), LA GeoHub, Chicago Data Portal, Municipode.
+### Live free sources (real, wired and verified)
+NYC Open Data (DOB permits, PLUTO zoning, HPD/ECB/DOB violations, DOF recorded sales, DOB job filings, HPD landlord registrations, NYPD complaints); US Census ACS (keyless via Census Reporter — see the UA gotcha below) + Census geocoder; FHFA House Price Index; FBI UCR / Crime Data Explorer; FEMA NFHL flood + **OpenFEMA disaster declarations**; **EPA Facility Registry Service (SEMS Superfund + ACRES brownfields)**; **USGS Earthquake Hazards (ASCE 7-22 building-codes + ComCat)**; **NOAA NCEI climate normals** (free token); IRS Opportunity Zones + **IRS SOI county migration** (self-hosted); **CFPB HMDA** (mortgage lending); **BLS QCEW** (employment/wages); **HUD Fair Market Rents** (free token); **Freddie Mac PMMS** (mortgage rate, direct CSV).
 
-### Paid sources (mocked as `representative` until funded)
-ATTOM, Shovels.ai (national permit aggregation), Placer.ai, SafeGraph, CoStar / LoopNet, Reonomy, HouseCanary, CoreLogic, MLS via Trestle, MSCI Real Capital Analytics, Verisk, premium hazard feeds, Walk Score (paid tier), AirDNA.
+Operational gotchas (durable): (1) **Census Reporter** now 403s generic user agents — the keyless ACS call MUST send a project-specific `User-Agent` header, else demographics silently falls to representative and drags every verdict. (2) **EPA FRS enforces 12 requests/minute** — a single verdict (2 calls) is fine; the archive's per-property contamination capture needs throttling if tracked-property count grows past ~6. Its provider uses `retries:0` (retrying a per-minute limit only storms). (3) **NYC GeoSearch fuzzy-matches** non-NYC addresses to NYC lots at full confidence — the 2 km cross-check against the Census geocoder is what rejects them.
 
-Each paid source has a corresponding mock provider with a `swap_note` documenting the exact one-line change that turns it live once funded.
+### Paid sources still mocked as `representative`
+Pro-forma benchmarks (CoStar-tier) and commercial deals (CoStar/RCA) — the only two representative providers left, and they feed documents/dashboards, never the verdict. National MLS comps (Trestle) remain the paid gap for non-NYC comps. Each mock carries a `swap_note` with the one-line registry change to go live. (Placer.ai foot traffic, Verisk/CoreLogic premium hazard, and Google Trends were NOT swapped — they were replaced by better free federal signals and their mocks deleted.)
 
 ### NYC-first rationale
 NYC publishes permits, zoning, and violations as free open data, so the Infrastructure and Regulatory agents can run genuinely live for NYC addresses today. This is the single most credible live demo available on a zero budget: deep on one city rather than shallow everywhere.
@@ -536,21 +576,18 @@ NYC publishes permits, zoning, and violations as free open data, so the Infrastr
 
 ## 15 — Build Sequence
 
-Reflects what is done and the order for what remains. Each step is verified before the next (Principle 3).
+Each step verified before the next (Principle 3).
 
-**Done:** Design system, marketing site, neural map.
+**Done:** Design system, marketing site, neural map. **Phase A** (backend spine: providers, 5 agents + synthesis, verdict routes, schema/RLS). **Phase B/C** (all four cluster dashboards + document engine). **Phase D** (Clerk auth/onboarding; spend guard). **Phase 0** (archive & calibration layer — Section 07A). **Phase 1** (every verdict live — the two mock-consuming agents re-based onto federal data; national geocoder; Superfund gap closed; Census UA fix). Paywall Phases 1–3 (tier gate + Stripe backend) wired.
 
-**Phase A — Backend spine (current focus).** Provider architecture (types, registry). Real NYC providers (permits, zoning, Opportunity Zones) plus Census/FHFA/FEMA/FBI/Trends. Mock providers for paid sources with swap notes. Build all five agents one at a time, testing each: Regulatory & Policy (live), Infrastructure (live), then Demand, Risk, Market Timing (mixed live/representative). Synthesis across all five. Clerk-protected /api/agents route. Supabase schema with RLS. Verify: a real NYC address returns a valid, provenance-tagged verdict, with live agents genuinely live.
+**Remaining / deferred:**
+- HMDA tract-level ingestion (county is live; tract is the immediate fast-follow).
+- Snapshot the national providers into the archive — DONE (Slice 5); user runs migration-013.
+- Stripe billing UI; PostHog; SOC 2; enterprise SSO for Cluster 5.
+- Paid-source swaps (pro-forma benchmarks, commercial deals, national MLS comps) — one-line registry changes when funded.
+- Marketing visual pass + 3D render drop-in; embed neural map into /intelligence.
 
-**Phase B — Cluster 4 dashboard (deepest slice).** Site comparison UI consuming real verdicts. ProvenanceBadge everywhere. System View tab embedding the neural map. This is the pitch centerpiece.
-
-**Phase C — Remaining dashboards.** Cluster 1, 2, 5 dashboards on the proven verdict engine. Cluster 5 gets the full-screen neural map and Monday briefing. Cluster 2 clearly labels representative MLS comps.
-
-**Phase D — Auth and onboarding polish.** Login, signup, cluster selection wired to Supabase profile.
-
-**Phase E — Marketing polish and deploy.** Visual pass, 3D render drop-in, embed neural map into /intelligence, deploy to Vercel. (Marketing deploy can happen anytime in parallel; it blocks nothing.)
-
-**Deferred until capital:** Stripe billing, paid source integrations (swap mocks to real), PostHog, SOC 2, enterprise SSO for Cluster 5.
+**Pending USER actions (migrations are the user's to run):** apply Supabase migrations in order through 013; seed IRS migration (`scripts/ingest-irs-migration.ts`); set free tokens (`NOAA_CDO_TOKEN`, `HUD_USER_TOKEN`) in `.env.local` AND Vercel (env additions need a redeploy to take effect).
 
 ---
 
@@ -561,7 +598,10 @@ Reflects what is done and the order for what remains. Each step is verified befo
 - Every data point carries provenance. Every non-live figure is badged in the UI.
 - A verdict's overall provenance equals its weakest input.
 - Agents never call data sources directly; only through provider interfaces.
-- A failed live call falls back to labeled `representative`, never a silent fake.
+- A failed live call falls back to labeled `representative`, never a silent fake. A *missing free credential / unseeded store* omits (data:null tagged live), never fabricates — the omission rule (Section 06).
+- The archive stores ONLY `live` provenance data — never snapshot a representative fallback into the time series (a permanent falsification of the record).
+- A non-NYC address resolves with bbl/bin/borough EXPLICITLY null; NYC providers must return coverage-absent, never a live zero, for a null key. Do not regress this.
+- The keyless Census ACS call must send a project-specific `User-Agent` header (Census Reporter 403s generic UAs). Losing this silently drags every verdict representative.
 
 ### Architecture
 - Swapping a mock provider to real is a one-line registry change. If a change requires touching agent or UI code, the abstraction is wrong; fix the abstraction.
@@ -622,7 +662,19 @@ ANTHROPIC_API_KEY=
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
 CLERK_SECRET_KEY=
 
-# Stripe (deferred)
+# Archive cron (REQUIRED for the weekly snapshot job; Vercel sends it as a Bearer token)
+CRON_SECRET=
+
+# Free provider tokens — OPTIONAL. Their absence never drags a verdict (omission rule):
+NYC_OPEN_DATA_APP_TOKEN=   # removes the Socrata per-IP throttle (recommended in prod)
+NOAA_CDO_TOKEN=            # NOAA climate normals (else that signal is omitted)
+HUD_USER_TOKEN=           # HUD Fair Market Rents (else omitted)
+FBI_CRIME_API_KEY=        # FBI CDE state-level crime (else NYPD live for NYC, representative elsewhere)
+CENSUS_API_KEY=           # NOT needed — keyless Census Reporter works with the UA header; only a higher-volume upgrade
+KOANO_RUNTIME_MODEL=      # optional override of the Sonnet-class runtime constant
+KOANO_DAILY_RUN_CAP=      # global spend breaker (default 50)
+
+# Stripe (backend wired; UI deferred)
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
 STRIPE_SECRET_KEY=
 STRIPE_WEBHOOK_SECRET=
@@ -630,12 +682,15 @@ STRIPE_WEBHOOK_SECRET=
 # Mapbox (deferred, dashboards)
 NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=
 
-# App URLs
+# App URLs (note: NEXT_PUBLIC_APP_URL must be the real deployed origin, not localhost,
+# or cron/self-POST calls break; the prod domain 308-redirects koano.co → www.koano.co,
+# which drops the auth header across the cross-host hop — POST directly to www.)
 NEXT_PUBLIC_APP_URL=
 NEXT_PUBLIC_MARKETING_URL=
 ```
 
 ---
 
-*KOANO CLAUDE.md v5.0 | Confidential & Proprietary | 2026*
+*KOANO CLAUDE.md v5.1 | Confidential & Proprietary | 2026*
+*v5.1 records the built reality: backend spine, all four dashboards, the archive/calibration layer (07A), and Phase 1 — every verdict now rolls up live for a NYC address, on federal data, honestly labeled.*
 *The premium demo is built honestly today so that capital turns it into production tomorrow, without a rewrite and without a lie.*
