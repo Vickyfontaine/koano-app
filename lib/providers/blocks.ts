@@ -14,19 +14,20 @@ import type {
   CostarDealsSummary,
   CrimeStats,
   DisasterHistoryInfo,
+  EmploymentInfo,
   EntitlementSummary,
   FloodInfo,
   LandlordPortfolioSummary,
-  FootTrafficInfo,
   HpiTrend,
+  MigrationInfo,
   MlsCompsSummary,
+  MortgageDemandInfo,
   OpportunityZoneInfo,
   PermitsSummary,
   ProformaBenchmark,
   ProviderResult,
   Provenance,
   ResolvedAddress,
-  SearchTrendsInfo,
   SeismicInfo,
   ZoningInfo,
 } from './types';
@@ -61,8 +62,9 @@ export interface SiteDetailResponse {
   crime?: SiteDetailBlock<CrimeStats>;
   building_violations?: SiteDetailBlock<BuildingViolationsSummary>;
   landlord_portfolio?: SiteDetailBlock<LandlordPortfolioSummary>;
-  search_trends?: SiteDetailBlock<SearchTrendsInfo>;
-  foot_traffic?: SiteDetailBlock<FootTrafficInfo>;
+  mortgage_demand?: SiteDetailBlock<MortgageDemandInfo>;
+  employment?: SiteDetailBlock<EmploymentInfo>;
+  migration?: SiteDetailBlock<MigrationInfo>;
   contamination?: SiteDetailBlock<ContaminationInfo>;
   seismic?: SiteDetailBlock<SeismicInfo>;
   disaster_history?: SiteDetailBlock<DisasterHistoryInfo>;
@@ -89,8 +91,9 @@ export const BLOCK_FETCHERS: Record<
   crime: (a) => registry.crime.getCrimeStats(a),
   building_violations: (a) => registry.buildingViolations.getViolations(a),
   landlord_portfolio: (a) => registry.landlordPortfolio.getPortfolio(a),
-  search_trends: (a) => registry.searchTrends.getSearchTrends(a),
-  foot_traffic: (a) => registry.footTraffic.getFootTraffic(a),
+  mortgage_demand: (a) => registry.mortgageDemand.getMortgageDemand(a),
+  employment: (a) => registry.employment.getEmployment(a),
+  migration: (a) => registry.migration.getMigration(a),
   contamination: (a) => registry.contamination.getContamination(a),
   seismic: (a) => registry.seismic.getSeismic(a),
   disaster_history: (a) => registry.disasterHistory.getDisasterHistory(a),

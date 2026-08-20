@@ -114,7 +114,7 @@ export const DOCUMENT_TYPES: Record<string, DocumentType> = {
     cluster: 'cluster_2',
     homeTier: 'transaction',
     scope: 'property',
-    requiredBlocks: ['mls_comps', 'zoning', 'hpi', 'search_trends'],
+    requiredBlocks: ['mls_comps', 'zoning', 'hpi', 'mortgage_demand'],
     formats: ['pdf', 'docx'], // DOCX so a broker can edit before sending
     sections: [
       { id: 'cover', title: 'Cover', kind: 'deterministic' },

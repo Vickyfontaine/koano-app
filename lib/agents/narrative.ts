@@ -18,7 +18,7 @@ Rules:
 - Cite concrete figures from the data (prices, percentages, counts, periods) — that is what makes the narrative credible.
 - Data points marked provenance "representative" are indicative benchmarks, NOT live market data. When you use one, call it an "indicative benchmark" — never imply live MLS access.
 - No hype words (hot, skyrocketing, once-in-a-lifetime). No investment guarantees. No predictions beyond what the data shows.
-- Structure: neighborhood character from demographics → market conditions (prices, velocity) → activity signals (permits, search interest) → one measured closing sentence.
+- Structure: neighborhood character from demographics → market conditions (prices, velocity) → activity signals (permits, mortgage lending, employment) → one measured closing sentence.
 - Output the narrative as plain text only. No headings, no markdown, no preamble.`;
 
 export interface NarrativeResult {
@@ -35,11 +35,12 @@ export async function generateNarrative(address: string): Promise<NarrativeResul
   }
   const addr = geo.data;
 
-  const [demo, hpi, permits, trends, comps] = await Promise.all([
+  const [demo, hpi, permits, mortgage, employment, comps] = await Promise.all([
     registry.demographics.getDemographics(addr),
     registry.hpi.getHpi(addr),
     registry.permits.getPermits(addr),
-    registry.searchTrends.getSearchTrends(addr),
+    registry.mortgageDemand.getMortgageDemand(addr),
+    registry.employment.getEmployment(addr),
     registry.mlsComps.getComps(addr),
   ]);
 
@@ -66,9 +67,15 @@ export async function generateNarrative(address: string): Promise<NarrativeResul
     push('construction permits last 24 months', permits.data.total_permits_24mo, permits);
     push('new building permits last 24 months', permits.data.new_building_permits, permits);
   }
-  if (trends.data) {
-    push(`search interest momentum for "${trends.data.term}"`, trends.data.momentum, trends);
-    push('search interest now (0-100)', trends.data.interest_current, trends);
+  if (mortgage.data) {
+    push(`mortgage originations (${mortgage.data.year})`, mortgage.data.originations, mortgage);
+    push('mortgage originations YoY %', mortgage.data.originations_yoy_pct, mortgage);
+    push('mortgage denial rate %', mortgage.data.denial_rate_pct, mortgage);
+  }
+  if (employment.data) {
+    push(`county employment (${employment.data.period})`, employment.data.total_employment, employment);
+    push('employment YoY %', employment.data.employment_yoy_pct, employment);
+    push('average weekly wage YoY %', employment.data.avg_weekly_wage_yoy_pct, employment);
   }
   if (comps.data) {
     push('median recorded-sale price per sq ft (NYC DOF recorded sales)', comps.data.median_price_per_sqft, comps);

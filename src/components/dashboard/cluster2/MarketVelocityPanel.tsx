@@ -68,7 +68,7 @@ export default function MarketVelocityPanel({ detail, detailError, id }: MarketV
   }
 
   const tiles: Tile[] = [];
-  const { hpi, mls_comps, search_trends, foot_traffic, proforma } = detail;
+  const { hpi, mls_comps, mortgage_demand, employment, proforma } = detail;
 
   if (hpi?.data) {
     tiles.push({
@@ -92,20 +92,22 @@ export default function MarketVelocityPanel({ detail, detailError, id }: MarketV
       provenance: mls_comps.provenance,
     });
   }
-  if (search_trends?.data) {
+  if (mortgage_demand?.data) {
+    const m = mortgage_demand.data;
     tiles.push({
-      label: "Search interest",
-      value: `${search_trends.data.interest_current}/100`,
-      sub: `"${search_trends.data.term}" · ${search_trends.data.momentum}`,
-      provenance: search_trends.provenance,
+      label: "Mortgage demand (HMDA)",
+      value: m.originations_yoy_pct != null ? `${m.originations_yoy_pct >= 0 ? "+" : ""}${m.originations_yoy_pct}% yoy` : `${m.originations.toLocaleString("en-US")}`,
+      sub: `${m.originations.toLocaleString("en-US")} originations · ${m.denial_rate_pct ?? "—"}% denied · ${m.year}`,
+      provenance: mortgage_demand.provenance,
     });
   }
-  if (foot_traffic?.data) {
+  if (employment?.data) {
+    const e = employment.data;
     tiles.push({
-      label: "Foot traffic",
-      value: `${foot_traffic.data.yoy_change_pct >= 0 ? "+" : ""}${foot_traffic.data.yoy_change_pct}% yoy`,
-      sub: foot_traffic.data.area,
-      provenance: foot_traffic.provenance,
+      label: "Employment (QCEW)",
+      value: e.employment_yoy_pct != null ? `${e.employment_yoy_pct >= 0 ? "+" : ""}${e.employment_yoy_pct}% yoy` : "—",
+      sub: `${e.total_employment?.toLocaleString("en-US") ?? "—"} jobs · wage ${e.avg_weekly_wage_yoy_pct != null ? `${e.avg_weekly_wage_yoy_pct >= 0 ? "+" : ""}${e.avg_weekly_wage_yoy_pct}%` : "—"} · ${e.period}`,
+      provenance: employment.provenance,
     });
   }
   if (proforma?.data) {

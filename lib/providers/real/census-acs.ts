@@ -46,7 +46,13 @@ async function fromCensusReporter(geoid: string): Promise<{ data: AcsDemographic
   const endpoint =
     `https://api.censusreporter.org/1.0/data/show/latest` +
     `?table_ids=B01003,B19013,B25064,B25077,B15003&geo_ids=${geoKey}`;
-  const res = await fetchJson<CensusReporterResponse>(endpoint);
+  // Census Reporter now BLOCKS generic user agents (Node's default fetch UA gets
+  // a 403 / {"error":"blocked"}), requiring a project-specific User-Agent. Without
+  // this header the keyless demographics path silently fell back to representative,
+  // which dragged every verdict (demographics feeds two agents) to representative.
+  const res = await fetchJson<CensusReporterResponse>(endpoint, {
+    headers: { 'User-Agent': 'KOANO/1.0 (real estate reasoning engine; +https://koano.co)' },
+  });
   const d = res.data?.[geoKey];
   if (!d) throw new Error('Census Reporter returned no data for tract');
 

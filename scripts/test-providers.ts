@@ -38,7 +38,8 @@ async function main() {
     registry.hpi.getHpi(addr).then((r) => ['fhfa-hpi', r] as const),
     registry.flood.getFloodZone(addr).then((r) => ['fema-flood', r] as const),
     registry.crime.getCrimeStats(addr).then((r) => ['fbi-ucr', r] as const),
-    registry.searchTrends.getSearchTrends(addr).then((r) => ['google-trends', r] as const),
+    registry.mortgageDemand.getMortgageDemand(addr).then((r) => ['cfpb-hmda', r] as const),
+    registry.employment.getEmployment(addr).then((r) => ['bls-qcew', r] as const),
   ]);
 
   for (const [name, r] of results) print(name, r);

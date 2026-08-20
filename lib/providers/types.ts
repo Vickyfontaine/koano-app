@@ -255,19 +255,6 @@ export interface CrimeProvider {
   getCrimeStats(addr: ResolvedAddress): Promise<ProviderResult<CrimeStats>>;
 }
 
-export interface SearchTrendsInfo {
-  term: string;
-  geo: string;
-  interest_current: number; // 0–100
-  interest_12mo_avg: number; // 0–100
-  momentum: 'rising' | 'falling' | 'flat';
-}
-
-export interface SearchTrendsProvider {
-  name: string;
-  getSearchTrends(addr: ResolvedAddress): Promise<ProviderResult<SearchTrendsInfo>>;
-}
-
 // ---------------------------------------------------------------------------
 // Environmental & climate hazard (federal, NATIONAL, live free sources).
 // These re-base the Risk & Volatility agent onto authoritative federal data so
@@ -349,6 +336,68 @@ export interface ClimateInfo {
 export interface ClimateProvider {
   name: string;
   getClimate(addr: ResolvedAddress): Promise<ProviderResult<ClimateInfo>>;
+}
+
+// ---------------------------------------------------------------------------
+// Housing demand (federal, NATIONAL, live free sources). These re-base the
+// Demand-Sentiment agent off foot-traffic + search-interest mocks onto genuine
+// housing-demand signals that work at any US address: mortgage lending (CFPB
+// HMDA), employment/wages (BLS QCEW), and who is moving in/out with what income
+// (IRS SOI migration). Better demand signals than pedestrian counts.
+// ---------------------------------------------------------------------------
+
+// CFPB HMDA — mortgage applications / originations / denials for the county.
+// A live, keyless aggregations API. County grain in Phase 1 (tract-level via the
+// raw modified-LAR is a planned fast-follow ingestion).
+export interface MortgageDemandInfo {
+  year: number;
+  originations: number;
+  denials: number;
+  denial_rate_pct: number | null; // denials / (originations + denials) — decisioned-denial rate
+  originations_yoy_pct: number | null; // vs prior year (loan-demand momentum)
+  scope_note: string;
+}
+
+export interface MortgageDemandProvider {
+  name: string;
+  getMortgageDemand(addr: ResolvedAddress): Promise<ProviderResult<MortgageDemandInfo>>;
+}
+
+// BLS QCEW — county employment level, average weekly wage, and their year-over-
+// year change (the CSV carries the over-the-year deltas directly).
+export interface EmploymentInfo {
+  period: string; // e.g. "2024 Q4"
+  total_employment: number | null;
+  avg_weekly_wage_usd: number | null;
+  employment_yoy_pct: number | null;
+  avg_weekly_wage_yoy_pct: number | null;
+  establishments: number | null;
+  scope_note: string;
+}
+
+export interface EmploymentProvider {
+  name: string;
+  getEmployment(addr: ResolvedAddress): Promise<ProviderResult<EmploymentInfo>>;
+}
+
+// IRS SOI county-to-county migration + AGI. No live API — bulk files only — so
+// this reads a SELF-HOSTED table (ingested once from the annual IRS CSVs). Tagged
+// `live` with an explicit vintage (like ACS/FHFA: authoritative, periodic). When
+// the table is unseeded the provider returns data:null tagged `live` (coverage
+// absence, not representative), so demand stays live on HMDA + QCEW alone.
+export interface MigrationInfo {
+  vintage: string; // e.g. "IRS SOI 2021→2022"
+  inflow_returns: number | null; // households moving IN (n1)
+  outflow_returns: number | null; // households moving OUT
+  net_migration_returns: number | null; // inflow − outflow
+  inflow_agi_per_return_usd: number | null; // avg income of in-movers
+  outflow_agi_per_return_usd: number | null; // avg income of out-movers
+  scope_note: string;
+}
+
+export interface MigrationProvider {
+  name: string;
+  getMigration(addr: ResolvedAddress): Promise<ProviderResult<MigrationInfo>>;
 }
 
 // ---------------------------------------------------------------------------
@@ -481,18 +530,6 @@ export interface MlsCompsSummary {
 export interface MlsCompsProvider {
   name: string;
   getComps(addr: ResolvedAddress): Promise<ProviderResult<MlsCompsSummary>>;
-}
-
-export interface FootTrafficInfo {
-  area: string;
-  monthly_visits: number;
-  yoy_change_pct: number;
-  weekend_share_pct: number;
-}
-
-export interface FootTrafficProvider {
-  name: string;
-  getFootTraffic(addr: ResolvedAddress): Promise<ProviderResult<FootTrafficInfo>>;
 }
 
 export interface CostarDeal {

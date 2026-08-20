@@ -27,9 +27,9 @@ const MARKET_BLOCKS = [
   "permits",
   "hpi",
   "demographics",
-  "search_trends",
+  "mortgage_demand",
   "mls_comps",
-  "foot_traffic",
+  "employment",
   "proforma",
 ];
 
