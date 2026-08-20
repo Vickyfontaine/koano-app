@@ -14,6 +14,13 @@ import { errMsg, fetchJson } from './http';
 
 const HUD_FMR = 'https://www.huduser.gov/hudapi/public/fmr/data';
 
+// HUD's API terms REQUIRE this notice displayed prominently wherever HUD data
+// appears. Carried in scope_note (same handling as OpenFEMA's non-endorsement
+// disclaimer) so it flows into the agent's data points and any document/panel
+// that surfaces this figure.
+const HUD_DISCLAIMER =
+  'This product uses the HUD User Data API but is not endorsed or certified by HUD User.';
+
 // HUD returns basicdata as an object (non-SAFMR area) or an array of ZIP rows
 // (SAFMR area). Fields are the human bedroom labels.
 interface FmrRow {
@@ -45,7 +52,7 @@ const REPRESENTATIVE_FALLBACK: FairMarketRentInfo = {
   fmr_2br: 2500,
   fmr_3br: 3200,
   fmr_4br: 3500,
-  scope_note: 'REPRESENTATIVE — HUD USER FMR was unreachable; a labeled metro stand-in.',
+  scope_note: `REPRESENTATIVE — HUD USER FMR was unreachable; a labeled metro stand-in. ${HUD_DISCLAIMER}`,
 };
 
 export const hudFmr: FairMarketRentProvider = {
@@ -95,7 +102,7 @@ export const hudFmr: FairMarketRentProvider = {
         fmr_2br: num(basic['Two-Bedroom']),
         fmr_3br: num(basic['Three-Bedroom']),
         fmr_4br: num(basic['Four-Bedroom']),
-        scope_note: `HUD Fair Market Rents FY${d.year ?? '—'} for the county/metro (public domain).`,
+        scope_note: `HUD Fair Market Rents FY${d.year ?? '—'} for the county/metro (public domain). ${HUD_DISCLAIMER}`,
       };
 
       return {

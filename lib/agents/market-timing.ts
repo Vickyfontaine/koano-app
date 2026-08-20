@@ -99,7 +99,10 @@ export async function runMarketTimingAgent(addr: ResolvedAddress): Promise<Agent
     const f = fmrRes.data;
     dataPoints.push(
       { label: `fmr_2br_usd (FY${f.fiscal_year})`, value: f.fmr_2br, provenance: fmrRes.provenance, source: fmrRes.source },
-      { label: 'fmr_1br_usd', value: f.fmr_1br, provenance: fmrRes.provenance, source: fmrRes.source }
+      { label: 'fmr_1br_usd', value: f.fmr_1br, provenance: fmrRes.provenance, source: fmrRes.source },
+      // Carries HUD's required non-endorsement notice (in scope_note) into the
+      // reasoning chain / any document that cites this source.
+      { label: 'fair_market_rent_note', value: f.scope_note, provenance: fmrRes.provenance, source: fmrRes.source }
     );
   } else {
     dataPoints.push({ label: 'fair_market_rent_unavailable', value: fmrRes.error ?? 'no data', provenance: fmrRes.provenance, source: fmrRes.source });
