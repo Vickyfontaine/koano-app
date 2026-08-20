@@ -13,6 +13,7 @@ import { createHash } from 'crypto';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { fetchJson } from '../providers/real/http';
 import { registry } from '../providers/registry';
+import { monitoringCap, type Plan } from '../koano-guard';
 import type {
   BuildingViolationsSummary,
   ContaminationInfo,
@@ -392,12 +393,12 @@ export interface TrackedProperty { address: string; bbl: string | null }
 // Monitoring needs EVERY property row (one owner each), NOT deduped by BBL like
 // the capture loader — two users watching the same BBL each get their own
 // notifications. Only monitoring_enabled rows.
-export interface MonitoredProperty { id: string; clerk_user_id: string; bbl: string | null; tract_geoid: string | null; zip: string | null }
+export interface MonitoredProperty { id: string; clerk_user_id: string; bbl: string | null; tract_geoid: string | null; zip: string | null; created_at: string }
 
 export async function loadMonitoredProperties(admin: SupabaseClient): Promise<MonitoredProperty[]> {
   const { data } = await admin
     .from('properties')
-    .select('id, clerk_user_id, bbl, tract_geoid, zip')
+    .select('id, clerk_user_id, bbl, tract_geoid, zip, created_at')
     .eq('monitoring_enabled', true);
   return (data ?? []).map((p) => ({
     id: p.id as string,
@@ -405,7 +406,42 @@ export async function loadMonitoredProperties(admin: SupabaseClient): Promise<Mo
     bbl: (p.bbl as string) ?? null,
     tract_geoid: (p.tract_geoid as string) ?? null,
     zip: (p.zip as string) ?? null,
+    created_at: (p.created_at as string) ?? '',
   }));
+}
+
+// The ACTIVE monitored set — enforces the per-plan cap NON-DESTRUCTIVELY. A user
+// watching more than their cap keeps every watch, but only the first `cap`
+// (oldest-watched) are actively monitored; the rest are paused and resume on
+// upgrade. free = 0 → nothing monitored (paid feature). This is the single
+// enforcement point, so a Stripe downgrade needs no special handler.
+export async function loadActiveMonitoredProperties(admin: SupabaseClient): Promise<MonitoredProperty[]> {
+  const all = await loadMonitoredProperties(admin);
+  if (all.length === 0) return [];
+
+  const userIds = Array.from(new Set(all.map((p) => p.clerk_user_id)));
+  const { data: profs } = await admin.from('profiles').select('clerk_user_id, plan').in('clerk_user_id', userIds);
+  const planByUser = new Map<string, Plan>();
+  for (const pr of profs ?? []) {
+    const plan = pr.plan as string | null;
+    planByUser.set(pr.clerk_user_id as string, plan && (['free', 'community', 'transaction', 'development', 'portfolio'] as string[]).includes(plan) ? (plan as Plan) : 'free');
+  }
+
+  const byUser = new Map<string, MonitoredProperty[]>();
+  for (const p of all) {
+    const arr = byUser.get(p.clerk_user_id) ?? [];
+    arr.push(p);
+    byUser.set(p.clerk_user_id, arr);
+  }
+
+  const active: MonitoredProperty[] = [];
+  for (const [userId, props] of Array.from(byUser.entries())) {
+    const cap = monitoringCap(planByUser.get(userId) ?? 'free');
+    if (cap <= 0) continue; // free → paused entirely
+    props.sort((a, b) => a.created_at.localeCompare(b.created_at)); // oldest-watched stay active
+    active.push(...props.slice(0, cap));
+  }
+  return active;
 }
 
 export async function loadTrackedProperties(admin: SupabaseClient): Promise<TrackedProperty[]> {

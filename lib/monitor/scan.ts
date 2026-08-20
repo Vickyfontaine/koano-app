@@ -45,14 +45,17 @@ function mapRow(p: Record<string, unknown>): MonitoredProperty {
   return {
     id: p.id as string, clerk_user_id: p.clerk_user_id as string,
     bbl: (p.bbl as string) ?? null, tract_geoid: (p.tract_geoid as string) ?? null, zip: (p.zip as string) ?? null,
+    created_at: (p.created_at as string) ?? '',
   };
 }
 
-async function monitoredInScope(admin: SupabaseClient, kind: 'county' | 'zip', key: string): Promise<MonitoredProperty[]> {
-  let q = admin.from('properties').select('id, clerk_user_id, bbl, tract_geoid, zip').eq('monitoring_enabled', true);
+// Monitored properties in a scope, RESTRICTED to the active set — a paused
+// (over-cap) or free-tier property must not receive fan-out notifications.
+async function monitoredInScope(admin: SupabaseClient, kind: 'county' | 'zip', key: string, activeIds: Set<string>): Promise<MonitoredProperty[]> {
+  let q = admin.from('properties').select('id, clerk_user_id, bbl, tract_geoid, zip, created_at').eq('monitoring_enabled', true);
   q = kind === 'zip' ? q.eq('zip', key) : q.like('tract_geoid', `${key}%`); // county = first 5 of the 11-digit tract GEOID
   const { data } = await q;
-  return (data ?? []).map(mapRow);
+  return (data ?? []).map(mapRow).filter((p) => activeIds.has(p.id));
 }
 
 async function latestVerdict(admin: SupabaseClient, bbl: string | null): Promise<string | null> {
@@ -66,7 +69,7 @@ async function latestVerdict(admin: SupabaseClient, bbl: string | null): Promise
 export interface MonitorResult { propertiesChecked: number; changesDetected: number; notificationsCreated: number }
 
 export async function scanMonitoring(
-  admin: SupabaseClient, runWeek: string, shardRows: MonitoredProperty[],
+  admin: SupabaseClient, runWeek: string, shardRows: MonitoredProperty[], activeIds: Set<string>,
 ): Promise<MonitorResult> {
   let changesDetected = 0;
   let notificationsCreated = 0;
@@ -129,7 +132,7 @@ export async function scanMonitoring(
     if (!pair || pair.current.captured_week !== runWeek) continue;
     const changes = detectDisaster(pair.prior.data as unknown as DisasterData, pair.current.data as unknown as DisasterData);
     if (changes.length === 0) continue;
-    for (const prop of await monitoredInScope(admin, 'county', county)) for (const ch of changes) await emit(prop, ch, pair);
+    for (const prop of await monitoredInScope(admin, 'county', county, activeIds)) for (const ch of changes) await emit(prop, ch, pair);
   }
 
   // 3. Comp price — fan a ZIP change out to every monitored property in that ZIP.
@@ -139,7 +142,7 @@ export async function scanMonitoring(
     if (!pair || pair.current.captured_week !== runWeek) continue;
     const changes = detectComp(pair.prior.data as unknown as CompData, pair.current.data as unknown as CompData);
     if (changes.length === 0) continue;
-    for (const prop of await monitoredInScope(admin, 'zip', zip)) for (const ch of changes) await emit(prop, ch, pair);
+    for (const prop of await monitoredInScope(admin, 'zip', zip, activeIds)) for (const ch of changes) await emit(prop, ch, pair);
   }
 
   // 4. verdict_data_change — deterministic flag (NOT a re-run): a material change

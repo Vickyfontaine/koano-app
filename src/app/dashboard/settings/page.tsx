@@ -5,6 +5,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import ProfileSettingsForm from "@/components/dashboard/ProfileSettingsForm";
+import MonitoringSettings from "@/components/dashboard/MonitoringSettings";
 
 export const dynamic = "force-dynamic";
 
@@ -40,6 +41,9 @@ export default async function SettingsPage() {
           Settings
         </h1>
         <ProfileSettingsForm />
+        <div style={{ marginTop: "32px" }}>
+          <MonitoringSettings id="monitoring-settings" />
+        </div>
       </div>
     </div>
   );

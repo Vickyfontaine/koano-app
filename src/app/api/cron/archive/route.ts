@@ -21,7 +21,7 @@ import {
   capturePropertySnapshots,
   captureHpiIfChanged,
   loadTrackedProperties,
-  loadMonitoredProperties,
+  loadActiveMonitoredProperties,
   missedShards,
   sendGapAlert,
 } from '../../../../../lib/archive/capture';
@@ -139,10 +139,15 @@ export async function POST(req: Request) {
   // archive run partial, and no model call / no verdict allowance is consumed.
   let monitor: { checked: number; changes: number; notifications: number; error?: string } = { checked: 0, changes: 0, notifications: 0 };
   try {
-    const monitored = await loadMonitoredProperties(admin);
+    // ACTIVE set only — enforces per-plan monitoring caps (free = 0; over-cap
+    // properties are paused, oldest-watched stay active). Non-destructive. The
+    // active id set also gates the county/ZIP fan-out so paused properties never
+    // get notified.
+    const monitored = await loadActiveMonitoredProperties(admin);
+    const activeIds = new Set(monitored.map((p) => p.id));
     const shardMonitored = sharded ? monitored.filter((p) => p.bbl && propertyShard(p.bbl) === shard) : monitored;
     const { data: mr } = await admin.from('monitor_runs').insert({ run_week: runWeek, status: 'running' }).select('id').single();
-    const res = await scanMonitoring(admin, runWeek, shardMonitored);
+    const res = await scanMonitoring(admin, runWeek, shardMonitored, activeIds);
     monitor = { checked: res.propertiesChecked, changes: res.changesDetected, notifications: res.notificationsCreated };
     if (mr) {
       await admin.from('monitor_runs').update({

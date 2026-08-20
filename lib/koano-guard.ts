@@ -42,6 +42,22 @@ export const PLAN_LIMITS: Record<Plan, PlanLimit> = {
   portfolio: { verdict: 500, content: 500, lifetime: false },
 };
 
+// Monitoring (Phase 2): how many properties a plan may ACTIVELY monitor. free=0
+// (monitoring is a paid feature — free users see it disabled with an upgrade
+// prompt). Enforced non-destructively: a downgrade never unwatches; properties
+// beyond the cap are paused (oldest-watched stay active) and resume on upgrade.
+export const MONITORING_CAPS: Record<Plan, number> = {
+  free: 0,
+  community: 3,
+  transaction: 20,
+  development: 50,
+  portfolio: 500,
+};
+
+export function monitoringCap(plan: Plan): number {
+  return MONITORING_CAPS[plan];
+}
+
 const VALID_PLANS = Object.keys(PLAN_LIMITS) as Plan[];
 
 export interface GuardDenial {
