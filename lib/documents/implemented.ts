@@ -23,6 +23,7 @@ export const IMPLEMENTED_DOC_TYPES = [
   'buyer_seller_net_sheet',
   'entitlement_risk_memo',
   'cma',
+  'portfolio_risk_report',
 ] as const;
 
 export type ImplementedDocType = (typeof IMPLEMENTED_DOC_TYPES)[number];

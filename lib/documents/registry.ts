@@ -351,11 +351,9 @@ export const DOCUMENT_TYPES: Record<string, DocumentType> = {
       { id: 'risk', title: 'Risk Exposure', kind: 'deterministic' },
       { id: 'provenance', title: 'Sources & Provenance', kind: 'deterministic' },
     ],
-    // Phase 1 removed the representative-hazard blocker: its required blocks are
-    // now all LIVE (federal EPA/USGS/FEMA + flood + crime). It remains BLOCKED
-    // pending a wired builder/renderer (it is not in IMPLEMENTED_DOC_TYPES) — an
-    // implementation gap, not a data gap. No `blockedOn` provider applies.
-    status: 'blocked',
+    // Phase 3: built. All required blocks are live (federal EPA/USGS/FEMA + flood
+    // + crime); the deterministic renderer is wired and in IMPLEMENTED_DOC_TYPES.
+    status: 'available',
   },
 
   asset_one_pager: {

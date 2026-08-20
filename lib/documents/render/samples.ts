@@ -845,6 +845,43 @@ function cmaSample(): RenderModel {
   };
 }
 
+function portfolioRiskSample(): RenderModel {
+  return {
+    docTitle: 'Portfolio Risk Report',
+    subtitle: 'Portfolio (3 properties)',
+    letterhead: NAMED_LETTERHEAD,
+    sections: [
+      {
+        heading: 'Risk Exposure',
+        provenanceNote: { provenance: 'live', text: 'Live federal + city hazard data per property. Decision-support, not decision-making.' },
+        highlight: {
+          figures: [
+            { label: 'Properties assessed', value: '3 of 3', emphasis: true },
+            { label: 'In a Special Flood Hazard Area', value: '1' },
+            { label: 'With a Superfund site ≤2 mi', value: '2' },
+            { label: 'With a disaster declared (10 yr)', value: '3' },
+          ],
+        },
+        paragraphs: ['1 of 3 assessed properties sit in a FEMA Special Flood Hazard Area; 2 have an EPA Superfund site within two miles; 3 are in a county with a federally-declared disaster in the last ten years.'],
+      },
+      {
+        heading: 'Per-Property Risk',
+        table: {
+          columns: ['Property', 'FEMA flood', 'Superfund ≤2mi', 'Seismic PGA (g)', 'Disasters (10yr)', 'Crime trend'],
+          rows: [
+            ['175 3rd St, Brooklyn', 'AE · SFHA', '12 (nearest 0.24mi)', '0.17', '6', 'falling'],
+            ['47-07 Vernon Blvd, LIC', 'X', '2 (nearest 0.4mi)', '0.16', '6', 'flat'],
+            ['369 6th St, Brooklyn', 'X', '0', '0.17', '6', 'falling'],
+          ],
+          caption: 'Flood zone is the current regulatory reality; disaster history is complementary. Contamination is a 2-mile proximity count.',
+        },
+      },
+    ],
+    appendix: LIVE_APPENDIX,
+    generatedAt: GENERATED_AT,
+  };
+}
+
 function netSheetSample(): RenderModel {
   return {
     docTitle: 'Buyer / Seller Net Sheet',
@@ -923,4 +960,5 @@ export const SAMPLE_MODELS: Record<string, RenderModel> = {
   client_neighborhood_report: neighborhoodSample(),
   entitlement_risk_memo: entitlementMemoSample(),
   cma: cmaSample(),
+  portfolio_risk_report: portfolioRiskSample(),
 };

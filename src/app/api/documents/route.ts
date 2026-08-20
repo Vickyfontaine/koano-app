@@ -14,6 +14,7 @@ import { getDocumentType } from '../../../../lib/documents/registry';
 import { IMPLEMENTED_DOC_TYPE_SET } from '../../../../lib/documents/implemented';
 import { guardDocument } from '../../../../lib/documents/guard';
 import { assembleDocumentData, getLetterhead } from '../../../../lib/documents/assembler';
+import type { DocumentData } from '../../../../lib/documents/types';
 import { buildProvenanceAppendix, appendixWithVerdict } from '../../../../lib/documents/disclaimer';
 import { renderPdf } from '../../../../lib/documents/render/pdf';
 import { renderDocx } from '../../../../lib/documents/render/docx';
@@ -73,6 +74,7 @@ import { extractPricingFacts, buildPricingModel } from '../../../../lib/document
 import {
   extractCmaFacts, buildCmaModel, deterministicCmaNarrative, cmaDataPoints, cmaFactsForModel, CMA_SYSTEM_PROMPT,
 } from '../../../../lib/documents/builders/cma';
+import { extractPortfolioRiskRow, buildPortfolioRiskModel } from '../../../../lib/documents/builders/portfolio-risk-report';
 import { extractNetSheetFacts, buildNetSheetModel } from '../../../../lib/documents/builders/net-sheet';
 import {
   extractNeighborhoodFacts,
@@ -393,6 +395,31 @@ export async function POST(req: Request) {
       addressInput = `Portfolio (${portfolio.length} propert${portfolio.length === 1 ? 'y' : 'ies'})`;
       bbl = null;
       overallProvenance = result.overall_provenance;
+    } else if (doc.id === 'portfolio_risk_report') {
+      const portfolio = await loadPortfolio(userId);
+      if (portfolio.length === 0) {
+        return NextResponse.json({ error: 'No properties in your portfolio yet. Add properties first.' }, { status: 422 });
+      }
+      // Deterministic risk grid across the portfolio. Cap the request-time fan-out
+      // (each property fetches 5 hazard blocks incl. EPA, which is rate-limited).
+      const rows = [];
+      let appendixData: DocumentData | null = null;
+      let weakest: Provenance = 'live';
+      for (const p of portfolio.slice(0, 15)) {
+        const r = await assembleDocumentData(p.address, doc.requiredBlocks);
+        if (!r.ok) continue;
+        rows.push(extractPortfolioRiskRow(r.data));
+        appendixData = appendixData ?? r.data;
+        if (r.data.overall_provenance === 'representative') weakest = 'representative';
+      }
+      if (rows.length === 0 || !appendixData) {
+        return NextResponse.json({ error: 'None of your portfolio addresses could be resolved for a risk read.' }, { status: 422 });
+      }
+      const appendix = { ...buildProvenanceAppendix(appendixData), overall: weakest };
+      model = buildPortfolioRiskModel({ rows, portfolioSize: portfolio.length, letterhead, appendix, generatedAt });
+      addressInput = `Portfolio (${portfolio.length} propert${portfolio.length === 1 ? 'y' : 'ies'})`;
+      bbl = null;
+      overallProvenance = weakest;
     } else if (doc.id === 'asset_one_pager') {
       const r = await assembleDocumentData(address, doc.requiredBlocks);
       if (!r.ok) return NextResponse.json({ error: r.error }, { status: r.status });
