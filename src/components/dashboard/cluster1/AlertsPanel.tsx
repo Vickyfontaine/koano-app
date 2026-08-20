@@ -6,11 +6,12 @@
 // invented and no timestamp is simulated; these are point-in-time signals,
 // not continuous monitoring.
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
 import type { Provenance } from "@/components/ui/verdict";
 import { BlockError, PanelHeader, panelStyle } from "../panels";
 import type { SiteDetailResponse } from "@/app/api/site-detail/route";
+import type { NotificationRow } from "@/app/api/notifications/route";
 
 type Severity = "positive" | "warning" | "negative" | "info";
 
@@ -164,10 +165,65 @@ interface AlertsPanelProps {
   id?: string;
 }
 
+const NOTIF_COLOR: Record<string, string> = {
+  high: "var(--signal-negative)",
+  material: "var(--signal-warning)",
+  info: "var(--mid-blue)",
+};
+
 export default function AlertsPanel({ detail, detailError, id }: AlertsPanelProps) {
+  const bbl = detail?.resolved_address.bbl ?? null;
+  const [feed, setFeed] = useState<NotificationRow[] | null>(null);
+
+  // Load the user's monitoring notifications for THIS building (by BBL). If a
+  // diff has fired, show the continuous-monitoring feed; otherwise we fall back
+  // to deriveAlerts below so a not-yet-monitored property is never blank.
+  useEffect(() => {
+    if (!bbl) { setFeed(null); return; }
+    let live = true;
+    fetch(`/api/notifications?bbl=${encodeURIComponent(bbl)}&limit=20`)
+      .then((r) => (r.ok ? r.json() : { notifications: [] }))
+      .then((j) => { if (live) setFeed((j.notifications as NotificationRow[]) ?? []); })
+      .catch(() => { if (live) setFeed([]); });
+    return () => { live = false; };
+  }, [bbl]);
+
   if (!detail) {
     return <BlockError title="Alerts" error={detailError ?? undefined} />;
   }
+
+  // MONITORING FEED — shown once a diff exists for this property.
+  if (feed && feed.length > 0) {
+    return (
+      <div style={panelStyle} id={id}>
+        <PanelHeader title="Recent changes — continuously monitored" />
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          {feed.map((n) => {
+            const w = n.data as { window_from?: string; window_to?: string };
+            return (
+              <div key={n.id} style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
+                <span aria-hidden="true" style={{ width: "8px", height: "8px", borderRadius: "50%", background: NOTIF_COLOR[n.severity] ?? "var(--mid-blue)", marginTop: "6px", flexShrink: 0 }} />
+                <div style={{ display: "flex", flexDirection: "column", gap: "3px", flex: 1 }}>
+                  <span style={{ fontSize: "14px", fontWeight: 500, color: "var(--ink-primary)" }}>{n.title}</span>
+                  <span style={{ fontSize: "13px", lineHeight: 1.5, color: "var(--ink-secondary)" }}>{n.body}</span>
+                  {w.window_from && w.window_to && (
+                    <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "10px", color: "var(--ink-faint)" }}>
+                      compared {w.window_from} → {w.window_to}
+                    </span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <p style={{ fontSize: "11px", color: "var(--ink-faint)", margin: 0 }}>
+          Changes detected weekly against the archived record. Point-in-time signals appear until the first change.
+        </p>
+      </div>
+    );
+  }
+
+  // FALLBACK — point-in-time signals (no monitoring history yet, or no changes).
   const alerts = deriveAlerts(detail);
 
   return (

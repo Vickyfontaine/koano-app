@@ -27,6 +27,7 @@ import {
 } from '../../../../../lib/archive/capture';
 import { scanVerdictOutcomes } from '../../../../../lib/archive/outcomes';
 import { scanMonitoring } from '../../../../../lib/monitor/scan';
+import { sendWeeklyDigests } from '../../../../../lib/monitor/digest';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -153,6 +154,19 @@ export async function POST(req: Request) {
     monitor = { checked: 0, changes: 0, notifications: 0, error: e instanceof Error ? e.message : String(e) };
   }
 
+  // WEEKLY DIGEST — Monday (shard 0), after this day's monitoring, covering all
+  // still-pending notifications from the week. One email per user; the in-app
+  // feed already carries same-day immediacy. Isolated: a send failure never
+  // affects the archive.
+  let digest: { usersEmailed: number; notificationsSent: number; error?: string } = { usersEmailed: 0, notificationsSent: 0 };
+  if (!sharded || shard === 0) {
+    try {
+      digest = { ...(await sendWeeklyDigests(admin)) };
+    } catch (e) {
+      digest = { usersEmailed: 0, notificationsSent: 0, error: e instanceof Error ? e.message : String(e) };
+    }
+  }
+
   const anyError = Object.values(datasets).some((d) => d.error);
   const anyBelowFloor = Object.values(datasets).some((d) => d.below_floor);
   const status = anyError || anyBelowFloor ? 'partial' : 'succeeded';
@@ -182,5 +196,5 @@ export async function POST(req: Request) {
     );
   }
 
-  return NextResponse.json({ run_week: runWeek, shard, sharded, status, datasets, outcomes, monitor, rows_written: total, shard_gaps: gaps });
+  return NextResponse.json({ run_week: runWeek, shard, sharded, status, datasets, outcomes, monitor, digest, rows_written: total, shard_gaps: gaps });
 }

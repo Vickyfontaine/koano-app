@@ -284,7 +284,10 @@ const TEMPLATES: Record<SignalType, (r: RawChange) => { title: string; body: str
     title: 'New federal disaster declaration for this county',
     body:
       `Federal disaster declarations for this county (all-time): ${r.before} → ${r.after}.` +
-      (r.facts.most_recent ? ` Most recent: ${r.facts.most_recent}.` : ''),
+      (r.facts.most_recent ? ` Most recent: ${r.facts.most_recent}.` : '') +
+      // FEMA's required non-endorsement notice — this is FEMA data, and it leaves
+      // the product by email, so the disclaimer travels with it.
+      ' This product uses the FEMA OpenFEMA API but is not endorsed by FEMA.',
   }),
   comp_price: (r) => ({
     title: 'Comp price movement in this ZIP',
