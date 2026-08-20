@@ -581,6 +581,20 @@ Each step verified before the next (Principle 3).
 **Done:** Design system, marketing site, neural map. **Phase A** (backend spine: providers, 5 agents + synthesis, verdict routes, schema/RLS). **Phase B/C** (all four cluster dashboards + document engine). **Phase D** (Clerk auth/onboarding; spend guard). **Phase 0** (archive & calibration layer — Section 07A). **Phase 1** (every verdict live — the two mock-consuming agents re-based onto federal data; national geocoder; Superfund gap closed; Census UA fix). Paywall Phases 1–3 (tier gate + Stripe backend) wired.
 
 **Remaining / deferred:**
+- **Archive cron property-scale ceiling (TRACKED ITEM — decide before it's hit).**
+  The weekly capture (`capturePropertySnapshots`) processes every tracked property
+  in one Vercel invocation at ~14s/property (geocode + Socrata + retries), plus a
+  fixed ~75s EPA contamination window. Budget is `maxDuration` 300s, so the
+  practical ceiling is **~15 tracked properties across all users** (currently 6).
+  Failure mode: the function times out mid-loop → that week's snapshots are
+  partial/missing → a permanent hole in the compounding archive. (It is no longer
+  fully silent — the coverage view flags the gap and the gap-alert now emails the
+  operator — but a missed week is still lost history.) FIX = daily fan-out: change
+  the cron to daily, shard properties by day-of-week (`id % 7`), all daily runs in
+  a week write the same `captured_week` (the ISO Monday), so every property is
+  still captured weekly but each run is ~N/7. Effort ~half a day (cron schedule +
+  property shard filter + adjust the EPA window to daily + verify week bucketing).
+  Build trigger: at ~12 tracked properties.
 - HMDA tract-level ingestion (county is live; tract is the immediate fast-follow).
 - Snapshot the national providers into the archive — DONE (Slice 5); migration-013 applied and verified (coverage view shows the new datasets).
 - Stripe billing UI; PostHog; SOC 2; enterprise SSO for Cluster 5.
