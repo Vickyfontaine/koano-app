@@ -15,9 +15,13 @@ import { fetchJson } from '../providers/real/http';
 import { registry } from '../providers/registry';
 import type {
   BuildingViolationsSummary,
-  LandlordPortfolioSummary,
+  ContaminationInfo,
+  DisasterHistoryInfo,
+  EmploymentInfo,
   EntitlementSummary,
   HpiTrend,
+  LandlordPortfolioSummary,
+  MortgageDemandInfo,
   ZoningInfo,
 } from '../providers/types';
 
@@ -30,6 +34,12 @@ export const CAPTURE_VERSION = {
   propertyFilings: 'property-filings@1',
   hpi: 'hpi-metro@1',
   zoning: 'zoning-property@1',
+  // Phase 1 national providers (Slice 5): EPA proximity per-property (weekly);
+  // disaster/HMDA/QCEW at county grain (capture-if-changed).
+  contamination: 'contamination-property@1',
+  disasterHistory: 'disaster-county@1',
+  mortgageDemand: 'hmda-county@1',
+  employment: 'qcew-county@1',
 } as const;
 
 const ROLLING_SALES = 'https://data.cityofnewyork.us/resource/usep-8jbt.json';
@@ -342,13 +352,18 @@ export async function captureCdEntitlement(admin: SupabaseClient, runWeek: strin
 //     provider results are archived (never a representative fallback).
 //     Chunking is designed-for but NOT built (tracked N is small): a future
 //     `offset/limit` on `props` slices this across invocations.
-export interface PropertyCaptureCounts { violations: number; landlord: number; filings: number; zoning: number }
+export interface PropertyCaptureCounts { violations: number; landlord: number; filings: number; zoning: number; contamination: number; disaster: number; hmda: number; qcew: number }
 
 export async function capturePropertySnapshots(admin: SupabaseClient, runWeek: string, props: TrackedProperty[]): Promise<PropertyCaptureCounts> {
   const violations: Record<string, unknown>[] = [];
   const landlord: Record<string, unknown>[] = [];
   const filings: Record<string, unknown>[] = [];
   const zoning: Record<string, unknown>[] = [];
+  const contamination: Record<string, unknown>[] = [];
+  // County-level datasets are deduped across properties and captured after the
+  // loop (many tracked properties share a county). Collected here as resolved
+  // addresses keyed by county FIPS.
+  const countyByFips = new Map<string, { addr: import('../providers/types').ResolvedAddress }>();
 
   for (const p of props) {
     let geo;
@@ -356,12 +371,29 @@ export async function capturePropertySnapshots(admin: SupabaseClient, runWeek: s
     if (!geo.ok || !geo.data) continue;
     const bbl = geo.data.bbl ?? p.bbl;
     if (!bbl) continue;
-    const [v, l, e, z] = await Promise.all([
+    if (geo.data.state_fips && geo.data.county_fips) {
+      countyByFips.set(`${geo.data.state_fips}${geo.data.county_fips}`, { addr: geo.data });
+    }
+    // EPA contamination proximity — 2 FRS calls/property. The FRS enforces
+    // 12 req/min; with a small tracked N this stays under, but a larger fleet
+    // needs throttling/chunking here (designed-for, not built).
+    const [v, l, e, z, cont] = await Promise.all([
       registry.buildingViolations.getViolations(geo.data).catch(() => null),
       registry.landlordPortfolio.getPortfolio(geo.data).catch(() => null),
       registry.entitlement.getEntitlement(geo.data).catch(() => null),
       registry.zoning.getZoning(geo.data).catch(() => null),
+      registry.contamination.getContamination(geo.data).catch(() => null),
     ]);
+
+    if (cont && cont.provenance === 'live' && cont.data) {
+      const d = cont.data as ContaminationInfo;
+      const data = {
+        radius_mi: d.radius_mi, superfund_sites_within_radius: d.superfund_sites_within_radius,
+        brownfield_within_radius: d.brownfield_within_radius, total_cleanup_sites_within_radius: d.total_cleanup_sites_within_radius,
+        nearest_site_name: d.nearest_site_name, nearest_site_distance_mi: d.nearest_site_distance_mi, nearest_site_program: d.nearest_site_program,
+      };
+      contamination.push({ dataset: 'contamination', scope_type: 'property', scope_key: bbl, captured_week: runWeek, source: cont.source, provenance: 'live', capture_version: CAPTURE_VERSION.contamination, data, row_count: d.total_cleanup_sites_within_radius, content_hash: hash(data) });
+    }
 
     if (v && v.provenance === 'live' && v.data) {
       const d = v.data as BuildingViolationsSummary;
@@ -407,11 +439,55 @@ export async function capturePropertySnapshots(admin: SupabaseClient, runWeek: s
     }
   }
 
+  // County-level national datasets (deduped): disaster history, HMDA lending,
+  // QCEW employment. All capture-if-changed — they move slowly (disaster
+  // declarations irregular, HMDA annual, QCEW quarterly), so a content-hash
+  // dedupe avoids redundant weekly rows while still capturing every real change.
+  const disaster: Record<string, unknown>[] = [];
+  const hmda: Record<string, unknown>[] = [];
+  const qcew: Record<string, unknown>[] = [];
+  for (const [fips, { addr }] of Array.from(countyByFips.entries())) {
+    const [dh, mh, qh] = await Promise.all([
+      registry.disasterHistory.getDisasterHistory(addr).catch(() => null),
+      registry.mortgageDemand.getMortgageDemand(addr).catch(() => null),
+      registry.employment.getEmployment(addr).catch(() => null),
+    ]);
+    if (dh && dh.provenance === 'live' && dh.data) {
+      const d = dh.data as DisasterHistoryInfo;
+      const data = { total_declarations: d.total_declarations, declarations_last_10yr: d.declarations_last_10yr, distinct_incident_types: d.distinct_incident_types, most_common_incident: d.most_common_incident, most_recent_declaration: d.most_recent_declaration };
+      const h = hash(data);
+      if (h !== (await lastHash(admin, 'disaster_history', 'county', fips))) {
+        disaster.push({ dataset: 'disaster_history', scope_type: 'county', scope_key: fips, captured_week: runWeek, source: dh.source, provenance: 'live', capture_version: CAPTURE_VERSION.disasterHistory, data, row_count: d.total_declarations, content_hash: h });
+      }
+    }
+    if (mh && mh.provenance === 'live' && mh.data) {
+      const d = mh.data as MortgageDemandInfo;
+      const data = { year: d.year, originations: d.originations, denials: d.denials, denial_rate_pct: d.denial_rate_pct, originations_yoy_pct: d.originations_yoy_pct };
+      const h = hash(data);
+      if (h !== (await lastHash(admin, 'mortgage_demand', 'county', fips))) {
+        hmda.push({ dataset: 'mortgage_demand', scope_type: 'county', scope_key: fips, captured_week: runWeek, source: mh.source, provenance: 'live', capture_version: CAPTURE_VERSION.mortgageDemand, data, row_count: d.originations, content_hash: h });
+      }
+    }
+    if (qh && qh.provenance === 'live' && qh.data) {
+      const d = qh.data as EmploymentInfo;
+      const data = { period: d.period, total_employment: d.total_employment, avg_weekly_wage_usd: d.avg_weekly_wage_usd, employment_yoy_pct: d.employment_yoy_pct, avg_weekly_wage_yoy_pct: d.avg_weekly_wage_yoy_pct, establishments: d.establishments };
+      const h = hash(data);
+      if (h !== (await lastHash(admin, 'employment', 'county', fips))) {
+        qcew.push({ dataset: 'employment', scope_type: 'county', scope_key: fips, captured_week: runWeek, source: qh.source, provenance: 'live', capture_version: CAPTURE_VERSION.employment, data, row_count: d.total_employment ?? 0, content_hash: h });
+      }
+    }
+  }
+
+  const oc = 'dataset,scope_type,scope_key,captured_week';
   return {
-    violations: await chunkedUpsert(admin, 'archive_snapshots', violations, 'dataset,scope_type,scope_key,captured_week'),
-    landlord: await chunkedUpsert(admin, 'archive_snapshots', landlord, 'dataset,scope_type,scope_key,captured_week'),
-    filings: await chunkedUpsert(admin, 'archive_snapshots', filings, 'dataset,scope_type,scope_key,captured_week'),
-    zoning: await chunkedUpsert(admin, 'archive_snapshots', zoning, 'dataset,scope_type,scope_key,captured_week'),
+    violations: await chunkedUpsert(admin, 'archive_snapshots', violations, oc),
+    landlord: await chunkedUpsert(admin, 'archive_snapshots', landlord, oc),
+    filings: await chunkedUpsert(admin, 'archive_snapshots', filings, oc),
+    zoning: await chunkedUpsert(admin, 'archive_snapshots', zoning, oc),
+    contamination: await chunkedUpsert(admin, 'archive_snapshots', contamination, oc),
+    disaster: await chunkedUpsert(admin, 'archive_snapshots', disaster, oc),
+    hmda: await chunkedUpsert(admin, 'archive_snapshots', hmda, oc),
+    qcew: await chunkedUpsert(admin, 'archive_snapshots', qcew, oc),
   };
 }
 

@@ -26,7 +26,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 300;
 
-const RUN_VERSION = 'archive-slice2@1';
+const RUN_VERSION = 'archive-slice5@1';
 // Plausibility floors — below these, a "successful" capture almost certainly
 // means the source query silently broke (the exact failure that destroys the
 // thesis). A run under floor is marked `partial` and shows as a gap. Only the
@@ -80,9 +80,13 @@ export async function POST(req: Request) {
     record('landlord', c.landlord);
     record('filings', c.filings);
     record('zoning', c.zoning);
+    record('contamination', c.contamination);
+    record('disaster_history', c.disaster);
+    record('mortgage_demand', c.hmda);
+    record('employment', c.qcew);
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    for (const n of ['violations', 'landlord', 'filings', 'zoning']) datasets[n] = { written: 0, error: msg };
+    for (const n of ['violations', 'landlord', 'filings', 'zoning', 'contamination', 'disaster_history', 'mortgage_demand', 'employment']) datasets[n] = { written: 0, error: msg };
   }
 
   // Calibration scan (Slice 3) — DOWNSTREAM of the archive, not an archive
