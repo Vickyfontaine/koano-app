@@ -25,13 +25,20 @@ import type {
 import { errMsg, fetchJson } from './http';
 
 const ROLLING_SALES = 'https://data.cityofnewyork.us/resource/usep-8jbt.json';
+const PLUTO = 'https://data.cityofnewyork.us/resource/64uk-42ks.json'; // MapPLUTO — has a lat/lng centroid per BBL
 
 const MIN_PRICE = 100000; // excludes $1 non-arms-length transfers
 const MIN_GSF = 300; // excludes bad/placeholder square footage
 const COMPS_SHOWN = 10;
 const TRIM_PCT = 0.1; // trim top/bottom decile of $/sqft before the median
+const RADIUS_MI = 1.0; // prefer comps within a mile of the subject
+const MIN_RADIUS_COMPS = 5; // below this, fall back to the nearest sales regardless of radius
+const NEAREST_FALLBACK = 20; // how many nearest to keep when the radius is sparse
 
 interface SaleRow {
+  borough?: string;
+  block?: string;
+  lot?: string;
   address?: string;
   sale_price?: string;
   sale_date?: string;
@@ -39,6 +46,33 @@ interface SaleRow {
   building_class_category?: string;
   residential_units?: string;
   zip_code?: string;
+}
+
+function haversineMi(aLat: number, aLon: number, bLat: number, bLon: number): number {
+  const R = 3958.8;
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(bLat - aLat);
+  const dLon = toRad(bLon - aLon);
+  const s = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(aLat)) * Math.cos(toRad(bLat)) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.min(1, Math.sqrt(s)));
+}
+
+// Centroid lat/lng for a set of BBLs, from MapPLUTO (one batch query). PLUTO
+// stores bbl as a number-formatted string ("3009720058.00000000"); we key the
+// map by the plain integer BBL to match the DOF-derived BBL.
+async function plutoCoords(bbls: string[]): Promise<Map<string, { lat: number; lon: number }>> {
+  const m = new Map<string, { lat: number; lon: number }>();
+  if (bbls.length === 0) return m;
+  const list = bbls.map((b) => `'${b}'`).join(',');
+  const url = `${PLUTO}?$where=${encodeURIComponent(`bbl in (${list})`)}&$select=bbl,latitude,longitude&$limit=5000`;
+  const rows = await fetchJson<{ bbl?: string; latitude?: string; longitude?: string }[]>(url, { timeoutMs: 30000 });
+  for (const r of rows) {
+    const bbl = r.bbl ? String(Math.trunc(Number(r.bbl))) : null;
+    const lat = Number(r.latitude);
+    const lon = Number(r.longitude);
+    if (bbl && Number.isFinite(lat) && Number.isFinite(lon)) m.set(bbl, { lat, lon });
+  }
+  return m;
 }
 
 function median(nums: number[]): number {
@@ -136,7 +170,7 @@ export const nycSalesComps: MlsCompsProvider = {
       );
       const rows = await fetchJson<SaleRow[]>(
         `${ROLLING_SALES}?$where=${where}` +
-          `&$select=address,sale_price,sale_date,gross_square_feet,building_class_category,residential_units,zip_code` +
+          `&$select=borough,block,lot,address,sale_price,sale_date,gross_square_feet,building_class_category,residential_units,zip_code` +
           `&$order=sale_date DESC&$limit=2000`,
         { timeoutMs: 30000 },
       );
@@ -146,6 +180,8 @@ export const nycSalesComps: MlsCompsProvider = {
         comp: MlsComp;
         psf: number;
         dateMs: number;
+        bbl: string | null;
+        dist: number; // miles from subject; Infinity until PLUTO coords resolve
       }
       const qualified: Qualified[] = [];
       for (const r of rows) {
@@ -156,9 +192,15 @@ export const nycSalesComps: MlsCompsProvider = {
         }
         const psf = Math.round(price / gsf);
         const dateMs = r.sale_date ? new Date(r.sale_date).getTime() : 0;
+        const bbl =
+          r.borough && r.block && r.lot
+            ? `${r.borough}${String(r.block).padStart(5, '0')}${String(r.lot).padStart(4, '0')}`
+            : null;
         qualified.push({
           psf,
           dateMs,
+          bbl,
+          dist: Infinity,
           comp: {
             address: r.address ?? '',
             sale_price: price,
@@ -166,15 +208,10 @@ export const nycSalesComps: MlsCompsProvider = {
             price_per_sqft: psf,
             gross_square_feet: gsf,
             building_class: r.building_class_category ?? '',
+            distance_mi: null,
           },
         });
       }
-
-      const proximityNote =
-        `Comparables are recorded residential sales in ZIP ${zip} (last 12 months). ` +
-        'Proximity is ZIP-keyed — this dataset has no coordinates — so a large or mixed ZIP may ' +
-        'include less-comparable sales; block-level/radius proximity is a future refinement. ' +
-        'Condos/co-ops without recorded square footage are excluded, so comps skew to 1-3 family homes. NYC only.';
 
       if (qualified.length === 0) {
         // Coverage fact, not a failure.
@@ -195,10 +232,34 @@ export const nycSalesComps: MlsCompsProvider = {
         };
       }
 
-      // price_trend: recent-6mo vs prior-6mo median $/sqft (from one query).
+      // --- Real distance: DOF BBL → PLUTO centroid → haversine from subject.
+      //     Prefer comps within RADIUS_MI; fall back to the nearest when sparse.
+      //     If PLUTO coords are unavailable, degrade to the ZIP-keyed set.
+      const bbls = Array.from(new Set(qualified.map((q) => q.bbl).filter(Boolean))) as string[];
+      const coords =
+        addr.latitude && addr.longitude
+          ? await plutoCoords(bbls).catch(() => new Map<string, { lat: number; lon: number }>())
+          : new Map<string, { lat: number; lon: number }>();
+
+      let pool: Qualified[] = qualified;
+      let distanceRanked = false;
+      if (coords.size > 0) {
+        distanceRanked = true;
+        for (const q of qualified) {
+          const c = q.bbl ? coords.get(q.bbl) : undefined;
+          q.dist = c ? haversineMi(addr.latitude, addr.longitude, c.lat, c.lon) : Infinity;
+        }
+        const sorted = qualified.filter((q) => Number.isFinite(q.dist)).sort((a, b) => a.dist - b.dist);
+        const within = sorted.filter((q) => q.dist <= RADIUS_MI);
+        pool = within.length >= MIN_RADIUS_COMPS ? within : sorted.slice(0, NEAREST_FALLBACK);
+        if (pool.length === 0) pool = qualified; // never empty when candidates exist
+        for (const q of pool) q.comp.distance_mi = Math.round(q.dist * 100) / 100;
+      }
+
+      // price_trend: recent-6mo vs prior-6mo median $/sqft within the comp pool.
       const sixMonthsMs = new Date(monthsAgoIso(6)).getTime();
-      const recent = qualified.filter((q) => q.dateMs >= sixMonthsMs).map((q) => q.psf);
-      const prior = qualified.filter((q) => q.dateMs < sixMonthsMs).map((q) => q.psf);
+      const recent = pool.filter((q) => q.dateMs >= sixMonthsMs).map((q) => q.psf);
+      const prior = pool.filter((q) => q.dateMs < sixMonthsMs).map((q) => q.psf);
       let price_trend: 'rising' | 'falling' | 'flat' = 'flat';
       if (recent.length >= 3 && prior.length >= 3) {
         const rMed = trimmedMedian(recent);
@@ -209,12 +270,22 @@ export const nycSalesComps: MlsCompsProvider = {
         }
       }
 
+      const withinCount = distanceRanked ? pool.filter((q) => q.dist <= RADIUS_MI).length : 0;
+      const scope_note = distanceRanked
+        ? `Comparables are recorded residential sales ranked by true distance from the subject ` +
+          `(DOF sale → PLUTO centroid), last 12 months. ` +
+          `${withinCount >= MIN_RADIUS_COMPS ? `${pool.length} within ${RADIUS_MI} mi.` : `Sparse within ${RADIUS_MI} mi — the ${pool.length} nearest sales are used.`} ` +
+          'Condos/co-ops without recorded square footage are excluded, so comps skew to 1-3 family homes. NYC only.'
+        : `Comparables are recorded residential sales in ZIP ${zip} (last 12 months); PLUTO coordinates ` +
+          'were unavailable this call, so proximity is ZIP-keyed. Condos/co-ops without recorded square ' +
+          'footage are excluded, so comps skew to 1-3 family homes. NYC only.';
+
       const data: MlsCompsSummary = {
-        comps: qualified.slice(0, COMPS_SHOWN).map((q) => q.comp),
-        median_price_per_sqft: trimmedMedian(qualified.map((q) => q.psf)),
-        sales_count: qualified.length,
+        comps: pool.slice(0, COMPS_SHOWN).map((q) => q.comp),
+        median_price_per_sqft: trimmedMedian(pool.map((q) => q.psf)),
+        sales_count: pool.length,
         price_trend,
-        scope_note: proximityNote,
+        scope_note,
       };
 
       return {

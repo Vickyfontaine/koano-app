@@ -558,6 +558,7 @@ export interface MlsComp {
   price_per_sqft: number;
   gross_square_feet: number;
   building_class: string;
+  distance_mi: number | null; // true distance from subject (DOF BBL → PLUTO centroid); null on ZIP fallback
 }
 
 export interface MlsCompsSummary {
