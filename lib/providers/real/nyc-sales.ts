@@ -80,6 +80,29 @@ export const nycSalesComps: MlsCompsProvider = {
     const zip = addr.zip;
 
     try {
+      // Outside NYC: a Census-geocoded address has a ZIP but no BBL. Without this
+      // guard we would query NYC DOF sales with an out-of-town ZIP, match nothing,
+      // and return a LIVE `sales_count: 0` that reads as "no sales here" — and,
+      // being tagged live, would not even flag the verdict as representative.
+      // Recorded-sales comps are NYC-only, so a non-NYC address is out of coverage.
+      if (!addr.bbl) {
+        return {
+          ok: true,
+          data: {
+            comps: [],
+            median_price_per_sqft: 0,
+            sales_count: 0,
+            price_trend: 'flat',
+            scope_note:
+              'Recorded-sales comps cover NYC only (DOF Rolling Sales). This address is outside NYC, ' +
+              'so no live comparable set is available — a national MLS integration would fill this.',
+          },
+          provenance: 'representative',
+          source: 'NYC Open Data — DOF Rolling Calendar Sales (usep-8jbt) — outside NYC coverage',
+          fetched_at,
+        };
+      }
+
       if (!zip) {
         // No ZIP resolved → coverage fact (can't key proximity), still live.
         return {
