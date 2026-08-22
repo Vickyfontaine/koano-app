@@ -19,6 +19,10 @@ import type {
 } from "mapbox-gl";
 import type { Provenance } from "../verdict";
 import {
+  BASE_GREEN,
+  BASE_GREEN_CLASSES,
+  BASE_WATER,
+  BASE_WATERWAY,
   FLOOD_SFHA_FILL,
   FLOOD_SFHA_LINE,
   FLOOD_SHADED_FILL,
@@ -225,9 +229,37 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
           } catch {
             /* style layer ids vary across versions — non-fatal */
           }
+          // Restrained geographic color on the base: water a soft blue-grey,
+          // parks a muted sage — real features, still subordinate to the data
+          // layers. Each guarded: light-v11 layer ids can change.
+          const paint = (fn: () => void) => {
+            try {
+              fn();
+            } catch {
+              /* layer absent in this style version — non-fatal */
+            }
+          };
+          paint(() => map!.setPaintProperty("water", "fill-color", BASE_WATER));
+          paint(() => map!.setPaintProperty("waterway", "line-color", BASE_WATERWAY));
+          paint(() => map!.setPaintProperty("national-park", "fill-color", BASE_GREEN));
+          paint(() => map!.setPaintProperty("national-park", "fill-opacity", 0.5));
+          paint(() =>
+            map!.setPaintProperty("landuse", "fill-color", [
+              "match",
+              ["get", "class"],
+              BASE_GREEN_CLASSES,
+              BASE_GREEN,
+              "rgba(0,0,0,0)",
+            ] as unknown as string),
+          );
+          paint(() => map!.setPaintProperty("landuse", "fill-opacity", 0.6));
           if (!cancelled) setReady(true);
         });
-        map.on("error", () => setFailed(true));
+        // Log runtime errors (a tile 404, a transient) but do NOT hide a working
+        // map — only a construction failure or a missing token shows the fallback.
+        map.on("error", (e: { error?: { message?: string } }) =>
+          console.warn("[KoanoMap]", e?.error?.message ?? "map error"),
+        );
         mapRef.current = map;
       } catch {
         setFailed(true);
@@ -354,12 +386,19 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
       // tally can also say how many are actually on screen — and stay correct as
       // the user pans/zooms.
       const recompute = () => {
-        const b = map.getBounds();
-        if (!b) return;
+        // Project each marker to a screen pixel and test against the actual
+        // canvas — robust to the camera padding fitBounds leaves set (getBounds()
+        // returns the padding-inset region and would miss edge markers).
+        const container = map.getContainer();
+        const w = container.clientWidth;
+        const h = container.clientHeight;
         const counts: Partial<Record<MarkerKind, number>> = {};
         for (const mk of markers) {
           if (!finite(mk)) continue;
-          if (b.contains([mk.lon, mk.lat])) counts[mk.kind] = (counts[mk.kind] ?? 0) + 1;
+          const p = map.project([mk.lon, mk.lat]);
+          if (p.x >= 0 && p.x <= w && p.y >= 0 && p.y <= h) {
+            counts[mk.kind] = (counts[mk.kind] ?? 0) + 1;
+          }
         }
         setInView(counts);
       };

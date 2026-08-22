@@ -47,3 +47,26 @@ export function compDivergingColor(v: number, mid: number, min: number, max: num
 
 // The CSS gradient that decodes the comp scale in the legend.
 export const COMP_GRADIENT_CSS = `linear-gradient(90deg, ${COMP_LOW}, ${COMP_MID} 50%, ${COMP_HIGH})`;
+
+// --- Restrained base geography ------------------------------------------------
+// Subordinate to every data layer (flood, comps, hazards). Water is a low-chroma
+// blue-GREY, deliberately NOT the flood blue/teal — the canal is water (base),
+// the flood zones are hazard (data); different meaning, different look. Parks a
+// muted pastel sage. Pastel so a park can never compete with a comp dot.
+export const BASE_WATER = "#C7D2D8"; // soft blue-grey (canal, bay)
+export const BASE_WATERWAY = "#A9B8C0"; // slightly deeper for the canal line
+export const BASE_GREEN = "#D2DEC8"; // muted sage (parks, green space)
+// landuse classes that are green space (Mapbox streets v8) — everything else on
+// that layer recedes to transparent, keeping the base quiet.
+export const BASE_GREEN_CLASSES = [
+  "park",
+  "grass",
+  "wood",
+  "scrub",
+  "cemetery",
+  "pitch",
+  "garden",
+  "recreation_ground",
+  "golf_course",
+  "agriculture",
+];
