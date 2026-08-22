@@ -235,9 +235,30 @@ export interface FloodInfo {
   static_bfe_ft: number | null;
 }
 
+// A single flood-hazard polygon near the subject, for drawing on a map. Only
+// actual flood-hazard zones are carried (SFHA + 0.2%-annual-chance); "area of
+// minimal flood hazard" is the null case and is omitted, not drawn.
+export type FloodGeometry =
+  | { type: 'Polygon'; coordinates: number[][][] }
+  | { type: 'MultiPolygon'; coordinates: number[][][][] };
+
+export interface FloodZoneFeature {
+  zone: string; // FLD_ZONE, e.g. "AE"
+  subtype: string | null; // ZONE_SUBTY
+  sfha: boolean; // Special Flood Hazard Area (1%-annual-chance)
+  geometry: FloodGeometry;
+}
+
+export interface FloodZonesInfo {
+  zones: FloodZoneFeature[];
+  scope_note: string;
+}
+
 export interface FloodProvider {
   name: string;
   getFloodZone(addr: ResolvedAddress): Promise<ProviderResult<FloodInfo>>;
+  // Flood-hazard polygons in a small box around the point, for map rendering.
+  getFloodZones(addr: ResolvedAddress): Promise<ProviderResult<FloodZonesInfo>>;
 }
 
 export interface CrimeStats {
@@ -276,7 +297,18 @@ export interface ContaminationInfo {
   nearest_site_name: string | null;
   nearest_site_distance_mi: number | null;
   nearest_site_program: string | null; // "SEMS (Superfund)" | "ACRES (brownfield)"
+  // Every cleanup site within the radius that carries coordinates (for mapping).
+  // The FRS response already includes these; the summary counts derive from them.
+  sites: ContaminationSite[];
   scope_note: string;
+}
+
+export interface ContaminationSite {
+  name: string | null;
+  latitude: number;
+  longitude: number;
+  distance_mi: number;
+  program: string; // "SEMS (Superfund)" | "ACRES (brownfield)"
 }
 
 export interface ContaminationProvider {
@@ -559,6 +591,8 @@ export interface MlsComp {
   gross_square_feet: number;
   building_class: string;
   distance_mi: number | null; // true distance from subject (DOF BBL → PLUTO centroid); null on ZIP fallback
+  latitude: number | null; // DOF BBL → PLUTO centroid; null on ZIP fallback (unmappable)
+  longitude: number | null;
 }
 
 export interface MlsCompsSummary {

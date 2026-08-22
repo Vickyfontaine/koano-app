@@ -9,12 +9,14 @@ import React, { useState } from "react";
 import AddressInput from "@/components/ui/AddressInput";
 import LoadingState from "@/components/ui/LoadingState";
 import VerdictCard from "@/components/ui/VerdictCard";
+import VerdictMathPanel from "@/components/ui/VerdictMathPanel";
 import ReasoningChain from "@/components/ui/ReasoningChain";
 import { CLUSTERS } from "../clusters";
 import { useVerdictStream } from "../useVerdictStream";
 import VerdictHistory from "../VerdictHistory";
 import PermitHistoryPanel from "../PermitHistoryPanel";
 import DocumentButton from "../DocumentButton";
+import PropertyMap from "./PropertyMap";
 import ValuationPanel from "./ValuationPanel";
 import AlertsPanel from "./AlertsPanel";
 import ViolationsPanel from "./ViolationsPanel";
@@ -26,9 +28,11 @@ const PROPERTY_BLOCKS = [
   "permits",
   "opportunity_zone",
   "flood",
+  "flood_zones",
   "demographics",
   "hpi",
   "mls_comps",
+  "contamination",
   "building_violations",
   "landlord_portfolio",
 ];
@@ -109,6 +113,13 @@ export default function Cluster1Dashboard() {
         </div>
       )}
 
+      {/* The map leads the property view — it orients instantly (and the
+          flood-edge relationship is itself a finding), while the verdict
+          pipeline runs below. Renders as soon as the fast block data lands. */}
+      {status !== "idle" && (
+        <PropertyMap detail={detail} detailError={detailError} id="c1-map" />
+      )}
+
       {status === "running" && (
         <LoadingState
           phase={stream.phase}
@@ -140,6 +151,8 @@ export default function Cluster1Dashboard() {
       {status === "done" && result && (
         <>
           <VerdictCard verdict={result.verdict} address={result.resolved_address.normalized} />
+
+          <VerdictMathPanel verdict={result.verdict} />
 
           <div
             style={{

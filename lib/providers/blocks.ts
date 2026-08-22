@@ -17,6 +17,7 @@ import type {
   EmploymentInfo,
   EntitlementSummary,
   FloodInfo,
+  FloodZonesInfo,
   LandlordPortfolioSummary,
   HpiTrend,
   MigrationInfo,
@@ -50,12 +51,15 @@ export interface SiteDetailResponse {
     bbl: string | null;
     borough: string | null;
     tract_geoid: string | null;
+    latitude: number; // live geocoded point (WGS84) — the map subject
+    longitude: number;
   };
   zoning?: SiteDetailBlock<ZoningInfo>;
   permits?: SiteDetailBlock<PermitsSummary>;
   opportunity_zone?: SiteDetailBlock<OpportunityZoneInfo>;
   proforma?: SiteDetailBlock<ProformaBenchmark>;
   flood?: SiteDetailBlock<FloodInfo>;
+  flood_zones?: SiteDetailBlock<FloodZonesInfo>;
   demographics?: SiteDetailBlock<AcsDemographics>;
   hpi?: SiteDetailBlock<HpiTrend>;
   mls_comps?: SiteDetailBlock<MlsCompsSummary>;
@@ -85,6 +89,7 @@ export const BLOCK_FETCHERS: Record<
   opportunity_zone: (a) => registry.opportunityZones.getOpportunityZone(a),
   proforma: (a) => registry.proformaBenchmark.getBenchmarks(a),
   flood: (a) => registry.flood.getFloodZone(a),
+  flood_zones: (a) => registry.flood.getFloodZones(a),
   demographics: (a) => registry.demographics.getDemographics(a),
   hpi: (a) => registry.hpi.getHpi(a),
   mls_comps: (a) => registry.mlsComps.getComps(a),

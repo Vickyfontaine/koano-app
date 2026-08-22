@@ -83,6 +83,8 @@ export async function POST(req: Request) {
       bbl: addr.bbl,
       borough: addr.borough,
       tract_geoid: addr.tract_geoid,
+      latitude: addr.latitude,
+      longitude: addr.longitude,
     },
   };
   blocks.forEach((b, i) => {

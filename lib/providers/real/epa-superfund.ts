@@ -7,7 +7,13 @@
 // named Superfund site from general knowledge — it cites a real site the data
 // gave it (or, honestly, states there are none within the radius).
 
-import type { ContaminationInfo, ContaminationProvider, ProviderResult, ResolvedAddress } from '../types';
+import type {
+  ContaminationInfo,
+  ContaminationProvider,
+  ContaminationSite,
+  ProviderResult,
+  ResolvedAddress,
+} from '../types';
 import { errMsg, fetchJson } from './http';
 
 const FRS = 'https://ofmpub.epa.gov/frs_public2/frs_rest_services.get_facilities';
@@ -58,6 +64,9 @@ const REPRESENTATIVE_FALLBACK: ContaminationInfo = {
   nearest_site_name: 'REPRESENTATIVE — live EPA FRS call failed',
   nearest_site_distance_mi: 0.6,
   nearest_site_program: 'SEMS (Superfund)',
+  // No coordinates in the fallback — a representative site must never be plotted
+  // at a real location on the map, which would read as a live finding.
+  sites: [],
   scope_note: 'REPRESENTATIVE — EPA Facility Registry Service was unreachable; typical inner-Brooklyn cleanup-site density shown as a labeled stand-in.',
 };
 
@@ -76,14 +85,27 @@ export const epaContamination: ContaminationProvider = {
         facs.map((f) => {
           const la = Number(f.Latitude83);
           const lo = Number(f.Longitude83);
-          const dist = Number.isFinite(la) && Number.isFinite(lo) ? haversineMi(addr.latitude, addr.longitude, la, lo) : null;
-          return { name: f.FacilityName ?? null, dist, program };
+          const ok = Number.isFinite(la) && Number.isFinite(lo);
+          const dist = ok ? haversineMi(addr.latitude, addr.longitude, la, lo) : null;
+          return { name: f.FacilityName ?? null, lat: ok ? la : null, lon: ok ? lo : null, dist, program };
         });
 
       const ranked = [...withDist(sems, 'SEMS (Superfund)'), ...withDist(acres, 'ACRES (brownfield)')]
         .filter((x) => x.dist != null)
         .sort((a, b) => (a.dist as number) - (b.dist as number));
       const nearest = ranked[0] ?? null;
+
+      // Every ranked site has finite coords (dist requires them) — carry them all
+      // for the map, nearest first.
+      const sites: ContaminationSite[] = ranked
+        .filter((x) => x.lat != null && x.lon != null)
+        .map((x) => ({
+          name: x.name,
+          latitude: x.lat as number,
+          longitude: x.lon as number,
+          distance_mi: Math.round((x.dist as number) * 100) / 100,
+          program: x.program,
+        }));
 
       const data: ContaminationInfo = {
         radius_mi: RADIUS_MI,
@@ -93,6 +115,7 @@ export const epaContamination: ContaminationProvider = {
         nearest_site_name: nearest?.name ?? null,
         nearest_site_distance_mi: nearest?.dist != null ? Math.round(nearest.dist * 100) / 100 : null,
         nearest_site_program: nearest?.program ?? null,
+        sites,
         scope_note:
           `EPA Facility Registry Service — cleanup sites within ${RADIUS_MI} mi of the point. ` +
           'SEMS = Superfund program sites (NPL and non-NPL); ACRES = brownfield sites. ' +

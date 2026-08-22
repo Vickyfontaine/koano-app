@@ -182,6 +182,7 @@ export const nycSalesComps: MlsCompsProvider = {
         dateMs: number;
         bbl: string | null;
         dist: number; // miles from subject; Infinity until PLUTO coords resolve
+        coord: { lat: number; lon: number } | null; // PLUTO centroid, once resolved
       }
       const qualified: Qualified[] = [];
       for (const r of rows) {
@@ -201,6 +202,7 @@ export const nycSalesComps: MlsCompsProvider = {
           dateMs,
           bbl,
           dist: Infinity,
+          coord: null,
           comp: {
             address: r.address ?? '',
             sale_price: price,
@@ -209,6 +211,8 @@ export const nycSalesComps: MlsCompsProvider = {
             gross_square_feet: gsf,
             building_class: r.building_class_category ?? '',
             distance_mi: null,
+            latitude: null,
+            longitude: null,
           },
         });
       }
@@ -247,13 +251,20 @@ export const nycSalesComps: MlsCompsProvider = {
         distanceRanked = true;
         for (const q of qualified) {
           const c = q.bbl ? coords.get(q.bbl) : undefined;
+          q.coord = c ?? null;
           q.dist = c ? haversineMi(addr.latitude, addr.longitude, c.lat, c.lon) : Infinity;
         }
         const sorted = qualified.filter((q) => Number.isFinite(q.dist)).sort((a, b) => a.dist - b.dist);
         const within = sorted.filter((q) => q.dist <= RADIUS_MI);
         pool = within.length >= MIN_RADIUS_COMPS ? within : sorted.slice(0, NEAREST_FALLBACK);
         if (pool.length === 0) pool = qualified; // never empty when candidates exist
-        for (const q of pool) q.comp.distance_mi = Math.round(q.dist * 100) / 100;
+        for (const q of pool) {
+          q.comp.distance_mi = Math.round(q.dist * 100) / 100;
+          if (q.coord) {
+            q.comp.latitude = q.coord.lat;
+            q.comp.longitude = q.coord.lon;
+          }
+        }
       }
 
       // price_trend: recent-6mo vs prior-6mo median $/sqft within the comp pool.

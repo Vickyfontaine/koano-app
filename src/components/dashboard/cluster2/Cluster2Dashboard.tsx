@@ -11,6 +11,7 @@ import React, { useState } from "react";
 import AddressInput from "@/components/ui/AddressInput";
 import LoadingState from "@/components/ui/LoadingState";
 import VerdictCard from "@/components/ui/VerdictCard";
+import VerdictMathPanel from "@/components/ui/VerdictMathPanel";
 import ReasoningChain from "@/components/ui/ReasoningChain";
 import { CLUSTERS } from "../clusters";
 import { useVerdictStream } from "../useVerdictStream";
@@ -229,6 +230,7 @@ export default function Cluster2Dashboard() {
           {status === "done" && result && (
             <>
               <VerdictCard verdict={result.verdict} address={result.resolved_address.normalized} />
+              <VerdictMathPanel verdict={result.verdict} />
               <ReasoningChain
                 reasoningChain={result.verdict.reasoning_chain}
                 minoritySignals={result.verdict.minority_signals}

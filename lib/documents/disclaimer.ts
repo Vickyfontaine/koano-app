@@ -25,6 +25,7 @@ const BLOCK_LABELS: Record<BlockKey, string> = {
   opportunity_zone: 'Opportunity Zone status',
   proforma: 'Pro forma benchmarks',
   flood: 'Flood zone',
+  flood_zones: 'Flood-zone boundaries (FEMA NFHL)',
   demographics: 'Demographics (ACS)',
   hpi: 'House Price Index',
   mls_comps: 'Comparable sales',

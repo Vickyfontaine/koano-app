@@ -9,6 +9,7 @@
 import React, { useState } from "react";
 import LoadingState from "@/components/ui/LoadingState";
 import VerdictCard from "@/components/ui/VerdictCard";
+import VerdictMathPanel from "@/components/ui/VerdictMathPanel";
 import ReasoningChain from "@/components/ui/ReasoningChain";
 import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
 import { VERDICT_COLORS, type SynthesisResult, type Verdict } from "@/components/ui/verdict";
@@ -328,6 +329,7 @@ export default function SiteComparison() {
                   )}
                 </div>
                 <VerdictCard verdict={r.verdict} />
+                <VerdictMathPanel verdict={r.verdict} />
                 <SitePanels
                   detail={details[slot].data}
                   detailError={details[slot].error}
