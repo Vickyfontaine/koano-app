@@ -10,6 +10,29 @@
 // subject address, a short common vocabulary, or a DOCUMENTED standard
 // code-definition. Anything else is forbidden and surfaced, never dropped.
 
+// ─────────────────────────────────────────────────────────────────────────────
+// KNOWN GAP — BACKLOG (documented so it is not rediscovered by the next incident)
+//
+// This gate polices exactly ONE class of hallucination: unsourced NAMED ENTITIES
+// (capitalized proper nouns / all-caps acronyms) and 4-DIGIT YEARS. That is the
+// class that produced the Superfund fabrication ("G" → "Gowanus Superfund site").
+//
+// It does NOT police other claim categories, because they are ordinary lowercase
+// words the entity/year regexes never fire on:
+//   • data-quality / provenance — "live", "live-confirmed", "verified" (this is
+//     the SAME class of hole, different category — it let the narrator call a
+//     representative-badged run "live-confirmed"; see the 175-3rd-St fix).
+//   • certainty / calibration — "definitely", "guaranteed", "certain", "proven".
+//   • recency / temporal — "recent", "latest", "as of today", "currently".
+//   • causal / comparative — "X drives Y", "highest in the area".
+//   • non-year numerics — a fabricated "42%" is not a year, so it is not checked.
+//
+// Current mitigation is PROMPT-level only (agent + narrator prompts forbid these);
+// prompts are soft. A structural fix would be a claim-category detector analogous
+// to this entity gate. NOT scheduled — but written down: this is a real integrity
+// gap, of the same class as the entity gap, awaiting a decision to build.
+// ─────────────────────────────────────────────────────────────────────────────
+
 import type { DataPoint } from '../providers/types';
 
 // Shown IN the reasoning chain in place of an ungrounded observation. The chain
