@@ -2,7 +2,14 @@
 // Live queries: subject property by BBL + neighborhood activity by census tract.
 // Falls back to a labeled representative response on failure.
 
-import type { PermitsProvider, PermitsSummary, PermitRecord, ProviderResult, ResolvedAddress } from '../types';
+import type {
+  PermitsProvider,
+  PermitsSummary,
+  PermitMonth,
+  PermitRecord,
+  ProviderResult,
+  ResolvedAddress,
+} from '../types';
 import { errMsg, fetchJson } from './http';
 
 const DATASET = 'https://data.cityofnewyork.us/resource/rbx6-tga4.json';
@@ -85,6 +92,24 @@ function countBy(rows: DobNowPermit[], match: (wt: string) => boolean): number {
   return rows.filter((p) => match((p.work_type ?? '').toLowerCase())).length;
 }
 
+// Bucket permit rows into the last 24 calendar months (zero-filled, chronological),
+// keyed "YYYY-MM" off each row's issued_date. The scope is the same rows the
+// aggregate counts use (census tract when available, else subject BBL), so the
+// trend and the totals always agree.
+function monthlySeries(rows: DobNowPermit[]): PermitMonth[] {
+  const now = new Date();
+  const buckets = new Map<string, number>();
+  for (let i = 23; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    buckets.set(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`, 0);
+  }
+  for (const p of rows) {
+    const key = normalizeDate(p.issued_date).slice(0, 7);
+    if (key && buckets.has(key)) buckets.set(key, (buckets.get(key) ?? 0) + 1);
+  }
+  return Array.from(buckets.entries()).map(([month, count]) => ({ month, count }));
+}
+
 const REPRESENTATIVE_FALLBACK: PermitsSummary = {
   bin: null,
   scope_note:
@@ -93,6 +118,7 @@ const REPRESENTATIVE_FALLBACK: PermitsSummary = {
   new_building_permits: 12,
   demolition_permits: 6,
   alteration_permits: 240,
+  monthly_permits: [],
   recent_permits: [],
   all_permits: [],
   all_permits_note:
@@ -186,6 +212,7 @@ export const nycPermits: PermitsProvider = {
           scope,
           (wt) => wt.includes('alteration') || wt.includes('general construction') || wt.includes('plumbing')
         ),
+        monthly_permits: monthlySeries(scope),
         recent_permits: [...subjectRows.slice(0, 5), ...tractRows.slice(0, 5)].map(toRecord),
         all_permits: allPermits,
         all_permits_note: DOB_NOW_COVERAGE_NOTE,

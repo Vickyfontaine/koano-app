@@ -67,6 +67,11 @@ export interface PermitRecord {
   dataset?: 'DOB NOW' | 'DOB legacy'; // which source this record came from
 }
 
+export interface PermitMonth {
+  month: string; // "YYYY-MM"
+  count: number;
+}
+
 export interface PermitsSummary {
   bin: string | null;
   scope_note: string; // what geography the counts cover
@@ -74,6 +79,10 @@ export interface PermitsSummary {
   new_building_permits: number;
   demolition_permits: number;
   alteration_permits: number;
+  // UI ONLY — neighborhood permits bucketed by month over the last 24 months
+  // (same scope as the aggregate counts). For the permit-trend chart; never
+  // serialized into an agent prompt.
+  monthly_permits: PermitMonth[];
   recent_permits: PermitRecord[];
   // UI ONLY — never serialize into an agent prompt (same contract as
   // ViolationsSummary.all_items). The FULL subject-BBL permit history (all

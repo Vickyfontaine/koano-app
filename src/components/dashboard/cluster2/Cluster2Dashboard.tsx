@@ -17,8 +17,11 @@ import { CLUSTERS } from "../clusters";
 import { useVerdictStream } from "../useVerdictStream";
 import VerdictHistory from "../VerdictHistory";
 import MarketVelocityPanel from "./MarketVelocityPanel";
+import PropertyMap from "../cluster1/PropertyMap";
 import CmaBuilder from "./CmaBuilder";
+import CompsScatter from "./CompsScatter";
 import PricingPanel from "./PricingPanel";
+import PermitTrend from "./PermitTrend";
 import NarrativePanel from "./NarrativePanel";
 import DocumentButton from "../DocumentButton";
 import type { SiteDetailResponse } from "@/app/api/site-detail/route";
@@ -116,13 +119,16 @@ export default function Cluster2Dashboard() {
         <>
           {/* Market data sections — render as soon as the fast fetch lands */}
           <MarketVelocityPanel detail={detail} detailError={detailError} id="c2-velocity" />
+          <PropertyMap detail={detail} detailError={detailError} title="Comparable sales" id="c2-map" />
           <CmaBuilder detail={detail} detailError={detailError} id="c2-cma" />
+          <CompsScatter detail={detail} id="c2-scatter" />
           <PricingPanel
             detail={detail}
             detailError={detailError}
             verdict={result?.verdict ?? null}
             id="c2-pricing"
           />
+          <PermitTrend detail={detail} id="c2-permits" />
           <NarrativePanel address={subjectAddress} id="c2-narrative" />
 
           {/* Downloadable documents — grouped, matching the Cluster 1 & 5 pattern */}

@@ -38,10 +38,13 @@ export default function PropertyMap({
   detail,
   detailError,
   id,
+  title = "Property map",
 }: {
   detail: SiteDetailResponse | null;
   detailError: string | null;
   id?: string;
+  /** Eyebrow label — e.g. "Comparable sales" when reused as a Cluster 2 CMA map. */
+  title?: string;
 }) {
   const ra = detail?.resolved_address;
   const hasCoords = !!ra && Number.isFinite(ra.latitude) && Number.isFinite(ra.longitude);
@@ -49,7 +52,7 @@ export default function PropertyMap({
   if (!detail || !hasCoords) {
     return (
       <section id={id} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-        <span style={panelTitle}>Property map</span>
+        <span style={panelTitle}>{title}</span>
         <div
           style={{
             height: 440,
@@ -185,7 +188,7 @@ export default function PropertyMap({
 
   return (
     <section id={id} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-      <span style={panelTitle}>Property map</span>
+      <span style={panelTitle}>{title}</span>
       <KoanoMap
         center={center}
         markers={markers}
