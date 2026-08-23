@@ -20,6 +20,8 @@ interface BarChartProps {
   data: BarDatum[];
   height?: number;
   color?: string;
+  /** Outline for the bars — a deeper tint of the fill, so a pastel fill reads on white. */
+  borderColor?: string;
   /** Label every Nth bar on the x-axis (0 = none). */
   axisEvery?: number;
   /** Render a y-axis (0 / mid / max) with gridlines so heights carry magnitude. */
@@ -40,6 +42,7 @@ export default function BarChart({
   data,
   height = 140,
   color = "var(--mid-blue)",
+  borderColor,
   axisEvery = 6,
   yAxis = false,
   valueFormat = (n) => n.toLocaleString("en-US"),
@@ -93,6 +96,7 @@ export default function BarChart({
                     backgroundImage: d.muted
                       ? "repeating-linear-gradient(45deg, rgba(255,255,255,0.6) 0 3px, rgba(255,255,255,0) 3px 6px)"
                       : undefined,
+                    border: borderColor ? `1px solid ${borderColor}` : undefined,
                     borderRadius: "2px 2px 0 0",
                   }}
                 />

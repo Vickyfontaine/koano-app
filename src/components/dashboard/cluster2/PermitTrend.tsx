@@ -7,7 +7,7 @@
 
 import React from "react";
 import BarChart, { type BarDatum } from "@/components/ui/charts/BarChart";
-import { DOMAIN_DEVELOPMENT } from "@/components/ui/charts/domains";
+import { DOMAIN_DEVELOPMENT, DOMAIN_DEVELOPMENT_EDGE } from "@/components/ui/charts/domains";
 import { panelStyle, PanelHeader } from "../panels";
 import type { SiteDetailResponse } from "@/app/api/site-detail/route";
 
@@ -56,6 +56,7 @@ export default function PermitTrend({
         axisEvery={3}
         yAxis
         color={DOMAIN_DEVELOPMENT}
+        borderColor={DOMAIN_DEVELOPMENT_EDGE}
         ariaLabel="Monthly permit counts, last 24 months"
       />
       <p style={{ fontSize: "12px", color: "var(--ink-faint)", margin: 0, lineHeight: 1.5 }}>
