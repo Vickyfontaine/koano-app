@@ -79,6 +79,10 @@ export interface DocumentData {
     bbl: string | null;
     borough: string | null;
     tract_geoid: string | null;
+    // Coordinate confidence (distinct from provenance) — 'unconfirmed' rides into
+    // the provenance appendix so a document never hides that its subject point
+    // was resolved without a cross-check.
+    location_confidence: 'confirmed' | 'unconfirmed';
   };
   blocks: Partial<Record<BlockKey, SiteDetailBlock<unknown>>>;
   overall_provenance: Provenance; // weakest across all fetched blocks

@@ -50,6 +50,7 @@ export async function assembleDocumentData(
       bbl: addr.bbl,
       borough: addr.borough,
       tract_geoid: addr.tract_geoid,
+      location_confidence: addr.location_confidence,
     },
     blocks,
     overall_provenance: weakest(blocks),

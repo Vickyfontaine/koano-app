@@ -12,6 +12,7 @@ import AddressInput from "@/components/ui/AddressInput";
 import LoadingState from "@/components/ui/LoadingState";
 import VerdictCard from "@/components/ui/VerdictCard";
 import VerdictMathPanel from "@/components/ui/VerdictMathPanel";
+import LocationConfidenceNote from "@/components/ui/LocationConfidenceNote";
 import ReasoningChain from "@/components/ui/ReasoningChain";
 import { CLUSTERS } from "../clusters";
 import { useVerdictStream } from "../useVerdictStream";
@@ -100,6 +101,8 @@ export default function Cluster2Dashboard() {
       </div>
 
       <AddressInput onSubmit={analyze} busy={status === "running"} />
+
+      <LocationConfidenceNote confidence={detail?.resolved_address?.location_confidence} />
 
       {!started && (
         /* Empty state — approved copy (KOANO_COPY.md) */

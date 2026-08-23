@@ -85,6 +85,7 @@ export async function POST(req: Request) {
       tract_geoid: addr.tract_geoid,
       latitude: addr.latitude,
       longitude: addr.longitude,
+      location_confidence: addr.location_confidence,
     },
   };
   blocks.forEach((b, i) => {

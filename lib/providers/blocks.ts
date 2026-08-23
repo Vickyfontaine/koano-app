@@ -53,6 +53,10 @@ export interface SiteDetailResponse {
     tract_geoid: string | null;
     latitude: number; // live geocoded point (WGS84) — the map subject
     longitude: number;
+    // Coordinate confidence, distinct from data provenance — 'unconfirmed' means
+    // the point was resolved from a single geocoder with no cross-check, so live
+    // data on it may describe the wrong lot. The UI flags it.
+    location_confidence: 'confirmed' | 'unconfirmed';
   };
   zoning?: SiteDetailBlock<ZoningInfo>;
   permits?: SiteDetailBlock<PermitsSummary>;

@@ -42,6 +42,16 @@ export interface ResolvedAddress {
   county_fips: string | null;
   tract_code: string | null; // 6-digit census tract
   tract_geoid: string | null; // 11-digit GEOID (state+county+tract)
+  // Coordinate confidence — a first-class part of the trust model, DISTINCT from
+  // data provenance. Provenance says whether a datapoint was fetched live; it
+  // says nothing about whether the point we fetched it FOR is the right building.
+  // 'confirmed' = two independent geocoders placed this address within 2 km
+  // (cross-checked). 'unconfirmed' = resolved from a single source with no
+  // cross-check, so a fuzzy mis-match could not have been caught — live data
+  // here may describe the wrong point. The UI and documents must surface
+  // 'unconfirmed' plainly. (A genuine >2 km disagreement inside NYC is not a
+  // low-confidence resolution at all — it fails to resolve; see the resolver.)
+  location_confidence: 'confirmed' | 'unconfirmed';
 }
 
 export interface GeocodeProvider {

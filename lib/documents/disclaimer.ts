@@ -84,10 +84,19 @@ export function buildProvenanceAppendix(data: DocumentData): ProvenanceAppendix 
     });
   }
 
-  const overall_note =
+  const provenanceNote =
     data.overall_provenance === 'live'
       ? 'Every figure in this document was fetched live from an authoritative public source at generation time.'
       : 'This document contains one or more representative figures (labeled below). It is not fully live: any figure marked representative is a plausible stand-in for a paid data source that is not yet integrated.';
+
+  // Coordinate-confidence is a SEPARATE flag from provenance: 'unconfirmed' means
+  // the subject point was resolved from a single geocoder without a cross-check,
+  // so even live figures may describe a nearby lot. Stated distinctly, never
+  // folded into the provenance wording.
+  const overall_note =
+    data.resolved_address.location_confidence === 'unconfirmed'
+      ? `${provenanceNote} SEPARATELY — location not cross-confirmed: this address resolved from a single geocoder with no independent cross-check, so figures may describe a nearby lot rather than the exact building. Verify the address before relying on this document.`
+      : provenanceNote;
 
   return { overall: data.overall_provenance, overall_note, rows };
 }

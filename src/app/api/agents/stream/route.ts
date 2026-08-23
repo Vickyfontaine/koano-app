@@ -74,6 +74,7 @@ export async function POST(req: Request) {
             normalized: resolved_address.normalized,
             bbl: resolved_address.bbl,
             tract_geoid: resolved_address.tract_geoid,
+            location_confidence: resolved_address.location_confidence,
           },
           verdict,
           persisted,

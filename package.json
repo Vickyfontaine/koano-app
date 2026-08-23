@@ -12,6 +12,7 @@
     "test:grounding": "tsx scripts/test-grounding.ts",
     "test:permits": "tsx scripts/test-permits-sanity.ts",
     "test:archive": "tsx scripts/test-archive-integrity.ts",
+    "test:geocode": "tsx scripts/test-geocode-guard.ts",
     "test:monitor": "tsx scripts/test-monitor-detect.ts",
     "test:shards": "tsx scripts/test-shard-logic.ts",
     "test:docs": "tsx scripts/test-document-engine.ts && tsx scripts/test-render.ts && tsx scripts/test-tax-appeal.ts && tsx scripts/test-disclaimer-regression.ts"

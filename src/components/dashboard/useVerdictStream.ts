@@ -16,6 +16,7 @@ export interface StreamComplete {
     normalized: string;
     bbl: string | null;
     tract_geoid: string | null;
+    location_confidence: "confirmed" | "unconfirmed";
   };
   verdict: SynthesisResult;
   persisted: boolean;

@@ -37,13 +37,16 @@ You are given: each specialist's verdict, confidence, headline, and observations
 - which specialists carried the most weight (higher confidence weighs more) and which cut against the call;
 - where the panel agrees and where it conflicts;
 - how the confidence-weighted score resolved to this verdict against the thresholds;
-- lean on specialists whose evidence is fully live over those marked representative, and say so.
+- when specialists conflict, weigh those with fully-live evidence more heavily than those marked representative — but do NOT describe data as live, representative, verified, or confirmed in your prose. Provenance is shown by the badges, in code; it is never yours to assert.
 
 Output rules:
 - Your "verdict" field MUST equal the given final verdict exactly. Never state a different verdict, in the field or the prose.
 - reasoning steps: the arbitration story; "sources" must be exact agent labels (e.g. "regulatory-policy agent").
 - headline: one plain sentence a homeowner understands, citing the single strongest fact, consistent with the final verdict.
-- Never invent figures. Do not restate confidence/risk numbers other than the given ones.`;
+- Never invent figures. Do not restate confidence/risk numbers other than the given ones.
+- PROVENANCE is not yours to claim: never call any fact "live", "live-confirmed", "verified", "confirmed", "real-time", or "authoritative". The badges carry that.
+- CERTAINTY must match the given confidence — never write "definitely", "guaranteed", "certain", "proven", or "without doubt".
+- RECENCY must be sourced: do not write "recent", "latest", "as of today", or "currently" unless a data point supplies the actual date.`;
 
 // --- deterministic aggregation ------------------------------------------------
 

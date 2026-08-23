@@ -29,7 +29,18 @@ export default function PricingPanel({ detail, detailError, verdict, id }: Prici
   const psf = comps?.data?.median_price_per_sqft ?? null;
   const sqft = zoning?.data?.building_area_sqft ?? null;
   const trend = comps?.data?.price_trend ?? null;
-  const base = psf != null && sqft != null && sqft > 0 ? psf * sqft : null;
+  // A band needs a REAL $/sqft and a REAL area. psf === 0 is the "no comps"
+  // signal (e.g. an out-of-coverage address) — it must NOT produce a "$0 – $0"
+  // band a user could act on; fall through to the unavailable message instead.
+  const base = psf != null && psf > 0 && sqft != null && sqft > 0 ? psf * sqft : null;
+
+  // The band leans on BOTH the comp benchmark and the PLUTO area, so its
+  // provenance is the weaker of the two — never just the comps'.
+  const areaLive = zoning?.provenance === "live";
+  const pricingProvenance =
+    comps?.provenance === "representative" || zoning?.provenance === "representative"
+      ? "representative"
+      : (comps?.provenance ?? zoning?.provenance);
 
   // Transparent banding rule keyed to recorded-sale price movement: rising →
   // price toward the top of the band; falling → toward the bottom; flat →
@@ -55,7 +66,7 @@ export default function PricingPanel({ detail, detailError, verdict, id }: Prici
 
   return (
     <div style={panelStyle} id={id}>
-      <PanelHeader title="Pricing recommendation" provenance={comps?.provenance} />
+      <PanelHeader title="Pricing recommendation" provenance={pricingProvenance} />
 
       {base != null ? (
         <>
@@ -70,13 +81,13 @@ export default function PricingPanel({ detail, detailError, verdict, id }: Prici
             >
               {fmtMoney(Math.round(low!))} – {fmtMoney(Math.round(high!))}
             </span>
-            {comps && <ProvenanceBadge provenance={comps.provenance} />}
+            {pricingProvenance && <ProvenanceBadge provenance={pricingProvenance} />}
           </div>
           <p style={{ fontSize: "12px", color: "var(--ink-muted)", margin: 0 }}>
             Benchmark {fmtMoney(psf)}/sq ft (median recorded sale) × {fmtInt(sqft)} sq ft
-            building area (live PLUTO) = {fmtMoney(Math.round(base))}; {bandNote}.
-            {comps?.provenance !== "live" && (
-              <> Representative fallback — live recorded sales were unavailable for this request.</>
+            building area ({areaLive ? "live PLUTO" : "representative"}) = {fmtMoney(Math.round(base))}; {bandNote}.
+            {pricingProvenance !== "live" && (
+              <> Representative fallback — a fully live band needs live recorded sales and live PLUTO area.</>
             )}
           </p>
         </>
