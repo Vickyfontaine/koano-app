@@ -1,11 +1,12 @@
 // Regression guard for the NYC address-resolution failure class (CLAUDE.md §05).
-// Bitten twice now: a non-NYC fuzzy match sneaking through, and — this case — a
-// genuinely-NYC address whose wrong ZIP made the two geocoders disagree, which
-// silently degraded to a confident run on the WRONG building.
+// Bitten twice: a non-NYC fuzzy match sneaking through, and a genuinely-NYC
+// address whose wrong ZIP made the two geocoders disagree.
 //
-// The bar: KOANO returns nothing before it returns a confident wrong answer.
-// So an ambiguous NYC resolution must REFUSE (ok:false), and a clean NYC address
-// must still resolve to its real BBL, confirmed.
+// The bar: KOANO returns nothing before it returns a confident wrong answer —
+// but a wall was the wrong end state. An ambiguous NYC address must now surface
+// BOTH candidates for the user to disambiguate (never silently pick), and the
+// chosen candidate must re-derive its real BBL server-side, confirmed. A clean
+// NYC address still resolves to its real BBL, confirmed, in one shot.
 //
 // Live test (hits NYC GeoSearch + US Census). Run: npm run test:geocode
 
@@ -31,18 +32,40 @@ async function main() {
   // 1. The exact regression: "175 3 Street, Brooklyn NY 11201". The wrong ZIP
   //    (11201 = Downtown Brooklyn) makes GeoSearch fuzzy-match "175 Adams St"
   //    while Census correctly finds "175 3rd St" (Gowanus) — 2.5 km apart. Both
-  //    are NYC, so we cannot pick a building: REFUSE.
-  console.log('\nBad-ZIP NYC address (must refuse, not degrade):');
-  const bad = await registry.geocode.resolve('175 3 Street, Brooklyn NY 11201');
-  check('refuses to resolve (ok:false)', bad.ok === false, `ok=${bad.ok}`);
-  check('returns no data', bad.data == null, bad.data ? 'DATA PRESENT (should be null)' : 'null');
+  //    are NYC, so we cannot pick a building: surface BOTH candidates.
+  console.log('\nBad-ZIP NYC address (must disambiguate, not wall or degrade):');
+  const bad = await registry.geocode.resolveDetailed('175 3 Street, Brooklyn NY 11201');
+  check('is ambiguous', bad.kind === 'ambiguous', `kind=${bad.kind}`);
+  const candidates = bad.kind === 'ambiguous' ? bad.candidates : [];
+  check('offers >= 2 candidates', candidates.length >= 2, `n=${candidates.length}`);
+  const exact = candidates.find((c) => c.match_reason === 'Exact street match');
   check(
-    'error explains the ambiguity',
-    !!bad.error && /candidate|km apart|ambiguous|check the address/i.test(bad.error),
-    bad.error ? `"${bad.error.slice(0, 90)}…"` : 'no error message',
+    'ranks an exact-street candidate first',
+    candidates[0]?.match_reason === 'Exact street match',
+    `top="${candidates[0]?.match_reason}" (${candidates[0]?.label ?? '—'})`,
+  );
+  check(
+    'the exact-street candidate is the 3rd St (Gowanus) building',
+    !!exact && /3RD ST|3 ST/i.test(exact.label),
+    exact ? `"${exact.label}"` : 'no exact-street candidate',
   );
 
-  // 2. The clean address must still resolve to the real BBL, confirmed.
+  // 2. Selecting the correct candidate re-derives its real BBL server-side.
+  console.log('\nSelecting the correct candidate (BBL re-derived server-side):');
+  if (exact) {
+    const picked = await registry.geocode.resolveCandidate(exact);
+    check('resolves (ok:true)', picked.ok === true, `ok=${picked.ok}`);
+    check('real BBL 3009720058', picked.data?.bbl === '3009720058', `bbl=${picked.data?.bbl}`);
+    check(
+      'location_confidence = confirmed',
+      picked.data?.location_confidence === 'confirmed',
+      picked.data?.location_confidence,
+    );
+  } else {
+    check('exact-street candidate present to select', false, 'skipped — none found');
+  }
+
+  // 3. The clean address must still resolve to the real BBL, confirmed, in one shot.
   console.log('\nCorrect address (must resolve with BBL, confirmed):');
   const good = await registry.geocode.resolve('175 3rd Street, Brooklyn, NY 11215');
   check('resolves (ok:true)', good.ok === true, `ok=${good.ok}`);

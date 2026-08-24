@@ -12,8 +12,17 @@
 // as "no violations / no permits / no sales". These fields must never be an
 // empty string or a fabricated value — absence has to be unambiguous downstream.
 
-import type { GeocodeProvider, ProviderResult, ResolvedAddress } from '../types';
+import type {
+  AddressCandidate,
+  GeocodeProvider,
+  GeocodeResolution,
+  ProviderResult,
+  ResolvedAddress,
+} from '../types';
 import { errMsg, fetchJson } from './http';
+
+const PROVIDER_NAME = 'NYC GeoSearch + US Census Geocoder';
+const GEOSEARCH = 'https://geosearch.planninglabs.nyc/v2';
 
 interface GeoSearchResponse {
   features: Array<{
@@ -138,133 +147,270 @@ function haversineKm(aLat: number, aLon: number, bLat: number, bLon: number): nu
   return 2 * R * Math.asin(Math.min(1, Math.sqrt(s)));
 }
 
-export const nycGeoSearch: GeocodeProvider = {
-  name: 'NYC GeoSearch + US Census Geocoder',
+// --- candidate ranking -------------------------------------------------------
+// A house-number + normalized-street key, so an EXACT street match (the strong
+// signal) can outrank a ZIP-area match — which is exactly what mis-steered the
+// bug: "175 3 Street … 11201" → GeoSearch trusted the wrong ZIP → "175 Adams St",
+// while Census matched the street → "175 3rd St". We ORDER the picker by this;
+// we never silently auto-correct — the user still chooses.
+const STREET_SUFFIXES = new Set([
+  'ST', 'STREET', 'AVE', 'AVENUE', 'RD', 'ROAD', 'PL', 'PLACE', 'BLVD', 'BOULEVARD',
+  'LN', 'LANE', 'DR', 'DRIVE', 'CT', 'COURT', 'TER', 'TERRACE', 'PKWY', 'PARKWAY',
+  'HWY', 'HIGHWAY', 'SQ', 'SQUARE', 'PLZ', 'PLAZA', 'WAY', 'LOOP', 'ALLEY', 'WALK',
+]);
+const DIRECTIONALS = new Set(['N', 'S', 'E', 'W', 'NORTH', 'SOUTH', 'EAST', 'WEST']);
+function streetKey(label: string): { num: string; core: string } | null {
+  const first = label.split(',')[0].trim().toUpperCase();
+  const m = first.match(/^(\d+[A-Z]?)\s+(.+)$/); // leading house number + street
+  if (!m) return null;
+  const core = m[2]
+    .replace(/[.#]/g, ' ')
+    .split(/\s+/)
+    .map((t) => t.replace(/^(\d+)(ST|ND|RD|TH)$/, '$1')) // 3RD → 3, 1ST → 1
+    .filter((t) => t && !STREET_SUFFIXES.has(t) && !DIRECTIONALS.has(t))
+    .join(' ');
+  return { num: m[1], core };
+}
+function isExactStreetMatch(input: string, candidateLabel: string): boolean {
+  const a = streetKey(input);
+  const b = streetKey(candidateLabel);
+  if (!a || !b || !a.core || !b.core) return false;
+  return a.num === b.num && a.core === b.core;
+}
+function rankCandidates(
+  input: string,
+  partials: Omit<AddressCandidate, 'match_reason'>[],
+): AddressCandidate[] {
+  return partials
+    .map((p) => ({ p, exact: isExactStreetMatch(input, p.label) }))
+    .sort((a, b) => Number(b.exact) - Number(a.exact)) // exact-street match first
+    .map(({ p, exact }) => ({ ...p, match_reason: exact ? 'Exact street match' : 'ZIP-area match' }));
+}
 
-  async resolve(address: string): Promise<ProviderResult<ResolvedAddress>> {
-    const fetched_at = new Date().toISOString();
-    const geoUrl = `https://geosearch.planninglabs.nyc/v2/search?text=${encodeURIComponent(address)}&size=1`;
-    try {
-      // Run both geocoders in parallel. The national Census geocoder is the
-      // authoritative cross-check: NYC GeoSearch fuzzy-matches non-NYC inputs to
-      // the nearest NYC lot at FULL confidence (e.g. "1 S Broad St, Philadelphia"
-      // → "1 Broad St, Manhattan", confidence 0.8 — identical to a real hit), so
-      // confidence/match_type cannot tell a real NYC hit from a mis-match. Only
-      // geographic agreement can.
-      const [national, feat] = await Promise.all([
-        fromCensusOneline(address).catch(() => null),
-        fetchJson<GeoSearchResponse>(geoUrl)
-          .then((g) => g.features?.[0] ?? null)
-          .catch(() => null),
-      ]);
+// The full resolution logic. Runs both geocoders and cross-checks geographically.
+async function resolveDetailedImpl(address: string): Promise<GeocodeResolution> {
+  const geoUrl = `${GEOSEARCH}/search?text=${encodeURIComponent(address)}&size=1`;
+  try {
+    // Run both geocoders in parallel. The national Census geocoder is the
+    // authoritative cross-check: NYC GeoSearch fuzzy-matches non-NYC inputs to
+    // the nearest NYC lot at FULL confidence, so confidence alone can't tell a
+    // real NYC hit from a mis-match — only geographic agreement can.
+    const [national, feat] = await Promise.all([
+      fromCensusOneline(address).catch(() => null),
+      fetchJson<GeoSearchResponse>(geoUrl)
+        .then((g) => g.features?.[0] ?? null)
+        .catch(() => null),
+    ]);
 
-      if (feat) {
-        const [longitude, latitude] = feat.geometry.coordinates;
-        const props = feat.properties;
-        const nycHit = (
-          fips: Pick<ResolvedAddress, 'state_fips' | 'county_fips' | 'tract_code' | 'tract_geoid'>,
-          confidence: ResolvedAddress['location_confidence'],
-          source: string,
-        ): ProviderResult<ResolvedAddress> => ({
-          ok: true,
-          data: {
-            input: address,
-            normalized: props.label ?? address,
+    if (feat) {
+      const [longitude, latitude] = feat.geometry.coordinates;
+      const props = feat.properties;
+      const geoAddress = (
+        confidence: ResolvedAddress['location_confidence'],
+        fips: Pick<ResolvedAddress, 'state_fips' | 'county_fips' | 'tract_code' | 'tract_geoid'>,
+      ): ResolvedAddress => ({
+        input: address,
+        normalized: props.label ?? address,
+        latitude,
+        longitude,
+        borough: props.borough ?? null,
+        bbl: props.addendum?.pad?.bbl ?? null,
+        bin: props.addendum?.pad?.bin ?? null,
+        zip: props.postalcode ?? national?.zip ?? null,
+        location_confidence: confidence,
+        ...fips,
+      });
+
+      // No national cross-check (odd-format address Census couldn't parse). Trust
+      // GeoSearch, but a fuzzy mis-match could NOT have been caught → UNCONFIRMED.
+      if (!national) {
+        const fips = await tractFromCoordinates(longitude, latitude);
+        return { kind: 'resolved', address: geoAddress('unconfirmed', fips) };
+      }
+
+      const km = haversineKm(latitude, longitude, national.latitude, national.longitude);
+      if (km <= 2) {
+        // Both geocoders agree on WHERE — a cross-checked, confirmed NYC hit.
+        return {
+          kind: 'resolved',
+          address: geoAddress('confirmed', {
+            state_fips: national.state_fips,
+            county_fips: national.county_fips,
+            tract_code: national.tract_code,
+            tract_geoid: national.tract_geoid,
+          }),
+        };
+      }
+
+      // >2 km disagreement. WHERE did the national geocoder land?
+      if (isNycLocation(national)) {
+        // Both point to NYC but to buildings 2+ km apart: we cannot say WHICH
+        // NYC building this is. Instead of a wall (the old throw), surface BOTH
+        // candidates and let the user disambiguate. (Regression: "175 3 Street,
+        // Brooklyn NY 11201" → GeoSearch "175 Adams St", Census "175 3rd St".)
+        const candidates = rankCandidates(address, [
+          {
+            id: 'geosearch',
+            label: props.label ?? address,
             latitude,
             longitude,
-            borough: props.borough ?? null,
             bbl: props.addendum?.pad?.bbl ?? null,
-            bin: props.addendum?.pad?.bin ?? null,
-            zip: props.postalcode ?? national?.zip ?? null,
-            location_confidence: confidence,
-            ...fips,
+            borough: props.borough ?? null,
+            zip: props.postalcode ?? null,
+            source: 'NYC GeoSearch',
           },
-          provenance: 'live',
-          source,
-          endpoint: geoUrl,
-          fetched_at,
-        });
-
-        // No national cross-check available (odd-format address the Census
-        // geocoder couldn't parse). Trust GeoSearch, but a fuzzy mis-match could
-        // NOT have been caught here — mark the location UNCONFIRMED so the UI and
-        // documents flag it. Live data on this point may describe the wrong lot.
-        if (!national) {
-          const fips = await tractFromCoordinates(longitude, latitude);
-          return nycHit(
-            fips,
-            'unconfirmed',
-            'NYC GeoSearch (NYC Planning Labs) — single-source, no national cross-check',
-          );
-        }
-
-        const km = haversineKm(latitude, longitude, national.latitude, national.longitude);
-        if (km <= 2) {
-          // The two geocoders agree on WHERE — a cross-checked, confirmed NYC hit.
-          return nycHit(
-            {
-              state_fips: national.state_fips,
-              county_fips: national.county_fips,
-              tract_code: national.tract_code,
-              tract_geoid: national.tract_geoid,
-            },
-            'confirmed',
-            'NYC GeoSearch (NYC Planning Labs) + US Census Geocoder',
-          );
-        }
-
-        // The two geocoders disagree by >2 km. GeoSearch's NYC lot is suspect.
-        // WHERE did the national geocoder land?
-        if (isNycLocation(national)) {
-          // Both point to NYC but to buildings 2+ km apart: GeoSearch mis-keyed
-          // (e.g. a wrong ZIP steered it to the wrong lot) and the national
-          // geocoder cannot supply a BBL. We cannot say WHICH NYC building this
-          // is, so we REFUSE — KOANO returns nothing rather than a confident run
-          // on a plausible wrong building. (Regression guard: "175 3 Street,
-          // Brooklyn NY 11201" → GeoSearch "175 Adams St", Census "175 3rd St".)
-          throw new Error(
-            `Could not confidently resolve this address to a specific NYC building — two candidate ` +
-              `locations ${km.toFixed(1)} km apart (GeoSearch: "${props.label ?? address}"; Census: ` +
-              `"${national.normalized}"). The ZIP or street format may be ambiguous; check the address and retry.`,
-          );
-        }
-
-        // The national geocoder placed the address OUTSIDE NYC — GeoSearch
-        // fuzzy-matched a genuinely non-NYC address to a NYC lot. Use the
-        // authoritative non-NYC result (bbl/bin/borough already null).
-        return {
-          ok: true,
-          data: national,
-          provenance: 'live',
-          source: 'US Census Geocoder (onelineaddress) — non-NYC (NYC GeoSearch match rejected as fuzzy mis-match)',
-          endpoint: geoUrl,
-          fetched_at,
-        };
+          {
+            id: 'census',
+            label: national.normalized,
+            latitude: national.latitude,
+            longitude: national.longitude,
+            bbl: null, // Census supplies no BBL — re-derived server-side on selection
+            borough: null,
+            zip: national.zip,
+            source: 'US Census',
+          },
+        ]);
+        return { kind: 'ambiguous', candidates };
       }
 
-      // No NYC candidate at all — use the national geocoder if it matched.
-      if (national) {
+      // National placed the address OUTSIDE NYC — GeoSearch fuzzy-matched a
+      // genuinely non-NYC address to a NYC lot. Use the authoritative non-NYC
+      // result (bbl/bin/borough already null).
+      return { kind: 'resolved', address: national };
+    }
+
+    // No NYC candidate at all — use the national geocoder if it matched.
+    if (national) return { kind: 'resolved', address: national };
+    return {
+      kind: 'none',
+      error: 'No geocoding match (NYC GeoSearch and US Census both returned no match)',
+    };
+  } catch (e) {
+    return { kind: 'none', error: errMsg(e) };
+  }
+}
+
+// Turn a user-chosen candidate into a CONFIRMED address with a real BBL. The BBL
+// is RE-DERIVED server-side by reverse-geocoding the coordinates the user picked
+// — candidate.bbl (client-supplied) is never trusted. "The server derived this
+// BBL from the selected point" is the defensible audit story; the browser's word
+// is not. The user's pick is itself the cross-check, so confidence = 'confirmed'.
+async function resolveCandidateImpl(
+  candidate: AddressCandidate,
+): Promise<ProviderResult<ResolvedAddress>> {
+  const fetched_at = new Date().toISOString();
+  const searchUrl = `${GEOSEARCH}/search?text=${encodeURIComponent(candidate.label)}&size=1`;
+  const revUrl = `${GEOSEARCH}/reverse?point.lat=${candidate.latitude}&point.lon=${candidate.longitude}&size=1`;
+  try {
+    let lat = candidate.latitude;
+    let lon = candidate.longitude;
+    let bbl: string | null = null;
+    let bin: string | null = null;
+    let borough = candidate.borough ?? null;
+    let normalized = candidate.label;
+
+    // PRIMARY: re-geocode the CHOSEN address string server-side. The label
+    // carries the corrected ZIP, so GeoSearch resolves it to the precise lot —
+    // and we accept it ONLY if that lot sits at the user-selected point (<= 2 km),
+    // so the label can't fuzzy-match a third building. This also yields the
+    // precise building COORDINATES, correcting the ~120 m Census offset that made
+    // the flood layer misread the wrong zone in the original bug.
+    const sf = await fetchJson<GeoSearchResponse>(searchUrl)
+      .then((g) => g.features?.[0] ?? null)
+      .catch(() => null);
+    if (sf) {
+      const [slon, slat] = sf.geometry.coordinates;
+      if (haversineKm(candidate.latitude, candidate.longitude, slat, slon) <= 2) {
+        bbl = sf.properties?.addendum?.pad?.bbl ?? null;
+        bin = sf.properties?.addendum?.pad?.bin ?? null;
+        borough = sf.properties?.borough ?? borough;
+        normalized = sf.properties?.label ?? normalized;
+        lat = slat;
+        lon = slon;
+      }
+    }
+
+    // FALLBACK: the label didn't resolve to a lot near the point → reverse-geocode
+    // the selected coordinates. Less precise (the point may be offset onto an
+    // adjacent lot), so it is only used when the precise search path came up empty.
+    if (!bbl) {
+      const rev = await fetchJson<GeoSearchResponse>(revUrl)
+        .then((g) => g.features?.[0] ?? null)
+        .catch(() => null);
+      bbl = rev?.properties?.addendum?.pad?.bbl ?? null;
+      bin = rev?.properties?.addendum?.pad?.bin ?? bin;
+      borough = rev?.properties?.borough ?? borough;
+      if (rev?.properties?.label) normalized = rev.properties.label;
+    }
+
+    const fips = await tractFromCoordinates(lon, lat);
+    return {
+      ok: true,
+      data: {
+        input: candidate.label,
+        normalized,
+        latitude: lat,
+        longitude: lon,
+        borough,
+        bbl,
+        bin,
+        zip: candidate.zip,
+        location_confidence: 'confirmed',
+        ...fips,
+      },
+      provenance: 'live',
+      source: 'NYC GeoSearch (server-derived BBL from the selected address, point-verified) + US Census tract',
+      endpoint: searchUrl,
+      fetched_at,
+    };
+  } catch (e) {
+    return {
+      ok: false,
+      data: null,
+      provenance: 'live',
+      source: 'NYC GeoSearch candidate resolution',
+      endpoint: searchUrl,
+      fetched_at,
+      error: errMsg(e),
+    };
+  }
+}
+
+export const nycGeoSearch: GeocodeProvider = {
+  name: PROVIDER_NAME,
+
+  resolveDetailed: resolveDetailedImpl,
+  resolveCandidate: resolveCandidateImpl,
+
+  // Convenience wrapper for NON-INTERACTIVE callers (archive, briefing,
+  // documents). On ambiguity there is no user to disambiguate, so it auto-selects
+  // the top-ranked (exact-street) candidate but tags it UNCONFIRMED — never a
+  // wall, never a silent CONFIRMED guess. Interactive callers use resolveDetailed
+  // + a picker instead.
+  async resolve(address: string): Promise<ProviderResult<ResolvedAddress>> {
+    const fetched_at = new Date().toISOString();
+    const r = await resolveDetailedImpl(address);
+    if (r.kind === 'resolved') {
+      return { ok: true, data: r.address, provenance: 'live', source: PROVIDER_NAME, fetched_at };
+    }
+    if (r.kind === 'ambiguous') {
+      const rc = await resolveCandidateImpl(r.candidates[0]);
+      if (rc.ok && rc.data) {
         return {
-          ok: true,
-          data: national,
-          provenance: 'live',
-          source: 'US Census Geocoder (onelineaddress) — national, non-NYC',
-          endpoint: geoUrl,
-          fetched_at,
+          ...rc,
+          data: { ...rc.data, location_confidence: 'unconfirmed' },
+          source: `${rc.source} — auto-selected among ${r.candidates.length} candidates (unverified; no user disambiguation)`,
         };
       }
-
-      throw new Error('No geocoding match (NYC GeoSearch and US Census both returned no match)');
-    } catch (e) {
       return {
         ok: false,
         data: null,
         provenance: 'live',
-        source: 'NYC GeoSearch + US Census Geocoder',
-        endpoint: geoUrl,
+        source: PROVIDER_NAME,
         fetched_at,
-        error: errMsg(e),
+        error: rc.error ?? 'ambiguous address; candidate resolution failed',
       };
     }
+    return { ok: false, data: null, provenance: 'live', source: PROVIDER_NAME, fetched_at, error: r.error };
   },
 };

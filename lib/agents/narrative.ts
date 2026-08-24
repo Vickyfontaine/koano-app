@@ -8,7 +8,7 @@
 // market data.
 
 import { registry } from '../providers/registry';
-import type { DataPoint, Provenance } from '../providers/types';
+import type { DataPoint, Provenance, ResolvedAddress } from '../providers/types';
 import { getAnthropicClient, KOANO_RUNTIME_MODEL, weakestProvenance } from './shared';
 
 const SYSTEM_PROMPT = `You are KOANO's neighborhood narrative writer for real estate agents and brokers. Write a client-ready neighborhood narrative for the subject address: 150-220 words, plain professional language a client can read as-is.
@@ -33,8 +33,13 @@ export async function generateNarrative(address: string): Promise<NarrativeResul
   if (!geo.ok || !geo.data) {
     throw new Error(`Geocoding failed for "${address}": ${geo.error ?? 'no data'}`);
   }
-  const addr = geo.data;
+  return generateNarrativeForAddress(geo.data);
+}
 
+// Narrative from an ALREADY-RESOLVED address — used when the caller has re-derived
+// the address server-side from a chosen disambiguation candidate, so resolution
+// is never re-run (and never re-ambiguates).
+export async function generateNarrativeForAddress(addr: ResolvedAddress): Promise<NarrativeResult> {
   const [demo, hpi, permits, mortgage, employment, comps] = await Promise.all([
     registry.demographics.getDemographics(addr),
     registry.hpi.getHpi(addr),

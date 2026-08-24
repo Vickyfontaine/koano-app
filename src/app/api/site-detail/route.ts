@@ -12,6 +12,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { requireApproved } from '../../../../lib/koano-guard';
 import { registry } from '../../../../lib/providers/registry';
+import type { AddressCandidate } from '../../../../lib/providers/types';
 import {
   BLOCK_FETCHERS,
   VALID_BLOCKS,
@@ -20,6 +21,19 @@ import {
   type SiteDetailBlock,
   type SiteDetailResponse,
 } from '../../../../lib/providers/blocks';
+
+function isCandidate(v: unknown): v is AddressCandidate {
+  if (!v || typeof v !== 'object') return false;
+  const c = v as Record<string, unknown>;
+  return (
+    typeof c.id === 'string' &&
+    typeof c.label === 'string' &&
+    typeof c.latitude === 'number' &&
+    Number.isFinite(c.latitude) &&
+    typeof c.longitude === 'number' &&
+    Number.isFinite(c.longitude)
+  );
+}
 
 // Re-exported so existing dashboard panels keep importing these from the route.
 // The definitions now live in lib/providers/blocks.ts (shared with the document
@@ -39,15 +53,16 @@ export async function POST(req: Request) {
   const denied = await requireApproved(userId);
   if (denied) return NextResponse.json(denied.body, { status: denied.status });
 
-  let body: { address?: unknown; blocks?: unknown };
+  let body: { address?: unknown; candidate?: unknown; blocks?: unknown };
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
+  const candidate = isCandidate(body.candidate) ? body.candidate : null;
   const address = typeof body.address === 'string' ? body.address.trim() : '';
-  if (!address) {
-    return NextResponse.json({ error: '"address" is required' }, { status: 400 });
+  if (!candidate && !address) {
+    return NextResponse.json({ error: '"address" or "candidate" is required' }, { status: 400 });
   }
 
   let blocks: BlockKey[] = DEFAULT_BLOCKS;
@@ -65,10 +80,14 @@ export async function POST(req: Request) {
     blocks = Array.from(new Set(body.blocks));
   }
 
-  const geo = await registry.geocode.resolve(address);
+  // A chosen candidate re-derives its address (with BBL) server-side; a raw
+  // address is geocoded normally.
+  const geo = candidate
+    ? await registry.geocode.resolveCandidate(candidate)
+    : await registry.geocode.resolve(address);
   if (!geo.ok || !geo.data) {
     return NextResponse.json(
-      { error: `Geocoding failed for "${address}": ${geo.error ?? 'no data'}` },
+      { error: `Geocoding failed for "${candidate ? candidate.label : address}": ${geo.error ?? 'no data'}` },
       { status: 422 },
     );
   }

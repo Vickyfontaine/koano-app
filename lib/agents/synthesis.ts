@@ -352,7 +352,20 @@ export async function runKoanoPipeline(
   if (!geo.ok || !geo.data) {
     throw new Error(`Geocoding failed for "${address}": ${geo.error ?? 'no data'}`);
   }
-  const addr = geo.data;
+  return runKoanoPipelineForAddress(geo.data, onEvent);
+}
+
+// The pipeline from an ALREADY-RESOLVED address — used when the caller has
+// re-derived the address server-side from a chosen disambiguation candidate, so
+// geocoding is never re-run (and can never re-ambiguate).
+export async function runKoanoPipelineForAddress(
+  addr: ResolvedAddress,
+  onEvent?: (e: PipelineProgressEvent) => void,
+): Promise<{
+  resolved_address: ResolvedAddress;
+  agents: AgentVerdict[];
+  verdict: SynthesisResult;
+}> {
   onEvent?.({ type: 'geocoded', normalized: addr.normalized, bbl: addr.bbl });
 
   // Report each specialist the moment its real verdict lands.

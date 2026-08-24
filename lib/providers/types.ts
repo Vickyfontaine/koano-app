@@ -54,9 +54,44 @@ export interface ResolvedAddress {
   location_confidence: 'confirmed' | 'unconfirmed';
 }
 
+// A single disambiguation candidate — one of two+ buildings a raw address could
+// mean when independent geocoders disagree by >2 km inside NYC. Presented to the
+// user to choose from; the user's pick IS the cross-check. IMPORTANT: `bbl` here
+// is for display/ranking ONLY. When a candidate is chosen, the server RE-DERIVES
+// the BBL from the candidate's coordinates (reverse-geocode) — it never trusts a
+// client-supplied BBL. "The server derived this BBL" is the defensible audit
+// story; "the browser told us the BBL" is not.
+export interface AddressCandidate {
+  id: string; // stable per-candidate id ('geosearch' | 'census') for selection
+  label: string; // full formatted address the user reads
+  latitude: number;
+  longitude: number;
+  bbl: string | null; // DISPLAY/RANKING ONLY — re-derived server-side on selection
+  borough: string | null;
+  zip: string | null;
+  source: string; // which geocoder proposed it — "NYC GeoSearch" | "US Census"
+  match_reason: string; // "Exact street match" | "ZIP-area match" | "Geocoder match"
+}
+
+// The structured outcome of resolving a raw address string. Replaces the old
+// throw-on-ambiguity: an in-NYC >2 km disagreement is `ambiguous` (the user
+// disambiguates) rather than a hard failure.
+export type GeocodeResolution =
+  | { kind: 'resolved'; address: ResolvedAddress }
+  | { kind: 'ambiguous'; candidates: AddressCandidate[] }
+  | { kind: 'none'; error: string };
+
 export interface GeocodeProvider {
   name: string;
+  // Convenience wrapper for NON-INTERACTIVE callers (archive, briefing,
+  // documents): on ambiguity it auto-selects the top-ranked candidate tagged
+  // `unconfirmed` (never a wall, never a silent confident guess).
   resolve(address: string): Promise<ProviderResult<ResolvedAddress>>;
+  // The full resolution logic. Interactive callers use this to surface a picker.
+  resolveDetailed(address: string): Promise<GeocodeResolution>;
+  // Turn a user-chosen candidate into a CONFIRMED address with a real BBL,
+  // re-derived server-side from the candidate's coordinates.
+  resolveCandidate(candidate: AddressCandidate): Promise<ProviderResult<ResolvedAddress>>;
 }
 
 // ---------------------------------------------------------------------------

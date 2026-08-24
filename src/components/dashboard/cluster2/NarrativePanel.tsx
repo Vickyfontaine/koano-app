@@ -4,9 +4,9 @@
 // Generated on demand by /api/narrative (runtime model, provider data only).
 // Labeled as generated; provenance = weakest input; sources listed. Copyable.
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
-import type { Provenance } from "@/components/ui/verdict";
+import type { Provenance, AddressCandidate } from "@/components/ui/verdict";
 import { PanelHeader, panelStyle, panelTitle } from "../panels";
 import { useUpgrade, isUpgradeRequired } from "../UpgradeProvider";
 
@@ -19,18 +19,33 @@ interface NarrativeResult {
 
 interface NarrativePanelProps {
   address: string | null; // normalized subject address (null until analysis runs)
+  // When the subject came from a disambiguation pick, the narrative re-derives
+  // its address server-side from the candidate (never trusts a client BBL).
+  candidate?: AddressCandidate | null;
   id?: string;
 }
 
-export default function NarrativePanel({ address, id }: NarrativePanelProps) {
+export default function NarrativePanel({ address, candidate = null, id }: NarrativePanelProps) {
   const { openUpgrade } = useUpgrade();
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<NarrativeResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
+  // Clear any prior narrative when the subject changes — otherwise a failed or new
+  // run leaves a previous building's narrative on screen with a LIVE badge over an
+  // empty prompt. The narrative is generated fresh per subject, on demand.
+  const subjectKey = candidate?.id ? `c:${candidate.id}:${candidate.label}` : address;
+  useEffect(() => {
+    setResult(null);
+    setError(null);
+    setCopied(false);
+  }, [subjectKey]);
+
+  const hasSubject = !!address || !!candidate;
+
   async function generate() {
-    if (!address || busy) return;
+    if (!hasSubject || busy) return;
     setBusy(true);
     setError(null);
     setCopied(false);
@@ -38,7 +53,7 @@ export default function NarrativePanel({ address, id }: NarrativePanelProps) {
       const res = await fetch("/api/narrative", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address }),
+        body: JSON.stringify(candidate ? { candidate } : { address }),
       });
       const json = await res.json();
       // Free-tier limit → surface the upgrade screen, not a raw error.
@@ -66,13 +81,13 @@ export default function NarrativePanel({ address, id }: NarrativePanelProps) {
     <div style={panelStyle} id={id}>
       <PanelHeader title="Neighborhood narrative — client-ready" />
 
-      {!address && (
+      {!hasSubject && (
         <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
           Run an analysis above, then generate a narrative for the subject neighborhood.
         </p>
       )}
 
-      {address && !result && (
+      {hasSubject && !result && (
         <div style={{ display: "flex", alignItems: "center", gap: "14px", flexWrap: "wrap" }}>
           <button
             className="btn-primary"

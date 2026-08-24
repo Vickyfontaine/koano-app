@@ -13,9 +13,12 @@ import LoadingState from "@/components/ui/LoadingState";
 import VerdictCard from "@/components/ui/VerdictCard";
 import VerdictMathPanel from "@/components/ui/VerdictMathPanel";
 import LocationConfidenceNote from "@/components/ui/LocationConfidenceNote";
+import CandidatePicker from "@/components/ui/CandidatePicker";
 import ReasoningChain from "@/components/ui/ReasoningChain";
+import type { AddressCandidate } from "@/components/ui/verdict";
 import { CLUSTERS } from "../clusters";
 import { useVerdictStream } from "../useVerdictStream";
+import { useAddressResolver, type RunPayload } from "../useAddressResolver";
 import VerdictHistory from "../VerdictHistory";
 import MarketVelocityPanel from "./MarketVelocityPanel";
 import PropertyMap from "../cluster1/PropertyMap";
@@ -44,15 +47,16 @@ export default function Cluster2Dashboard() {
   const [detail, setDetail] = useState<SiteDetailResponse | null>(null);
   const [detailError, setDetailError] = useState<string | null>(null);
   const [started, setStarted] = useState(false);
+  const [activePayload, setActivePayload] = useState<RunPayload | null>(null);
 
-  async function fetchDetail(address: string) {
+  async function fetchDetail(payload: RunPayload) {
     setDetail(null);
     setDetailError(null);
     try {
       const res = await fetch("/api/site-detail", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address, blocks: MARKET_BLOCKS }),
+        body: JSON.stringify({ ...payload, blocks: MARKET_BLOCKS }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json?.error || `Request failed (${res.status})`);
@@ -62,14 +66,36 @@ export default function Cluster2Dashboard() {
     }
   }
 
-  function analyze(address: string) {
+  // Fires only AFTER resolution succeeds (a confident match, or the user's pick).
+  function startRun(payload: RunPayload) {
     setStarted(true);
-    void stream.run(address);
-    void fetchDetail(address);
+    setActivePayload(payload);
+    void stream.run(payload);
+    void fetchDetail(payload);
+  }
+
+  const resolver = useAddressResolver(startRun);
+
+  // A new submission hides any prior panels until this address resolves, so a
+  // resolution problem never leaves stale results (or five panel errors) on screen.
+  function analyze(address: string) {
+    setStarted(false);
+    setActivePayload(null);
+    setDetail(null);
+    setDetailError(null);
+    stream.reset();
+    void resolver.resolve(address);
   }
 
   const { status, result } = stream;
-  const subjectAddress = result?.resolved_address.normalized ?? detail?.resolved_address.normalized ?? null;
+  const activeCandidate: AddressCandidate | null =
+    activePayload && "candidate" in activePayload ? activePayload.candidate : null;
+  const subjectAddress =
+    result?.resolved_address.normalized ??
+    detail?.resolved_address.normalized ??
+    activeCandidate?.label ??
+    null;
+  const resolving = resolver.state.phase === "resolving";
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "24px", maxWidth: "1080px" }}>
@@ -100,11 +126,37 @@ export default function Cluster2Dashboard() {
         </p>
       </div>
 
-      <AddressInput onSubmit={analyze} busy={status === "running"} />
+      <AddressInput onSubmit={analyze} busy={resolving || status === "running"} />
 
       <LocationConfidenceNote confidence={detail?.resolved_address?.location_confidence} />
 
-      {!started && (
+      {/* Resolution step — a single banner, never five panel errors. */}
+      {resolving && (
+        <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>Resolving address…</p>
+      )}
+      {resolver.state.phase === "ambiguous" && (
+        <CandidatePicker candidates={resolver.state.candidates} onChoose={resolver.choose} />
+      )}
+      {resolver.state.phase === "none" && (
+        <div
+          style={{
+            border: "1px solid var(--border)",
+            borderLeft: "3px solid var(--signal-negative)",
+            borderRadius: "0 12px 12px 0",
+            padding: "16px 20px",
+            maxWidth: "620px",
+          }}
+        >
+          <p style={{ fontSize: "14px", color: "var(--ink-secondary)", margin: 0 }}>
+            {resolver.state.error}
+          </p>
+          <p style={{ fontSize: "12px", color: "var(--ink-faint)", margin: "6px 0 0" }}>
+            Live NYC data is deepest. Try a New York City street address.
+          </p>
+        </div>
+      )}
+
+      {!started && resolver.state.phase === "idle" && (
         /* Empty state — approved copy (KOANO_COPY.md) */
         <div style={{ maxWidth: "620px" }}>
           <h3 style={{ fontSize: "18px", fontWeight: 500, color: "var(--ink-primary)", margin: "0 0 8px" }}>
@@ -132,7 +184,7 @@ export default function Cluster2Dashboard() {
             id="c2-pricing"
           />
           <PermitTrend detail={detail} id="c2-permits" />
-          <NarrativePanel address={subjectAddress} id="c2-narrative" />
+          <NarrativePanel address={subjectAddress} candidate={activeCandidate} id="c2-narrative" />
 
           {/* Downloadable documents — grouped, matching the Cluster 1 & 5 pattern */}
           {subjectAddress && (

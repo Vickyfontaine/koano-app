@@ -2,7 +2,7 @@
 // Type-only re-exports from /lib are erased at compile time — no server code
 // (Anthropic SDK, Supabase) ever reaches the client bundle through this file.
 
-export type { DataPoint, Provenance } from "../../../lib/providers/types";
+export type { DataPoint, Provenance, AddressCandidate } from "../../../lib/providers/types";
 export type {
   AgentName,
   KoanoVerdict,

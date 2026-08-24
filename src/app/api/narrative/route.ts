@@ -5,11 +5,26 @@
 
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { generateNarrative } from '../../../../lib/agents/narrative';
+import { generateNarrative, generateNarrativeForAddress } from '../../../../lib/agents/narrative';
 import { guardSpend } from '../../../../lib/koano-guard';
+import { registry } from '../../../../lib/providers/registry';
+import type { AddressCandidate } from '../../../../lib/providers/types';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
+
+function isCandidate(v: unknown): v is AddressCandidate {
+  if (!v || typeof v !== 'object') return false;
+  const c = v as Record<string, unknown>;
+  return (
+    typeof c.id === 'string' &&
+    typeof c.label === 'string' &&
+    typeof c.latitude === 'number' &&
+    Number.isFinite(c.latitude) &&
+    typeof c.longitude === 'number' &&
+    Number.isFinite(c.longitude)
+  );
+}
 
 export async function POST(req: Request) {
   const { userId } = await auth();
@@ -17,15 +32,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  let body: { address?: unknown };
+  let body: { address?: unknown; candidate?: unknown };
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
+  const candidate = isCandidate(body.candidate) ? body.candidate : null;
   const address = typeof body.address === 'string' ? body.address.trim() : '';
-  if (!address) {
-    return NextResponse.json({ error: '"address" is required' }, { status: 400 });
+  if (!candidate && !address) {
+    return NextResponse.json({ error: '"address" or "candidate" is required' }, { status: 400 });
   }
 
   // Spend guard: approval + shared narrative/briefing rate limit + breaker.
@@ -35,7 +51,15 @@ export async function POST(req: Request) {
   }
 
   try {
-    const result = await generateNarrative(address);
+    let result;
+    if (candidate) {
+      // Re-derive the confirmed address (BBL) from the user's pick, server-side.
+      const rc = await registry.geocode.resolveCandidate(candidate);
+      if (!rc.ok || !rc.data) throw new Error(rc.error ?? 'Could not resolve the selected address');
+      result = await generateNarrativeForAddress(rc.data);
+    } else {
+      result = await generateNarrative(address);
+    }
     return NextResponse.json(result);
   } catch (e) {
     return NextResponse.json(

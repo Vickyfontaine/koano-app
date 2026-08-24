@@ -9,6 +9,7 @@ import { useCallback, useState } from "react";
 import type { AgentProgress, PipelinePhase } from "@/components/ui/LoadingState";
 import type { AgentName, SynthesisResult } from "@/components/ui/verdict";
 import { useUpgrade, isUpgradeRequired } from "./UpgradeProvider";
+import type { RunPayload } from "./useAddressResolver";
 
 export interface StreamComplete {
   resolved_address: {
@@ -47,7 +48,9 @@ export interface VerdictStream {
   startedAt: number;
   result: StreamComplete | null;
   error: string | null;
-  run: (address: string) => Promise<void>;
+  // Accepts a raw address (geocoded server-side) OR a chosen disambiguation
+  // candidate (BBL re-derived server-side from the selected point).
+  run: (input: string | RunPayload) => Promise<void>;
   reset: () => void;
 }
 
@@ -70,7 +73,8 @@ export function useVerdictStream(): VerdictStream {
     setError(null);
   }, []);
 
-  const run = useCallback(async (address: string) => {
+  const run = useCallback(async (input: string | RunPayload) => {
+    const payload: RunPayload = typeof input === "string" ? { address: input } : input;
     setStatus("running");
     setPhase("geocoding");
     setAgents({});
@@ -116,7 +120,7 @@ export function useVerdictStream(): VerdictStream {
       const res = await fetch("/api/agents/stream", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address }),
+        body: JSON.stringify(payload),
       });
       if (!res.ok) {
         const json = await res.json().catch(() => null);
