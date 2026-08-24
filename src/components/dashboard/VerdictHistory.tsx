@@ -23,12 +23,15 @@ export default function VerdictHistory({ id }: { id?: string }) {
   const [rows, setRows] = useState<VerdictHistoryRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [filter, setFilter] = useState("");
+  const [showHidden, setShowHidden] = useState(false);
+  const [busyId, setBusyId] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch("/api/verdicts?limit=20");
+        const res = await fetch("/api/verdicts?limit=50");
         const json = await res.json();
         if (!res.ok) throw new Error(json?.error || `Request failed (${res.status})`);
         if (!cancelled) setRows(json.verdicts as VerdictHistoryRow[]);
@@ -41,9 +44,79 @@ export default function VerdictHistory({ id }: { id?: string }) {
     };
   }, []);
 
+  // Curate the VIEW only — the verdict record is never touched (append-only).
+  async function setHidden(verdictId: string, hidden: boolean) {
+    setBusyId(verdictId);
+    // Optimistic: flip locally, revert on failure.
+    setRows((prev) => prev && prev.map((r) => (r.id === verdictId ? { ...r, hidden } : r)));
+    try {
+      const res = await fetch("/api/verdicts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ verdict_id: verdictId, hidden }),
+      });
+      if (!res.ok) throw new Error();
+    } catch {
+      setRows((prev) => prev && prev.map((r) => (r.id === verdictId ? { ...r, hidden: !hidden } : r)));
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  const q = filter.trim().toLowerCase();
+  const matches = (r: VerdictHistoryRow) =>
+    !q || (r.address_normalized ?? r.address_input ?? "").toLowerCase().includes(q);
+  const all = rows ?? [];
+  const hiddenCount = all.filter((r) => r.hidden).length;
+  const visible = all.filter((r) => matches(r) && (showHidden || !r.hidden));
+
   return (
     <div style={panelStyle} id={id}>
       <PanelHeader title="Verdict history — append-only audit trail" />
+
+      {rows !== null && rows.length > 0 && (
+        <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+          <input
+            type="text"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            placeholder="Filter by address…"
+            aria-label="Filter history by address"
+            style={{
+              flex: 1,
+              minWidth: "200px",
+              padding: "8px 14px",
+              borderRadius: "100px",
+              border: "1px solid var(--border)",
+              background: "var(--white)",
+              fontFamily: "inherit",
+              fontSize: "13px",
+              color: "var(--ink-primary)",
+              outline: "none",
+            }}
+          />
+          {hiddenCount > 0 && (
+            <button
+              onClick={() => setShowHidden((v) => !v)}
+              style={{
+                border: "1px solid var(--border)",
+                background: showHidden ? "var(--pale-wash)" : "transparent",
+                borderRadius: "100px",
+                padding: "7px 14px",
+                fontFamily: "'DM Mono', monospace",
+                fontSize: "11px",
+                letterSpacing: "0.04em",
+                color: "var(--ink-muted)",
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {showHidden ? `Hide ${hiddenCount} again` : `Show hidden (${hiddenCount})`}
+            </button>
+          )}
+        </div>
+      )}
+
       {error && (
         <p style={{ fontSize: "13px", color: "var(--signal-negative)", margin: 0 }}>{error}</p>
       )}
@@ -55,16 +128,25 @@ export default function VerdictHistory({ id }: { id?: string }) {
           No verdicts yet. Run an analysis above.
         </p>
       )}
-      {rows !== null && rows.length > 0 && (
+      {rows !== null && rows.length > 0 && visible.length === 0 && (
+        <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
+          {q ? `No history rows match "${filter.trim()}".` : "All rows are hidden — use “Show hidden”."}
+        </p>
+      )}
+      {rows !== null && visible.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-          {rows.map((r) => {
+          {visible.map((r) => {
             const canExpand = Array.isArray(r.agent_summaries) && r.agent_summaries.length > 0;
             const expanded = expandedId === r.id;
             const preGate = new Date(r.created_at).getTime() < new Date(GROUNDING_GATE_AT).getTime();
             return (
               <div
                 key={r.id}
-                style={{ borderBottom: "1px solid var(--border-light)", paddingBottom: "10px" }}
+                style={{
+                  borderBottom: "1px solid var(--border-light)",
+                  paddingBottom: "10px",
+                  opacity: r.hidden ? 0.55 : 1,
+                }}
               >
                 <div style={{ display: "flex", alignItems: "baseline", gap: "12px", flexWrap: "wrap" }}>
                   <span
@@ -125,6 +207,24 @@ export default function VerdictHistory({ id }: { id?: string }) {
                       {expanded ? "Hide math" : "Show math"}
                     </button>
                   )}
+                  <button
+                    onClick={() => setHidden(r.id, !r.hidden)}
+                    disabled={busyId === r.id}
+                    title={r.hidden ? "Unhide this row" : "Hide this row from the view (the verdict record is kept)"}
+                    style={{
+                      border: "1px solid var(--border)",
+                      background: "transparent",
+                      borderRadius: "100px",
+                      padding: "3px 12px",
+                      fontFamily: "'DM Mono', monospace",
+                      fontSize: "10px",
+                      letterSpacing: "0.04em",
+                      color: "var(--ink-faint)",
+                      cursor: busyId === r.id ? "wait" : "pointer",
+                    }}
+                  >
+                    {r.hidden ? "Unhide" : "Hide"}
+                  </button>
                 </div>
                 {expanded && canExpand && (
                   <div style={{ marginTop: "14px" }}>

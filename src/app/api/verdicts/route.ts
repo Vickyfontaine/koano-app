@@ -24,6 +24,9 @@ export interface VerdictHistoryRow {
   // Stored votes — enough to RE-DERIVE the verdict math for a history row with no
   // model call (weighting_breakdown isn't persisted; it's a pure function of these).
   agent_summaries: AgentSummary[];
+  // User-curated "hide from view" flag (side table; the verdict itself is
+  // immutable). The UI hides these by default with a "show hidden" toggle.
+  hidden: boolean;
 }
 
 export async function GET(req: Request) {
@@ -50,5 +53,50 @@ export async function GET(req: Request) {
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
-  return NextResponse.json({ verdicts: (data ?? []) as VerdictHistoryRow[] });
+
+  // Which of these verdicts has the user hidden? Deploy-safe: if migration-019
+  // isn't applied, the table is missing → treat nothing as hidden.
+  const hiddenSet = new Set<string>();
+  const hiddenRes = await supabaseAdmin()
+    .from('verdict_hidden')
+    .select('verdict_id')
+    .eq('clerk_user_id', userId);
+  if (!hiddenRes.error) {
+    for (const r of hiddenRes.data ?? []) hiddenSet.add((r as { verdict_id: string }).verdict_id);
+  }
+
+  const verdicts = ((data ?? []) as Record<string, unknown>[]).map((r) => ({
+    ...(r as object),
+    hidden: hiddenSet.has(r.id as string),
+  })) as VerdictHistoryRow[];
+  return NextResponse.json({ verdicts });
+}
+
+// POST { verdict_id, hidden } → set/clear the per-user hide flag. The verdict
+// itself is never modified (append-only audit trail); this only curates the view.
+export async function POST(req: Request) {
+  const { userId } = await auth();
+  if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const denied = await requireApproved(userId);
+  if (denied) return NextResponse.json(denied.body, { status: denied.status });
+
+  let body: { verdict_id?: unknown; hidden?: unknown };
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+  }
+  const verdictId = typeof body.verdict_id === 'string' ? body.verdict_id : '';
+  if (!verdictId) return NextResponse.json({ error: '"verdict_id" is required' }, { status: 400 });
+  const hidden = body.hidden === true;
+
+  const admin = supabaseAdmin();
+  const { error } = hidden
+    ? await admin
+        .from('verdict_hidden')
+        .upsert({ clerk_user_id: userId, verdict_id: verdictId }, { onConflict: 'clerk_user_id,verdict_id' })
+    : await admin.from('verdict_hidden').delete().eq('clerk_user_id', userId).eq('verdict_id', verdictId);
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json({ ok: true, verdict_id: verdictId, hidden });
 }

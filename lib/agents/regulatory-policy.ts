@@ -8,6 +8,7 @@
 import { registry } from '../providers/registry';
 import type { DataPoint, ResolvedAddress } from '../providers/types';
 import { assembleAgentVerdict, callAgentLLM, type AgentVerdict } from './shared';
+import { deterministicEntitlementRisk, blendEntitlementRisk } from './entitlement';
 
 const SYSTEM_PROMPT = `You are KOANO's Regulatory & Policy specialist agent — one of five specialist real estate reasoning agents.
 
@@ -111,6 +112,18 @@ export async function runRegulatoryPolicyAgent(addr: ResolvedAddress): Promise<A
     addressLabel: addr.normalized || addr.input,
     dataPoints,
   });
+
+  // Entitlement risk is DRIVEN by the zoning facts (variance need, special-district
+  // complexity, as-of-right headroom), not the model's coarse band — a computed
+  // score from facts beats an LLM band. The model's judgment only adjusts it
+  // (ENTITLEMENT_FACT_WEIGHT). When zoning isn't live (e.g. throttled to
+  // representative under load), the fact score can't compute and the agent band
+  // stands, carrying its representative flag — so degradation shows, never a
+  // silent "moderate".
+  const ent = deterministicEntitlementRisk(zoningRes.data, zoningRes.provenance);
+  if (ent) {
+    llm.risk_score = blendEntitlementRisk(ent.score, llm.risk_score);
+  }
 
   return assembleAgentVerdict({ agent: 'regulatory-policy', llm, dataPoints });
 }

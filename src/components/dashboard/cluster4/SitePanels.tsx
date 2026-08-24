@@ -8,7 +8,7 @@
 
 import React from "react";
 import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
-import { swapIntegrationFor, type SynthesisResult } from "@/components/ui/verdict";
+import { swapIntegrationFor, deterministicEntitlementRisk, type SynthesisResult } from "@/components/ui/verdict";
 import {
   BlockError,
   Meter,
@@ -32,6 +32,10 @@ interface SitePanelsProps {
 export default function SitePanels({ detail, detailError, verdict }: SitePanelsProps) {
   const regPolicy = verdict.agent_summaries.find((s) => s.agent === "regulatory-policy");
   const zoning = detail?.zoning;
+  // The facts driving the score (the same function the agent's risk_score is
+  // blended from). Null when zoning isn't live — then the score rests on the
+  // agent band alone, which the provenance badge already flags.
+  const entFactors = zoning ? deterministicEntitlementRisk(zoning.data, zoning.provenance)?.factors ?? null : null;
   const permits = detail?.permits;
   const oz = detail?.opportunity_zone;
   const proforma = detail?.proforma;
@@ -71,6 +75,29 @@ export default function SitePanels({ detail, detailError, verdict }: SitePanelsP
             <p style={{ fontSize: "13px", lineHeight: 1.6, color: "var(--ink-secondary)", margin: 0 }}>
               {regPolicy.headline}
             </p>
+            {entFactors && entFactors.length > 0 && (
+              <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                <span
+                  style={{
+                    fontFamily: "'DM Mono', monospace",
+                    fontSize: "10px",
+                    letterSpacing: "0.06em",
+                    textTransform: "uppercase",
+                    color: "var(--ink-faint)",
+                  }}
+                >
+                  What drives this score (from the zoning facts)
+                </span>
+                {entFactors.map((f, i) => (
+                  <div key={i} style={{ display: "flex", gap: "8px", alignItems: "flex-start" }}>
+                    <span aria-hidden="true" style={{ color: "var(--ink-faint)", lineHeight: 1.6 }}>
+                      ·
+                    </span>
+                    <span style={{ fontSize: "12px", lineHeight: 1.55, color: "var(--ink-secondary)" }}>{f}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </>
         ) : (
           <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>

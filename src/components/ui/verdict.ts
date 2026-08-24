@@ -16,6 +16,10 @@ export type { PipelineProgressEvent } from "../../../lib/agents/synthesis";
 // verdict's math from its stored agent_summaries, + the breakdown type.
 export { breakdownFromSummaries } from "../../../lib/agents/breakdown";
 export type { WeightingBreakdown, AgentSummary } from "../../../lib/agents/breakdown";
+// Client-safe (only imports types): the fact-driven entitlement-risk score, so
+// the Cluster 4 panel can show the same factors the agent's score is driven by.
+export { deterministicEntitlementRisk } from "../../../lib/agents/entitlement";
+export type { EntitlementRisk } from "../../../lib/agents/entitlement";
 
 import type { AgentName, Verdict } from "../../../lib/agents/shared";
 
