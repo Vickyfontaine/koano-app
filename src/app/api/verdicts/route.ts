@@ -6,6 +6,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { supabaseAdmin } from '../../../../lib/supabase/server';
 import { requireApproved } from '../../../../lib/koano-guard';
+import type { AgentSummary } from '../../../../lib/agents/breakdown';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,6 +21,9 @@ export interface VerdictHistoryRow {
   headline: string;
   overall_provenance: 'live' | 'representative';
   created_at: string;
+  // Stored votes — enough to RE-DERIVE the verdict math for a history row with no
+  // model call (weighting_breakdown isn't persisted; it's a pure function of these).
+  agent_summaries: AgentSummary[];
 }
 
 export async function GET(req: Request) {
@@ -37,7 +41,7 @@ export async function GET(req: Request) {
   const { data, error } = await supabaseAdmin()
     .from('verdicts')
     .select(
-      'id, address_input, address_normalized, verdict, confidence, risk_score, signal_window_months, headline, overall_provenance, created_at',
+      'id, address_input, address_normalized, verdict, confidence, risk_score, signal_window_months, headline, overall_provenance, created_at, agent_summaries',
     )
     .eq('clerk_user_id', userId)
     .order('created_at', { ascending: false })

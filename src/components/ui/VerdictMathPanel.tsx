@@ -16,13 +16,20 @@ import DivergingBar, { type DivergingDatum } from "./charts/DivergingBar";
 import {
   AGENT_LABELS,
   VERDICT_COLORS,
+  breakdownFromSummaries,
   type AgentName,
   type Provenance,
   type SynthesisResult,
+  type Verdict,
 } from "./verdict";
 
+// The panel needs only these fields. A fresh SynthesisResult satisfies it; a
+// persisted history verdict (no stored weighting_breakdown) also satisfies it and
+// gets its math reconstructed from agent_summaries.
 interface VerdictMathPanelProps {
-  verdict: SynthesisResult;
+  verdict: Pick<SynthesisResult, "verdict" | "overall_provenance" | "agent_summaries"> & {
+    weighting_breakdown?: SynthesisResult["weighting_breakdown"] | null;
+  };
 }
 
 const DOMAIN: [number, number] = [-2, 2];
@@ -87,9 +94,16 @@ function joinNames(names: string[]): string {
 }
 
 export default function VerdictMathPanel({ verdict }: VerdictMathPanelProps) {
-  const wb = verdict.weighting_breakdown;
-  // Persisted-history verdicts may not carry the breakdown; show nothing rather
-  // than a broken panel. (Fresh pipeline verdicts always include it.)
+  // Fresh pipeline verdicts carry the live-computed breakdown. Persisted-history
+  // verdicts don't (it isn't stored) — but it's a PURE function of the stored
+  // agent_summaries, so we RE-DERIVE it (breakdownFromSummaries marks it
+  // reconstructed:true, surfaced below). Same arithmetic, same stored inputs.
+  const wb =
+    verdict.weighting_breakdown && verdict.weighting_breakdown.agents.length > 0
+      ? verdict.weighting_breakdown
+      : verdict.agent_summaries && verdict.agent_summaries.length > 0
+        ? breakdownFromSummaries(verdict.agent_summaries, verdict.verdict as Verdict)
+        : null;
   if (!wb || wb.agents.length === 0) return null;
 
   const provByAgent = new Map(verdict.agent_summaries.map((s) => [s.agent, s.overall_provenance]));
@@ -165,7 +179,27 @@ export default function VerdictMathPanel({ verdict }: VerdictMathPanelProps) {
     >
       {/* Header */}
       <div>
-        <div style={monoLabel}>How this verdict was computed</div>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+          <div style={monoLabel}>How this verdict was computed</div>
+          {wb.reconstructed && (
+            <span
+              style={{
+                fontFamily: "'DM Mono', monospace",
+                fontSize: "10px",
+                letterSpacing: "0.06em",
+                textTransform: "uppercase",
+                color: "var(--ink-muted)",
+                background: "var(--pale-wash)",
+                border: "1px solid var(--border)",
+                borderRadius: "100px",
+                padding: "2px 9px",
+              }}
+              title="This verdict's breakdown was not stored; it is re-derived now from the same stored agent votes. Identical arithmetic — but a re-derivation, not the original live computation."
+            >
+              Reconstructed from stored inputs
+            </span>
+          )}
+        </div>
         <p
           style={{
             fontSize: "14px",

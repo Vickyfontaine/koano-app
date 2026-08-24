@@ -12,6 +12,10 @@ export type {
 } from "../../../lib/agents/shared";
 export type { SynthesisResult } from "../../../lib/agents/synthesis";
 export type { PipelineProgressEvent } from "../../../lib/agents/synthesis";
+// Client-safe (no server imports): the pure reconstruction of a persisted
+// verdict's math from its stored agent_summaries, + the breakdown type.
+export { breakdownFromSummaries } from "../../../lib/agents/breakdown";
+export type { WeightingBreakdown, AgentSummary } from "../../../lib/agents/breakdown";
 
 import type { AgentName, Verdict } from "../../../lib/agents/shared";
 

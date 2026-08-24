@@ -5,6 +5,7 @@
 
 import React, { useEffect, useState } from "react";
 import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
+import VerdictMathPanel from "@/components/ui/VerdictMathPanel";
 import { VERDICT_COLORS, type Verdict } from "@/components/ui/verdict";
 import { PanelHeader, panelStyle } from "./panels";
 import type { VerdictHistoryRow } from "@/app/api/verdicts/route";
@@ -12,6 +13,7 @@ import type { VerdictHistoryRow } from "@/app/api/verdicts/route";
 export default function VerdictHistory({ id }: { id?: string }) {
   const [rows, setRows] = useState<VerdictHistoryRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -46,42 +48,70 @@ export default function VerdictHistory({ id }: { id?: string }) {
       )}
       {rows !== null && rows.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-          {rows.map((r) => (
-            <div
-              key={r.id}
-              style={{
-                display: "flex",
-                alignItems: "baseline",
-                gap: "12px",
-                flexWrap: "wrap",
-                borderBottom: "1px solid var(--border-light)",
-                paddingBottom: "10px",
-              }}
-            >
-              <span
-                style={{
-                  fontFamily: "'DM Mono', monospace",
-                  fontSize: "12px",
-                  fontWeight: 500,
-                  textTransform: "uppercase",
-                  color: VERDICT_COLORS[r.verdict as Verdict] ?? "var(--ink-primary)",
-                  minWidth: "44px",
-                }}
+          {rows.map((r) => {
+            const canExpand = Array.isArray(r.agent_summaries) && r.agent_summaries.length > 0;
+            const expanded = expandedId === r.id;
+            return (
+              <div
+                key={r.id}
+                style={{ borderBottom: "1px solid var(--border-light)", paddingBottom: "10px" }}
               >
-                {r.verdict}
-              </span>
-              <span style={{ fontSize: "13px", color: "var(--ink-secondary)", flex: 1, minWidth: "200px" }}>
-                {r.address_normalized ?? r.address_input}
-              </span>
-              <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "11px", color: "var(--ink-muted)" }}>
-                conf {r.confidence} · risk {r.risk_score} · {r.signal_window_months} mo
-              </span>
-              <ProvenanceBadge provenance={r.overall_provenance} />
-              <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "11px", color: "var(--ink-faint)" }}>
-                {new Date(r.created_at).toLocaleDateString()}
-              </span>
-            </div>
-          ))}
+                <div style={{ display: "flex", alignItems: "baseline", gap: "12px", flexWrap: "wrap" }}>
+                  <span
+                    style={{
+                      fontFamily: "'DM Mono', monospace",
+                      fontSize: "12px",
+                      fontWeight: 500,
+                      textTransform: "uppercase",
+                      color: VERDICT_COLORS[r.verdict as Verdict] ?? "var(--ink-primary)",
+                      minWidth: "44px",
+                    }}
+                  >
+                    {r.verdict}
+                  </span>
+                  <span style={{ fontSize: "13px", color: "var(--ink-secondary)", flex: 1, minWidth: "200px" }}>
+                    {r.address_normalized ?? r.address_input}
+                  </span>
+                  <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "11px", color: "var(--ink-muted)" }}>
+                    conf {r.confidence} · risk {r.risk_score} · {r.signal_window_months} mo
+                  </span>
+                  <ProvenanceBadge provenance={r.overall_provenance} />
+                  <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "11px", color: "var(--ink-faint)" }}>
+                    {new Date(r.created_at).toLocaleDateString()}
+                  </span>
+                  {canExpand && (
+                    <button
+                      onClick={() => setExpandedId(expanded ? null : r.id)}
+                      style={{
+                        border: "1px solid var(--border)",
+                        background: "transparent",
+                        borderRadius: "100px",
+                        padding: "3px 12px",
+                        fontFamily: "'DM Mono', monospace",
+                        fontSize: "10px",
+                        letterSpacing: "0.04em",
+                        color: "var(--ink-muted)",
+                        cursor: "pointer",
+                      }}
+                    >
+                      {expanded ? "Hide math" : "Show math"}
+                    </button>
+                  )}
+                </div>
+                {expanded && canExpand && (
+                  <div style={{ marginTop: "14px" }}>
+                    <VerdictMathPanel
+                      verdict={{
+                        verdict: r.verdict as Verdict,
+                        overall_provenance: r.overall_provenance,
+                        agent_summaries: r.agent_summaries,
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
