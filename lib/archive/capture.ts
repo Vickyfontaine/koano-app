@@ -343,6 +343,17 @@ export async function missedShards(admin: SupabaseClient, runWeek: string, today
   return computeShardGaps(runWeek, todayShard, genesis, ran);
 }
 
+// Datasets that have NEVER captured a single row (migration-018 view). A dataset
+// silent since inception is a first-class gap — a never-captured one looks
+// identical to "not yet due", which is how HPI sat at zero unnoticed. Deploy-safe:
+// if the view isn't applied yet, returns [] (no false alarm). Genesis- and
+// needs-properties-guarded inside the view itself.
+export async function neverCapturedDatasets(admin: SupabaseClient): Promise<string[]> {
+  const { data, error } = await admin.from('archive_never_captured').select('dataset, never_captured');
+  if (error || !data) return [];
+  return data.filter((r) => (r as { never_captured?: boolean }).never_captured).map((r) => (r as { dataset: string }).dataset);
+}
+
 // Best-effort email on a missed run. Uses Resend's HTTP API (no SDK) when
 // configured; otherwise logs LOUDLY so the gap is at least in the logs.
 // Sender reuses the verified MONITORING_EMAIL_FROM (falls back to the legacy

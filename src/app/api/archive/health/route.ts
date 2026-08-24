@@ -16,10 +16,13 @@ export async function GET(req: Request) {
   }
   const admin = supabaseAdmin();
 
-  const [coverageRes, shardRes, lastRunRes] = await Promise.all([
+  const [coverageRes, shardRes, neverRes, lastRunRes] = await Promise.all([
     admin.from('archive_coverage').select('*').limit(52),
     // Shard completeness (daily fan-out): which (week, shard) days ran vs missed.
     admin.from('archive_week_shards').select('*').limit(371), // ~53 weeks × 7
+    // All-time presence: a dataset that has NEVER captured a row (migration-018).
+    // Deploy-safe — if the view isn't applied yet, treat as empty.
+    admin.from('archive_never_captured').select('*'),
     admin.from('archive_runs').select('run_week, shard, status, rows_written, finished_at, datasets').order('run_week', { ascending: false }).order('shard', { ascending: false }).limit(1),
   ]);
 
@@ -30,14 +33,20 @@ export async function GET(req: Request) {
   const datasetGaps = coverage.filter((r) => r.is_gap);
   const shardRows = shardRes.data ?? [];
   const shardGaps = shardRows.filter((r) => r.is_gap); // missed shard-days
+  // Never-captured is a first-class gap: a dataset silent since inception. If the
+  // view is missing (pre-migration-018), neverRes errors — degrade to [].
+  const neverCaptured = (neverRes.error ? [] : neverRes.data ?? []).filter((r) => r.never_captured);
 
   return NextResponse.json({
-    // Healthy only when NO dataset wrote nothing AND every elapsed shard-day ran.
-    healthy: datasetGaps.length === 0 && shardGaps.length === 0,
+    // Healthy only when NO dataset wrote nothing this week, every elapsed shard-day
+    // ran, AND no expected dataset has never captured at all.
+    healthy: datasetGaps.length === 0 && shardGaps.length === 0 && neverCaptured.length === 0,
     dataset_gap_count: datasetGaps.length,
     dataset_gaps: datasetGaps,
     shard_gap_count: shardGaps.length,
     shard_gaps: shardGaps, // [{ week, shard, ran, is_gap }] — a missed day, not "6 of 7"
+    never_captured_count: neverCaptured.length,
+    never_captured: neverCaptured, // [{ dataset, total_rows, never_captured }] — silent since inception
     coverage,
     last_run: lastRunRes.data?.[0] ?? null,
   });

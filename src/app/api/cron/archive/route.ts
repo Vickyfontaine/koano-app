@@ -23,6 +23,7 @@ import {
   loadTrackedProperties,
   loadActiveMonitoredProperties,
   missedShards,
+  neverCapturedDatasets,
   sendGapAlert,
 } from '../../../../../lib/archive/capture';
 import { scanVerdictOutcomes } from '../../../../../lib/archive/outcomes';
@@ -201,5 +202,15 @@ export async function POST(req: Request) {
     );
   }
 
-  return NextResponse.json({ run_week: runWeek, shard, sharded, status, datasets, outcomes, monitor, digest, rows_written: total, shard_gaps: gaps });
+  // Never-captured check — a dataset silent since inception (the HPI-at-zero
+  // failure class). Run weekly (shard 0 / unsharded) to avoid daily repeats.
+  const neverCaptured = !sharded || shard === 0 ? await neverCapturedDatasets(admin) : [];
+  for (const ds of neverCaptured) {
+    await sendGapAlert(
+      `KOANO archive NEVER-CAPTURED: ${ds}`,
+      `Dataset "${ds}" has zero rows across all history — it has never captured, so it never appeared as a weekly gap. Its capture path is failing or was never reached. Investigate before more history is lost.`,
+    );
+  }
+
+  return NextResponse.json({ run_week: runWeek, shard, sharded, status, datasets, outcomes, monitor, digest, rows_written: total, shard_gaps: gaps, never_captured: neverCaptured });
 }
