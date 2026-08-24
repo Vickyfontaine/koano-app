@@ -1,11 +1,24 @@
-// FHFA House Price Index — master CSV download, filtered to the New York MSA
-// (CBSA 35620). Cached in-module for the process lifetime (file is ~10MB).
+// FHFA House Price Index — New York MSA (metro division 35614).
+//
+// DURABLE-BACKED (production-only failure fix): the FHFA master CSV is ~10MB and
+// was cached only in /tmp, which on Vercel serverless is per-instance ephemeral —
+// cold instances re-download it, FHFA rate-blocks repeated large downloads, so
+// some requests time out and fall back to representative. Invisible locally (the
+// cache warms), intermittently representative in production.
+//
+// Fix: HPI is quarterly, and the archive cron already snapshots it into Supabase.
+// The hot path (agents, dashboard, blocks) now reads that DURABLE snapshot — no
+// per-request megabyte download. The ONE live download happens weekly in the
+// cron (fetchLiveHpi, below), where a 90s fetch is fine. Staleness is explicit:
+// if the archived quarter is old AND a live refresh fails, it reads as STALE
+// (representative + a visible note), never a silent old figure served as current.
 
 import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { HpiProvider, HpiTrend, ProviderResult, ResolvedAddress } from '../types';
 import { errMsg, fetchText } from './http';
+import { supabaseAdmin } from '../../supabase/server';
 
 const CSV_URLS = [
   'https://www.fhfa.gov/hpi/download/monthly/hpi_master.csv',
@@ -137,29 +150,93 @@ const REPRESENTATIVE_FALLBACK: HpiTrend = {
   five_yr_change_pct: 38,
 };
 
+// The live download + computation. Throws on failure. Called by the WEEKLY cron
+// (the one place the ~10MB download is acceptable) — never on the request hot
+// path, which reads the durable snapshot below.
+export async function fetchLiveHpi(): Promise<{ data: HpiTrend; endpoint: string }> {
+  const { rows, endpoint } = await loadNyMsaRows();
+  const latest = rows[rows.length - 1];
+  const yearAgo = rows[rows.length - 5]; // 4 quarters back
+  const fiveYrAgo = rows[rows.length - 21]; // 20 quarters back
+  const pct = (from?: HpiRow) =>
+    from ? Number((((latest.index_nsa - from.index_nsa) / from.index_nsa) * 100).toFixed(1)) : null;
+  return {
+    data: {
+      region: 'New York-Jersey City-White Plains, NY-NJ',
+      region_type: 'Metropolitan Division (35614)',
+      latest_period: `${latest.yr} Q${latest.period}`,
+      latest_index: latest.index_nsa,
+      yoy_change_pct: pct(yearAgo),
+      five_yr_change_pct: pct(fiveYrAgo),
+    },
+    endpoint,
+  };
+}
+
+// Parse "YYYY QN" → a monotonic quarter index (year*4 + quarter). null if unparseable.
+function quarterIndex(period: string): number | null {
+  const m = /^(\d{4})\s*Q([1-4])$/.exec(period.trim());
+  if (!m) return null;
+  return Number(m[1]) * 4 + Number(m[2]);
+}
+
+// FHFA all-transactions quarterly publishes with ~1 quarter of lag. So the latest
+// AVAILABLE quarter trails the calendar by up to ~2. An archived figure within 2
+// quarters of the current calendar quarter is plausibly the latest FHFA has
+// published → FRESH. More than 2 behind means our stored figure is genuinely old
+// (the cron stopped updating) → STALE, so a live refresh is required before we
+// serve it as current.
+function isFreshQuarter(latestPeriod: string): boolean {
+  const q = quarterIndex(latestPeriod);
+  if (q == null) return false;
+  const now = new Date();
+  const nowQ = now.getUTCFullYear() * 4 + (Math.floor(now.getUTCMonth() / 3) + 1);
+  return nowQ - q <= 2;
+}
+
+// Read the most recent HPI snapshot from the durable archive. Graceful: any error
+// (missing service-role env, unreachable DB) → null, and getHpi falls back to a
+// live fetch, so this never hard-fails a verdict.
+async function readArchivedHpi(): Promise<HpiTrend | null> {
+  try {
+    const { data } = await supabaseAdmin()
+      .from('archive_snapshots')
+      .select('data')
+      .eq('dataset', 'hpi')
+      .eq('scope_type', 'metro')
+      .order('captured_week', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    const d = (data as { data?: HpiTrend } | null)?.data;
+    if (d && typeof d.latest_period === 'string') return d;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 export const fhfaHpi: HpiProvider = {
   name: 'FHFA House Price Index',
 
   async getHpi(_addr: ResolvedAddress): Promise<ProviderResult<HpiTrend>> {
     const fetched_at = new Date().toISOString();
-    try {
-      const { rows, endpoint } = await loadNyMsaRows();
-      const latest = rows[rows.length - 1];
-      const yearAgo = rows[rows.length - 5]; // 4 quarters back
-      const fiveYrAgo = rows[rows.length - 21]; // 20 quarters back
+    const archived = await readArchivedHpi();
 
-      const pct = (from?: HpiRow) =>
-        from ? Number((((latest.index_nsa - from.index_nsa) / from.index_nsa) * 100).toFixed(1)) : null;
-
-      const data: HpiTrend = {
-        region: 'New York-Jersey City-White Plains, NY-NJ',
-        region_type: 'Metropolitan Division (35614)',
-        latest_period: `${latest.yr} Q${latest.period}`,
-        latest_index: latest.index_nsa,
-        yoy_change_pct: pct(yearAgo),
-        five_yr_change_pct: pct(fiveYrAgo),
+    // Hot path: a fresh archived quarter is genuine current FHFA data from our
+    // durable cache of the source — served live, with no per-request download.
+    if (archived && isFreshQuarter(archived.latest_period)) {
+      return {
+        ok: true,
+        data: archived,
+        provenance: 'live',
+        source: `FHFA House Price Index (via KOANO durable archive, ${archived.latest_period})`,
+        fetched_at,
       };
+    }
 
+    // Archive stale or absent → refresh from the live source.
+    try {
+      const { data, endpoint } = await fetchLiveHpi();
       return {
         ok: true,
         data,
@@ -169,6 +246,21 @@ export const fhfaHpi: HpiProvider = {
         fetched_at,
       };
     } catch (e) {
+      // Refresh failed. If we have an archived figure, serve it but read as STALE
+      // (representative + a visible note) — never a silent old figure as current.
+      if (archived) {
+        return {
+          ok: true,
+          data: {
+            ...archived,
+            region: `${archived.region} (STALE as of ${archived.latest_period} — live refresh failed)`,
+          },
+          provenance: 'representative',
+          source: `FHFA House Price Index (durable archive, STALE ${archived.latest_period} — refresh failed)`,
+          fetched_at,
+          error: `Live refresh failed and archived HPI is older than a quarter: ${errMsg(e)}`,
+        };
+      }
       return {
         ok: true,
         data: REPRESENTATIVE_FALLBACK,

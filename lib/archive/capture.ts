@@ -12,6 +12,7 @@
 import { createHash } from 'crypto';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { fetchJson } from '../providers/real/http';
+import { fetchLiveHpi } from '../providers/real/fhfa-hpi';
 import { registry } from '../providers/registry';
 import { monitoringCap, type Plan } from '../koano-guard';
 import type {
@@ -20,7 +21,6 @@ import type {
   DisasterHistoryInfo,
   EmploymentInfo,
   EntitlementSummary,
-  HpiTrend,
   LandlordPortfolioSummary,
   MlsCompsSummary,
   MortgageDemandInfo,
@@ -89,7 +89,6 @@ export const CAPTURE_VERSION = {
 const ROLLING_SALES = 'https://data.cityofnewyork.us/resource/usep-8jbt.json';
 const DOB_PERMITS = 'https://data.cityofnewyork.us/resource/rbx6-tga4.json';
 const DOB_FILINGS = 'https://data.cityofnewyork.us/resource/ic3t-wcy2.json';
-const HPI_REF_ADDRESS = '1 Centre Street, New York, NY'; // resolves the NYC metro for HPI
 
 // ISO-week Monday (UTC) for a date — the canonical captured_week / run_week.
 export function isoWeekMonday(d: Date): string {
@@ -714,18 +713,23 @@ export async function capturePropertySnapshots(admin: SupabaseClient, runWeek: s
 
 // --- HPI — metro, capture-if-changed (quarterly cadence in practice). ---------
 export async function captureHpiIfChanged(admin: SupabaseClient, runWeek: string): Promise<number> {
-  const geo = await registry.geocode.resolve(HPI_REF_ADDRESS);
-  if (!geo.ok || !geo.data) return 0;
-  const res = await registry.hpi.getHpi(geo.data);
-  if (res.provenance !== 'live' || !res.data) return 0;
-  const d = res.data as HpiTrend;
+  // The cron is the ONE place the live ~10MB FHFA download happens (fetchLiveHpi,
+  // direct) — so the archive discovers new quarters. The request hot path reads
+  // this snapshot instead of downloading (see fhfa-hpi.ts getHpi).
+  let live;
+  try {
+    live = await fetchLiveHpi();
+  } catch {
+    return 0; // FHFA unreachable this run — the durable snapshot stays; no falsification
+  }
+  const d = live.data;
   const data = { region: d.region, region_type: d.region_type, latest_period: d.latest_period, latest_index: d.latest_index, yoy_change_pct: d.yoy_change_pct, five_yr_change_pct: d.five_yr_change_pct };
   const scopeKey = d.region;
   const h = hash(data);
   if (h === (await lastHash(admin, 'hpi', 'metro', scopeKey))) return 0; // unchanged quarter
   return chunkedUpsert(
     admin, 'archive_snapshots',
-    [{ dataset: 'hpi', scope_type: 'metro', scope_key: scopeKey, captured_week: runWeek, source: res.source, provenance: 'live', capture_version: CAPTURE_VERSION.hpi, data, content_hash: h }],
+    [{ dataset: 'hpi', scope_type: 'metro', scope_key: scopeKey, captured_week: runWeek, source: 'FHFA House Price Index (all-transactions, quarterly)', provenance: 'live', capture_version: CAPTURE_VERSION.hpi, data, content_hash: h }],
     'dataset,scope_type,scope_key,captured_week',
   );
 }

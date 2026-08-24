@@ -1,8 +1,10 @@
 "use client";
 
 // MarketVelocityPanel — Cluster 2 default view (Checkpoint 4).
-// Market speed at a glance: live FHFA price velocity and search interest,
-// representative DOM / $psf / absorption / foot traffic clearly badged.
+// Market speed at a glance, all live: FHFA price velocity, DOF recorded-sales
+// count / median $psf / sales velocity, HMDA mortgage demand, QCEW employment.
+// (Sales velocity is recorded-sales/mo, deliberately NOT labeled absorption —
+// true months-of-supply needs active listings, the paid MLS gap.)
 
 import React from "react";
 import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
@@ -68,7 +70,7 @@ export default function MarketVelocityPanel({ detail, detailError, id }: MarketV
   }
 
   const tiles: Tile[] = [];
-  const { hpi, mls_comps, mortgage_demand, employment, proforma } = detail;
+  const { hpi, mls_comps, mortgage_demand, employment } = detail;
 
   if (hpi?.data) {
     tiles.push({
@@ -91,6 +93,16 @@ export default function MarketVelocityPanel({ detail, detailError, id }: MarketV
       sub: "NYC DOF recorded sales",
       provenance: mls_comps.provenance,
     });
+    // Recorded-sales VELOCITY from DOF (trailing 12mo ÷ 12). Live — it replaces
+    // the old representative "absorption" figure. Labeled to NOT be read as true
+    // absorption / months-of-supply (which needs active listings — the paid MLS
+    // gap KOANO does not source).
+    tiles.push({
+      label: "Recorded sales velocity",
+      value: `${(mls_comps.data.sales_count / 12).toFixed(1)} sales/mo`,
+      sub: "Trailing 12 mo (DOF) · not absorption / months-of-supply",
+      provenance: mls_comps.provenance,
+    });
   }
   if (mortgage_demand?.data) {
     const m = mortgage_demand.data;
@@ -110,15 +122,6 @@ export default function MarketVelocityPanel({ detail, detailError, id }: MarketV
       provenance: employment.provenance,
     });
   }
-  if (proforma?.data) {
-    tiles.push({
-      label: "Absorption",
-      value: `${proforma.data.absorption_units_per_month} units/mo`,
-      sub: proforma.data.submarket,
-      provenance: proforma.provenance,
-    });
-  }
-
   return (
     <div style={panelStyle} id={id}>
       <PanelHeader title="Market velocity" />
