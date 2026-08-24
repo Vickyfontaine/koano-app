@@ -12,8 +12,10 @@ import VerdictCard from "@/components/ui/VerdictCard";
 import VerdictMathPanel from "@/components/ui/VerdictMathPanel";
 import ReasoningChain from "@/components/ui/ReasoningChain";
 import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
-import { VERDICT_COLORS, type SynthesisResult, type Verdict } from "@/components/ui/verdict";
+import CandidatePicker from "@/components/ui/CandidatePicker";
+import { VERDICT_COLORS, type SynthesisResult, type Verdict, type AddressCandidate } from "@/components/ui/verdict";
 import { useVerdictStream, type VerdictStream } from "../useVerdictStream";
+import type { RunPayload } from "../useAddressResolver";
 import SitePanels from "./SitePanels";
 import DocumentButton from "../DocumentButton";
 import type { SiteDetailResponse } from "@/app/api/site-detail/route";
@@ -54,23 +56,35 @@ export default function SiteComparison() {
   const [activeSlots, setActiveSlots] = useState<number[]>([]);
   const [details, setDetails] = useState<DetailState[]>([idleDetail, idleDetail, idleDetail]);
 
+  // Disambiguation is per-slot, but presented ONE picker at a time so three
+  // ambiguous addresses never become three simultaneous prompts. Slots that
+  // resolve confidently start analyzing immediately; ambiguous ones queue.
+  const [resolvingSlots, setResolvingSlots] = useState<number[]>([]);
+  const [pendingQueue, setPendingQueue] = useState<{ slot: number; candidates: AddressCandidate[] }[]>([]);
+  const [resolveErrors, setResolveErrors] = useState<Record<number, string>>({});
+
   const streamA = useVerdictStream();
   const streamB = useVerdictStream();
   const streamC = useVerdictStream();
   const streams: VerdictStream[] = [streamA, streamB, streamC];
 
-  const running = activeSlots.some((i) => streams[i].status === "running");
+  const resolving = resolvingSlots.length > 0;
+  const hasPending = pendingQueue.length > 0;
+  const running =
+    resolving || hasPending || activeSlots.some((i) => streams[i].status === "running");
   const finished =
+    !resolving &&
+    !hasPending &&
     activeSlots.length > 0 &&
     activeSlots.every((i) => streams[i].status === "done" || streams[i].status === "error");
 
-  async function fetchDetail(slot: number, address: string) {
+  async function fetchDetail(slot: number, payload: RunPayload) {
     setDetails((prev) => prev.map((d, i) => (i === slot ? { loading: true, data: null, error: null } : d)));
     try {
       const res = await fetch("/api/site-detail", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address }),
+        body: JSON.stringify(payload),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json?.error || `Request failed (${res.status})`);
@@ -85,18 +99,57 @@ export default function SiteComparison() {
     }
   }
 
-  function runComparison(e: React.FormEvent) {
+  // A slot begins analysis only AFTER it resolves (confident, or the user's pick).
+  function startSlot(slot: number, payload: RunPayload) {
+    setActiveSlots((prev) => (prev.includes(slot) ? prev : [...prev, slot].sort((a, b) => a - b)));
+    void streams[slot].run(payload);
+    void fetchDetail(slot, payload);
+  }
+
+  function choosePending(slot: number, candidate: AddressCandidate) {
+    setPendingQueue((prev) => prev.filter((p) => p.slot !== slot));
+    startSlot(slot, { candidate });
+  }
+
+  async function runComparison(e: React.FormEvent) {
     e.preventDefault();
     if (running) return;
     const slots = addresses
       .map((a, i) => ({ address: a.trim(), i }))
       .filter((s) => s.address.length > 0);
     if (slots.length === 0) return;
-    setActiveSlots(slots.map((s) => s.i));
-    for (const s of slots) {
-      void streams[s.i].run(s.address);
-      void fetchDetail(s.i, s.address);
-    }
+
+    // Fresh run — clear prior state on every slot.
+    streams.forEach((s) => s.reset());
+    setActiveSlots([]);
+    setDetails([idleDetail, idleDetail, idleDetail]);
+    setPendingQueue([]);
+    setResolveErrors({});
+    setResolvingSlots(slots.map((s) => s.i));
+
+    // Resolve all slots concurrently. Confident → start now; ambiguous → queue
+    // (surfaced one at a time); none → a per-slot resolve error.
+    slots.forEach(async ({ address, i }) => {
+      try {
+        const res = await fetch("/api/resolve-address", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ address }),
+        });
+        const json = await res.json().catch(() => null);
+        setResolvingSlots((prev) => prev.filter((x) => x !== i));
+        if (res.ok && json?.status === "ambiguous" && Array.isArray(json.candidates) && json.candidates.length > 0) {
+          setPendingQueue((prev) => [...prev, { slot: i, candidates: json.candidates as AddressCandidate[] }]);
+        } else if (res.ok && json?.status === "resolved") {
+          startSlot(i, { address });
+        } else {
+          setResolveErrors((prev) => ({ ...prev, [i]: json?.error || `Could not resolve ${SLOT_LABELS[i]}` }));
+        }
+      } catch (err) {
+        setResolvingSlots((prev) => prev.filter((x) => x !== i));
+        setResolveErrors((prev) => ({ ...prev, [i]: err instanceof Error ? err.message : "resolve failed" }));
+      }
+    });
   }
 
   // Ranked results (only sites whose pipeline completed).
@@ -104,6 +157,9 @@ export default function SiteComparison() {
     .filter((i) => streams[i].status === "done" && streams[i].result)
     .sort((a, b) => opportunityScore(streams[b].result!.verdict) - opportunityScore(streams[a].result!.verdict));
   const errored = activeSlots.filter((i) => streams[i].status === "error");
+  const resolveErrorSlots = Object.keys(resolveErrors).map(Number);
+  const anyActivity =
+    resolving || hasPending || activeSlots.length > 0 || resolveErrorSlots.length > 0;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
@@ -166,7 +222,47 @@ export default function SiteComparison() {
         </div>
       </form>
 
-      {activeSlots.length === 0 && (
+      {/* Disambiguation — one picker at a time, so three ambiguous addresses
+          never stack into three prompts. Confident slots are already running. */}
+      {resolving && (
+        <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
+          Resolving {resolvingSlots.length === 1 ? "1 address" : `${resolvingSlots.length} addresses`}…
+        </p>
+      )}
+      {hasPending && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+          <span style={monoLabel}>
+            {SLOT_LABELS[pendingQueue[0].slot]} — which building?
+            {pendingQueue.length > 1 && ` (${pendingQueue.length - 1} more to confirm)`}
+          </span>
+          <CandidatePicker
+            candidates={pendingQueue[0].candidates}
+            onChoose={(cand) => choosePending(pendingQueue[0].slot, cand)}
+          />
+        </div>
+      )}
+      {resolveErrorSlots.length > 0 && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+          {resolveErrorSlots.map((i) => (
+            <div
+              key={i}
+              style={{
+                border: "1px solid var(--border)",
+                borderLeft: "3px solid var(--signal-negative)",
+                borderRadius: "0 12px 12px 0",
+                padding: "12px 16px",
+                maxWidth: "620px",
+              }}
+            >
+              <p style={{ fontSize: "13px", color: "var(--ink-secondary)", margin: 0 }}>
+                <strong style={{ fontWeight: 500 }}>{SLOT_LABELS[i]}:</strong> {resolveErrors[i]}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {!anyActivity && (
         /* Empty state — approved copy (KOANO_COPY.md) */
         <div style={{ maxWidth: "620px" }}>
           <h3 style={{ fontSize: "18px", fontWeight: 500, color: "var(--ink-primary)", margin: "0 0 8px" }}>

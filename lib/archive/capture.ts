@@ -525,11 +525,21 @@ export async function capturePropertySnapshots(admin: SupabaseClient, runWeek: s
   const countyByFips = new Map<string, { addr: Addr }>();
   const resolved: { bbl: string; addr: Addr }[] = [];
   const zipByCode = new Map<string, Addr>();
+  const skippedUnconfirmed: string[] = []; // location-unverified resolutions, not snapshotted
 
   for (const p of props) {
     let geo;
     try { geo = await registry.geocode.resolve(p.address); } catch { continue; }
     if (!geo.ok || !geo.data) continue;
+    // A location-UNCONFIRMED resolution (the wrapper auto-picked among ambiguous
+    // candidates with no user disambiguation) may attribute a nearby lot's data
+    // to this BBL. Snapshotting that would falsify the longitudinal record — a
+    // mislabeled snapshot is worse than a gap. Skip AND log, so it surfaces as a
+    // visible gap in archive_runs, never as confident history.
+    if (geo.data.location_confidence === 'unconfirmed') {
+      skippedUnconfirmed.push(`${p.address}${geo.data.bbl ? ` (bbl ${geo.data.bbl})` : ''}`);
+      continue;
+    }
     const bbl = geo.data.bbl ?? p.bbl;
     if (!bbl) continue;
     if (geo.data.state_fips && geo.data.county_fips) {
@@ -678,6 +688,14 @@ export async function capturePropertySnapshots(admin: SupabaseClient, runWeek: s
     if (h !== (await lastHash(admin, 'comp_zip', 'zip', zip))) {
       compZip.push({ dataset: 'comp_zip', scope_type: 'zip', scope_key: zip, captured_week: runWeek, source: res.source, provenance: 'live', capture_version: CAPTURE_VERSION.compZip, data, row_count: d.sales_count, content_hash: h });
     }
+  }
+
+  // Surface any location-unverified properties that were deliberately NOT
+  // snapshotted, so the skip is visible (a gap by design), not silent.
+  if (skippedUnconfirmed.length > 0) {
+    console.warn(
+      `[archive] skipped ${skippedUnconfirmed.length} location-unconfirmed propert${skippedUnconfirmed.length === 1 ? 'y' : 'ies'} (not snapshotted — re-add with a confident address): ${skippedUnconfirmed.join('; ')}`,
+    );
   }
 
   const oc = 'dataset,scope_type,scope_key,captured_week';
