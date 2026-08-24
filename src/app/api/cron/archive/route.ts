@@ -42,7 +42,11 @@ const RUN_VERSION = 'archive-daily@1';
 // tracked N, and hpi/zoning are capture-if-changed (0 is normal), so they don't.
 const FLOORS: Record<string, number> = { sales: 100, permits: 1500, entitlement_cd: 40 };
 
-export async function POST(req: Request) {
+// Vercel cron jobs invoke the path with a GET request (auto-adding
+// Authorization: Bearer $CRON_SECRET). This route was POST-only, so EVERY
+// scheduled fire hit a 405 and the job never ran — silently, since the gap alert
+// lives inside the handler. GET is the primary; POST stays for manual triggers.
+async function handle(req: Request) {
   const secret = process.env.CRON_SECRET;
   if (!secret || req.headers.get('authorization') !== `Bearer ${secret}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -214,3 +218,7 @@ export async function POST(req: Request) {
 
   return NextResponse.json({ run_week: runWeek, shard, sharded, status, datasets, outcomes, monitor, digest, rows_written: total, shard_gaps: gaps, never_captured: neverCaptured });
 }
+
+// GET = the Vercel cron trigger (the one that was missing). POST = manual runs.
+export const GET = handle;
+export const POST = handle;

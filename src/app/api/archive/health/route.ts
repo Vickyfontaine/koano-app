@@ -37,10 +37,23 @@ export async function GET(req: Request) {
   // view is missing (pre-migration-018), neverRes errors — degrade to [].
   const neverCaptured = (neverRes.error ? [] : neverRes.data ?? []).filter((r) => r.never_captured);
 
+  // STALENESS — the signal for EXTERNAL liveness detection. The gap alert fires
+  // from inside the cron, so a dead cron can't report itself; an outside poller
+  // reads this instead. A daily job that hasn't run in >30h has stopped.
+  const lastRun = lastRunRes.data?.[0] ?? null;
+  const lastAt = lastRun?.finished_at ?? lastRun?.run_week ?? null;
+  const lastRunAgeHours = lastAt ? (Date.now() - new Date(lastAt).getTime()) / 3_600_000 : null;
+  const STALE_HOURS = 30;
+  const stale = lastRunAgeHours === null || lastRunAgeHours > STALE_HOURS;
+
   return NextResponse.json({
-    // Healthy only when NO dataset wrote nothing this week, every elapsed shard-day
-    // ran, AND no expected dataset has never captured at all.
-    healthy: datasetGaps.length === 0 && shardGaps.length === 0 && neverCaptured.length === 0,
+    // Healthy only when the job is running on time (not stale) AND no dataset
+    // wrote nothing this week AND every elapsed shard-day ran AND nothing has
+    // never captured.
+    healthy: !stale && datasetGaps.length === 0 && shardGaps.length === 0 && neverCaptured.length === 0,
+    stale, // <-- external liveness signal: true if the cron has not run in >30h
+    last_run_age_hours: lastRunAgeHours === null ? null : Math.round(lastRunAgeHours * 10) / 10,
+    stale_threshold_hours: STALE_HOURS,
     dataset_gap_count: datasetGaps.length,
     dataset_gaps: datasetGaps,
     shard_gap_count: shardGaps.length,
@@ -48,6 +61,6 @@ export async function GET(req: Request) {
     never_captured_count: neverCaptured.length,
     never_captured: neverCaptured, // [{ dataset, total_rows, never_captured }] — silent since inception
     coverage,
-    last_run: lastRunRes.data?.[0] ?? null,
+    last_run: lastRun,
   });
 }

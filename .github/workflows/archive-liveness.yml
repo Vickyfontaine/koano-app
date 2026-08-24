@@ -1,0 +1,55 @@
+# EXTERNAL archive liveness check.
+#
+# The archive's gap alert fires from INSIDE the cron, so a dead cron can never
+# report itself — which is exactly how a POST-only route silently never ran. This
+# check lives OUTSIDE Vercel entirely (GitHub's scheduler), polls the archive
+# health endpoint, and FAILS the workflow — which emails the repo owner — if the
+# cron has not run in >30h or the site is unreachable. Defense in depth: it
+# catches "the cron didn't fire" AND "Vercel is down".
+#
+# ONE-TIME SETUP: add repo secret CRON_SECRET (Settings → Secrets and variables →
+# Actions). Optionally set repo variable ARCHIVE_HEALTH_URL (defaults to the prod
+# health endpoint). GitHub disables scheduled workflows after 60 days of repo
+# inactivity and may delay them under load — it is a safety net, not the primary.
+
+name: Archive liveness
+
+on:
+  schedule:
+    - cron: '0 */6 * * *' # every 6 hours, independent of Vercel's cron
+  workflow_dispatch: {}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Poll archive health for staleness
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          HEALTH_URL: ${{ vars.ARCHIVE_HEALTH_URL || 'https://www.koano.co/api/archive/health' }}
+        run: |
+          set -euo pipefail
+          if [ -z "${CRON_SECRET:-}" ]; then
+            echo "::error::CRON_SECRET repo secret is not set — cannot poll archive health."
+            exit 1
+          fi
+          echo "Polling $HEALTH_URL"
+          resp=$(curl -sS -m 30 -w '\n%{http_code}' -H "Authorization: Bearer $CRON_SECRET" "$HEALTH_URL") || {
+            echo "::error::Archive health endpoint UNREACHABLE — cannot confirm the archive is alive."
+            exit 1
+          }
+          code=$(printf '%s' "$resp" | tail -n1)
+          body=$(printf '%s' "$resp" | sed '$d')
+          echo "HTTP $code"
+          echo "$body"
+          if [ "$code" != "200" ]; then
+            echo "::error::Health endpoint returned HTTP $code."
+            exit 1
+          fi
+          stale=$(printf '%s' "$body" | jq -r '.stale')
+          age=$(printf '%s' "$body" | jq -r '.last_run_age_hours')
+          if [ "$stale" = "true" ]; then
+            echo "::error::ARCHIVE STALE — last run ${age}h ago (> threshold). The cron is not firing; sales data is rolling off unrecoverably."
+            exit 1
+          fi
+          echo "OK — archive last ran ${age}h ago."
