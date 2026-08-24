@@ -10,6 +10,15 @@ import { VERDICT_COLORS, type Verdict } from "@/components/ui/verdict";
 import { PanelHeader, panelStyle } from "./panels";
 import type { VerdictHistoryRow } from "@/app/api/verdicts/route";
 
+// The grounding gate (commit 595ffdf, 2026-08-19T07:54:23Z) began checking every
+// reasoning claim + headline against an actual data point — the fix that closed
+// the coded-field→named-entity fabrication class (the "G"→Gowanus/Superfund/MIH
+// defect). Verdicts generated BEFORE it may carry ungated narrative. The table is
+// append-only (audit trail), so we MARK those rows rather than edit them — a
+// reader sees the era's narrative was not gate-checked. No verdict falls in the
+// commit→deploy window, so the commit timestamp is a clean boundary.
+const GROUNDING_GATE_AT = "2026-08-19T07:54:23Z";
+
 export default function VerdictHistory({ id }: { id?: string }) {
   const [rows, setRows] = useState<VerdictHistoryRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -51,6 +60,7 @@ export default function VerdictHistory({ id }: { id?: string }) {
           {rows.map((r) => {
             const canExpand = Array.isArray(r.agent_summaries) && r.agent_summaries.length > 0;
             const expanded = expandedId === r.id;
+            const preGate = new Date(r.created_at).getTime() < new Date(GROUNDING_GATE_AT).getTime();
             return (
               <div
                 key={r.id}
@@ -76,6 +86,24 @@ export default function VerdictHistory({ id }: { id?: string }) {
                     conf {r.confidence} · risk {r.risk_score} · {r.signal_window_months} mo
                   </span>
                   <ProvenanceBadge provenance={r.overall_provenance} />
+                  {preGate && (
+                    <span
+                      title="Generated before the grounding gate (2026-08-19). Its narrative was not checked claim-by-claim against the data, so the headline may contain unsourced assertions. The verdict math (Show math) is unaffected — it is deterministic from the stored votes."
+                      style={{
+                        fontFamily: "'DM Mono', monospace",
+                        fontSize: "10px",
+                        letterSpacing: "0.04em",
+                        textTransform: "uppercase",
+                        color: "var(--signal-warning)",
+                        background: "var(--white)",
+                        border: "1px solid var(--signal-warning)",
+                        borderRadius: "100px",
+                        padding: "2px 9px",
+                      }}
+                    >
+                      Pre-grounding-gate
+                    </span>
+                  )}
                   <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "11px", color: "var(--ink-faint)" }}>
                     {new Date(r.created_at).toLocaleDateString()}
                   </span>
