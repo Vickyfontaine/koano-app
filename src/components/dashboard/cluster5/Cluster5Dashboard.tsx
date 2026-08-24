@@ -30,7 +30,6 @@ export default function Cluster5Dashboard() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [analyzingId, setAnalyzingId] = useState<string | null>(null);
   const [analyzedAddress, setAnalyzedAddress] = useState<string | null>(null);
-  const [heroView, setHeroView] = useState<"map" | "system">("map");
 
   const loadProperties = useCallback(async () => {
     try {
@@ -85,101 +84,37 @@ export default function Cluster5Dashboard() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "24px", maxWidth: "1160px" }}>
-      {/* Hero: geographic portfolio risk map, with the neural map preserved as an
-          on-demand System view (Section 08 — the map is the hero; the topology is
-          available, not decorative). */}
+      {/* Hero: geographic portfolio risk map. (The neural "System view" was
+          removed — decoration, not a decision surface.) */}
       <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "flex-end",
-            justifyContent: "space-between",
-            gap: "16px",
-            flexWrap: "wrap",
-          }}
-        >
-          <div>
-            <span className="section-number">{c.number}</span>
-            <h1
-              style={{
-                fontSize: "32px",
-                fontWeight: 700,
-                letterSpacing: "-0.02em",
-                color: "var(--ink-primary)",
-                margin: "12px 0 8px",
-              }}
-            >
-              {c.label}
-            </h1>
-            <p
-              style={{
-                fontFamily: "'DM Mono', monospace",
-                fontSize: "11px",
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-                color: "var(--ink-faint)",
-                margin: 0,
-              }}
-            >
-              {c.audience}
-            </p>
-          </div>
-          <div
-            role="tablist"
-            aria-label="Hero view"
+        <div>
+          <span className="section-number">{c.number}</span>
+          <h1
             style={{
-              display: "inline-flex",
-              border: "1px solid var(--border)",
-              borderRadius: "100px",
-              padding: "3px",
-              gap: "2px",
+              fontSize: "32px",
+              fontWeight: 700,
+              letterSpacing: "-0.02em",
+              color: "var(--ink-primary)",
+              margin: "12px 0 8px",
             }}
           >
-            {([
-              ["map", "Portfolio map"],
-              ["system", "System view"],
-            ] as const).map(([key, label]) => {
-              const active = heroView === key;
-              return (
-                <button
-                  key={key}
-                  role="tab"
-                  aria-selected={active}
-                  onClick={() => setHeroView(key)}
-                  style={{
-                    border: "none",
-                    cursor: "pointer",
-                    borderRadius: "100px",
-                    padding: "7px 16px",
-                    fontSize: "13px",
-                    fontWeight: 500,
-                    background: active ? "var(--brand-blue)" : "transparent",
-                    color: active ? "var(--near-black)" : "var(--ink-muted)",
-                  }}
-                >
-                  {label}
-                </button>
-              );
-            })}
-          </div>
+            {c.label}
+          </h1>
+          <p
+            style={{
+              fontFamily: "'DM Mono', monospace",
+              fontSize: "11px",
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              color: "var(--ink-faint)",
+              margin: 0,
+            }}
+          >
+            {c.audience}
+          </p>
         </div>
 
-        {heroView === "map" ? (
-          <PortfolioMap properties={properties} loadError={loadError} />
-        ) : (
-          <iframe
-            src="/neural-map.html"
-            title="KOANO system — agent and data source topology"
-            style={{
-              width: "100%",
-              height: "62vh",
-              border: "1px solid var(--border)",
-              borderRadius: "20px",
-              background: "var(--white)",
-              display: "block",
-            }}
-          />
-        )}
+        <PortfolioMap properties={properties} loadError={loadError} />
       </div>
 
       <PortfolioOverview

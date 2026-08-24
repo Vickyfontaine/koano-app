@@ -46,36 +46,24 @@ async function queryProgram(lat: number, lon: number, pgm: string): Promise<FrsF
   const url =
     `${FRS}?latitude83=${lat}&longitude83=${lon}&search_radius=${RADIUS_MI}` +
     `&pgm_sys_acrnm=${pgm}&output=JSON`;
-  // retries: 0 — the FRS enforces a 12-requests/minute limit. Retrying a 429
-  // within seconds cannot clear a per-minute window; it only burns more of the
-  // budget and turns a single call into a storm. A single verdict makes just two
-  // FRS calls (SEMS + ACRES), well under the limit; on a 429 we fall straight to
-  // a labeled representative result rather than hammering.
+  // retries: 0 HERE (per-call) — the FRS enforces 12 req/min and a same-second
+  // retry can't clear a per-minute window. The single JITTERED backoff-retry lives
+  // one level up in getContamination, where it spreads concurrent multi-site
+  // bursts across the window; if it still fails, contamination is OMITTED (a live
+  // coverage note), never a representative stand-in.
   const res = await fetchJson<FrsResponse>(url, { timeoutMs: 20000, retries: 0 });
   return asArray(res.Results?.FRSFacility);
 }
 
-// Labeled stand-in for a runtime FRS failure (never a silent fake).
-const REPRESENTATIVE_FALLBACK: ContaminationInfo = {
-  radius_mi: RADIUS_MI,
-  superfund_sites_within_radius: 1,
-  brownfield_within_radius: 3,
-  total_cleanup_sites_within_radius: 4,
-  nearest_site_name: 'REPRESENTATIVE — live EPA FRS call failed',
-  nearest_site_distance_mi: 0.6,
-  nearest_site_program: 'SEMS (Superfund)',
-  // No coordinates in the fallback — a representative site must never be plotted
-  // at a real location on the map, which would read as a live finding.
-  sites: [],
-  scope_note: 'REPRESENTATIVE — EPA Facility Registry Service was unreachable; typical inner-Brooklyn cleanup-site density shown as a labeled stand-in.',
-};
+const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
 export const epaContamination: ContaminationProvider = {
   name: 'EPA Superfund + Brownfields (Facility Registry Service)',
 
   async getContamination(addr: ResolvedAddress): Promise<ProviderResult<ContaminationInfo>> {
     const fetched_at = new Date().toISOString();
-    try {
+
+    const buildData = async (): Promise<ContaminationInfo> => {
       const [sems, acres] = await Promise.all([
         queryProgram(addr.latitude, addr.longitude, 'SEMS'),
         queryProgram(addr.latitude, addr.longitude, 'ACRES'),
@@ -95,8 +83,6 @@ export const epaContamination: ContaminationProvider = {
         .sort((a, b) => (a.dist as number) - (b.dist as number));
       const nearest = ranked[0] ?? null;
 
-      // Every ranked site has finite coords (dist requires them) — carry them all
-      // for the map, nearest first.
       const sites: ContaminationSite[] = ranked
         .filter((x) => x.lat != null && x.lon != null)
         .map((x) => ({
@@ -107,7 +93,7 @@ export const epaContamination: ContaminationProvider = {
           program: x.program,
         }));
 
-      const data: ContaminationInfo = {
+      return {
         radius_mi: RADIUS_MI,
         superfund_sites_within_radius: sems.length,
         brownfield_within_radius: acres.length,
@@ -121,24 +107,43 @@ export const epaContamination: ContaminationProvider = {
           'SEMS = Superfund program sites (NPL and non-NPL); ACRES = brownfield sites. ' +
           'Zero within the radius is a real coverage result, not "no risk".',
       };
+    };
 
-      return {
-        ok: true,
-        data,
-        provenance: 'live',
-        source: 'EPA Facility Registry Service (SEMS Superfund + ACRES brownfields)',
-        endpoint: `${FRS}?latitude83=${addr.latitude}&longitude83=${addr.longitude}&search_radius=${RADIUS_MI}&pgm_sys_acrnm=SEMS|ACRES&output=JSON`,
-        fetched_at,
-      };
-    } catch (e) {
-      return {
-        ok: true,
-        data: REPRESENTATIVE_FALLBACK,
-        provenance: 'representative',
-        source: 'EPA Facility Registry Service [FALLBACK]',
-        fetched_at,
-        error: `Live call failed: ${errMsg(e)}`,
-      };
+    const ok = (data: ContaminationInfo, recovered: boolean): ProviderResult<ContaminationInfo> => ({
+      ok: true,
+      data,
+      provenance: 'live',
+      source: `EPA Facility Registry Service (SEMS Superfund + ACRES brownfields)${recovered ? ' — recovered after backoff' : ''}`,
+      endpoint: `${FRS}?latitude83=${addr.latitude}&longitude83=${addr.longitude}&search_radius=${RADIUS_MI}&pgm_sys_acrnm=SEMS|ACRES&output=JSON`,
+      fetched_at,
+    });
+
+    try {
+      return ok(await buildData(), false);
+    } catch {
+      // The FRS 12-req/min limit bites under concurrent multi-site runs. ONE
+      // jittered backoff (not a storm) spreads the concurrent calls across the
+      // per-minute window so the second attempt usually lands — keeping the live
+      // contamination signal instead of losing it.
+      await sleep(4000 + Math.floor(Math.random() * 8000)); // 4–12s jitter
+      try {
+        return ok(await buildData(), true);
+      } catch (e2) {
+        // Still unavailable → OMIT, never a representative stand-in. Contamination
+        // proximity is ADDITIVE hazard signal; a transient EPA outage must not
+        // fabricate a nearby Superfund site NOR drag the whole verdict to
+        // representative (the multi-site regression). data:null tagged live → the
+        // agent emits a coverage note (the omission rule), verdict stays live.
+        return {
+          ok: true,
+          data: null,
+          provenance: 'live',
+          source:
+            'EPA Facility Registry Service — temporarily unavailable (rate-limited or unreachable); contamination proximity omitted this run',
+          fetched_at,
+          error: `Live call failed after one backoff retry: ${errMsg(e2)}`,
+        };
+      }
     }
   },
 };

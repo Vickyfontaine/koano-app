@@ -96,7 +96,6 @@ export const CLUSTER_NAV: Record<ClusterId, ClusterNavItem[]> = {
     { label: "Site comparison", target: "c4-sites" },
     { label: "Entitlement risk", target: "c4-entitlement" },
     { label: "Pro forma", target: "c4-proforma" },
-    { label: "System view", target: "c4-system" },
     { label: "History", target: "c4-history" },
   ],
   cluster_5: [
