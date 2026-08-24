@@ -18,6 +18,19 @@ export const FLOOD_SFHA_LINE = "#1a4f6e";
 export const FLOOD_SHADED_FILL = "#2f9fbf"; // teal
 export const FLOOD_SHADED_LINE = "#1f7f96";
 
+// Portfolio-holding risk pins — the same 3-bucket status scale as the RiskMonitor
+// table (panels.riskColor), as concrete hexes (SVG marker fills can't resolve CSS
+// vars). Green→amber→red for risk 0-100. Red here is unambiguous: the portfolio
+// map carries no hazard diamonds, so a high-risk holding cannot be misread as one.
+export const RISK_LOW = "#22C55E"; // signal-positive
+export const RISK_MID = "#F59E0B"; // signal-warning
+export const RISK_HIGH = "#EF4444"; // signal-negative
+export const RISK_UNKNOWN = "#8A9AA5"; // no verdict yet — a neutral slate
+export function riskPinColor(score: number | null | undefined): string {
+  if (score == null) return RISK_UNKNOWN;
+  return score >= 67 ? RISK_HIGH : score >= 34 ? RISK_MID : RISK_LOW;
+}
+
 function mixHex(a: string, b: string, t: number): string {
   const pa = parseInt(a.slice(1), 16);
   const pb = parseInt(b.slice(1), 16);

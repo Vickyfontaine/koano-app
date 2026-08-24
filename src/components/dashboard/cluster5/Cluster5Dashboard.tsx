@@ -13,8 +13,11 @@ import VerdictMathPanel from "@/components/ui/VerdictMathPanel";
 import ReasoningChain from "@/components/ui/ReasoningChain";
 import { CLUSTERS } from "../clusters";
 import { useVerdictStream } from "../useVerdictStream";
+import type { RunPayload } from "../useAddressResolver";
 import VerdictHistory from "../VerdictHistory";
 import PortfolioOverview from "./PortfolioOverview";
+import PortfolioMap from "./PortfolioMap";
+import MonitoringFeed from "./MonitoringFeed";
 import MondayBriefing from "./MondayBriefing";
 import RiskMonitor from "./RiskMonitor";
 import DocumentButton from "../DocumentButton";
@@ -27,6 +30,7 @@ export default function Cluster5Dashboard() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [analyzingId, setAnalyzingId] = useState<string | null>(null);
   const [analyzedAddress, setAnalyzedAddress] = useState<string | null>(null);
+  const [heroView, setHeroView] = useState<"map" | "system">("map");
 
   const loadProperties = useCallback(async () => {
     try {
@@ -44,12 +48,15 @@ export default function Cluster5Dashboard() {
     void loadProperties();
   }, [loadProperties]);
 
-  async function addProperty(address: string): Promise<string | null> {
+  // Accepts a raw {address} (geocoded server-side) or a chosen {candidate}
+  // (BBL re-derived server-side). PortfolioOverview does the resolve/disambiguate
+  // step and calls this once the building is settled.
+  async function addProperty(payload: RunPayload): Promise<string | null> {
     try {
       const res = await fetch("/api/properties", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address }),
+        body: JSON.stringify(payload),
       });
       const json = await res.json();
       if (!res.ok) return json?.error || `Request failed (${res.status})`;
@@ -78,53 +85,101 @@ export default function Cluster5Dashboard() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "24px", maxWidth: "1160px" }}>
-      {/* Full-screen neural map hero */}
-      <div style={{ position: "relative" }}>
-        <iframe
-          src="/neural-map.html"
-          title="KOANO system — agent and data source topology"
-          style={{
-            width: "100%",
-            height: "62vh",
-            border: "1px solid var(--border)",
-            borderRadius: "20px",
-            background: "var(--white)",
-            display: "block",
-          }}
-        />
+      {/* Hero: geographic portfolio risk map, with the neural map preserved as an
+          on-demand System view (Section 08 — the map is the hero; the topology is
+          available, not decorative). */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
         <div
           style={{
-            position: "absolute",
-            top: "28px",
-            left: "32px",
-            pointerEvents: "none",
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "space-between",
+            gap: "16px",
+            flexWrap: "wrap",
           }}
         >
-          <span className="section-number">{c.number}</span>
-          <h1
+          <div>
+            <span className="section-number">{c.number}</span>
+            <h1
+              style={{
+                fontSize: "32px",
+                fontWeight: 700,
+                letterSpacing: "-0.02em",
+                color: "var(--ink-primary)",
+                margin: "12px 0 8px",
+              }}
+            >
+              {c.label}
+            </h1>
+            <p
+              style={{
+                fontFamily: "'DM Mono', monospace",
+                fontSize: "11px",
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                color: "var(--ink-faint)",
+                margin: 0,
+              }}
+            >
+              {c.audience}
+            </p>
+          </div>
+          <div
+            role="tablist"
+            aria-label="Hero view"
             style={{
-              fontSize: "32px",
-              fontWeight: 700,
-              letterSpacing: "-0.02em",
-              color: "var(--ink-primary)",
-              margin: "12px 0 8px",
+              display: "inline-flex",
+              border: "1px solid var(--border)",
+              borderRadius: "100px",
+              padding: "3px",
+              gap: "2px",
             }}
           >
-            {c.label}
-          </h1>
-          <p
-            style={{
-              fontFamily: "'DM Mono', monospace",
-              fontSize: "11px",
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              color: "var(--ink-faint)",
-              margin: 0,
-            }}
-          >
-            {c.audience}
-          </p>
+            {([
+              ["map", "Portfolio map"],
+              ["system", "System view"],
+            ] as const).map(([key, label]) => {
+              const active = heroView === key;
+              return (
+                <button
+                  key={key}
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => setHeroView(key)}
+                  style={{
+                    border: "none",
+                    cursor: "pointer",
+                    borderRadius: "100px",
+                    padding: "7px 16px",
+                    fontSize: "13px",
+                    fontWeight: 500,
+                    background: active ? "var(--brand-blue)" : "transparent",
+                    color: active ? "var(--near-black)" : "var(--ink-muted)",
+                  }}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
         </div>
+
+        {heroView === "map" ? (
+          <PortfolioMap properties={properties} loadError={loadError} />
+        ) : (
+          <iframe
+            src="/neural-map.html"
+            title="KOANO system — agent and data source topology"
+            style={{
+              width: "100%",
+              height: "62vh",
+              border: "1px solid var(--border)",
+              borderRadius: "20px",
+              background: "var(--white)",
+              display: "block",
+            }}
+          />
+        )}
       </div>
 
       <PortfolioOverview
@@ -174,6 +229,8 @@ export default function Cluster5Dashboard() {
       )}
 
       <MondayBriefing hasProperties={!!properties && properties.length > 0} id="c5-briefing" />
+
+      <MonitoringFeed id="c5-monitoring" />
 
       {/* Downloadable documents — portfolio briefing PDF + per-asset one-pager,
           matching the Cluster 1 grouped pattern. */}

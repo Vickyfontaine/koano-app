@@ -31,7 +31,7 @@ import {
 
 const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
-export type MarkerKind = "subject" | "hazard" | "comp";
+export type MarkerKind = "subject" | "hazard" | "comp" | "holding";
 
 export interface MapMarker {
   id: string;
@@ -50,6 +50,12 @@ export interface MapMarker {
    * When no marker sets it, the map frames to all markers.
    */
   frame?: boolean;
+  /**
+   * Coordinate confidence is degraded — the marker renders hollow + dashed so a
+   * pin whose location was resolved without a cross-check never reads as a
+   * confident dot (a portfolio pin in the wrong place is a real failure).
+   */
+  uncertain?: boolean;
 }
 
 interface PolyGeometry {
@@ -87,6 +93,12 @@ export interface MapLegendItem {
   /** When set, the map appends a live "· N in view" count of this marker kind,
    *  recomputed as the viewport changes — so the number matches the picture. */
   inViewKind?: MarkerKind;
+  /** Render the glyph in its uncertain (dashed/hollow) form — e.g. the
+   *  "location unverified" holding legend row. */
+  uncertain?: boolean;
+  /** Suppress the trailing provenance dot. A risk-bucket row is a color KEY
+   *  (color→meaning), not a data layer, so a "live" dot on it would mislead. */
+  hideProvenanceDot?: boolean;
 }
 
 interface KoanoMapProps {
@@ -104,9 +116,24 @@ interface KoanoMapProps {
 const NAVY = "#1A4F6E";
 const INK_MUTED = "#5A7A8C";
 
-function markerSvg(kind: MarkerKind, provenance: Provenance, accent?: string): string {
+function markerSvg(kind: MarkerKind, provenance: Provenance, accent?: string, uncertain = false): string {
   const rep = provenance === "representative";
   const dash = rep ? ` stroke-dasharray="3 2"` : "";
+  if (kind === "holding") {
+    // A portfolio holding, colored by risk (accent). Uncertain location → hollow,
+    // dashed accent ring + a dashed amber outer ring, so a pin whose coordinates
+    // were resolved without a cross-check never reads as a confident dot.
+    const c = accent ?? INK_MUTED;
+    if (uncertain) {
+      return `<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="10" cy="10" r="8" fill="none" stroke="#F59E0B" stroke-width="1.25" stroke-dasharray="2 2"/>
+        <circle cx="10" cy="10" r="5" fill="#FFFFFF" stroke="${c}" stroke-width="1.75" stroke-dasharray="2.5 2"/>
+      </svg>`;
+    }
+    return `<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="8" cy="8" r="6" fill="${c}" stroke="#FFFFFF" stroke-width="2"/>
+    </svg>`;
+  }
   if (kind === "subject") {
     // The anchor — the one thing the page is about. Its own language: a solid
     // navy roundel with a white keyline and a soft halo, plus locating ticks.
@@ -143,9 +170,24 @@ function provDotColor(p: Provenance): string {
   return p === "live" ? "var(--signal-positive)" : p === "representative" ? "var(--signal-warning)" : "var(--ink-faint)";
 }
 
-function legendGlyph(kind: MarkerKind | "flood", provenance: Provenance, accent?: string): React.ReactNode {
+function legendGlyph(
+  kind: MarkerKind | "flood",
+  provenance: Provenance,
+  accent?: string,
+  uncertain = false,
+): React.ReactNode {
   const rep = provenance === "representative";
   const common: React.CSSProperties = { flexShrink: 0 };
+  if (kind === "holding") {
+    const c = accent ?? INK_MUTED;
+    return uncertain ? (
+      <span
+        style={{ ...common, width: 12, height: 12, borderRadius: "50%", background: "#FFF", border: `1.5px dashed ${c}`, boxShadow: "0 0 0 1.5px #F59E0B" }}
+      />
+    ) : (
+      <span style={{ ...common, width: 12, height: 12, borderRadius: "50%", background: c, border: "2px solid #FFF", boxShadow: `0 0 0 1px ${c}` }} />
+    );
+  }
   if (kind === "subject")
     return (
       <span
@@ -346,7 +388,7 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
         el.style.cursor = "default";
         // A white halo so any mark reads on the pale base and the flood fills.
         el.style.filter = "drop-shadow(0 0 1px #fff) drop-shadow(0 0 1px #fff)";
-        el.innerHTML = markerSvg(mk.kind, mk.provenance, mk.accent);
+        el.innerHTML = markerSvg(mk.kind, mk.provenance, mk.accent, mk.uncertain);
         if (mk.title) {
           el.addEventListener("mouseenter", () => {
             if (!popupRef.current) return;
@@ -500,7 +542,7 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
           <>
             <div style={{ display: "flex", flexDirection: "column", gap: "9px" }}>
               {legend.map((item) => {
-                const provDot = (
+                const provDot = item.hideProvenanceDot ? null : (
                   <span
                     title={item.provenance}
                     style={{ width: "7px", height: "7px", borderRadius: "50%", background: provDotColor(item.provenance), flexShrink: 0 }}
@@ -554,7 +596,7 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
                   <div key={item.label} style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                       <span style={{ display: "inline-flex", width: "16px", justifyContent: "center" }}>
-                        {legendGlyph(item.kind, item.provenance, item.accent)}
+                        {legendGlyph(item.kind, item.provenance, item.accent, item.uncertain)}
                       </span>
                       {labelText}
                       {provDot}

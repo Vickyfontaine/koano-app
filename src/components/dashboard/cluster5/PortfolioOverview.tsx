@@ -7,14 +7,16 @@
 
 import React, { useState } from "react";
 import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
-import { VERDICT_COLORS, type Verdict } from "@/components/ui/verdict";
+import CandidatePicker from "@/components/ui/CandidatePicker";
+import { VERDICT_COLORS, type Verdict, type AddressCandidate } from "@/components/ui/verdict";
 import { PanelHeader, panelStyle, panelTitle } from "../panels";
+import type { RunPayload } from "../useAddressResolver";
 import type { PortfolioProperty } from "@/app/api/properties/route";
 
 interface PortfolioOverviewProps {
   properties: PortfolioProperty[] | null;
   loadError: string | null;
-  onAdd: (address: string) => Promise<string | null>; // returns error or null
+  onAdd: (payload: RunPayload) => Promise<string | null>; // returns error or null
   onRemove: (id: string) => Promise<void>;
   onAnalyze: (property: PortfolioProperty) => void;
   analyzingId: string | null;
@@ -33,17 +35,55 @@ export default function PortfolioOverview({
   const [address, setAddress] = useState("");
   const [adding, setAdding] = useState(false);
   const [addError, setAddError] = useState<string | null>(null);
+  const [candidates, setCandidates] = useState<AddressCandidate[] | null>(null);
 
+  // Commit an add once the building is settled, then clear the form.
+  async function commitAdd(payload: RunPayload) {
+    setAdding(true);
+    setAddError(null);
+    setCandidates(null);
+    const err = await onAdd(payload);
+    if (err) setAddError(err);
+    else setAddress("");
+    setAdding(false);
+  }
+
+  // Resolve first. A confident match adds directly; an ambiguous one surfaces a
+  // picker (BBL re-derived server-side on selection); no match is an error.
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault();
     const a = address.trim();
     if (!a || adding) return;
     setAdding(true);
     setAddError(null);
-    const err = await onAdd(a);
-    if (err) setAddError(err);
-    else setAddress("");
-    setAdding(false);
+    setCandidates(null);
+    try {
+      const res = await fetch("/api/resolve-address", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address: a }),
+      });
+      const json = await res.json().catch(() => null);
+      if (!res.ok) {
+        setAddError(json?.error || `Request failed (${res.status})`);
+        setAdding(false);
+        return;
+      }
+      if (json?.status === "ambiguous" && Array.isArray(json.candidates) && json.candidates.length > 0) {
+        setCandidates(json.candidates as AddressCandidate[]);
+        setAdding(false);
+        return;
+      }
+      if (json?.status === "resolved") {
+        await commitAdd({ address: a });
+        return;
+      }
+      setAddError(json?.error || "We couldn't find that address.");
+      setAdding(false);
+    } catch (err) {
+      setAddError(err instanceof Error ? err.message : "Could not resolve address");
+      setAdding(false);
+    }
   }
 
   return (
@@ -82,6 +122,9 @@ export default function PortfolioOverview({
           {!adding && <span aria-hidden="true">↗</span>}
         </button>
       </form>
+      {candidates && (
+        <CandidatePicker candidates={candidates} onChoose={(c) => commitAdd({ candidate: c })} busy={adding} />
+      )}
       {addError && (
         <p style={{ fontSize: "13px", color: "var(--signal-negative)", margin: 0 }}>{addError}</p>
       )}
