@@ -24,6 +24,7 @@ import type {
   MlsCompsSummary,
   MortgageDemandInfo,
   OpportunityZoneInfo,
+  GeometryInfo,
   PermitsSummary,
   ProformaBenchmark,
   ProviderResult,
@@ -61,6 +62,7 @@ export interface SiteDetailResponse {
   zoning?: SiteDetailBlock<ZoningInfo>;
   permits?: SiteDetailBlock<PermitsSummary>;
   opportunity_zone?: SiteDetailBlock<OpportunityZoneInfo>;
+  geometry?: SiteDetailBlock<GeometryInfo>;
   proforma?: SiteDetailBlock<ProformaBenchmark>;
   flood?: SiteDetailBlock<FloodInfo>;
   flood_zones?: SiteDetailBlock<FloodZonesInfo>;
@@ -91,6 +93,7 @@ export const BLOCK_FETCHERS: Record<
   zoning: (a) => registry.zoning.getZoning(a),
   permits: (a) => registry.permits.getPermits(a),
   opportunity_zone: (a) => registry.opportunityZones.getOpportunityZone(a),
+  geometry: (a) => registry.geometry.getGeometry(a),
   proforma: (a) => registry.proformaBenchmark.getBenchmarks(a),
   flood: (a) => registry.flood.getFloodZone(a),
   flood_zones: (a) => registry.flood.getFloodZones(a),

@@ -20,6 +20,7 @@ import type {
   HpiProvider,
   MigrationProvider,
   MlsCompsProvider,
+  GeometryProvider,
   MortgageDemandProvider,
   MortgageRateProvider,
   OpportunityZoneProvider,
@@ -37,6 +38,7 @@ import { nycZoning } from './real/nyc-zoning';
 import { nycAssemblage } from './real/nyc-assemblage';
 import { nycDobFilings } from './real/nyc-dob-filings';
 import { irsOpportunity } from './real/irs-opportunity';
+import { nycGeometry } from './real/nyc-geometry';
 import { censusAcs } from './real/census-acs';
 import { fhfaHpi } from './real/fhfa-hpi';
 import { femaFlood } from './real/fema-flood';
@@ -62,6 +64,7 @@ export interface ProviderRegistry {
   landlordPortfolio: LandlordPortfolioProvider;
   zoning: ZoningProvider;
   opportunityZones: OpportunityZoneProvider;
+  geometry: GeometryProvider;
   demographics: DemographicsProvider;
   hpi: HpiProvider;
   flood: FloodProvider;
@@ -95,6 +98,7 @@ export const registry: ProviderRegistry = {
   landlordPortfolio: nycLandlord,
   zoning: nycZoning,
   opportunityZones: irsOpportunity,
+  geometry: nycGeometry,
   demographics: censusAcs,
   hpi: fhfaHpi,
   flood: femaFlood,

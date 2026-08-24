@@ -247,6 +247,25 @@ export interface OpportunityZoneInfo {
   designation_note: string | null;
 }
 
+// Map geometry for the Cluster 4 multi-site map. GeoJSON polygons, live:
+//   tract_polygon — the census tract boundary (shades an Opportunity Zone).
+//   lot_polygon   — the subject tax lot footprint (the zoning overlay the
+//                   district code + FAR headroom describe).
+// A non-NYC / null-BBL address leaves lot_polygon null (coverage-absent, never a
+// fabricated shape); a missing tract GEOID leaves tract_polygon null.
+export interface PolyGeom {
+  type: 'Polygon' | 'MultiPolygon';
+  coordinates: number[][][] | number[][][][];
+}
+export interface GeometryInfo {
+  tract_polygon: PolyGeom | null;
+  lot_polygon: PolyGeom | null;
+}
+export interface GeometryProvider {
+  name: string;
+  getGeometry(addr: ResolvedAddress): Promise<ProviderResult<GeometryInfo>>;
+}
+
 export interface OpportunityZoneProvider {
   name: string;
   getOpportunityZone(addr: ResolvedAddress): Promise<ProviderResult<OpportunityZoneInfo>>;

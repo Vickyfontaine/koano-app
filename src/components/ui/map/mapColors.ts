@@ -61,6 +61,19 @@ export function compDivergingColor(v: number, mid: number, min: number, max: num
 // The CSS gradient that decodes the comp scale in the legend.
 export const COMP_GRADIENT_CSS = `linear-gradient(90deg, ${COMP_LOW}, ${COMP_MID} 50%, ${COMP_HIGH})`;
 
+// Opportunity Zone tract shading (Cluster 4). A tax-incentive designation — a
+// warm pale GOLD, deliberately distinct from the cool flood blue/teal and the
+// comp blue↔magenta, so an OZ never reads as a hazard or a price. Pastel so the
+// subject lot and pins stay dominant.
+export const OZ_FILL = "#EAD9A6"; // pale gold (opportunity)
+export const OZ_LINE = "#C9A94E"; // deeper gold edge
+
+// Subject LOT footprint (Cluster 4 zoning overlay). The actual tax lot, drawn as
+// a strong navy outline over a faint fill — it's the entitlement footprint the
+// district code + FAR headroom describe (shown in the pin tooltip).
+export const LOT_FILL = "rgba(26,79,110,0.10)"; // faint navy
+export const LOT_LINE = "#1A4F6E"; // deep-navy outline
+
 // --- Restrained base geography ------------------------------------------------
 // Subordinate to every data layer (flood, comps, hazards). Water is a low-chroma
 // blue-GREY, deliberately NOT the flood blue/teal — the canal is water (base),

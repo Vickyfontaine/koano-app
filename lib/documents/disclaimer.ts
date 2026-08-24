@@ -23,6 +23,7 @@ const BLOCK_LABELS: Record<BlockKey, string> = {
   zoning: 'Zoning / PLUTO',
   permits: 'Building permits',
   opportunity_zone: 'Opportunity Zone status',
+  geometry: 'Map geometry (tract / lot boundaries)',
   proforma: 'Pro forma benchmarks',
   flood: 'Flood zone',
   flood_zones: 'Flood-zone boundaries (FEMA NFHL)',

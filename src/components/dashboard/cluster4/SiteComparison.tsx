@@ -17,6 +17,9 @@ import { VERDICT_COLORS, type SynthesisResult, type Verdict, type AddressCandida
 import { useVerdictStream, type VerdictStream } from "../useVerdictStream";
 import type { RunPayload } from "../useAddressResolver";
 import SitePanels from "./SitePanels";
+import MultiSiteMap, { type MultiSite } from "./MultiSiteMap";
+import SiteMathStrip, { type StripSite } from "./SiteMathStrip";
+import MonitoringFeed from "../cluster5/MonitoringFeed";
 import DocumentButton from "../DocumentButton";
 import type { SiteDetailResponse } from "@/app/api/site-detail/route";
 
@@ -84,7 +87,9 @@ export default function SiteComparison() {
       const res = await fetch("/api/site-detail", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        // Blocks the comparison + map need: entitlement inputs, OZ, and the
+        // geometry for tract shading + lot footprint.
+        body: JSON.stringify({ ...payload, blocks: ["zoning", "opportunity_zone", "permits", "proforma", "geometry"] }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json?.error || `Request failed (${res.status})`);
@@ -157,6 +162,17 @@ export default function SiteComparison() {
     .filter((i) => streams[i].status === "done" && streams[i].result)
     .sort((a, b) => opportunityScore(streams[b].result!.verdict) - opportunityScore(streams[a].result!.verdict));
   const errored = activeSlots.filter((i) => streams[i].status === "error");
+  const rankedSites: MultiSite[] = ranked.map((slot, rank) => ({
+    label: SLOT_LABELS[slot],
+    detail: details[slot].data,
+    verdict: streams[slot].result?.verdict.verdict ?? null,
+    rank: rank + 1,
+  }));
+  const stripSites: StripSite[] = ranked.map((slot, rank) => ({
+    label: SLOT_LABELS[slot],
+    rank: rank + 1,
+    verdict: streams[slot].result!.verdict,
+  }));
   const resolveErrorSlots = Object.keys(resolveErrors).map(Number);
   const anyActivity =
     resolving || hasPending || activeSlots.length > 0 || resolveErrorSlots.length > 0;
@@ -331,6 +347,9 @@ export default function SiteComparison() {
             </p>
           </div>
 
+          {/* The three sites in space — Opportunity-Zone tract shading + subject lots, all live. */}
+          <MultiSiteMap sites={rankedSites} />
+
           {/* Summary table */}
           <div style={{ overflowX: "auto" }}>
             <table style={{ borderCollapse: "collapse", width: "100%", minWidth: "560px" }}>
@@ -390,6 +409,9 @@ export default function SiteComparison() {
               </tbody>
             </table>
           </div>
+
+          {/* Small-multiples: the three sites' verdict math side by side. */}
+          <SiteMathStrip sites={stripSites} />
 
           {/* Per-site detail */}
           {ranked.map((slot, rank) => {
@@ -496,6 +518,9 @@ export default function SiteComparison() {
           </p>
         </div>
       )}
+
+      {/* Monitoring feed — the developer's watched sites, portfolio-wide (Phase 2). */}
+      <MonitoringFeed id="c4-monitoring" />
     </div>
   );
 }

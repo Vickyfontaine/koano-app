@@ -27,6 +27,10 @@ import {
   FLOOD_SFHA_LINE,
   FLOOD_SHADED_FILL,
   FLOOD_SHADED_LINE,
+  OZ_FILL,
+  OZ_LINE,
+  LOT_FILL,
+  LOT_LINE,
 } from "./mapColors";
 
 const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
@@ -64,10 +68,10 @@ interface PolyGeometry {
 }
 export interface MapPolygonLayer {
   id: string;
-  kind: "flood";
+  kind: "flood" | "oz" | "lot";
   provenance: Provenance;
-  /** Each feature carries { sfha: boolean } for styling weight. */
-  features: Array<{ sfha: boolean; geometry: PolyGeometry }>;
+  /** flood features carry { sfha: boolean } for styling weight; oz/lot ignore it. */
+  features: Array<{ sfha?: boolean; geometry: PolyGeometry }>;
 }
 
 /** A diverging color scale decoded in the legend (e.g. comps by $/sqft). */
@@ -339,46 +343,38 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
     (async () => {
       mapboxgl = (await import("mapbox-gl")).default;
 
-      // Flood polygons: SFHA stronger, 0.2%-shaded lighter; representative dashed.
-      for (const layer of polygons) {
+      // Polygon layers by kind: flood (SFHA/0.2%), OZ tract shading (gold), and
+      // the subject lot footprint (navy outline). Drawn before markers so pins sit
+      // on top. OZ under lot so the lot outline stays legible over the shading.
+      const drawOrder = { oz: 0, flood: 1, lot: 2 } as const;
+      for (const layer of [...polygons].sort((a, b) => drawOrder[a.kind] - drawOrder[b.kind])) {
         if (layer.features.length === 0) continue;
         const fc = {
           type: "FeatureCollection" as const,
           features: layer.features.map((f) => ({
             type: "Feature" as const,
-            properties: { sfha: f.sfha },
+            properties: { sfha: !!f.sfha },
             geometry: f.geometry,
           })),
         };
         map.addSource(layer.id, { type: "geojson", data: fc as unknown as GeoJSON.FeatureCollection });
         const rep = layer.provenance === "representative";
-        // SFHA (1%-annual) blue and 0.2%-annual teal differ by hue, not just
-        // opacity, so a serious boundary reads distinctly from the lighter one.
-        map.addLayer({
-          id: layer.id + "-fill",
-          type: "fill",
-          source: layer.id,
-          filter: ["==", ["get", "sfha"], true],
-          paint: { "fill-color": FLOOD_SFHA_FILL, "fill-opacity": rep ? 0.12 : 0.3 },
-        });
-        map.addLayer({
-          id: layer.id + "-shaded",
-          type: "fill",
-          source: layer.id,
-          filter: ["==", ["get", "sfha"], false],
-          paint: { "fill-color": FLOOD_SHADED_FILL, "fill-opacity": rep ? 0.1 : 0.26 },
-        });
-        map.addLayer({
-          id: layer.id + "-line",
-          type: "line",
-          source: layer.id,
-          paint: {
-            "line-color": ["case", ["==", ["get", "sfha"], true], FLOOD_SFHA_LINE, FLOOD_SHADED_LINE],
-            "line-width": 1.2,
-            "line-opacity": 0.75,
-            ...(rep ? { "line-dasharray": [2, 2] } : {}),
-          },
-        });
+
+        if (layer.kind === "flood") {
+          // SFHA (1%-annual) blue and 0.2%-annual teal differ by hue, not just
+          // opacity, so a serious boundary reads distinctly from the lighter one.
+          map.addLayer({ id: layer.id + "-fill", type: "fill", source: layer.id, filter: ["==", ["get", "sfha"], true], paint: { "fill-color": FLOOD_SFHA_FILL, "fill-opacity": rep ? 0.12 : 0.3 } });
+          map.addLayer({ id: layer.id + "-shaded", type: "fill", source: layer.id, filter: ["==", ["get", "sfha"], false], paint: { "fill-color": FLOOD_SHADED_FILL, "fill-opacity": rep ? 0.1 : 0.26 } });
+          map.addLayer({ id: layer.id + "-line", type: "line", source: layer.id, paint: { "line-color": ["case", ["==", ["get", "sfha"], true], FLOOD_SFHA_LINE, FLOOD_SHADED_LINE], "line-width": 1.2, "line-opacity": 0.75, ...(rep ? { "line-dasharray": [2, 2] } : {}) } });
+        } else if (layer.kind === "oz") {
+          // Opportunity Zone tract — pale gold fill, gold edge.
+          map.addLayer({ id: layer.id + "-fill", type: "fill", source: layer.id, paint: { "fill-color": OZ_FILL, "fill-opacity": 0.4 } });
+          map.addLayer({ id: layer.id + "-line", type: "line", source: layer.id, paint: { "line-color": OZ_LINE, "line-width": 1, "line-opacity": 0.7, "line-dasharray": [3, 2] } });
+        } else {
+          // Subject lot footprint — faint navy fill, strong navy outline.
+          map.addLayer({ id: layer.id + "-fill", type: "fill", source: layer.id, paint: { "fill-color": LOT_FILL, "fill-opacity": 1 } });
+          map.addLayer({ id: layer.id + "-line", type: "line", source: layer.id, paint: { "line-color": LOT_LINE, "line-width": 2, "line-opacity": 0.9 } });
+        }
       }
 
       // Markers, drawn subject-last so it sits on top.
