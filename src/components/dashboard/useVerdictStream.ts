@@ -11,6 +11,13 @@ import type { AgentName, SynthesisResult } from "@/components/ui/verdict";
 import { useUpgrade, isUpgradeRequired } from "./UpgradeProvider";
 import type { RunPayload } from "./useAddressResolver";
 
+export interface RunDegradation {
+  degraded: boolean;
+  timeouts: number;
+  throttled: number;
+  hosts: string[];
+}
+
 export interface StreamComplete {
   resolved_address: {
     input: string;
@@ -20,6 +27,8 @@ export interface StreamComplete {
     location_confidence: "confirmed" | "unconfirmed";
   };
   verdict: SynthesisResult;
+  // Present when the run hit throttle/timeout degradation (a fixable condition).
+  degradation?: RunDegradation;
   persisted: boolean;
   persist_error: string | null;
 }

@@ -9,6 +9,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import LoadingState from "@/components/ui/LoadingState";
 import VerdictCard from "@/components/ui/VerdictCard";
+import RunDegradationNote from "@/components/ui/RunDegradationNote";
 import VerdictMathPanel from "@/components/ui/VerdictMathPanel";
 import ReasoningChain from "@/components/ui/ReasoningChain";
 import { CLUSTERS } from "../clusters";
@@ -154,6 +155,7 @@ export default function Cluster5Dashboard() {
       {status === "done" && result && (
         <>
           <VerdictCard verdict={result.verdict} address={result.resolved_address.normalized} />
+          <RunDegradationNote degradation={result.degradation} />
           <VerdictMathPanel verdict={result.verdict} />
           <ReasoningChain
             reasoningChain={result.verdict.reasoning_chain}

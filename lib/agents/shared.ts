@@ -7,6 +7,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import type { DataPoint, Provenance } from '../providers/types';
 import { buildAllowedTokens, groundObservation, WITHHELD_OBSERVATION } from './grounding';
+import { deterministicConfidence, blendConfidence } from './confidence';
 
 // Sonnet-class runtime model. Single source of truth for every agent call.
 // NOTE: CLAUDE.md v4 specifies claude-sonnet-4-20250514, but that model reached
@@ -333,10 +334,18 @@ export function assembleAgentVerdict(args: {
     };
   });
 
+  // Confidence is DRIVEN by the evidence (strength · richness · agreement), not the
+  // model's conviction band (which pinned at medium=72 everywhere and flattened the
+  // synthesis weighting). The band only adjusts. See lib/agents/confidence.ts.
+  const confidence = blendConfidence(
+    deterministicConfidence(dataPoints, llm.minority_signals.length),
+    llm.confidence,
+  );
+
   return {
     agent,
     verdict: llm.verdict,
-    confidence: llm.confidence,
+    confidence,
     signal_window_months: llm.signal_window_months,
     headline: llm.headline,
     reasoning_chain,

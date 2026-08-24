@@ -12,6 +12,7 @@ import VerdictCard from "@/components/ui/VerdictCard";
 import VerdictMathPanel from "@/components/ui/VerdictMathPanel";
 import LocationConfidenceNote from "@/components/ui/LocationConfidenceNote";
 import CandidatePicker from "@/components/ui/CandidatePicker";
+import RunDegradationNote from "@/components/ui/RunDegradationNote";
 import ReasoningChain from "@/components/ui/ReasoningChain";
 import { CLUSTERS } from "../clusters";
 import { useVerdictStream } from "../useVerdictStream";
@@ -195,6 +196,8 @@ export default function Cluster1Dashboard() {
       {status === "done" && result && (
         <>
           <VerdictCard verdict={result.verdict} address={result.resolved_address.normalized} />
+
+          <RunDegradationNote degradation={result.degradation} />
 
           <VerdictMathPanel verdict={result.verdict} />
 

@@ -1,7 +1,17 @@
 // Shared HTTP helpers for real providers: timeout, one retry, 429 backoff.
 
+import { recordDegradation } from '../degradation';
+
 function sleep(ms: number): Promise<void> {
   return new Promise((r) => setTimeout(r, ms));
+}
+
+function hostOf(url: string): string {
+  try {
+    return new URL(url).host;
+  } catch {
+    return url.slice(0, 40);
+  }
 }
 
 interface FetchOpts {
@@ -51,6 +61,16 @@ async function fetchRaw(url: string, opts: FetchOpts = {}): Promise<Response> {
       clearTimeout(timer);
     }
   }
+  // Exhausted retries. If the FINAL failure was a fixable throttle/timeout (not a
+  // genuine data-unavailable, which isn't a fetch error at all), record it at the
+  // run level so a degraded run can say WHY — a source that was throttled/timed
+  // out, not data that doesn't exist. The provider still falls back per-figure.
+  const msg = lastErr instanceof Error ? lastErr.message : String(lastErr);
+  const isTimeout = lastErr instanceof Error && (lastErr.name === 'AbortError' || /abort/i.test(msg));
+  const isThrottle = /\b429\b|rate limit/i.test(msg);
+  if (isTimeout) recordDegradation(hostOf(url), 'timeout');
+  else if (isThrottle) recordDegradation(hostOf(url), 'throttle');
+
   throw lastErr instanceof Error ? lastErr : new Error(String(lastErr));
 }
 

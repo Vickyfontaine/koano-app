@@ -14,8 +14,9 @@ import ReasoningChain from "@/components/ui/ReasoningChain";
 import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
 import CandidatePicker from "@/components/ui/CandidatePicker";
 import { VERDICT_COLORS, type SynthesisResult, type Verdict, type AddressCandidate } from "@/components/ui/verdict";
-import { useVerdictStream, type VerdictStream } from "../useVerdictStream";
+import { useVerdictStream, type VerdictStream, type RunDegradation } from "../useVerdictStream";
 import type { RunPayload } from "../useAddressResolver";
+import RunDegradationNote from "@/components/ui/RunDegradationNote";
 import SitePanels from "./SitePanels";
 import MultiSiteMap, { type MultiSite } from "./MultiSiteMap";
 import SiteMathStrip, { type StripSite } from "./SiteMathStrip";
@@ -176,6 +177,17 @@ export default function SiteComparison() {
   const resolveErrorSlots = Object.keys(resolveErrors).map(Number);
   const anyActivity =
     resolving || hasPending || activeSlots.length > 0 || resolveErrorSlots.length > 0;
+
+  // Aggregate throttle/timeout degradation across the three site runs.
+  const degradedSlots = activeSlots.filter((i) => streams[i].result?.degradation?.degraded);
+  const runDegradation: RunDegradation | undefined = degradedSlots.length
+    ? {
+        degraded: true,
+        timeouts: degradedSlots.reduce((s, i) => s + (streams[i].result!.degradation!.timeouts || 0), 0),
+        throttled: degradedSlots.reduce((s, i) => s + (streams[i].result!.degradation!.throttled || 0), 0),
+        hosts: Array.from(new Set(degradedSlots.flatMap((i) => streams[i].result!.degradation!.hosts))),
+      }
+    : undefined;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
@@ -346,6 +358,8 @@ export default function SiteComparison() {
               verdicts below, every input auditable.
             </p>
           </div>
+
+          <RunDegradationNote degradation={runDegradation} />
 
           {/* The three sites in space — Opportunity-Zone tract shading + subject lots, all live. */}
           <MultiSiteMap sites={rankedSites} />

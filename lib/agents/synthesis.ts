@@ -11,6 +11,11 @@
 import { registry } from '../providers/registry';
 import type { Provenance, ResolvedAddress } from '../providers/types';
 import {
+  runWithDegradationTracking,
+  summarizeDegradations,
+  type DegradationSummary,
+} from '../providers/degradation';
+import {
   callAgentLLM,
   clamp,
   weakestProvenance,
@@ -283,15 +288,20 @@ export type PipelineProgressEvent =
     }
   | { type: 'synthesis_start' };
 
+export interface PipelineResult {
+  resolved_address: ResolvedAddress;
+  agents: AgentVerdict[];
+  verdict: SynthesisResult;
+  // Throttle/timeout degradation for THIS run — a fixable infrastructure
+  // condition, distinct from a per-figure data-unavailable. Empty when clean.
+  degradation: DegradationSummary;
+}
+
 // Full KOANO pipeline: geocode → 5 specialist agents in parallel → synthesis.
 export async function runKoanoPipeline(
   address: string,
   onEvent?: (e: PipelineProgressEvent) => void
-): Promise<{
-  resolved_address: ResolvedAddress;
-  agents: AgentVerdict[];
-  verdict: SynthesisResult;
-}> {
+): Promise<PipelineResult> {
   const geo = await registry.geocode.resolve(address);
   if (!geo.ok || !geo.data) {
     throw new Error(`Geocoding failed for "${address}": ${geo.error ?? 'no data'}`);
@@ -305,11 +315,7 @@ export async function runKoanoPipeline(
 export async function runKoanoPipelineForAddress(
   addr: ResolvedAddress,
   onEvent?: (e: PipelineProgressEvent) => void,
-): Promise<{
-  resolved_address: ResolvedAddress;
-  agents: AgentVerdict[];
-  verdict: SynthesisResult;
-}> {
+): Promise<PipelineResult> {
   onEvent?.({ type: 'geocoded', normalized: addr.normalized, bbl: addr.bbl });
 
   // Report each specialist the moment its real verdict lands.
@@ -325,15 +331,25 @@ export async function runKoanoPipelineForAddress(
       return v;
     });
 
-  const agents = await Promise.all([
-    track(runMarketTimingAgent(addr)),
-    track(runInfrastructureAgent(addr)),
-    track(runDemandSentimentAgent(addr)),
-    track(runRiskVolatilityAgent(addr)),
-    track(runRegulatoryPolicyAgent(addr)),
-  ]);
+  // Track throttle/timeout degradation across all five parallel agents + their
+  // provider fetches (AsyncLocalStorage propagates through Promise.all).
+  const { result, degradations } = await runWithDegradationTracking(async () => {
+    const agents = await Promise.all([
+      track(runMarketTimingAgent(addr)),
+      track(runInfrastructureAgent(addr)),
+      track(runDemandSentimentAgent(addr)),
+      track(runRiskVolatilityAgent(addr)),
+      track(runRegulatoryPolicyAgent(addr)),
+    ]);
+    onEvent?.({ type: 'synthesis_start' });
+    const verdict = await runSynthesis(addr, agents);
+    return { agents, verdict };
+  });
 
-  onEvent?.({ type: 'synthesis_start' });
-  const verdict = await runSynthesis(addr, agents);
-  return { resolved_address: addr, agents, verdict };
+  return {
+    resolved_address: addr,
+    agents: result.agents,
+    verdict: result.verdict,
+    degradation: summarizeDegradations(degradations),
+  };
 }

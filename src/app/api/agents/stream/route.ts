@@ -90,7 +90,7 @@ export async function POST(req: Request) {
           }
           resolved = rc.data;
         }
-        const { resolved_address, verdict } = resolved
+        const { resolved_address, verdict, degradation } = resolved
           ? await runKoanoPipelineForAddress(resolved, send)
           : await runKoanoPipeline(address, send);
         const { persisted, persist_error } = await persistVerdict({
@@ -109,6 +109,7 @@ export async function POST(req: Request) {
             location_confidence: resolved_address.location_confidence,
           },
           verdict,
+          degradation,
           persisted,
           persist_error,
         });
