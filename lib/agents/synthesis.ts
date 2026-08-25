@@ -148,10 +148,23 @@ export function aggregate(agents: AgentVerdict[]): Aggregate {
   };
 }
 
+// One figure in the provenance ledger — every fact an agent saw, agent-tagged.
+export interface LedgerDataPoint {
+  agent: AgentName;
+  label: string;
+  value: string | number | boolean | null;
+  provenance: Provenance;
+  source: string;
+}
+
 export interface SynthesisResult extends KoanoVerdict {
   overall_provenance: Provenance; // weakest provenance across ALL agent inputs
   weighting_breakdown: WeightingBreakdown; // the scored math behind the verdict — shown to the user
   agent_summaries: AgentSummary[];
+  // Every figure behind the verdict, for the provenance ledger a skeptic tests.
+  // Fresh-run only (not persisted — the verdicts table stores summaries, not the
+  // full evidence); a history verdict simply has an empty ledger.
+  data_points: LedgerDataPoint[];
 }
 
 export async function runSynthesis(
@@ -300,6 +313,9 @@ export async function runSynthesis(
       overall_provenance: a.overall_provenance,
       headline: a.headline,
     })),
+    data_points: agents.flatMap((a) =>
+      a.data_points.map((d) => ({ agent: a.agent, label: d.label, value: d.value, provenance: d.provenance, source: d.source })),
+    ),
   };
 }
 

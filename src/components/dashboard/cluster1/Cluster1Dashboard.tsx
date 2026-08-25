@@ -13,6 +13,7 @@ import VerdictMathPanel from "@/components/ui/VerdictMathPanel";
 import LocationConfidenceNote from "@/components/ui/LocationConfidenceNote";
 import CandidatePicker from "@/components/ui/CandidatePicker";
 import RunDegradationNote from "@/components/ui/RunDegradationNote";
+import ProvenanceLedger from "@/components/ui/ProvenanceLedger";
 import ReasoningChain from "@/components/ui/ReasoningChain";
 import { CLUSTERS } from "../clusters";
 import { useVerdictStream } from "../useVerdictStream";
@@ -292,6 +293,12 @@ export default function Cluster1Dashboard() {
             reasoningChain={result.verdict.reasoning_chain}
             minoritySignals={result.verdict.minority_signals}
             agentSummaries={result.verdict.agent_summaries}
+          />
+
+          <ProvenanceLedger
+            dataPoints={result.verdict.data_points}
+            locationConfidence={result.resolved_address.location_confidence}
+            address={result.resolved_address.normalized}
           />
 
           <p

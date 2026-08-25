@@ -10,7 +10,7 @@ export type {
   ReasoningStep,
   Verdict,
 } from "../../../lib/agents/shared";
-export type { SynthesisResult } from "../../../lib/agents/synthesis";
+export type { SynthesisResult, LedgerDataPoint } from "../../../lib/agents/synthesis";
 export type { PipelineProgressEvent } from "../../../lib/agents/synthesis";
 // Client-safe (no server imports): the pure reconstruction of a persisted
 // verdict's math from its stored agent_summaries, + the breakdown type.

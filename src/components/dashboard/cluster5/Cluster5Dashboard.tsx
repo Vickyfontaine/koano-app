@@ -10,6 +10,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import LoadingState from "@/components/ui/LoadingState";
 import VerdictCard from "@/components/ui/VerdictCard";
 import RunDegradationNote from "@/components/ui/RunDegradationNote";
+import ProvenanceLedger from "@/components/ui/ProvenanceLedger";
 import VerdictMathPanel from "@/components/ui/VerdictMathPanel";
 import ReasoningChain from "@/components/ui/ReasoningChain";
 import { CLUSTERS } from "../clusters";
@@ -19,6 +20,7 @@ import VerdictHistory from "../VerdictHistory";
 import PortfolioOverview from "./PortfolioOverview";
 import PortfolioMap from "./PortfolioMap";
 import MonitoringFeed from "./MonitoringFeed";
+import ArchiveTrend from "./ArchiveTrend";
 import MondayBriefing from "./MondayBriefing";
 import RiskMonitor from "./RiskMonitor";
 import DocumentButton from "../DocumentButton";
@@ -162,6 +164,11 @@ export default function Cluster5Dashboard() {
             minoritySignals={result.verdict.minority_signals}
             agentSummaries={result.verdict.agent_summaries}
           />
+          <ProvenanceLedger
+            dataPoints={result.verdict.data_points}
+            locationConfidence={result.resolved_address.location_confidence}
+            address={result.resolved_address.normalized}
+          />
         </>
       )}
 
@@ -244,6 +251,7 @@ export default function Cluster5Dashboard() {
       </div>
 
       <RiskMonitor properties={properties} id="c5-risk" />
+      <ArchiveTrend id="c5-archive" />
       <VerdictHistory id="c5-history" />
     </div>
   );
