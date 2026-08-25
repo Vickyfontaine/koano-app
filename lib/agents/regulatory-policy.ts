@@ -19,16 +19,18 @@ How to reason:
 - Manufacturing districts (M-) with residential overlays or recent rezonings signal transition; pure M- zoning without residential rights is an entitlement risk for residential plays.
 - Special districts and commercial overlays change what can be built as-of-right. State the coded value exactly as the data gives it (e.g. "special district G, per the zoning source") and note that it affects as-of-right development. Do NOT describe the district's specific rules, name, adoption year, or programs from general knowledge — the zoning data gives you a code, not a rulebook.
 - Opportunity Zone designation is a material tax incentive for capital-gains investors (10-year basis step-up); absence of it is neutral, not negative.
+- LIHTC eligibility (HUD QCT / DDA): a Qualified Census Tract OR a Difficult Development Area qualifies a Low-Income Housing Tax Credit project for a 30% eligible-basis boost — a material affordable-housing feasibility signal, and a federal designation like the Opportunity Zone. State QCT and DDA status exactly as given (in / not in), and if designated note the 30% basis boost for affordable/mixed-income development. Absence is neutral, not negative — it only means this specific LIHTC incentive does not apply. Do NOT infer income limits, rents, or unit counts from the designation; it is an eligibility flag, not a pro forma.
 - Older year_built + low built FAR + high max FAR = classic redevelopment candidate.
 - Ownership records: the registered owner and portfolio come from HPD registrations under EXACT name matching only — treat portfolio size as a floor, never a ceiling, and say so when you use it. A portfolio with heavy open violations signals an operator with regulatory exposure. Speculation Watch List membership means the building sold at a price/cap-rate profile the city flags as speculative — material tenant-displacement and regulatory-scrutiny context. hpd_registered=false just means the building is not a registered 3+ unit rental.
 - Your verdict is about regulatory posture: "buy" = regulatory tailwinds/latent rights, "wait" = entitlement uncertainty, "hold" = neutral, "drop" = regulatory blockers.
 - risk_score reflects regulatory/entitlement risk specifically.`;
 
 export async function runRegulatoryPolicyAgent(addr: ResolvedAddress): Promise<AgentVerdict> {
-  const [zoningRes, ozRes, portfolioRes] = await Promise.all([
+  const [zoningRes, ozRes, portfolioRes, lihtcRes] = await Promise.all([
     registry.zoning.getZoning(addr),
     registry.opportunityZones.getOpportunityZone(addr),
     registry.landlordPortfolio.getPortfolio(addr),
+    registry.lihtcEligibility.getLihtcEligibility(addr),
   ]);
 
   const dataPoints: DataPoint[] = [];
@@ -82,6 +84,27 @@ export async function runRegulatoryPolicyAgent(addr: ResolvedAddress): Promise<A
       value: ozRes.error ?? 'no data',
       provenance: ozRes.provenance,
       source: ozRes.source,
+    });
+  }
+
+  // HUD LIHTC eligibility (QCT / DDA) — a federal affordable-housing incentive,
+  // alongside the Opportunity Zone designation above.
+  if (lihtcRes.data) {
+    const l = lihtcRes.data;
+    const p = lihtcRes.provenance;
+    const s = lihtcRes.source;
+    dataPoints.push(
+      { label: 'in_hud_qualified_census_tract', value: l.is_qct, provenance: p, source: s },
+      { label: 'in_hud_difficult_development_area', value: l.is_dda, provenance: p, source: s },
+      { label: 'dda_area_name', value: l.dda_name ?? 'n/a', provenance: p, source: s },
+      { label: 'lihtc_eligibility_note', value: l.scope_note, provenance: p, source: s }
+    );
+  } else {
+    dataPoints.push({
+      label: 'lihtc_eligibility_unavailable',
+      value: lihtcRes.error ?? 'no data',
+      provenance: lihtcRes.provenance,
+      source: lihtcRes.source,
     });
   }
 

@@ -437,6 +437,25 @@ export interface NationalRiskProvider {
   getNationalRisk(addr: ResolvedAddress): Promise<ProviderResult<NationalRiskInfo>>;
 }
 
+// HUD LIHTC eligibility designations — Qualified Census Tract (QCT) and Difficult
+// Development Area (DDA). National, keyless (HUD Official Content ArcGIS). A QCT or
+// DDA designation gives a Low-Income Housing Tax Credit project a 30% eligible-
+// basis boost — a material affordable-housing feasibility signal, and a federal
+// designation like Opportunity Zones (regulatory-policy domain). QCT is tract-keyed
+// (queried by GEOID); DDA is an area polygon (point-in-polygon on the address).
+export interface LihtcEligibilityInfo {
+  is_qct: boolean | null; // Qualified Census Tract (tract-level)
+  is_dda: boolean | null; // Difficult Development Area (area-level)
+  dda_name: string | null; // e.g. "New York, NY HUD Metro FMR Area"
+  dda_type: string | null; // HUD DDA type code (e.g. "SA" = Small Area DDA)
+  scope_note: string;
+}
+
+export interface LihtcEligibilityProvider {
+  name: string;
+  getLihtcEligibility(addr: ResolvedAddress): Promise<ProviderResult<LihtcEligibilityInfo>>;
+}
+
 // OpenFEMA — federally-declared disaster HISTORY for the county (multi-peril,
 // historical frequency). Explicitly complements NFHL: not a regulatory zone, but
 // how often this county has actually been declared a disaster and for what.

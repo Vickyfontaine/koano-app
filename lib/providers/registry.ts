@@ -14,6 +14,7 @@ import type {
   EntitlementProvider,
   FairMarketRentProvider,
   LandlordPortfolioProvider,
+  LihtcEligibilityProvider,
   DemographicsProvider,
   FloodProvider,
   GeocodeProvider,
@@ -46,6 +47,7 @@ import { femaFlood } from './real/fema-flood';
 import { fbiUcr } from './real/fbi-ucr';
 import { epaContamination } from './real/epa-superfund';
 import { femaNri } from './real/fema-nri';
+import { hudQctDda } from './real/hud-qct-dda';
 import { usgsSeismic } from './real/usgs-seismic';
 import { openFemaDisasters } from './real/openfema-disasters';
 import { noaaClimate } from './real/noaa-climate';
@@ -66,6 +68,7 @@ export interface ProviderRegistry {
   landlordPortfolio: LandlordPortfolioProvider;
   zoning: ZoningProvider;
   opportunityZones: OpportunityZoneProvider;
+  lihtcEligibility: LihtcEligibilityProvider;
   geometry: GeometryProvider;
   demographics: DemographicsProvider;
   hpi: HpiProvider;
@@ -101,6 +104,7 @@ export const registry: ProviderRegistry = {
   landlordPortfolio: nycLandlord,
   zoning: nycZoning,
   opportunityZones: irsOpportunity,
+  lihtcEligibility: hudQctDda,
   geometry: nycGeometry,
   demographics: censusAcs,
   hpi: fhfaHpi,

@@ -20,6 +20,7 @@ import type {
   FloodZonesInfo,
   LandlordPortfolioSummary,
   HpiTrend,
+  LihtcEligibilityInfo,
   MigrationInfo,
   MlsCompsSummary,
   MortgageDemandInfo,
@@ -63,6 +64,7 @@ export interface SiteDetailResponse {
   zoning?: SiteDetailBlock<ZoningInfo>;
   permits?: SiteDetailBlock<PermitsSummary>;
   opportunity_zone?: SiteDetailBlock<OpportunityZoneInfo>;
+  lihtc_eligibility?: SiteDetailBlock<LihtcEligibilityInfo>;
   geometry?: SiteDetailBlock<GeometryInfo>;
   proforma?: SiteDetailBlock<ProformaBenchmark>;
   flood?: SiteDetailBlock<FloodInfo>;
@@ -95,6 +97,7 @@ export const BLOCK_FETCHERS: Record<
   zoning: (a) => registry.zoning.getZoning(a),
   permits: (a) => registry.permits.getPermits(a),
   opportunity_zone: (a) => registry.opportunityZones.getOpportunityZone(a),
+  lihtc_eligibility: (a) => registry.lihtcEligibility.getLihtcEligibility(a),
   geometry: (a) => registry.geometry.getGeometry(a),
   proforma: (a) => registry.proformaBenchmark.getBenchmarks(a),
   flood: (a) => registry.flood.getFloodZone(a),

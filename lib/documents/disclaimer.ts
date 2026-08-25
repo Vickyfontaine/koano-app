@@ -23,6 +23,7 @@ const BLOCK_LABELS: Record<BlockKey, string> = {
   zoning: 'Zoning / PLUTO',
   permits: 'Building permits',
   opportunity_zone: 'Opportunity Zone status',
+  lihtc_eligibility: 'LIHTC eligibility (HUD QCT / DDA)',
   geometry: 'Map geometry (tract / lot boundaries)',
   proforma: 'Pro forma benchmarks',
   flood: 'Flood zone',
