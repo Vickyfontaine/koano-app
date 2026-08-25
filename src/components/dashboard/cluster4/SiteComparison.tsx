@@ -169,8 +169,11 @@ export default function SiteComparison() {
     verdict: streams[slot].result?.verdict.verdict ?? null,
     rank: rank + 1,
   }));
+  // Label the strip with the SAME identifier the table uses (the address, short
+  // form) — not "Site A/B/C" — so the two read as the same ranking. Both derive
+  // from `ranked`, so the order already agrees; this makes it visibly agree.
   const stripSites: StripSite[] = ranked.map((slot, rank) => ({
-    label: SLOT_LABELS[slot],
+    label: (streams[slot].result!.resolved_address.normalized || SLOT_LABELS[slot]).split(",")[0].trim(),
     rank: rank + 1,
     verdict: streams[slot].result!.verdict,
   }));

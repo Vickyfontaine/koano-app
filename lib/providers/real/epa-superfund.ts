@@ -15,9 +15,39 @@ import type {
   ResolvedAddress,
 } from '../types';
 import { errMsg, fetchJson } from './http';
+import { supabaseAdmin } from '../../supabase/server';
 
 const FRS = 'https://ofmpub.epa.gov/frs_public2/frs_rest_services.get_facilities';
 const RADIUS_MI = 2;
+// Contamination barely changes — 90 days between EPA refreshes is plenty.
+const CACHE_TTL_MS = 90 * 24 * 60 * 60 * 1000;
+
+async function readCache(bbl: string): Promise<{ data: ContaminationInfo; ageMs: number } | null> {
+  try {
+    const { data } = await supabaseAdmin()
+      .from('contamination_cache')
+      .select('data, fetched_at')
+      .eq('bbl', bbl)
+      .maybeSingle();
+    const d = data as { data?: ContaminationInfo; fetched_at?: string } | null;
+    if (d?.data && d.fetched_at) {
+      return { data: d.data, ageMs: Date.now() - new Date(d.fetched_at).getTime() };
+    }
+  } catch {
+    // pre-migration-020 or DB unreachable → no cache, fall through to live
+  }
+  return null;
+}
+
+async function writeCache(bbl: string, data: ContaminationInfo): Promise<void> {
+  try {
+    await supabaseAdmin()
+      .from('contamination_cache')
+      .upsert({ bbl, data, fetched_at: new Date().toISOString() }, { onConflict: 'bbl' });
+  } catch {
+    /* cache write is best-effort */
+  }
+}
 
 interface FrsFacility {
   FacilityName?: string;
@@ -46,16 +76,15 @@ async function queryProgram(lat: number, lon: number, pgm: string): Promise<FrsF
   const url =
     `${FRS}?latitude83=${lat}&longitude83=${lon}&search_radius=${RADIUS_MI}` +
     `&pgm_sys_acrnm=${pgm}&output=JSON`;
-  // retries: 0 HERE (per-call) — the FRS enforces 12 req/min and a same-second
-  // retry can't clear a per-minute window. The single JITTERED backoff-retry lives
-  // one level up in getContamination, where it spreads concurrent multi-site
-  // bursts across the window; if it still fails, contamination is OMITTED (a live
-  // coverage note), never a representative stand-in.
-  const res = await fetchJson<FrsResponse>(url, { timeoutMs: 20000, retries: 0 });
+  // retries: 0 — a same-second retry can't clear the FRS 12-req/min window, and a
+  // retry is what doubled concurrent multi-site calls to 12 (the timeout burst).
+  // Instead we CACHE per BBL (one slow call per building, then free) and give the
+  // FRS a generous timeout, because its radius queries are genuinely slow (20s+).
+  // A miss that still fails is OMITTED (a live coverage note), never representative.
+  const res = await fetchJson<FrsResponse>(url, { timeoutMs: 45000, retries: 0 });
   return asArray(res.Results?.FRSFacility);
 }
 
-const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
 export const epaContamination: ContaminationProvider = {
   name: 'EPA Superfund + Brownfields (Facility Registry Service)',
@@ -109,41 +138,45 @@ export const epaContamination: ContaminationProvider = {
       };
     };
 
-    const ok = (data: ContaminationInfo, recovered: boolean): ProviderResult<ContaminationInfo> => ({
+    const ok = (data: ContaminationInfo, via: string): ProviderResult<ContaminationInfo> => ({
       ok: true,
       data,
       provenance: 'live',
-      source: `EPA Facility Registry Service (SEMS Superfund + ACRES brownfields)${recovered ? ' — recovered after backoff' : ''}`,
+      source: `EPA Facility Registry Service (SEMS Superfund + ACRES brownfields)${via}`,
       endpoint: `${FRS}?latitude83=${addr.latitude}&longitude83=${addr.longitude}&search_radius=${RADIUS_MI}&pgm_sys_acrnm=SEMS|ACRES&output=JSON`,
       fetched_at,
     });
 
+    // CACHE-FIRST by BBL — contamination barely changes, so a fresh cache entry is
+    // served with ZERO EPA calls. This is what makes concurrent multi-site (and
+    // repeat) runs stop hammering the 12-req/min FRS limit.
+    const cached = addr.bbl ? await readCache(addr.bbl) : null;
+    if (cached && cached.ageMs < CACHE_TTL_MS) {
+      return ok(cached.data, ' — via KOANO per-BBL cache');
+    }
+
+    // Miss or stale → one live fetch (no retry: a retry only doubled the calls and
+    // pushed the burst over the limit). Cache it for next time.
     try {
-      return ok(await buildData(), false);
-    } catch {
-      // The FRS 12-req/min limit bites under concurrent multi-site runs. ONE
-      // jittered backoff (not a storm) spreads the concurrent calls across the
-      // per-minute window so the second attempt usually lands — keeping the live
-      // contamination signal instead of losing it.
-      await sleep(4000 + Math.floor(Math.random() * 8000)); // 4–12s jitter
-      try {
-        return ok(await buildData(), true);
-      } catch (e2) {
-        // Still unavailable → OMIT, never a representative stand-in. Contamination
-        // proximity is ADDITIVE hazard signal; a transient EPA outage must not
-        // fabricate a nearby Superfund site NOR drag the whole verdict to
-        // representative (the multi-site regression). data:null tagged live → the
-        // agent emits a coverage note (the omission rule), verdict stays live.
-        return {
-          ok: true,
-          data: null,
-          provenance: 'live',
-          source:
-            'EPA Facility Registry Service — temporarily unavailable (rate-limited or unreachable); contamination proximity omitted this run',
-          fetched_at,
-          error: `Live call failed after one backoff retry: ${errMsg(e2)}`,
-        };
-      }
+      const data = await buildData();
+      if (addr.bbl) await writeCache(addr.bbl, data);
+      return ok(data, '');
+    } catch (e) {
+      // A stale cache entry (real data, just old) beats omitting.
+      if (cached) return ok(cached.data, ' — via cache (refresh unavailable, stale)');
+      // No cache and unavailable → OMIT, never a representative stand-in. A
+      // transient EPA outage must not fabricate a nearby Superfund site nor drag
+      // the verdict to representative. data:null tagged live → the agent emits a
+      // coverage note (the omission rule), verdict stays live.
+      return {
+        ok: true,
+        data: null,
+        provenance: 'live',
+        source:
+          'EPA Facility Registry Service — temporarily unavailable (rate-limited or unreachable); contamination proximity omitted this run',
+        fetched_at,
+        error: `Live call failed: ${errMsg(e)}`,
+      };
     }
   },
 };
