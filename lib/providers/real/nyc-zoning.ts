@@ -3,6 +3,7 @@
 
 import type { ProviderResult, ResolvedAddress, ZoningInfo, ZoningProvider } from '../types';
 import { errMsg, fetchJson } from './http';
+import { outOfMarketMunicipal } from './coverage';
 
 const DATASET = 'https://data.cityofnewyork.us/resource/64uk-42ks.json';
 
@@ -66,14 +67,11 @@ export const nycZoning: ZoningProvider = {
     const url = `${DATASET}?$where=${encodeURIComponent(`bbl='${bbl}'`)}&$limit=1`;
 
     if (!bbl) {
-      return {
-        ok: true,
-        data: REPRESENTATIVE_FALLBACK,
-        provenance: 'representative',
-        source: 'NYC Open Data — MapPLUTO (64uk-42ks) [FALLBACK]',
+      return outOfMarketMunicipal<ZoningInfo>({
+        layer: 'MapPLUTO zoning',
+        dataset: 'NYC Open Data — MapPLUTO (64uk-42ks)',
         fetched_at,
-        error: 'No BBL resolved for address — cannot query PLUTO',
-      };
+      });
     }
 
     try {

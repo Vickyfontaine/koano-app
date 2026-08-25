@@ -12,6 +12,7 @@ import type {
   ResolvedAddress,
 } from '../types';
 import { errMsg, fetchJson } from './http';
+import { outOfMarketMunicipal } from './coverage';
 
 const FILINGS = 'https://data.cityofnewyork.us/resource/ic3t-wcy2.json';
 const PLUTO = 'https://data.cityofnewyork.us/resource/64uk-42ks.json';
@@ -96,10 +97,17 @@ export const nycDobFilings: EntitlementProvider = {
   async getEntitlement(addr: ResolvedAddress): Promise<ProviderResult<EntitlementSummary>> {
     const fetched_at = new Date().toISOString();
 
+    // Out of market: no NYC BBL → coverage-absent, never the representative
+    // fallback (that is for a live call that FAILS on a real NYC BBL).
+    if (!addr.bbl || !/^\d{10}$/.test(addr.bbl)) {
+      return outOfMarketMunicipal<EntitlementSummary>({
+        layer: 'DOB entitlement filings',
+        dataset: 'NYC Open Data — DOB Job Application Filings (ic3t-wcy2)',
+        fetched_at,
+      });
+    }
+
     try {
-      if (!addr.bbl || !/^\d{10}$/.test(addr.bbl)) {
-        throw new Error('No BBL resolved — outside NYC coverage');
-      }
       const boroName = BORO_NAME[addr.bbl[0]];
       const block = Number(addr.bbl.slice(1, 6));
       const lot = Number(addr.bbl.slice(6));

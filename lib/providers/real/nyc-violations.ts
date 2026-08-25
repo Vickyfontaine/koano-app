@@ -20,6 +20,7 @@ import type {
   ViolationRecentItem,
 } from '../types';
 import { errMsg, fetchJson } from './http';
+import { outOfMarketMunicipal } from './coverage';
 
 const HPD_VIOLATIONS = 'https://data.cityofnewyork.us/resource/wvxf-dwi5.json';
 const ECB_VIOLATIONS = 'https://data.cityofnewyork.us/resource/6bgk-3dad.json';
@@ -109,10 +110,18 @@ export const nycViolations: BuildingViolationsProvider = {
     const parts = addr.bbl ? splitBbl(addr.bbl) : null;
     const bin = realBin(addr.bin);
 
+    // Out of market: no NYC lot key (BBL) or BIN → nothing to query. Coverage-
+    // absent, never the NYC-flavored REPRESENTATIVE_FALLBACK (a real "mid-size
+    // registered multiple dwelling" profile — fabrication for a non-NYC address).
+    if (!parts && !bin) {
+      return outOfMarketMunicipal<BuildingViolationsSummary>({
+        layer: 'HPD/ECB/DOB violations',
+        dataset: 'NYC Open Data — HPD (wvxf-dwi5), ECB (6bgk-3dad), DOB complaints (eabe-havv)',
+        fetched_at,
+      });
+    }
+
     try {
-      if (!parts && !bin) {
-        throw new Error('Neither BBL nor a real BIN resolved — outside NYC coverage');
-      }
 
       const hpdWhere = parts
         ? encodeURIComponent(`boroid=${parts.boroid} AND block=${parts.block} AND lot=${parts.lot}`)

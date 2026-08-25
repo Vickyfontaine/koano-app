@@ -20,6 +20,7 @@ import type {
   ResolvedAddress,
 } from '../types';
 import { errMsg, fetchJson } from './http';
+import { outOfMarketMunicipal } from './coverage';
 
 const REGISTRATIONS = 'https://data.cityofnewyork.us/resource/tesw-yqqr.json';
 const CONTACTS = 'https://data.cityofnewyork.us/resource/feu5-w2e2.json';
@@ -109,10 +110,17 @@ export const nycLandlord: LandlordPortfolioProvider = {
   async getPortfolio(addr: ResolvedAddress): Promise<ProviderResult<LandlordPortfolioSummary>> {
     const fetched_at = new Date().toISOString();
 
+    // Out of market: no NYC BBL → coverage-absent, never the representative
+    // fallback (that is for a live call that FAILS on a real NYC BBL).
+    if (!addr.bbl || !/^\d{10}$/.test(addr.bbl)) {
+      return outOfMarketMunicipal<LandlordPortfolioSummary>({
+        layer: 'HPD landlord registrations',
+        dataset: 'NYC Open Data — HPD registrations (tesw-yqqr), contacts (feu5-w2e2), Speculation Watch List (adax-9mit)',
+        fetched_at,
+      });
+    }
+
     try {
-      if (!addr.bbl || !/^\d{10}$/.test(addr.bbl)) {
-        throw new Error('No BBL resolved — outside NYC coverage');
-      }
       const boroid = Number(addr.bbl[0]);
       const block = Number(addr.bbl.slice(1, 6));
       const lot = Number(addr.bbl.slice(6));

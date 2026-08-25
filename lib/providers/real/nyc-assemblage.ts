@@ -13,6 +13,7 @@ import type {
   ResolvedAddress,
 } from '../types';
 import { errMsg, fetchJson } from './http';
+import { outOfMarketMunicipal } from './coverage';
 
 const DATASET = 'https://data.cityofnewyork.us/resource/64uk-42ks.json';
 const BORO_ABBR: Record<string, string> = { '1': 'MN', '2': 'BX', '3': 'BK', '4': 'QN', '5': 'SI' };
@@ -72,10 +73,17 @@ export const nycAssemblage: AssemblageProvider = {
   async getAssemblage(addr: ResolvedAddress): Promise<ProviderResult<AssemblageSummary>> {
     const fetched_at = new Date().toISOString();
 
+    // Out of market: no NYC BBL → coverage-absent, never the representative
+    // fallback (that is for a live call that FAILS on a real NYC BBL).
+    if (!addr.bbl || !/^\d{10}$/.test(addr.bbl)) {
+      return outOfMarketMunicipal<AssemblageSummary>({
+        layer: 'tax-block assemblage',
+        dataset: 'NYC Open Data — MapPLUTO (64uk-42ks)',
+        fetched_at,
+      });
+    }
+
     try {
-      if (!addr.bbl || !/^\d{10}$/.test(addr.bbl)) {
-        throw new Error('No BBL resolved — outside NYC coverage');
-      }
       const borough = BORO_ABBR[addr.bbl[0]];
       const block = Number(addr.bbl.slice(1, 6));
       if (!borough || !Number.isFinite(block)) throw new Error(`Bad BBL ${addr.bbl}`);

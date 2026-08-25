@@ -11,6 +11,7 @@ import type {
   ResolvedAddress,
 } from '../types';
 import { errMsg, fetchJson } from './http';
+import { outOfMarketMunicipal } from './coverage';
 
 const DATASET = 'https://data.cityofnewyork.us/resource/rbx6-tga4.json';
 // Legacy DOB Permit Issuance — covers permits filed before DOB NOW (pre-2021)
@@ -137,6 +138,17 @@ export const nycPermits: PermitsProvider = {
 
   async getPermits(addr: ResolvedAddress): Promise<ProviderResult<PermitsSummary>> {
     const fetched_at = new Date().toISOString();
+    // Out of market: no NYC BBL → nothing to query. Coverage-absent, never the
+    // NYC-flavored REPRESENTATIVE_FALLBACK (which is a real Brooklyn profile and
+    // would be fabrication for a non-NYC address). The fallback stays for a live
+    // call that FAILS on a real NYC BBL.
+    if (!addr.bbl) {
+      return outOfMarketMunicipal<PermitsSummary>({
+        layer: 'DOB permits',
+        dataset: 'NYC Open Data — DOB permits (DOB NOW rbx6-tga4 + legacy ipu4-2q9a)',
+        fetched_at,
+      });
+    }
     const cutoff = new Date();
     cutoff.setMonth(cutoff.getMonth() - 24);
     const cutoffStr = `${cutoff.toISOString().slice(0, 10)}T00:00:00.000`;
