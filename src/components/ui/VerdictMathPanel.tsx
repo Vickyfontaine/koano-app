@@ -222,7 +222,7 @@ export default function VerdictMathPanel({ verdict }: VerdictMathPanelProps) {
         <ScoreBands
           domain={DOMAIN}
           bands={bands}
-          score={wb.aggregate_score}
+          score={wb.final_score ?? wb.aggregate_score}
           verdictLabel={verdict.verdict}
           verdictColor={VERDICT_COLORS[verdict.verdict] ?? "var(--ink-primary)"}
           ticks={[DOMAIN[0], wb.thresholds.wait, wb.thresholds.hold, wb.thresholds.buy, DOMAIN[1]]}
@@ -242,6 +242,28 @@ export default function VerdictMathPanel({ verdict }: VerdictMathPanelProps) {
         <DivergingBar data={rows} domain={DOMAIN} />
       </div>
 
+      {/* Structural direction — the deterministic nudge from the facts, and which
+          facts produced the lean. Only present when a clear structural signal fired. */}
+      {wb.structural_nudge != null && wb.structural_nudge !== 0 && (wb.structural_drivers?.length ?? 0) > 0 && (
+        <div style={{ borderTop: "1px solid var(--border-light)", paddingTop: "20px" }}>
+          <div style={{ ...monoLabel, marginBottom: "6px" }}>
+            Structural direction — from the facts ({fmtSigned(wb.structural_nudge, 2)} to the score)
+          </div>
+          <p style={{ fontSize: "13px", lineHeight: 1.55, color: "var(--ink-muted)", margin: "0 0 12px", maxWidth: "660px" }}>
+            The specialists lean neutral on weak signal by design; a clear structural fact adds this
+            directional nudge, which the drivers below explain.
+          </p>
+          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            {wb.structural_drivers!.map((d, i) => (
+              <div key={i} style={{ display: "flex", gap: "8px", alignItems: "flex-start" }}>
+                <span aria-hidden="true" style={{ color: "var(--ink-faint)", lineHeight: 1.55 }}>·</span>
+                <span style={{ fontSize: "13px", lineHeight: 1.55, color: "var(--ink-secondary)" }}>{d}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* The arithmetic, in plain terms */}
       <div
         style={{
@@ -257,7 +279,16 @@ export default function VerdictMathPanel({ verdict }: VerdictMathPanelProps) {
           Σ weighted votes {fmtSigned(sumContrib, 0)} ÷ Σ confidence {totalWeight} ={" "}
           <span style={{ color: "var(--ink-primary)", fontWeight: 500 }}>
             {fmtNum(wb.aggregate_score, 2)}
-          </span>{" "}
+          </span>
+          {wb.structural_nudge != null && wb.structural_nudge !== 0 && (
+            <>
+              {" "}
+              structural nudge {fmtSigned(wb.structural_nudge, 2)} ={" "}
+              <span style={{ color: "var(--ink-primary)", fontWeight: 500 }}>
+                {fmtNum(wb.final_score ?? wb.aggregate_score, 2)}
+              </span>
+            </>
+          )}{" "}
           →{" "}
           <span
             style={{

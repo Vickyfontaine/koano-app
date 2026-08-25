@@ -41,6 +41,7 @@ export {
   type WeightingBreakdown,
   type AgentSummary,
 } from './breakdown';
+import { structuralDirection, extractStructuralFacts } from './direction';
 import { runRegulatoryPolicyAgent } from './regulatory-policy';
 import { runInfrastructureAgent } from './infrastructure';
 import { runDemandSentimentAgent } from './demand-sentiment';
@@ -57,6 +58,7 @@ You are given: each specialist's verdict, confidence, headline, and observations
 - which specialists carried the most weight (higher confidence weighs more) and which cut against the call;
 - where the panel agrees and where it conflicts;
 - how the confidence-weighted score resolved to this verdict against the thresholds;
+- IF a "structural nudge" is present in the breakdown, the verdict is driven partly by deterministic structural FACTS (large as-of-right FAR headroom, an over-max variance requirement, active ground-up development), not the agent votes alone. Explain the lean using EXACTLY those driver facts — that is why the final score can differ from the agent-weighted score. Do not invent structural facts beyond the drivers given.
 - when specialists conflict, weigh those with fully-live evidence more heavily than those marked representative — but do NOT describe data as live, representative, verified, or confirmed in your prose. Provenance is shown by the badges, in code; it is never yours to assert.
 
 Output rules:
@@ -95,11 +97,23 @@ export function aggregate(agents: AgentVerdict[]): Aggregate {
     contribution: a.confidence * DIRECTION[a.verdict],
   }));
   const totalWeight = contribs.reduce((s, c) => s + c.weight, 0) || 1;
-  const score = contribs.reduce((s, c) => s + c.contribution, 0) / totalWeight;
+  const agentScore = contribs.reduce((s, c) => s + c.contribution, 0) / totalWeight;
+
+  // Deterministic structural nudge: the agents regress to hold on weak signal
+  // (by design), so a CLEAR structural fact (large as-of-right headroom, an
+  // over-max variance requirement, active ground-up development) adds a
+  // directional lean the votes alone don't express. Only fires on unambiguous
+  // facts — genuine hold survives. The verdict is read from the NUDGED score.
+  const dir = structuralDirection(extractStructuralFacts(agents));
+  const score = agentScore + dir.nudge;
   const verdict = verdictFromScore(score);
 
   const overall_provenance = weakestProvenance(agents.map((a) => ({ provenance: a.overall_provenance })));
-  const matchWeight = contribs.filter((c) => c.verdict === verdict).reduce((s, c) => s + c.weight, 0);
+  // Confidence reflects how much the AGENTS converged among themselves (their
+  // modal read), NOT agreement with the nudged verdict — otherwise a fact-driven
+  // verdict the agents were neutral on would spuriously read as low-confidence.
+  const modalVerdict = verdictFromScore(agentScore);
+  const matchWeight = contribs.filter((c) => c.verdict === modalVerdict).reduce((s, c) => s + c.weight, 0);
   const agreementFrac = matchWeight / totalWeight;
   const weightedAvgConf = contribs.reduce((s, c) => s + c.confidence * c.weight, 0) / totalWeight;
   const cap = overall_provenance === 'representative' ? 74 : 95;
@@ -119,9 +133,12 @@ export function aggregate(agents: AgentVerdict[]): Aggregate {
       method: 'confidence-weighted v1',
       agents: contribs,
       total_weight: totalWeight,
-      aggregate_score: Math.round(score * 100) / 100,
+      aggregate_score: Math.round(agentScore * 100) / 100, // agent votes, before the nudge
       thresholds: THRESHOLDS,
       chosen_verdict: verdict,
+      structural_nudge: dir.nudge,
+      structural_drivers: dir.drivers,
+      final_score: Math.round(score * 100) / 100, // agentScore + nudge → the verdict
     },
     verdict,
     confidence,
@@ -173,7 +190,15 @@ export async function runSynthesis(
     {
       label: 'weighting_breakdown',
       value: agg.breakdown.agents.map((c) => `${c.agent} ${c.verdict}@${c.confidence} (dir ${c.direction}, contrib ${c.contribution})`).join('; ') +
-        ` | weighted score ${agg.breakdown.aggregate_score} vs thresholds buy≥${THRESHOLDS.buy}, hold≥${THRESHOLDS.hold}, wait≥${THRESHOLDS.wait}`,
+        ` | agent-weighted score ${agg.breakdown.aggregate_score}` +
+        // Give the narrator the FULL math including the deterministic structural
+        // nudge — otherwise it sees a score below the buy threshold with a "buy"
+        // verdict and narrates a contradiction. The drivers are its allowed
+        // vocabulary for explaining a fact-driven lean.
+        (agg.breakdown.structural_nudge
+          ? ` + structural nudge ${agg.breakdown.structural_nudge} [${(agg.breakdown.structural_drivers ?? []).join('; ')}] = final score ${agg.breakdown.final_score}`
+          : '') +
+        ` vs thresholds buy≥${THRESHOLDS.buy}, hold≥${THRESHOLDS.hold}, wait≥${THRESHOLDS.wait}`,
       provenance: agg.overall_provenance,
       source: 'KOANO aggregator',
     }
@@ -213,7 +238,11 @@ export async function runSynthesis(
     observation:
       `Verdict math (confidence-weighted v1): ` +
       agg.breakdown.agents.map((c) => `${c.agent} ${c.verdict}@${c.confidence}→${c.contribution >= 0 ? '+' : ''}${c.contribution}`).join(', ') +
-      `. Weighted score ${agg.breakdown.aggregate_score} (buy≥${THRESHOLDS.buy}, hold≥${THRESHOLDS.hold}, wait≥${THRESHOLDS.wait}) → ${agg.verdict.toUpperCase()} at confidence ${agg.confidence}.`,
+      `. Agent-weighted score ${agg.breakdown.aggregate_score}` +
+      (agg.breakdown.structural_nudge
+        ? ` + structural nudge ${agg.breakdown.structural_nudge} (${(agg.breakdown.structural_drivers ?? []).join('; ')}) = ${agg.breakdown.final_score}`
+        : '') +
+      ` (buy≥${THRESHOLDS.buy}, hold≥${THRESHOLDS.hold}, wait≥${THRESHOLDS.wait}) → ${agg.verdict.toUpperCase()} at confidence ${agg.confidence}.`,
     sources: agents.map((a) => `${a.agent} agent`),
     provenance: agg.overall_provenance,
   });

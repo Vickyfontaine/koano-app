@@ -34,9 +34,16 @@ export interface WeightingBreakdown {
   method: string; // methodology marker — distinguishes this era from pre-fix rows
   agents: AgentContribution[];
   total_weight: number;
-  aggregate_score: number; // confidence-weighted S
+  aggregate_score: number; // confidence-weighted S from the agent votes (before the nudge)
   thresholds: { buy: number; hold: number; wait: number };
   chosen_verdict: Verdict;
+  // Deterministic structural nudge added to aggregate_score before the verdict is
+  // read off the thresholds. final_score = aggregate_score + structural_nudge. The
+  // drivers are the facts that produced the lean (shown in the panel). Absent on a
+  // reconstructed breakdown (agent_summaries don't carry the structural facts).
+  structural_nudge?: number;
+  structural_drivers?: string[];
+  final_score?: number;
   // TRUE when this breakdown was RE-DERIVED now from a persisted verdict's stored
   // inputs, rather than computed live at verdict time. Same arithmetic, same
   // stored inputs — but a reader auditing an old verdict should know which they
