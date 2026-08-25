@@ -19,7 +19,22 @@ rm -rf "$DIST"
 git checkout -- tsconfig.json >/dev/null 2>&1 || true
 if [ "$status" -ne 0 ]; then
   echo "[prepush] ✗ BUILD FAILED — push blocked. Fix the build, then push again."
-else
-  echo "[prepush] ✓ build clean — push may proceed."
+  exit "$status"
 fi
-exit "$status"
+echo "[prepush] ✓ build clean"
+
+# Phase 5 verdict-reproducibility gate. Replays the frozen fixture OFFLINE (no
+# network, no LLM) and asserts the NYC decision surface is byte-identical. This is
+# the guardrail that a slice never silently moves a verdict. A RED here means EITHER
+# a decision-logic regression (fix it) OR an intended decision change (re-record —
+# see CLAUDE.md §07C for when that is legitimate). Never re-record just to green it.
+echo "[prepush] verdict fixture replay (offline) …"
+npx tsx scripts/test-fixture.ts
+fx=$?
+if [ "$fx" -ne 0 ]; then
+  echo "[prepush] ✗ VERDICT FIXTURE FAILED — push blocked. The NYC decision surface moved."
+  echo "[prepush]   If the change is intended, review the diff and re-record (CLAUDE.md §07C). Otherwise fix the regression."
+  exit "$fx"
+fi
+echo "[prepush] ✓ build clean + verdict fixture byte-identical — push may proceed."
+exit 0

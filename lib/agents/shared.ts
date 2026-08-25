@@ -8,6 +8,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import type { DataPoint, Provenance } from '../providers/types';
 import { buildAllowedTokens, groundObservation, WITHHELD_OBSERVATION } from './grounding';
 import { deterministicConfidence, blendConfidence } from './confidence';
+import { viaCassette } from '../testing/cassette';
 
 // Sonnet-class runtime model. Single source of truth for every agent call.
 // NOTE: CLAUDE.md v4 specifies claude-sonnet-4-20250514, but that model reached
@@ -190,23 +191,31 @@ export async function callAgentLLM(args: {
   );
 
   // One model call + parse. Reused for the grounding retry.
+  // The cassette (Phase 5 fixture) freezes only the raw completion TEXT here; on
+  // replay everything below — extractJson, JSON.parse, band mapping, grounding,
+  // blending, aggregation — runs live on the frozen text, so a decision-code
+  // regression is caught while model drift is not. In production the cassette is
+  // 'off' and this is a plain pass-through.
   async function runModel(messages: Anthropic.MessageParam[]): Promise<{ text: string; raw: Record<string, unknown> }> {
-    const msg = await anthropic().messages.create({
-      model: KOANO_RUNTIME_MODEL,
-      max_tokens: 2000,
-      temperature,
-      system: [
-        {
-          type: 'text',
-          text: systemPrompt + '\n' + RESPONSE_FORMAT_INSTRUCTIONS,
-          cache_control: { type: 'ephemeral' }, // prompt caching on the system prompt
-        },
-      ],
-      messages,
+    const text = await viaCassette<string>('llm', { agent, temperature, systemPrompt, messages }, async () => {
+      const msg = await anthropic().messages.create({
+        model: KOANO_RUNTIME_MODEL,
+        max_tokens: 2000,
+        temperature,
+        system: [
+          {
+            type: 'text',
+            text: systemPrompt + '\n' + RESPONSE_FORMAT_INSTRUCTIONS,
+            cache_control: { type: 'ephemeral' }, // prompt caching on the system prompt
+          },
+        ],
+        messages,
+      });
+      const tb = msg.content.find((b) => b.type === 'text');
+      if (!tb || tb.type !== 'text') throw new Error(`Agent ${agent}: no text block in LLM response`);
+      return tb.text;
     });
-    const tb = msg.content.find((b) => b.type === 'text');
-    if (!tb || tb.type !== 'text') throw new Error(`Agent ${agent}: no text block in LLM response`);
-    return { text: tb.text, raw: JSON.parse(extractJson(tb.text)) as Record<string, unknown> };
+    return { text, raw: JSON.parse(extractJson(text)) as Record<string, unknown> };
   }
 
   const first = await runModel([{ role: 'user', content: userPayload }]);

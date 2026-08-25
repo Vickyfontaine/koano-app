@@ -316,6 +316,28 @@ Scheduled monitoring turns the archive from a passive acquisition asset into a l
 
 ---
 
+## 07C — Verdict Reproducibility Fixture (Phase 5 — the regression guardrail)
+
+Reproducibility of the verdict DECISION is the product. This fixture asserts it mechanically so no change silently moves a NYC verdict. It is wired into the pre-push gate (§16): every push replays it OFFLINE and blocks on a mismatch.
+
+**What it freezes (two seams).** `lib/testing/cassette.ts` records/replays the pipeline's two external boundaries: (1) every registry provider method (`installProviderCassette`), and (2) the raw LLM completion TEXT inside `shared.ts` `runModel` (`viaCassette`). It stores the model's raw completion, NOT KOANO's parsed decision — so on replay `extractJson` → `JSON.parse` → the grounding gate → band→figure → confidence/entitlement blend → aggregation → the synthesis narrator ALL run live on the frozen text. A regression in any of KOANO's deterministic decision code makes replay diverge; a change in the model's output cannot (the text is frozen). That is the "distinguish a code regression from model drift" property. The cassette defaults to `'off'` (a pure pass-through) and is only ever enabled by the two harness scripts — it never runs in production.
+
+**What it asserts (the decision surface, NOT the prose).** `scripts/lib/decision-surface.ts` extracts: verdict, confidence, risk_score, signal_window, provenance rollup, per-agent bands (regulatory-policy's `risk_score` carries the blended entitlement score), and the full weighting breakdown (aggregate_score, final_score, structural_nudge + drivers, per-agent contributions). It EXCLUDES the temp-0.4 narrator prose (headline, observations) and all timestamps — those are non-deterministic or irrelevant to the decision.
+
+**How a regression is caught (two paths, both fail-closed).** Because the synthesis narrator's prompt includes the computed decision + breakdown, most decision changes surface as a REPLAY MISS at the synthesis seam (the frozen completion no longer matches its inputs). A change to a field the narrator never sees (e.g. `signal_window_months`) surfaces as a decision-surface DIFF that names the exact fields. There is no silent pass: any decision-affecting change reds.
+
+**Commands.** `npx tsx scripts/record-fixture.ts` (LIVE — records `scripts/fixtures/nyc-175-3rd-st.json`); `npx tsx scripts/test-fixture.ts` (OFFLINE replay + assert). The replay is in the pre-push gate.
+
+**Why the fixture asserts confidence 67 while a fresh live run may show 68 (EXPECTED — not a bug).** The specialist LLM bands wobble slightly run-to-run even at temperature 0, so the deterministic confidence blend lands a point or two apart across two independent LIVE runs (e.g. 67 vs 68) — while the verdict itself is stable (BUY). The fixture PINS ONE recording; byte-identity is meaningful ONLY against those frozen inputs, never across two live runs. A future reader seeing the fixture assert 67 while a live run shows 68 is looking at the frozen recording vs a fresh live sample — both correct. This is exactly why the fixture freezes inputs rather than re-running live.
+
+**RE-RECORD PROCEDURE (load-bearing — the fixture's integrity depends on this rule).** A red fixture means one of two things, and they are handled OPPOSITELY:
+- The change was an UNINTENDED regression → **fix the code.** Never touch the fixture.
+- The change was a DELIBERATE, reviewed decision-logic change we accept (a new threshold, a reweighting, a scoring change we intend to ship) → re-record: `npx tsx scripts/record-fixture.ts`, then **read the decision-surface diff in the commit and confirm every changed field is one you intended**, and say so in the commit message.
+
+**The one rule with no exceptions: NEVER re-record to make a failing gate pass.** Re-recording to green a red you have not understood silently disables the guardrail — the first unreviewed re-record turns the fixture from a regression detector into a rubber stamp. Re-record ONLY when the diff is reviewed and intended. If you cannot explain the diff, it is a regression, not a re-record. (A model change that shifts the frozen completions is also a legitimate re-record, but it must be an explicit, noted decision — never a reflex to clear a red.)
+
+---
+
 ## 08 — The Four Clusters
 
 Same engine, same five agents, four different presentations and depths. All four are in scope. Cluster 3 (due diligence) is reserved for a future roadmap and is not built. There is no Cluster 0.
@@ -670,7 +692,7 @@ Each step verified before the next (Principle 3).
 
 ### Release discipline
 - Before ANY `git push`, run a full production build (`next build`), not just `tsc` and the harnesses. `tsc` and the doc harnesses do NOT catch ESLint errors (e.g. `no-unused-vars`), which Vercel's build fails on — that is how a broken deploy shipped once. The build is the gate.
-- This is enforced, not remembered: a git pre-push hook (`.githooks/pre-push` → `npm run prepush` → `scripts/prepush.sh`) runs the full build and blocks the push on failure. The build goes to an isolated dir so it never corrupts a running `next dev` server. One-time per clone: `git config core.hooksPath .githooks`.
+- This is enforced, not remembered: a git pre-push hook (`.githooks/pre-push` → `npm run prepush` → `scripts/prepush.sh`) runs the full build AND replays the verdict-reproducibility fixture offline (§07C), blocking the push on either failure. The build goes to an isolated dir so it never corrupts a running `next dev` server. One-time per clone: `git config core.hooksPath .githooks`. A red fixture is NOT cleared by re-recording unless the decision diff is reviewed and intended — see §07C.
 - Never bypass the gate (`--no-verify`) to push a red build. Fix the build first.
 
 ### Visual
