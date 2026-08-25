@@ -11,26 +11,9 @@ loadEnv(); // harmless; replay needs no keys
 import { registry } from '../lib/providers/registry';
 import { runKoanoPipeline } from '../lib/agents/synthesis';
 import { installProviderCassette, beginReplay, replayMisses, stop } from '../lib/testing/cassette';
-import { decisionSurface, canonical, type DecisionSurface } from './lib/decision-surface';
+import { decisionSurface, canonical, diffPaths, type DecisionSurface } from './lib/decision-surface';
 
 const FIXTURE_PATH = join(process.cwd(), 'scripts', 'fixtures', 'nyc-175-3rd-st.json');
-
-// Walk two decision surfaces and report the first differing leaf paths — so a RED
-// is actionable ("breakdown.final_score: 1.25 → 0.66"), not just "not equal".
-function diffPaths(a: unknown, b: unknown, path = ''): string[] {
-  if (canonical(a) === canonical(b)) return [];
-  if (a === null || b === null || typeof a !== 'object' || typeof b !== 'object') {
-    return [`${path || '(root)'}: ${JSON.stringify(a)} → ${JSON.stringify(b)}`];
-  }
-  const keys = Array.from(new Set([...Object.keys(a as object), ...Object.keys(b as object)]));
-  const out: string[] = [];
-  for (const k of keys) {
-    out.push(
-      ...diffPaths((a as Record<string, unknown>)[k], (b as Record<string, unknown>)[k], path ? `${path}.${k}` : k),
-    );
-  }
-  return out;
-}
 
 (async () => {
   const fx = JSON.parse(readFileSync(FIXTURE_PATH, 'utf8')) as {

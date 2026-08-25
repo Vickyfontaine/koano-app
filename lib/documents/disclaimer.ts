@@ -39,6 +39,7 @@ const BLOCK_LABELS: Record<BlockKey, string> = {
   contamination: 'Environmental contamination (EPA)',
   seismic: 'Seismic hazard (USGS)',
   disaster_history: 'Disaster history (FEMA)',
+  national_risk: 'Natural-hazard risk (FEMA National Risk Index)',
   climate: 'Climate normals (NOAA)',
   costar_deals: 'Commercial deals',
   assemblage: 'Assemblage / air rights',

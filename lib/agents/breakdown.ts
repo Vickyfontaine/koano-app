@@ -10,6 +10,20 @@ import type { Provenance } from '../providers/types';
 // Position of each verdict on the act↔avoid axis.
 export const DIRECTION: Record<Verdict, number> = { buy: 2, hold: 0, wait: -1, sell: -2, drop: -2 };
 
+// Verdict-engine INPUTS era — a boundary marker DISTINCT from `method` (the
+// aggregation math, unchanged). `method` answers "how were the votes combined";
+// this answers "what evidence existed when this verdict was produced". The
+// calibration record buckets on it so verdicts produced before and after a signal
+// expansion are never compared as like-for-like.
+//   era 1 (implicit, pre-marker): the post-grounding-gate NYC + federal-macro engine.
+//   era 2 (this): adds the FEMA National Risk Index hazard composite (Slice 3a),
+//     and — arriving in the same federal expansion — HUD QCT/DDA (regulatory) and
+//     the Census Building Permits Survey supply signal (Slices 3b/3c).
+// A live verdict stamps this; a breakdown RECONSTRUCTED from a persisted verdict's
+// stored summaries cannot know the era it was produced under, so it leaves this
+// unset rather than mislabel an old verdict with today's marker.
+export const VERDICT_INPUTS_ERA = 'v2-federal-risk-supply';
+
 // Score→verdict bands. Boundaries resolve DOWN (to the more conservative
 // verdict); the band widths are the margin that stops a single agent's
 // confidence-weighted move from flip-flopping the category.
@@ -31,7 +45,11 @@ export interface AgentContribution {
 }
 
 export interface WeightingBreakdown {
-  method: string; // methodology marker — distinguishes this era from pre-fix rows
+  method: string; // AGGREGATION methodology marker (how votes combine) — distinct from inputs_era
+  // The verdict-engine INPUTS era (see VERDICT_INPUTS_ERA). Set on a live verdict;
+  // left undefined on a breakdown reconstructed from stored summaries (the era a
+  // persisted verdict was produced under is not recoverable from its summaries).
+  inputs_era?: string;
   agents: AgentContribution[];
   total_weight: number;
   aggregate_score: number; // confidence-weighted S from the agent votes (before the nudge)

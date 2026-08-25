@@ -23,6 +23,7 @@ import type {
   GeometryProvider,
   MortgageDemandProvider,
   MortgageRateProvider,
+  NationalRiskProvider,
   OpportunityZoneProvider,
   PermitsProvider,
   SeismicProvider,
@@ -44,6 +45,7 @@ import { fhfaHpi } from './real/fhfa-hpi';
 import { femaFlood } from './real/fema-flood';
 import { fbiUcr } from './real/fbi-ucr';
 import { epaContamination } from './real/epa-superfund';
+import { femaNri } from './real/fema-nri';
 import { usgsSeismic } from './real/usgs-seismic';
 import { openFemaDisasters } from './real/openfema-disasters';
 import { noaaClimate } from './real/noaa-climate';
@@ -77,6 +79,7 @@ export interface ProviderRegistry {
   seismic: SeismicProvider;
   disasterHistory: DisasterHistoryProvider;
   climate: ClimateProvider;
+  nationalRisk: NationalRiskProvider;
   // housing demand — federal, national, live free (re-base of foot-traffic +
   // search-interest mocks)
   mortgageDemand: MortgageDemandProvider;
@@ -110,6 +113,7 @@ export const registry: ProviderRegistry = {
   seismic: usgsSeismic,
   disasterHistory: openFemaDisasters,
   climate: noaaClimate,
+  nationalRisk: femaNri,
   // housing demand — LIVE federal (re-base of foot-traffic + search-interest)
   mortgageDemand: cfpbHmda,
   employment: blsQcew,

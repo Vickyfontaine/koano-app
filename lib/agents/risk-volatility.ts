@@ -21,6 +21,7 @@ Your domain: downside — crime, climate/flood exposure, and hazard trajectory. 
 How to reason:
 - FEMA flood zone is the regulatory/insurance reality TODAY (Zone X = minimal hazard, A/AE/VE = Special Flood Hazard Area with mandatory insurance). It is the current regulatory zone — distinct from disaster HISTORY below.
 - Disaster history (OpenFEMA): how often this county has actually been federally declared a disaster, and for what perils. This is historical multi-peril frequency, COMPLEMENTARY to the flood zone — a county repeatedly declared for floods/hurricanes carries realized risk the current zone may under-state. A property outside the SFHA in a county with frequent flood declarations is carrying tail risk — flag it.
+- National Risk Index (FEMA NRI): a composite natural-hazard risk for the CENSUS TRACT expressed as a national percentile (0-100, higher = more expected annual loss relative to the nation), plus per-hazard ratings and social-vulnerability / community-resilience context. It COMPLEMENTS the flood zone and disaster history — a forward-looking expected-annual-loss composite, not a regulatory zone or a declaration count. CRITICAL: the composite is loss-weighted, so a LOW composite does NOT clear a specific peril. If a notable hazard (e.g. Coastal Flooding) is rated moderate or higher, cite THAT even when the composite reads low — do not let a low composite bury a real single-peril signal. Cite the composite rating and the notable hazards exactly as the data gives them; never translate a rating into a probability or a dollar loss for the subject property.
 - Environmental contamination (EPA): Superfund (SEMS) and brownfield (ACRES) sites within a 2-mile radius. Proximity to active cleanup sites is a value/liability risk and can gate financing/insurance. Cite the actual nearest site the data gives you; if zero within the radius, say so plainly — that is a real result, not "no risk everywhere". Do NOT name a specific Superfund site or program unless the data point supplies that name.
 - Seismic (USGS): ASCE 7-22 mapped design values (PGA, Ss, S1) and the Seismic Design Category, plus the count of nearby historical earthquakes. Higher PGA / SDC = higher seismic exposure and construction cost; most of the US Northeast is low (SDC A/B). Treat this as structural/insurance context.
 - Climate normals (NOAA), when present: long-run temperature/precipitation context for operating cost and livability, not acute loss. If climate data is marked unavailable, simply omit it — do not infer.
@@ -31,7 +32,7 @@ How to reason:
 - risk_score is your headline output: 0-100, higher = riskier, synthesized across crime, flood, contamination, seismic, and disaster history.`;
 
 export async function runRiskVolatilityAgent(addr: ResolvedAddress): Promise<AgentVerdict> {
-  const [crimeRes, floodRes, contaminationRes, seismicRes, disasterRes, climateRes, violationsRes] =
+  const [crimeRes, floodRes, contaminationRes, seismicRes, disasterRes, climateRes, violationsRes, nationalRiskRes] =
     await Promise.all([
       registry.crime.getCrimeStats(addr),
       registry.flood.getFloodZone(addr),
@@ -40,6 +41,7 @@ export async function runRiskVolatilityAgent(addr: ResolvedAddress): Promise<Age
       registry.disasterHistory.getDisasterHistory(addr),
       registry.climate.getClimate(addr),
       registry.buildingViolations.getViolations(addr),
+      registry.nationalRisk.getNationalRisk(addr),
     ]);
 
   const dataPoints: DataPoint[] = [];
@@ -123,6 +125,30 @@ export async function runRiskVolatilityAgent(addr: ResolvedAddress): Promise<Age
     );
   } else {
     dataPoints.push({ label: 'disaster_history_unavailable', value: disasterRes.error ?? 'no data', provenance: disasterRes.provenance, source: disasterRes.source });
+  }
+
+  // FEMA National Risk Index — composite natural-hazard risk (national percentile)
+  // + notable per-hazard ratings. Complements the flood zone + disaster history.
+  if (nationalRiskRes.data) {
+    const nr = nationalRiskRes.data;
+    const s = nationalRiskRes.source;
+    const p = nationalRiskRes.provenance;
+    dataPoints.push(
+      { label: 'nri_composite_risk_score_national_percentile', value: nr.risk_score, provenance: p, source: s },
+      { label: 'nri_composite_risk_rating', value: nr.risk_rating ?? 'n/a', provenance: p, source: s },
+      { label: 'nri_expected_annual_loss_usd', value: nr.expected_annual_loss_usd, provenance: p, source: s },
+      { label: 'nri_social_vulnerability_rating', value: nr.social_vulnerability_rating ?? 'n/a', provenance: p, source: s },
+      { label: 'nri_community_resilience_rating', value: nr.community_resilience_rating ?? 'n/a', provenance: p, source: s },
+      {
+        label: 'nri_notable_hazards_moderate_or_higher',
+        value: nr.notable_hazards.map((h) => `${h.hazard}: ${h.rating}`).join('; ') || 'none rated moderate or higher',
+        provenance: p,
+        source: s,
+      },
+      { label: 'nri_coverage_note', value: nr.scope_note, provenance: p, source: s }
+    );
+  } else {
+    dataPoints.push({ label: 'national_risk_index_unavailable', value: nationalRiskRes.error ?? 'no data', provenance: nationalRiskRes.provenance, source: nationalRiskRes.source });
   }
 
   // Climate normals (NOAA) — coverage note only when the free token is unset

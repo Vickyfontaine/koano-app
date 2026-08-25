@@ -32,6 +32,7 @@ export interface DecisionSurface {
   }>;
   breakdown: {
     method: string;
+    inputs_era: string | null;
     aggregate_score: number;
     final_score: number;
     structural_nudge: number;
@@ -77,6 +78,7 @@ export function decisionSurface(r: PipelineResult): DecisionSurface {
       })),
     breakdown: {
       method: b.method,
+      inputs_era: b.inputs_era ?? null,
       aggregate_score: b.aggregate_score,
       // final_score / structural_nudge are always set by aggregate() but typed
       // optional on WeightingBreakdown — coalesce (never triggers in practice) so
@@ -107,4 +109,19 @@ export function canonical(v: unknown): string {
   if (Array.isArray(v)) return '[' + v.map(canonical).join(',') + ']';
   const obj = v as Record<string, unknown>;
   return '{' + Object.keys(obj).sort().map((k) => JSON.stringify(k) + ':' + canonical(obj[k])).join(',') + '}';
+}
+
+// The first differing leaf paths between two decision surfaces — so a diff is
+// actionable ("breakdown.final_score: 1.22 → 0.66"), not just "not equal".
+export function diffPaths(a: unknown, b: unknown, path = ''): string[] {
+  if (canonical(a) === canonical(b)) return [];
+  if (a === null || b === null || typeof a !== 'object' || typeof b !== 'object') {
+    return [`${path || '(root)'}: ${JSON.stringify(a)} → ${JSON.stringify(b)}`];
+  }
+  const keys = Array.from(new Set([...Object.keys(a as object), ...Object.keys(b as object)]));
+  const out: string[] = [];
+  for (const k of keys) {
+    out.push(...diffPaths((a as Record<string, unknown>)[k], (b as Record<string, unknown>)[k], path ? `${path}.${k}` : k));
+  }
+  return out;
 }

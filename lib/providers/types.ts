@@ -407,6 +407,36 @@ export interface SeismicProvider {
   getSeismic(addr: ResolvedAddress): Promise<ProviderResult<SeismicInfo>>;
 }
 
+// FEMA National Risk Index (Census tract) — a national, keyless composite of 18
+// natural-hazard risks combined with social vulnerability and community
+// resilience. COMPLEMENTS the NFHL flood zone + OpenFEMA disaster history: NRI is
+// a forward-looking expected-annual-loss composite, not a regulatory zone or a
+// declaration count. Keyed by tract GEOID (national — works outside NYC).
+// NOTE on reading it honestly: the composite is expected-annual-LOSS weighted, so
+// a low-population tract can read "Very Low" overall while a specific peril (e.g.
+// coastal flood) is rated moderate/high — surface the notable per-hazard ratings,
+// never let the composite bury a real single-peril signal.
+export interface NationalRiskHazard {
+  hazard: string; // human name, e.g. "Coastal Flooding"
+  rating: string; // NRI rating, e.g. "Relatively Moderate"
+}
+export interface NationalRiskInfo {
+  tract_fips: string;
+  risk_score: number | null; // composite national percentile (0–100)
+  risk_rating: string | null; // "Very Low" … "Very High"
+  expected_annual_loss_usd: number | null; // EAL, total, all hazards
+  eal_rating: string | null;
+  social_vulnerability_rating: string | null;
+  community_resilience_rating: string | null;
+  notable_hazards: NationalRiskHazard[]; // per-hazard ratings ≥ "Relatively Moderate"
+  scope_note: string;
+}
+
+export interface NationalRiskProvider {
+  name: string;
+  getNationalRisk(addr: ResolvedAddress): Promise<ProviderResult<NationalRiskInfo>>;
+}
+
 // OpenFEMA — federally-declared disaster HISTORY for the county (multi-peril,
 // historical frequency). Explicitly complements NFHL: not a regulatory zone, but
 // how often this county has actually been declared a disaster and for what.

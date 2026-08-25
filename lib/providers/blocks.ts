@@ -23,6 +23,7 @@ import type {
   MigrationInfo,
   MlsCompsSummary,
   MortgageDemandInfo,
+  NationalRiskInfo,
   OpportunityZoneInfo,
   GeometryInfo,
   PermitsSummary,
@@ -78,6 +79,7 @@ export interface SiteDetailResponse {
   contamination?: SiteDetailBlock<ContaminationInfo>;
   seismic?: SiteDetailBlock<SeismicInfo>;
   disaster_history?: SiteDetailBlock<DisasterHistoryInfo>;
+  national_risk?: SiteDetailBlock<NationalRiskInfo>;
   climate?: SiteDetailBlock<ClimateInfo>;
   costar_deals?: SiteDetailBlock<CostarDealsSummary>;
   assemblage?: SiteDetailBlock<AssemblageSummary>;
@@ -109,6 +111,7 @@ export const BLOCK_FETCHERS: Record<
   contamination: (a) => registry.contamination.getContamination(a),
   seismic: (a) => registry.seismic.getSeismic(a),
   disaster_history: (a) => registry.disasterHistory.getDisasterHistory(a),
+  national_risk: (a) => registry.nationalRisk.getNationalRisk(a),
   climate: (a) => registry.climate.getClimate(a),
   costar_deals: (a) => registry.costarDeals.getDeals(a),
   assemblage: (a) => registry.assemblage.getAssemblage(a),

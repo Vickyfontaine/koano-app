@@ -29,6 +29,7 @@ import {
 import {
   DIRECTION,
   THRESHOLDS,
+  VERDICT_INPUTS_ERA,
   verdictFromScore,
   type AgentContribution,
   type WeightingBreakdown,
@@ -131,6 +132,7 @@ export function aggregate(agents: AgentVerdict[]): Aggregate {
   return {
     breakdown: {
       method: 'confidence-weighted v1',
+      inputs_era: VERDICT_INPUTS_ERA,
       agents: contribs,
       total_weight: totalWeight,
       aggregate_score: Math.round(agentScore * 100) / 100, // agent votes, before the nudge

@@ -336,6 +336,10 @@ Reproducibility of the verdict DECISION is the product. This fixture asserts it 
 
 **The one rule with no exceptions: NEVER re-record to make a failing gate pass.** Re-recording to green a red you have not understood silently disables the guardrail — the first unreviewed re-record turns the fixture from a regression detector into a rubber stamp. Re-record ONLY when the diff is reviewed and intended. If you cannot explain the diff, it is a regression, not a re-record. (A model change that shifts the frozen completions is also a legitimate re-record, but it must be an explicit, noted decision — never a reflex to clear a red.)
 
+**Reviewing a diff: separate a real change from temp-0 wobble (the load-bearing method).** `scripts/diff-fixture.ts [runs]` live-runs the new code N times and diffs each against the committed baseline. Two things matter when reading it, and the SECOND is primary:
+1. **Run count. Two samples is NOT enough** — a field that only wobbles between two band values agrees across 2 runs ~50% of the time by chance, so a 2-run "stable" label is worthless (it labelled an unrelated agent's confidence wobble as a code change in Slice 3a). Use **at least 5 runs** (P(a binary-wobble field looks stable) ≈ 6%), more if a field has several bands. Run count alone still is not proof.
+2. **Causal attribution is the real filter, and it is decisive regardless of run count.** A decision-surface field can only be a REAL effect of the change if it belongs to a component that actually consumes the changed input. A new datapoint wired into ONE agent cannot move a *different* agent's band — any movement there is wobble by construction. Attribute a diff line to the change ONLY when (a) it is stable across ≥5 runs AND (b) the agent/field it belongs to consumes the new input. Everything else is sampling noise the frozen re-record eliminates.
+
 ---
 
 ## 08 — The Four Clusters

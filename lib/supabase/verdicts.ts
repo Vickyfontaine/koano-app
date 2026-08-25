@@ -32,6 +32,11 @@ export async function persistVerdict(args: {
       signal_window_months: verdict.signal_window_months,
       headline: verdict.headline,
       overall_provenance: verdict.overall_provenance,
+      // Verdict-engine markers for the calibration record (migration-021). If that
+      // migration is not yet applied the insert fails and persist_error is reported
+      // (the verdict is still returned) — never a silent loss.
+      method: verdict.weighting_breakdown.method,
+      inputs_era: verdict.weighting_breakdown.inputs_era ?? null,
       reasoning_chain: verdict.reasoning_chain,
       minority_signals: verdict.minority_signals,
       top_data_sources: verdict.top_data_sources,
