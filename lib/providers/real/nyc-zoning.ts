@@ -37,7 +37,7 @@ function num(v: string | undefined): number | null {
 
 const REPRESENTATIVE_FALLBACK: ZoningInfo = {
   bbl: 'unknown',
-  zoning_district: 'R6B (REPRESENTATIVE — live PLUTO call failed)',
+  zoning_district: 'R6B (REPRESENTATIVE: live PLUTO call failed)',
   commercial_overlay: null,
   special_district: null,
   land_use_code: '02',
@@ -69,7 +69,7 @@ export const nycZoning: ZoningProvider = {
     if (!bbl) {
       return outOfMarketMunicipal<ZoningInfo>({
         layer: 'MapPLUTO zoning',
-        dataset: 'NYC Open Data — MapPLUTO (64uk-42ks)',
+        dataset: 'NYC Open Data: MapPLUTO (64uk-42ks)',
         fetched_at,
       });
     }
@@ -118,7 +118,7 @@ export const nycZoning: ZoningProvider = {
         ok: true,
         data,
         provenance: 'live',
-        source: 'NYC Open Data — MapPLUTO (64uk-42ks)',
+        source: 'NYC Open Data: MapPLUTO (64uk-42ks)',
         endpoint: url,
         fetched_at,
       };
@@ -127,7 +127,7 @@ export const nycZoning: ZoningProvider = {
         ok: true,
         data: { ...REPRESENTATIVE_FALLBACK, bbl },
         provenance: 'fetch_failed',
-        source: 'NYC Open Data — MapPLUTO (64uk-42ks) [FALLBACK]',
+        source: 'NYC Open Data: MapPLUTO (64uk-42ks) [FALLBACK]',
         endpoint: url,
         fetched_at,
         error: `Live call failed: ${errMsg(e)}`,

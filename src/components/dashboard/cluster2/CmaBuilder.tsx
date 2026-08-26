@@ -127,7 +127,7 @@ export default function CmaBuilder({ detail, detailError, id }: CmaBuilderProps)
 
       {/* Early-signal overlay — live indicators that lead the MLS */}
       <div style={{ borderTop: "1px solid var(--border-light)", paddingTop: "14px", display: "flex", flexDirection: "column", gap: "10px" }}>
-        <span style={panelTitle}>Early-signal overlay — live indicators that lead the MLS</span>
+        <span style={panelTitle}>Early-signal overlay: live indicators that lead the MLS</span>
         {earlySignals.length === 0 ? (
           <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
             No live leading signals in the fetched data.

@@ -4,7 +4,7 @@ import AuthShell from "@/components/ui/AuthShell";
 import { koanoClerkAppearance } from "@/components/ui/clerkAppearance";
 
 export const metadata: Metadata = {
-  title: "Sign up — KOANO",
+  title: "Sign up for KOANO",
   description: "Create your account for KOANO, the real estate reasoning engine.",
 };
 

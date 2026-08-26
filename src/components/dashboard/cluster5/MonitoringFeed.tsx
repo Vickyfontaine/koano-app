@@ -59,7 +59,7 @@ export default function MonitoringFeed({ id }: { id?: string }) {
             Portfolio monitoring
           </h2>
           <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
-            Weekly diff on the archived public record — every watched holding.
+            Weekly diff on the archived public record, every watched holding.
           </p>
         </div>
         {feed && feed.length > 0 && unread > 0 && (
@@ -122,7 +122,7 @@ export default function MonitoringFeed({ id }: { id?: string }) {
       )}
 
       <p style={{ fontSize: "11px", color: "var(--ink-faint)", margin: 0 }}>
-        Changes are stated as before/after values read directly from two archived snapshots — never
+        Changes are stated as before/after values read directly from two archived snapshots, never
         inferred. A Monday email digest carries the same feed.
       </p>
     </div>

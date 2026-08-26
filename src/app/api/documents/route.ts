@@ -245,7 +245,7 @@ export async function POST(req: Request) {
     return NextResponse.json(
       {
         error: doc.blockedOn
-          ? `The ${doc.title} is not available yet — it depends on a data source (${doc.blockedOn}) that is representative until funded.`
+          ? `The ${doc.title} is not available yet. It depends on a data source (${doc.blockedOn}) that is representative until funded.`
           : `The ${doc.title} is not available yet.`,
         blocked_on: doc.blockedOn ?? null,
       },

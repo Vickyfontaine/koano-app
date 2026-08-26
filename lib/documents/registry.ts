@@ -41,7 +41,7 @@ export const DOCUMENT_TYPES: Record<string, DocumentType> = {
       { id: 'identity', title: 'What This Property Is', kind: 'deterministic' },
       { id: 'valuation', title: 'What It Is Worth (Indicative)', kind: 'deterministic' },
       { id: 'context', title: 'Where the Neighborhood Is Heading', kind: 'deterministic' },
-      { id: 'record', title: 'Public Record — What to Watch', kind: 'deterministic' },
+      { id: 'record', title: 'Public Record: What to Watch', kind: 'deterministic' },
       { id: 'trajectory', title: 'Neighborhood Trajectory', kind: 'narrative' },
       { id: 'provenance', title: 'Sources & Provenance', kind: 'deterministic' },
     ],
@@ -169,7 +169,7 @@ export const DOCUMENT_TYPES: Record<string, DocumentType> = {
     formats: ['pdf'],
     sections: [
       { id: 'assumed_price', title: 'Assumed Sale Price', kind: 'deterministic' },
-      { id: 'costs', title: 'Closing Costs — You Provide These', kind: 'deterministic' },
+      { id: 'costs', title: 'Closing Costs: You Provide These', kind: 'deterministic' },
       { id: 'net', title: 'Estimated Net', kind: 'deterministic' },
       { id: 'provenance', title: 'Sources & Provenance', kind: 'deterministic' },
     ],

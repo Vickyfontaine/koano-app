@@ -56,7 +56,7 @@ export const hudQctDda: LihtcEligibilityProvider = {
         provenance: 'live',
         source: 'HUD QCT + DDA',
         fetched_at,
-        error: 'No tract GEOID or coordinates resolved — LIHTC eligibility not queried.',
+        error: 'No tract GEOID or coordinates resolved. LIHTC eligibility not queried.',
       };
     }
 

@@ -140,7 +140,7 @@ export function deterministicCmaNarrative(f: CmaFacts): string[] {
     ? `The ${f.hpiRegion ?? 'regional'} House Price Index moved ${fmtPct(f.hpiYoy)} year over year (${f.hpiPeriod ?? 'latest period'})${f.hpi5yr != null ? ` and ${fmtPct(f.hpi5yr)} over five years` : ''}, the macro backdrop against which these comparables should be read.`
     : 'House Price Index context was unavailable for this call.';
   const fin = f.denialRatePct != null
-    ? `On financing, ${f.denialRatePct}% of mortgage applications in the county were denied${f.originationsYoyPct != null ? ` and originations moved ${fmtPct(f.originationsYoyPct)} year over year` : ''} (CFPB HMDA${f.hmdaYear ? ` ${f.hmdaYear}` : ''}) — a read on how readily buyers here can transact.`
+    ? `On financing, ${f.denialRatePct}% of mortgage applications in the county were denied${f.originationsYoyPct != null ? ` and originations moved ${fmtPct(f.originationsYoyPct)} year over year` : ''} (CFPB HMDA${f.hmdaYear ? ` ${f.hmdaYear}` : ''}). A read on how readily buyers here can transact.`
     : '';
   const close = 'This is an indicative range from recorded sales, not an appraisal; recorded sales carry no bed/bath, condition, or days-on-market detail, which the reviewing agent should weigh.';
   return [band, macro, fin, close].filter(Boolean);
@@ -168,7 +168,7 @@ export function buildCmaModel(args: {
       ],
     },
     paragraphs: [
-      `The band is the interquartile spread (25th–75th percentile) of ${fmtInt(f.salesCount)} comparable recorded $/sq ft — the middle 50% of nearby sales, excluding outliers on both ends — applied to the subject's ${fmtInt(f.buildingAreaSqft)} sq ft. Comparables are ranked by true distance from the subject (recorded sale → PLUTO centroid).`,
+      `The band is the interquartile spread (25th–75th percentile) of ${fmtInt(f.salesCount)} comparable recorded $/sq ft (the middle 50% of nearby sales, excluding outliers on both ends) applied to the subject's ${fmtInt(f.buildingAreaSqft)} sq ft. Comparables are ranked by true distance from the subject (recorded sale → PLUTO centroid).`,
       `The HPI-adjusted midpoint moves each comparable's price to today using the ${f.hpiRegion ?? 'regional'} House Price Index (${fmtPct(f.hpiYoy)} YoY${f.hpiPeriod ? `, ${f.hpiPeriod}` : ''}), so older sales are not read at stale prices. Local recorded-sale prices are ${f.priceTrend}.`,
     ],
   });

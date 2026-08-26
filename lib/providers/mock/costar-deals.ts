@@ -8,7 +8,7 @@ const SWAP_NOTE =
   '(implement /lib/providers/real/costar-deals.ts using COSTAR_API_KEY).';
 
 export const mockCostarDeals: CostarDealsProvider = {
-  name: 'Institutional deal comps [REPRESENTATIVE — CoStar stand-in]',
+  name: 'Institutional deal comps [REPRESENTATIVE: CoStar stand-in]',
 
   async getDeals(addr: ResolvedAddress): Promise<ProviderResult<CostarDealsSummary>> {
     const sub = `${addr.borough ?? 'Brooklyn'} (representative)`;

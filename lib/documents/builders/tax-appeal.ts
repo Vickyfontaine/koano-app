@@ -54,7 +54,7 @@ export function extractTaxAppealFacts(
 
   if (!zoning) return { ok: false, error: 'Zoning/PLUTO data unavailable for this address.' };
   if (!comps || comps.sales_count <= 0) {
-    return { ok: false, error: 'No recorded comparable sales available for this area — cannot build a comps-based packet.' };
+    return { ok: false, error: 'No recorded comparable sales available for this area. Cannot build a comps-based packet.' };
   }
   const buildingAreaSqft = zoning.building_area_sqft;
   const indicativeValue =

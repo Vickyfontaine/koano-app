@@ -42,7 +42,7 @@ function failClosed(detail: string): GuardDenial {
   return {
     ok: false,
     status: 503,
-    body: { error: 'Access control is unavailable — request denied.' },
+    body: { error: 'Access control is unavailable. Request denied.' },
   };
 }
 
@@ -87,7 +87,7 @@ export async function guardDocument(args: {
         ok: false,
         status: 403,
         body: {
-          error: `The ${doc.title} is a ${doc.homeTier}-tier document. Your ${plan} plan cannot generate it — upgrade to ${doc.homeTier} or higher.`,
+          error: `The ${doc.title} is a ${doc.homeTier}-tier document. Your ${plan} plan cannot generate it. Upgrade to ${doc.homeTier} or higher.`,
           upgrade_required: true,
           plan,
           required_tier: doc.homeTier,

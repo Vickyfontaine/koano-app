@@ -40,7 +40,7 @@ export const noaaClimate: ClimateProvider = {
         provenance: 'live',
         source: 'NOAA NCEI climate normals',
         fetched_at,
-        error: 'NOAA_CDO_TOKEN not configured — climate normals omitted (set the free token to enable)',
+        error: 'NOAA_CDO_TOKEN not configured. Climate normals omitted (set the free token to enable)',
       };
     }
 
@@ -51,7 +51,7 @@ export const noaaClimate: ClimateProvider = {
         provenance: 'live',
         source: 'NOAA NCEI climate normals',
         fetched_at,
-        error: 'No county FIPS resolved — climate normals omitted',
+        error: 'No county FIPS resolved. Climate normals omitted',
       };
     }
 
@@ -92,7 +92,7 @@ export const noaaClimate: ClimateProvider = {
         ok: true,
         data: info,
         provenance: 'live',
-        source: 'NOAA NCEI Climate Data Online — 1991–2020 normals',
+        source: 'NOAA NCEI Climate Data Online: 1991–2020 normals',
         endpoint: `${CDO}/data?datasetid=NORMAL_ANN&stationid=${station.id}`,
         fetched_at,
       };

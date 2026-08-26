@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import OnboardingClusters from "@/components/dashboard/OnboardingClusters";
 
 export const metadata: Metadata = {
-  title: "Choose your cluster — KOANO",
+  title: "Choose your cluster on KOANO",
   description: "Select the KOANO intelligence cluster that fits how you work.",
 };
 

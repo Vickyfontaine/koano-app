@@ -91,7 +91,7 @@ export default function CompsScatter({
         {data.sales_count > comps.length
           ? `The ${comps.length} nearest of ${data.sales_count.toLocaleString()} qualifying residential sales within ~1 mile`
           : `${comps.length} qualifying residential sales within ~1 mile`}
-        , over the last 12 months — colored by $/sq ft against the indicative value. Gaps are months
+        , over the last 12 months, colored by $/sq ft against the indicative value. Gaps are months
         when none of these {comps.length} sold, not neighborhood-wide absence. Condos/co-ops without
         recorded square footage are excluded.
       </p>

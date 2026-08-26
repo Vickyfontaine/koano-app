@@ -62,7 +62,7 @@ export function extractOnePagerFacts(
   verdict: IcMemoVerdict,
 ): { ok: true; facts: OnePagerFacts } | { ok: false; error: string } {
   const zoning = data.blocks.zoning?.data as ZoningInfo | null | undefined;
-  if (!zoning) return { ok: false, error: 'Zoning/PLUTO data unavailable — cannot build the property snapshot.' };
+  if (!zoning) return { ok: false, error: 'Zoning/PLUTO data unavailable. Cannot build the property snapshot.' };
   return {
     ok: true,
     facts: {
@@ -130,7 +130,7 @@ export function buildOnePagerModel(args: {
         ['Recorded sale $/sq ft (median)', fmtMoney(f.comps?.median_price_per_sqft)],
         ['Recorded sales in scope / trend', f.comps && f.comps.sales_count > 0 ? `${fmtInt(f.comps.sales_count)} / ${f.comps.price_trend}` : '—'],
       ],
-      caption: 'Recorded residential sales (NYC DOF) — not institutional CRE transactions.',
+      caption: 'Recorded residential sales (NYC DOF), not institutional CRE transactions.',
     },
   });
 
@@ -153,7 +153,7 @@ export function buildOnePagerModel(args: {
   sections.push({
     heading: 'Current Status',
     paragraphs: [
-      `KOANO verdict ${v.verdict.toUpperCase()} at confidence ${v.confidence}/100, generated ${v.verdictGeneratedAt.slice(0, 10)} (${ageDays} day${ageDays === 1 ? '' : 's'} ago)${ageDays > 30 ? ' — verdict is over 30 days old; re-run the analysis before acting.' : '.'} Decision support built on public record, not a decision.`,
+      `KOANO verdict ${v.verdict.toUpperCase()} at confidence ${v.confidence}/100, generated ${v.verdictGeneratedAt.slice(0, 10)} (${ageDays} day${ageDays === 1 ? '' : 's'} ago)${ageDays > 30 ? '. Verdict is over 30 days old; re-run the analysis before acting.' : '.'} Decision support built on public record, not a decision.`,
     ],
   });
 

@@ -131,7 +131,7 @@ export const femaFlood: FloodProvider = {
         data: {
           zones,
           scope_note:
-            'FEMA NFHL flood-hazard polygons within ~1 mi of the point — Special Flood Hazard Areas ' +
+            'FEMA NFHL flood-hazard polygons within ~1 mi of the point. Special Flood Hazard Areas ' +
             '(1%-annual-chance) and 0.2%-annual-chance shaded zones. Areas of minimal flood hazard are omitted.',
         },
         provenance: 'live',

@@ -30,7 +30,7 @@ export default function OwnershipPanel({ portfolio, error, id }: OwnershipPanelP
           <Row label="Registered owner (HPD)" value={p.registered_owner ?? "—"} />
           {p.management_company && <Row label="Managing agent" value={p.management_company} />}
           <Row
-            label="Buildings under this entity (exact match — a floor)"
+            label="Buildings under this entity (exact match, a floor)"
             value={`${fmtInt(p.portfolio_building_count)}${p.portfolio_truncated ? "+" : ""}`}
           />
           <Row

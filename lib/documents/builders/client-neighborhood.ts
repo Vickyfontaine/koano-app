@@ -179,9 +179,9 @@ export function buildNeighborhoodModel(args: {
   const sections: RenderSection[] = [];
 
   const snapshotRows: string[][] = [
-    ['Recorded home sales — median $/sq ft', fmtMoney(f.medianPsf)],
+    ['Recorded home sales: median $/sq ft', fmtMoney(f.medianPsf)],
     ['Recorded sales in scope / recent trend', f.priceTrend ? `${fmtInt(f.salesCount)} / ${f.priceTrend}` : '—'],
-    ['Price index — past year / 5 years', `${fmtPct(f.hpiYoY)} / ${fmtPct(f.hpi5yr)}${f.hpiRegion ? ` — ${f.hpiRegion}` : ''}`],
+    ['Price index: past year / 5 years', `${fmtPct(f.hpiYoY)} / ${fmtPct(f.hpi5yr)}${f.hpiRegion ? ` — ${f.hpiRegion}` : ''}`],
     ['Building permits nearby (last 24 months)', fmtInt(f.permits24mo)],
     ['FEMA flood zone', f.floodZone ? `${f.floodZone}${f.inSFHA ? ' — Special Flood Hazard Area' : ''}` : '—'],
   ];
@@ -191,7 +191,7 @@ export function buildNeighborhoodModel(args: {
   }
   const snapshot: RenderSection = {
     heading: 'Neighborhood Snapshot',
-    provenanceNote: { provenance: 'live', text: 'Recorded residential sales (NYC DOF), FHFA price index, NYC DOB permits, FEMA flood — all live. Not an appraisal.' },
+    provenanceNote: { provenance: 'live', text: 'Recorded residential sales (NYC DOF), FHFA price index, NYC DOB permits, FEMA flood. All live. Not an appraisal.' },
     table: { columns: ['Indicator', 'Reading'], rows: snapshotRows, caption: f.demoVintage ? `Demographics: ${f.demoVintage}.` : undefined },
   };
   if (!f.demoLive) {

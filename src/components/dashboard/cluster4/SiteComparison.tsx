@@ -265,7 +265,7 @@ export default function SiteComparison() {
       {hasPending && (
         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
           <span style={monoLabel}>
-            {SLOT_LABELS[pendingQueue[0].slot]} — which building?
+            {SLOT_LABELS[pendingQueue[0].slot]}: which building?
             {pendingQueue.length > 1 && ` (${pendingQueue.length - 1} more to confirm)`}
           </span>
           <CandidatePicker

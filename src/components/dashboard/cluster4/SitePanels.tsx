@@ -51,7 +51,7 @@ export default function SitePanels({ detail, detailError, verdict }: SitePanelsP
       {/* Entitlement risk — scored by the Regulatory & Policy agent */}
       <div style={panelStyle} id="c4-entitlement">
         <PanelHeader
-          title="Entitlement risk — Regulatory & Policy agent"
+          title="Entitlement risk: Regulatory & Policy agent"
           provenance={regPolicy?.overall_provenance}
         />
         {regPolicy ? (
@@ -122,7 +122,7 @@ export default function SitePanels({ detail, detailError, verdict }: SitePanelsP
       {/* Zoning envelope — live NYC PLUTO */}
       {zoning && zoning.ok && zoning.data ? (
         <div style={panelStyle}>
-          <PanelHeader title={`Zoning — ${zoning.source}`} provenance={zoning.provenance} />
+          <PanelHeader title={`Zoning: ${zoning.source}`} provenance={zoning.provenance} />
           <Row
             label="District"
             value={

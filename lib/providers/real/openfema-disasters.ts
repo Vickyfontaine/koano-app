@@ -43,9 +43,9 @@ export const openFemaDisasters: DisasterHistoryProvider = {
         ok: true,
         data: null,
         provenance: 'live',
-        source: 'OpenFEMA DisasterDeclarationsSummaries — not queried',
+        source: 'OpenFEMA DisasterDeclarationsSummaries, not queried',
         fetched_at,
-        error: `No county FIPS resolved for this address — disaster history not queried. ${FEMA_DISCLAIMER}`,
+        error: `No county FIPS resolved for this address. Disaster history not queried. ${FEMA_DISCLAIMER}`,
       };
     }
 
@@ -85,14 +85,14 @@ export const openFemaDisasters: DisasterHistoryProvider = {
           : null,
         scope_note:
           `Federally-declared disasters for this county (OpenFEMA), all years. Historical multi-peril ` +
-          `frequency — complements, not duplicates, the FEMA NFHL regulatory flood zone. ${FEMA_DISCLAIMER}`,
+          `frequency that complements, not duplicates, the FEMA NFHL regulatory flood zone. ${FEMA_DISCLAIMER}`,
       };
 
       return {
         ok: true,
         data,
         provenance: 'live',
-        source: 'FEMA OpenFEMA — DisasterDeclarationsSummaries',
+        source: 'FEMA OpenFEMA: DisasterDeclarationsSummaries',
         endpoint: url,
         fetched_at,
       };

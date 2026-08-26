@@ -122,7 +122,7 @@ export function deterministicComparisonReasoning(sites: ComparisonSite[]): strin
   const order = ranked.map((s) => `${shortAddr(s.address)} (${s.verdict.decision}, conf ${s.verdict.confidence})`).join(', then ');
   return [
     `${SELECTION_RULE} Applying that rule across the sites, the ranking is: ${order}.`,
-    `The top-ranked site leads on development headroom and the community district’s entitlement record, net of any flood, violation, or speculation flag. This is a screening comparison of public record, not a feasibility study — it carries no financial modelling.`,
+    `The top-ranked site leads on development headroom and the community district’s entitlement record, net of any flood, violation, or speculation flag. This is a screening comparison of public record, not a feasibility study. It carries no financial modelling.`,
   ];
 }
 
@@ -185,7 +185,7 @@ export function buildComparisonModel(args: {
       table: {
         columns: cols,
         rows,
-        caption: 'Identical structure across all sites — every row is present for every site. Envelope is FAR / floor area only, not height- or parking-complete.',
+        caption: 'Identical structure across all sites. Every row is present for every site. Envelope is FAR / floor area only, not height- or parking-complete.',
       },
     },
     { heading: 'Reasoning', paragraphs: reasoning },

@@ -324,14 +324,14 @@ export function buildPropertyIntelligenceModel(args: {
   // 4 — Public record / what to watch.
   const openViol = (f.hpdOpen ?? 0) + (f.ecbActive ?? 0) + (f.dobActive ?? 0);
   sections.push({
-    heading: 'Public Record — What to Watch',
+    heading: 'Public Record: What to Watch',
     table: {
       columns: ['Field', 'Value'],
       rows: [
         ['Open HPD violations', fmtInt(f.hpdOpen)],
         ['Active ECB violations', fmtInt(f.ecbActive)],
         ['Active DOB complaints', fmtInt(f.dobActive)],
-        ['HPD-registered (3+ units)', f.hpdRegistered ? 'Yes' : 'No — HPD zeros are a coverage fact'],
+        ['HPD-registered (3+ units)', f.hpdRegistered ? 'Yes' : 'No. HPD zeros are a coverage fact'],
         ['Registered owner', f.registeredOwner ?? '—'],
         ['FEMA flood zone', f.floodZone ? `${f.floodZone}${f.inSFHA ? ' — Special Flood Hazard Area' : ''}` : '—'],
       ],

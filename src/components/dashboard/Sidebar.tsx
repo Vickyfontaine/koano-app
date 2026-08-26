@@ -93,7 +93,7 @@ export default function Sidebar({
         >
           {CLUSTER_IDS.map((id) => (
             <option key={id} value={id}>
-              {CLUSTERS[id].badge} — {CLUSTERS[id].label}
+              {CLUSTERS[id].badge} · {CLUSTERS[id].label}
               {id === homeCluster ? " (home)" : ""}
             </option>
           ))}

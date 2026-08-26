@@ -59,7 +59,7 @@ export const hudFmr: FairMarketRentProvider = {
         provenance: 'live', // coverage absence, never representative
         source: 'HUD Fair Market Rents',
         fetched_at,
-        error: 'HUD_USER_TOKEN not configured — Fair Market Rents omitted (set the free token to enable)',
+        error: 'HUD_USER_TOKEN not configured. Fair Market Rents omitted (set the free token to enable)',
       };
     }
     if (!addr.state_fips || !addr.county_fips) {
@@ -69,7 +69,7 @@ export const hudFmr: FairMarketRentProvider = {
         provenance: 'live',
         source: 'HUD Fair Market Rents',
         fetched_at,
-        error: 'No county FIPS resolved — Fair Market Rents omitted',
+        error: 'No county FIPS resolved. Fair Market Rents omitted',
       };
     }
 
@@ -102,7 +102,7 @@ export const hudFmr: FairMarketRentProvider = {
         ok: true,
         data,
         provenance: 'live',
-        source: 'HUD USER — Fair Market Rents',
+        source: 'HUD USER: Fair Market Rents',
         endpoint: `${HUD_FMR}/${entity}`,
         fetched_at,
       };

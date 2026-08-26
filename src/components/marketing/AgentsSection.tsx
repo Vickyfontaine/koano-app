@@ -3,6 +3,13 @@
 import React, { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import SectionNumber from "../ui/SectionNumber";
+import VerdictMathPanel from "../ui/VerdictMathPanel";
+import { VERDICT_COLORS } from "../ui/verdict";
+import {
+  EXAMPLE_VERDICT,
+  EXAMPLE_VERDICT_ADDRESS,
+  EXAMPLE_VERDICT_DATE,
+} from "./exampleVerdict";
 
 const AGENTS = [
   {
@@ -91,7 +98,7 @@ export default function AgentsSection() {
           custom={0}
           style={{ marginBottom: "80px", textAlign: "center" }}
         >
-          <SectionNumber number="02" />
+          <SectionNumber number="01" />
           <h2
             className="text-h2"
             style={{
@@ -258,69 +265,73 @@ export default function AgentsSection() {
             </span>
           </motion.div>
 
-          {/* Verdict card */}
+          {/* Real recorded verdict — the actual VerdictMathPanel the dashboard
+              renders, fed a frozen real run. Not a mock, not a demo card. */}
           <motion.div
             custom={7}
             initial="hidden"
             animate={isInView ? "visible" : "hidden"}
             variants={fadeUp}
-            style={{
-              display: "flex",
-              justifyContent: "center",
-            }}
+            style={{ display: "flex", flexDirection: "column", gap: "18px" }}
           >
+            {/* Honest provenance of the example itself */}
             <div
-              id="verdict-card-demo"
               style={{
-                background: "var(--white)",
-                border: "1px solid var(--brand-blue)",
-                borderRadius: "20px",
-                padding: "28px",
-                maxWidth: "440px",
-                width: "100%",
-                textAlign: "center",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "10px",
+                flexWrap: "wrap",
               }}
             >
-              <span
-                className="data-chip"
-                style={{ marginBottom: "16px", display: "inline-flex" }}
-              >
-                Verdict
+              <span className="data-chip" style={{ display: "inline-flex" }}>
+                Recorded example
               </span>
-              <h3
+              <span
                 style={{
-                  fontSize: "22px",
-                  fontWeight: 500,
-                  color: "var(--ink-primary)",
-                  marginBottom: "8px",
+                  fontFamily: "'DM Mono', monospace",
+                  fontSize: "11px",
+                  color: "var(--ink-faint)",
+                  letterSpacing: "0.08em",
                 }}
               >
-                Buy · High confidence
+                {EXAMPLE_VERDICT_ADDRESS} · {EXAMPLE_VERDICT_DATE}
+              </span>
+            </div>
+
+            {/* Verdict headline */}
+            <div style={{ textAlign: "center" }}>
+              <h3
+                style={{
+                  fontSize: "34px",
+                  fontWeight: 700,
+                  letterSpacing: "-0.02em",
+                  color: VERDICT_COLORS[EXAMPLE_VERDICT.verdict],
+                  marginBottom: "6px",
+                  textTransform: "uppercase",
+                }}
+              >
+                {EXAMPLE_VERDICT.verdict}
               </h3>
               <p
                 style={{
                   fontFamily: "'DM Mono', monospace",
                   fontSize: "13px",
                   color: "var(--ink-muted)",
-                  letterSpacing: "0.08em",
-                  marginBottom: "4px",
+                  letterSpacing: "0.06em",
                 }}
               >
-                Confidence: 87 / 100 · Signal window: 6–12 months
+                Confidence {EXAMPLE_VERDICT.confidence} / 100 · Signal window{" "}
+                {EXAMPLE_VERDICT.signal_window_months} months · Provenance live
               </p>
-              <p
-                style={{
-                  fontFamily: "'DM Mono', monospace",
-                  fontSize: "11px",
-                  color: "var(--ink-faint)",
-                  letterSpacing: "0.08em",
-                  marginBottom: "20px",
-                }}
-              >
-                Demo
-              </p>
+            </div>
+
+            {/* The exact panel the product shows, rendered from the frozen run */}
+            <VerdictMathPanel verdict={EXAMPLE_VERDICT} />
+
+            <div style={{ textAlign: "center", marginTop: "4px" }}>
               <a
-                href="/intelligence"
+                href="/signup"
                 style={{
                   fontSize: "14px",
                   fontWeight: 500,
@@ -328,7 +339,7 @@ export default function AgentsSection() {
                   textDecoration: "none",
                 }}
               >
-                View full reasoning chain →
+                Run the same analysis on an address you know →
               </a>
             </div>
           </motion.div>

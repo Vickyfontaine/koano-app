@@ -4,7 +4,7 @@ import ClusterLanding from "@/components/marketing/ClusterLanding";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Property Intelligence — KOANO",
+  title: "KOANO Property Intelligence",
   description:
     "KOANO reads the violations, the ownership, the permits, and the risk data tied to an address, whether you own the place or rent it, and tells you what it means.",
 };

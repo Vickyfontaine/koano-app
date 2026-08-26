@@ -252,8 +252,8 @@ export default function ProfileSettingsForm() {
             Preparer details
           </h2>
           <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
-            These populate the letterhead and signature block of documents you generate. All optional —
-            leave anything blank and it is simply omitted.
+            These populate the letterhead and signature block of documents you generate. All optional.
+            Leave anything blank and it is simply omitted.
           </p>
         </div>
 

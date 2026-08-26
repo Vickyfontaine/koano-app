@@ -147,7 +147,7 @@ export default function ProvenanceLedger({ dataPoints, locationConfidence, addre
                       <ProvenanceBadge provenance={d.provenance} />
                       {unconfirmed && (
                         <span
-                          title="Location unverified — this figure may be for a nearby lot"
+                          title="Location unverified. This figure may be for a nearby lot"
                           style={{ ...mono, fontSize: "9px", color: "var(--signal-warning)", border: "1px solid var(--signal-warning)", borderRadius: "100px", padding: "1px 6px", textTransform: "uppercase" }}
                         >
                           loc?

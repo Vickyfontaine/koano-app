@@ -14,7 +14,7 @@ function NeuralMapSection() {
   return (
     <iframe
       src="/neural-map.html"
-      title="KOANO neural map — agent and data source topology"
+      title="KOANO neural map: agent and data source topology"
       style={{
         width: "100%",
         height: 600,

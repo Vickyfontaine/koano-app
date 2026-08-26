@@ -132,7 +132,7 @@ export const epaContamination: ContaminationProvider = {
         nearest_site_program: nearest?.program ?? null,
         sites,
         scope_note:
-          `EPA Facility Registry Service — cleanup sites within ${RADIUS_MI} mi of the point. ` +
+          `EPA Facility Registry Service. Cleanup sites within ${RADIUS_MI} mi of the point. ` +
           'SEMS = Superfund program sites (NPL and non-NPL); ACRES = brownfield sites. ' +
           'Zero within the radius is a real coverage result, not "no risk".',
       };
@@ -152,7 +152,7 @@ export const epaContamination: ContaminationProvider = {
     // repeat) runs stop hammering the 12-req/min FRS limit.
     const cached = addr.bbl ? await readCache(addr.bbl) : null;
     if (cached && cached.ageMs < CACHE_TTL_MS) {
-      return ok(cached.data, ' — via KOANO per-BBL cache');
+      return ok(cached.data, ', via KOANO per-BBL cache');
     }
 
     // Miss or stale → one live fetch (no retry: a retry only doubled the calls and
@@ -163,7 +163,7 @@ export const epaContamination: ContaminationProvider = {
       return ok(data, '');
     } catch (e) {
       // A stale cache entry (real data, just old) beats omitting.
-      if (cached) return ok(cached.data, ' — via cache (refresh unavailable, stale)');
+      if (cached) return ok(cached.data, ', via cache (refresh unavailable, stale)');
       // No cache and unavailable → OMIT, never a representative stand-in. A
       // transient EPA outage must not fabricate a nearby Superfund site nor drag
       // the verdict to representative. data:null tagged live → the agent emits a
@@ -173,7 +173,7 @@ export const epaContamination: ContaminationProvider = {
         data: null,
         provenance: 'live',
         source:
-          'EPA Facility Registry Service — temporarily unavailable (rate-limited or unreachable); contamination proximity omitted this run',
+          'EPA Facility Registry Service: temporarily unavailable (rate-limited or unreachable); contamination proximity omitted this run',
         fetched_at,
         error: `Live call failed: ${errMsg(e)}`,
       };

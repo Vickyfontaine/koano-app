@@ -36,7 +36,7 @@ export default function CandidatePicker({ candidates, onChoose, busy = false }: 
           More than one building matches that address.
         </h3>
         <p style={{ fontSize: "13px", lineHeight: 1.5, color: "var(--ink-muted)", margin: 0 }}>
-          Two data sources placed it on different lots. Choose the building you meant — the analysis
+          Two data sources placed it on different lots. Choose the building you meant. The analysis
           runs on that lot, at full confidence, once you pick.
         </p>
       </div>

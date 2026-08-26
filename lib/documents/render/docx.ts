@@ -155,7 +155,7 @@ function sectionParagraphs(s: RenderSection): (Paragraph | Table)[] {
           right: { style: BorderStyle.DASHED, size: 4, color: '8AABB8', space: 6 },
         },
         children: [
-          new TextRun({ text: 'To be completed by the analyst — ', bold: true, size: 18, color: INK_MUTED }),
+          new TextRun({ text: 'To be completed by the analyst: ', bold: true, size: 18, color: INK_MUTED }),
           new TextRun({ text: s.placeholder.note, italics: true, size: 18, color: INK_MUTED }),
         ],
       }),
@@ -307,7 +307,7 @@ function longFormFrontMatter(model: RenderModel): (Paragraph | TableOfContents)[
       }),
     );
   }
-  out.push(new Paragraph({ spacing: { before: 300 }, children: [new TextRun({ text: 'CONFIDENTIAL — decision support, not a decision', size: 16, color: INK_MUTED })] }));
+  out.push(new Paragraph({ spacing: { before: 300 }, children: [new TextRun({ text: 'CONFIDENTIAL: decision support, not a decision', size: 16, color: INK_MUTED })] }));
   // Page break → TOC on its own page.
   out.push(new Paragraph({ children: [new PageBreak()] }));
   // A plain styled label, NOT a heading — a heading here would list itself in

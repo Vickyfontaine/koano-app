@@ -66,7 +66,7 @@ export const blsQcew: EmploymentProvider = {
         ok: true,
         data: null,
         provenance: 'live',
-        source: 'BLS QCEW (county) — not queried',
+        source: 'BLS QCEW (county), not queried',
         fetched_at,
         error: 'No county FIPS resolved',
       };

@@ -38,10 +38,10 @@ const SECTIONS: Array<{
   showUnlock: boolean;
 }> = [
   { state: "live", heading: "Live coverage", blurb: "Fetched live from authoritative sources this run.", showUnlock: false },
-  { state: "partner", heading: "Partner-sourced", blurb: "Supplied by a data partner — attributed to the named source, not verified by KOANO.", showUnlock: false },
-  { state: "representative", heading: "Representative stand-ins", blurb: "A labeled stand-in for an unfunded paid source — becomes live with the feed named.", showUnlock: true },
-  { state: "fetch_failed", heading: "Fetch failed — transient", blurb: "These layers are covered but failed to fetch this run. Usually transient — re-run to refresh. Not a coverage limit.", showUnlock: false },
-  { state: "coverage_absent", heading: "Not covered in this market", blurb: "These layers are not wired for this market. Each names the feed that would light it up — a structural gap, not a failure.", showUnlock: true },
+  { state: "partner", heading: "Partner-sourced", blurb: "Supplied by a data partner. Attributed to the named source, not verified by KOANO.", showUnlock: false },
+  { state: "representative", heading: "Representative stand-ins", blurb: "A labeled stand-in for an unfunded paid source. Becomes live with the feed named.", showUnlock: true },
+  { state: "fetch_failed", heading: "Fetch failed: transient", blurb: "These layers are covered but failed to fetch this run. Usually transient. Re-run to refresh. Not a coverage limit.", showUnlock: false },
+  { state: "coverage_absent", heading: "Not covered in this market", blurb: "These layers are not wired for this market. Each names the feed that would light it up, a structural gap, not a failure.", showUnlock: true },
 ];
 
 function LayerRow({ l, showUnlock, color }: { l: CoverageLayer; showUnlock: boolean; color: string }) {

@@ -115,7 +115,7 @@ export function extractScreeningFacts(
 ): { ok: true; facts: ScreeningFacts } | { ok: false; error: string } {
   const b = data.blocks;
   const zoning = blockData<ZoningInfo>(b.zoning);
-  if (!zoning) return { ok: false, error: 'Zoning/PLUTO data unavailable — cannot screen this site.' };
+  if (!zoning) return { ok: false, error: 'Zoning/PLUTO data unavailable. Cannot screen this site.' };
   const oz = blockData<OpportunityZoneInfo>(b.opportunity_zone);
   const ent = blockData<EntitlementSummary>(b.entitlement);
   const asm = blockData<AssemblageSummary>(b.assemblage);
@@ -300,7 +300,7 @@ function factsForModel(f: ScreeningFacts, v: ScreeningVerdict) {
 export function deterministicReasoning(f: ScreeningFacts, v: ScreeningVerdict): string[] {
   return [
     `${SELECTION_RULE} On that rule, this site is a ${v.decision} at confidence ${v.confidence}.`,
-    `${v.rationale} Development headroom is ${f.unusedFarPct != null ? `${f.unusedFarPct}% unused FAR` : 'unavailable'}, and the community district’s recorded approval rate is ${f.approvalRatio != null ? `${f.approvalRatio}%` : 'unavailable'} with a median filing timeline of ${f.cdMedianTimelineDays != null ? `${f.cdMedianTimelineDays} days` : 'unavailable'}. This is a screening read of public record, not a feasibility study — it carries no financial modelling.`,
+    `${v.rationale} Development headroom is ${f.unusedFarPct != null ? `${f.unusedFarPct}% unused FAR` : 'unavailable'}, and the community district’s recorded approval rate is ${f.approvalRatio != null ? `${f.approvalRatio}%` : 'unavailable'} with a median filing timeline of ${f.cdMedianTimelineDays != null ? `${f.cdMedianTimelineDays} days` : 'unavailable'}. This is a screening read of public record, not a feasibility study. It carries no financial modelling.`,
   ];
 }
 
@@ -351,22 +351,22 @@ function usedAppendix(data: DocumentData, demoLive: boolean): ProvenanceAppendix
 // site's facts (it states what KOANO verified vs what needs a vendor).
 function ddRegisterSection(): RenderSection {
   const rows: string[][] = [
-    ['Zoning verification', 'Verified — NYC MapPLUTO (26v1, City of Yes)'],
-    ['Permit research', 'Verified — DOB permits + Job Application Filings'],
-    ['Flood zone evaluation', 'Verified — FEMA NFHL'],
-    ['Violations', 'Verified — HPD / ECB / DOB'],
-    ['Ownership', 'Verified — HPD registrations (block-level)'],
-    ['Title examination', 'Open — requires a title company; liens/encumbrances are not in public record here'],
-    ['Boundary & land survey', 'Open — requires a licensed surveyor; PLUTO lot area is not survey-grade'],
-    ['Environmental assessment', 'Open — requires a Phase I/II; contamination history not screened'],
-    ['Utility access review', 'Open — requires utility confirmation of capacity/hookups'],
-    ['Easement analysis', 'Open — requires counsel; recorded easements affect the buildable area'],
+    ['Zoning verification', 'Verified: NYC MapPLUTO (26v1, City of Yes)'],
+    ['Permit research', 'Verified: DOB permits + Job Application Filings'],
+    ['Flood zone evaluation', 'Verified: FEMA NFHL'],
+    ['Violations', 'Verified: HPD / ECB / DOB'],
+    ['Ownership', 'Verified: HPD registrations (block-level)'],
+    ['Title examination', 'Open: requires a title company; liens/encumbrances are not in public record here'],
+    ['Boundary & land survey', 'Open: requires a licensed surveyor; PLUTO lot area is not survey-grade'],
+    ['Environmental assessment', 'Open: requires a Phase I/II; contamination history not screened'],
+    ['Utility access review', 'Open: requires utility confirmation of capacity/hookups'],
+    ['Easement analysis', 'Open: requires counsel; recorded easements affect the buildable area'],
   ];
   return {
     heading: 'Due Diligence Gap Register',
     keepTogether: true, // never split the register mid-table across a page break
     table: { columns: ['Item', 'Status'], rows },
-    paragraphs: ['This register states what KOANO verified from public record and what remains open — it is not a complete due-diligence report.'],
+    paragraphs: ['This register states what KOANO verified from public record and what remains open. It is not a complete due-diligence report.'],
   };
 }
 
@@ -427,7 +427,7 @@ export function buildScreeningModel(args: {
         [
           'Unused development rights (base)',
           f.unusedDevRights === 0 && (f.buildingAreaSqft ?? 0) > 0
-            ? 'Built out at base FAR (affordable-housing rights may remain — see above)'
+            ? 'Built out at base FAR (affordable-housing rights may remain, see above)'
             : `${fmtInt(f.unusedDevRights)} sq ft`,
         ],
         ['Year built / building class', `${f.yearBuilt ?? '—'} / ${f.buildingClass ?? '—'}`],
@@ -450,7 +450,7 @@ export function buildScreeningModel(args: {
         ['Median filing timeline', f.cdMedianTimelineDays != null ? `${fmtInt(f.cdMedianTimelineDays)} days` : '—'],
         ['Filings on this lot', fmtInt(f.subjectFilingCount)],
       ],
-      caption: 'DOB Job Application Filings (legacy BIS) for the subject community district — a disposition track record, not a prediction.',
+      caption: 'DOB Job Application Filings (legacy BIS) for the subject community district: a disposition track record, not a prediction.',
     },
   });
 
@@ -482,7 +482,7 @@ export function buildScreeningModel(args: {
       soleLot
         ? 'The subject is the only lot on its tax block, so there are no adjacent block lots to assemble; its own unused rights are in the envelope above.'
         : hasSameOwner
-          ? 'A single entity already controls adjacent block lots — a potential assemblage opportunity.'
+          ? 'A single entity already controls adjacent block lots, a potential assemblage opportunity.'
           : `Adjacent block lots hold ${fmtInt(f.blockUnusedFar)} sq ft of unused development rights (separate from the subject's own).`,
       f.assemblageBlockNote,
     ],

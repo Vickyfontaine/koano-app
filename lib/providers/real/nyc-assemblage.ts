@@ -57,7 +57,7 @@ function unusedFloorArea(lot: PlutoLot): number | null {
 
 const REPRESENTATIVE_FALLBACK: AssemblageSummary = {
   subject_bbl: null,
-  subject_owner_name: 'REPRESENTATIVE — live PLUTO block lookup failed',
+  subject_owner_name: 'REPRESENTATIVE: live PLUTO block lookup failed',
   block_lot_count: 0,
   same_owner_lot_count: 0,
   same_owner_bbls: [],
@@ -78,7 +78,7 @@ export const nycAssemblage: AssemblageProvider = {
     if (!addr.bbl || !/^\d{10}$/.test(addr.bbl)) {
       return outOfMarketMunicipal<AssemblageSummary>({
         layer: 'tax-block assemblage',
-        dataset: 'NYC Open Data — MapPLUTO (64uk-42ks)',
+        dataset: 'NYC Open Data: MapPLUTO (64uk-42ks)',
         fetched_at,
       });
     }
@@ -146,7 +146,7 @@ export const nycAssemblage: AssemblageProvider = {
         ok: true,
         data,
         provenance: 'live',
-        source: 'NYC Open Data — MapPLUTO (64uk-42ks), block-level ownership + unused FAR',
+        source: 'NYC Open Data: MapPLUTO (64uk-42ks), block-level ownership + unused FAR',
         endpoint: url,
         fetched_at,
       };
@@ -155,7 +155,7 @@ export const nycAssemblage: AssemblageProvider = {
         ok: true,
         data: REPRESENTATIVE_FALLBACK,
         provenance: 'fetch_failed',
-        source: 'NYC Open Data — MapPLUTO (64uk-42ks) [FALLBACK]',
+        source: 'NYC Open Data: MapPLUTO (64uk-42ks) [FALLBACK]',
         fetched_at,
         error: `Live call failed: ${errMsg(e)}`,
       };

@@ -103,7 +103,7 @@ const REPRESENTATIVE_FALLBACK: MlsCompsSummary = {
   sales_count: 0,
   price_trend: 'flat',
   scope_note:
-    'REPRESENTATIVE — live NYC recorded-sales call failed. Typical brownstone-Brooklyn $/sq ft profile.',
+    'REPRESENTATIVE: live NYC recorded-sales call failed. Typical brownstone-Brooklyn $/sq ft profile.',
 };
 
 export const nycSalesComps: MlsCompsProvider = {
@@ -129,10 +129,10 @@ export const nycSalesComps: MlsCompsProvider = {
             price_trend: 'flat',
             scope_note:
               'Recorded-sales comps cover NYC only (DOF Rolling Sales). This address is outside NYC, ' +
-              'so no live comparable set is available — a national MLS integration would fill this.',
+              'so no live comparable set is available. A national MLS integration would fill this.',
           },
           provenance: 'coverage_absent',
-          source: 'NYC Open Data — DOF Rolling Calendar Sales (usep-8jbt) — outside NYC coverage',
+          source: 'NYC Open Data: DOF Rolling Calendar Sales (usep-8jbt), outside NYC coverage',
           fetched_at,
         };
       }
@@ -150,7 +150,7 @@ export const nycSalesComps: MlsCompsProvider = {
               'No ZIP resolved for this address, so no comparable set could be drawn. Recorded sales cover NYC only.',
           },
           provenance: 'live',
-          source: 'NYC Open Data — DOF Rolling Calendar Sales (usep-8jbt)',
+          source: 'NYC Open Data: DOF Rolling Calendar Sales (usep-8jbt)',
           fetched_at,
         };
       }
@@ -231,7 +231,7 @@ export const nycSalesComps: MlsCompsProvider = {
               'Recorded sales cover NYC only and exclude units without recorded square footage.',
           },
           provenance: 'live',
-          source: 'NYC Open Data — DOF Rolling Calendar Sales (usep-8jbt)',
+          source: 'NYC Open Data: DOF Rolling Calendar Sales (usep-8jbt)',
           fetched_at,
         };
       }
@@ -303,7 +303,7 @@ export const nycSalesComps: MlsCompsProvider = {
         ok: true,
         data,
         provenance: 'live',
-        source: 'NYC Open Data — DOF Rolling Calendar Sales (usep-8jbt)',
+        source: 'NYC Open Data: DOF Rolling Calendar Sales (usep-8jbt)',
         fetched_at,
       };
     } catch (e) {

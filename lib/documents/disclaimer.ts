@@ -22,7 +22,7 @@ function notFullyLiveNote(p: Provenance): string {
     case 'representative':
       return 'This document contains one or more representative figures (labeled below): a plausible stand-in for a paid data source not yet integrated. It is not fully live.';
     case 'fetch_failed':
-      return 'One or more live sources failed to fetch at generation time (labeled below) — usually transient. It is not fully live; regenerate to refresh.';
+      return 'One or more live sources failed to fetch at generation time (labeled below). Usually transient. It is not fully live; regenerate to refresh.';
     case 'coverage_absent':
       return "One or more data layers are outside KOANO's coverage for this market (labeled below) and were not available. It is not fully live.";
     case 'live':
@@ -117,7 +117,7 @@ export function buildProvenanceAppendix(data: DocumentData): ProvenanceAppendix 
   // folded into the provenance wording.
   const overall_note =
     data.resolved_address.location_confidence === 'unconfirmed'
-      ? `${provenanceNote} SEPARATELY — location not cross-confirmed: this address resolved from a single geocoder with no independent cross-check, so figures may describe a nearby lot rather than the exact building. Verify the address before relying on this document.`
+      ? `${provenanceNote} SEPARATELY. Location not cross-confirmed: this address resolved from a single geocoder with no independent cross-check, so figures may describe a nearby lot rather than the exact building. Verify the address before relying on this document.`
       : provenanceNote;
 
   return { overall: data.overall_provenance, overall_note, rows };

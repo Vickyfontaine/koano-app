@@ -4,7 +4,7 @@ import ClusterLanding from "@/components/marketing/ClusterLanding";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Development Intelligence — KOANO",
+  title: "KOANO Development Intelligence",
   description:
     "Find your best site. Model your deal. Understand your entitlement risk. Before anyone else does.",
 };

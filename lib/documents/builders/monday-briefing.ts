@@ -57,7 +57,7 @@ export function briefingAppendix(result: BriefingResult): ProvenanceAppendix {
   const overall_note =
     overall === 'live'
       ? 'Every input to this briefing was fetched live from an authoritative public source at generation time.'
-      : 'This briefing draws on one or more representative inputs (labeled below) — a plausible stand-in for a paid source not yet integrated. It is not fully live.';
+      : 'This briefing draws on one or more representative inputs (labeled below), a plausible stand-in for a paid source not yet integrated. It is not fully live.';
   return {
     overall,
     overall_note,

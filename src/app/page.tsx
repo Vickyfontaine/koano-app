@@ -1,8 +1,11 @@
 import Nav from "@/components/marketing/Nav";
 import HeroSection from "@/components/marketing/HeroSection";
+import AgentsSection from "@/components/marketing/AgentsSection";
+import ProvenanceSection from "@/components/marketing/ProvenanceSection";
+import ArchiveSection from "@/components/marketing/ArchiveSection";
+import MonitoringSection from "@/components/marketing/MonitoringSection";
 import ClustersSection from "@/components/marketing/ClustersSection";
 import PromiseSection from "@/components/marketing/PromiseSection";
-import AgentsSection from "@/components/marketing/AgentsSection";
 import DataTickerSection from "@/components/marketing/DataTickerSection";
 import EarlyAccessSection from "@/components/marketing/EarlyAccessSection";
 import Footer from "@/components/marketing/Footer";
@@ -10,28 +13,37 @@ import Footer from "@/components/marketing/Footer";
 export default function Home() {
   return (
     <>
-      {/* Section 1 — NAV */}
+      {/* NAV */}
       <Nav />
 
-      {/* Section 2 — HERO */}
+      {/* HERO */}
       <HeroSection />
 
-      {/* Section 3 — CLUSTERS */}
-      <ClustersSection />
-
-      {/* Section 4 — PROMISE */}
-      <PromiseSection />
-
-      {/* Section 5 — AGENTS (Russian doll flow) */}
+      {/* 01 — THE ENGINE: five agents → one verdict, with its real arithmetic */}
       <AgentsSection />
 
-      {/* Section 6 — DATA TICKER */}
+      {/* 02 — PROVENANCE: every figure sourced (real ledger) */}
+      <ProvenanceSection />
+
+      {/* 03 — ARCHIVE: the compounding record */}
+      <ArchiveSection />
+
+      {/* 04 — MONITORING: the weekly watch */}
+      <MonitoringSection />
+
+      {/* 05 — CLUSTERS: four altitudes */}
+      <ClustersSection />
+
+      {/* PROMISE */}
+      <PromiseSection />
+
+      {/* DATA TICKER */}
       <DataTickerSection />
 
-      {/* Section 7 — EARLY ACCESS CTA */}
+      {/* EARLY ACCESS CTA */}
       <EarlyAccessSection />
 
-      {/* Section 8 — FOOTER */}
+      {/* FOOTER */}
       <Footer />
     </>
   );

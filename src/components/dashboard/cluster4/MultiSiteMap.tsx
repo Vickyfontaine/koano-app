@@ -55,7 +55,7 @@ export default function MultiSiteMap({ sites }: { sites: MultiSite[] }) {
 
     const zoningLine = z?.zoning_district
       ? `Zoning ${z.zoning_district}${z.unused_far_pct != null ? ` · ${z.unused_far_pct}% unused FAR` : ""}`
-      : "Zoning — n/a";
+      : "Zoning: n/a";
     const title = [
       `${s.label}${s.rank ? ` · rank ${s.rank}` : ""}`,
       addr.normalized || addr.input,
@@ -112,7 +112,7 @@ export default function MultiSiteMap({ sites }: { sites: MultiSite[] }) {
       polygons={polygons}
       legend={legend}
       height={460}
-      note="Sites, their Opportunity-Zone tract shading, and each subject lot — all live. Zoning + FAR headroom in each pin."
+      note="Sites, their Opportunity-Zone tract shading, and each subject lot: all live. Zoning + FAR headroom in each pin."
     />
   );
 }

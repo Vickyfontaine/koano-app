@@ -29,9 +29,9 @@ export default function PermitHistoryPanel({ permits, error, id }: PermitHistory
 
       {/* Scope block 1 — THIS BUILDING, all-time. Explicitly labeled so the
           neighborhood counts below are never read as the building's own record. */}
-      <div style={{ ...panelTitle, marginBottom: "2px" }}>This building — all-time</div>
+      <div style={{ ...panelTitle, marginBottom: "2px" }}>This building: all-time</div>
       <Row label="Permits on record" value={fmtInt(allTime)} />
-      <Row label="Most recent permit" value={mostRecent ?? "— none on record"} />
+      <Row label="Most recent permit" value={mostRecent ?? "None on record"} />
       <p style={{ fontSize: "11px", color: "var(--ink-faint)", margin: "0 0 4px" }}>
         DOB NOW (2021+) merged with DOB&rsquo;s legacy permit dataset, which is frozen at June 2020.
         A short or empty history reflects permits filed, not all work done.
@@ -46,7 +46,7 @@ export default function PermitHistoryPanel({ permits, error, id }: PermitHistory
           paddingTop: "12px",
         }}
       >
-        Neighborhood — last 24 months
+        Neighborhood: last 24 months
       </div>
       <Row label="Permits in the area" value={fmtInt(d.total_permits_24mo)} />
       <Row label="New building" value={fmtInt(d.new_building_permits)} />
@@ -54,7 +54,7 @@ export default function PermitHistoryPanel({ permits, error, id }: PermitHistory
       <Row label="Alterations" value={fmtInt(d.alteration_permits)} />
       {d.recent_permits.length > 0 && (
         <div style={{ paddingTop: "8px" }}>
-          <div style={{ ...panelTitle, marginBottom: "8px" }}>Recent — building &amp; nearby</div>
+          <div style={{ ...panelTitle, marginBottom: "8px" }}>Recent: building &amp; nearby</div>
           <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
             {d.recent_permits.slice(0, 5).map((p, i) => (
               <div

@@ -79,7 +79,7 @@ export default function NarrativePanel({ address, candidate = null, id }: Narrat
 
   return (
     <div style={panelStyle} id={id}>
-      <PanelHeader title="Neighborhood narrative — client-ready" />
+      <PanelHeader title="Neighborhood narrative: client-ready" />
 
       {!hasSubject && (
         <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>

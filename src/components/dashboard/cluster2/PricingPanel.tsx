@@ -86,7 +86,7 @@ export default function PricingPanel({ detail, detailError, verdict, id }: Prici
             Benchmark {fmtMoney(psf)}/sq ft (median recorded sale) × {fmtInt(sqft)} sq ft
             building area ({areaLive ? "live PLUTO" : "non-live area"}) = {fmtMoney(Math.round(base))}; {bandNote}.
             {pricingProvenance !== "live" && (
-              <> Not fully live — a fully live band needs live recorded sales and live PLUTO area.</>
+              <> Not fully live. A fully live band needs live recorded sales and live PLUTO area.</>
             )}
           </p>
         </>

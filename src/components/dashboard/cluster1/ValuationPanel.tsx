@@ -57,7 +57,7 @@ export default function ValuationPanel({ detail, detailError, id }: ValuationPan
           Indicative value: median recorded-sale {psf != null ? fmtMoney(psf) : "—"}/sq ft ×{" "}
           {sqft != null ? fmtInt(sqft) : "—"} sq ft building area (live PLUTO).
           {comps?.provenance !== "live" && (
-            <> Representative fallback — live NYC recorded sales were unavailable for this request.</>
+            <> Representative fallback. Live NYC recorded sales were unavailable for this request.</>
           )}
         </p>
       </div>
@@ -88,7 +88,7 @@ export default function ValuationPanel({ detail, detailError, id }: ValuationPan
         {hpi?.data && (
           <>
             <Row
-              label={`Price velocity — ${hpi.data.region} (${hpi.data.region_type}, FHFA HPI)`}
+              label={`Price velocity: ${hpi.data.region} (${hpi.data.region_type}, FHFA HPI)`}
               value={
                 <span style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
                   {hpi.data.yoy_change_pct != null ? `${hpi.data.yoy_change_pct}% yoy` : "—"}

@@ -152,13 +152,13 @@ export function buildPermitHistoryModel(args: {
       `This building has ${fmtInt(openCount)} open (active) permit${openCount === 1 ? '' : 's'} and ${fmtInt(expiredCount)} expired permit${expiredCount === 1 ? '' : 's'} on record.`,
     );
     flagParas.push(
-      'An EXPIRED permit means DOB-authorized work was not signed off before the permit lapsed. An OPEN permit means work is authorized and not yet closed out. Either can delay a sale or refinance and can indicate work that was started, not finished, or not properly closed — a title company or expeditor should reconcile these against the actual condition of the building.',
+      'An EXPIRED permit means DOB-authorized work was not signed off before the permit lapsed. An OPEN permit means work is authorized and not yet closed out. Either can delay a sale or refinance and can indicate work that was started, not finished, or not properly closed. A title company or expeditor should reconcile these against the actual condition of the building.',
     );
   } else {
     flagParas.push('No open or expired permits were identified in the records retrieved.');
   }
   flagParas.push(f.coverageNote);
-  sections.push({ heading: 'Open & Expired Permits — Why It Matters', paragraphs: flagParas });
+  sections.push({ heading: 'Open & Expired Permits: Why It Matters', paragraphs: flagParas });
 
   // 4 — Neighborhood permit activity (live context, clearly scoped as NOT the
   // subject building so the two are never conflated).

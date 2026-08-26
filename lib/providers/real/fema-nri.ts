@@ -94,7 +94,7 @@ export const femaNri: NationalRiskProvider = {
         provenance: 'live',
         source: 'FEMA National Risk Index (Census tract)',
         fetched_at,
-        error: 'No census tract resolved for this address — National Risk Index not queried.',
+        error: 'No census tract resolved for this address. National Risk Index not queried.',
       };
     }
 

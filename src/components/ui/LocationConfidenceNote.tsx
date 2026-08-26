@@ -31,7 +31,7 @@ export default function LocationConfidenceNote({
       <p style={{ fontSize: "13px", lineHeight: 1.55, color: "var(--ink-secondary)", margin: "4px 0 0" }}>
         This address resolved from a single geocoder with no independent cross-check, so the figures
         below may describe a nearby lot rather than the exact building. This is a coordinate-confidence
-        flag, separate from data provenance — verify the address if the property facts look wrong.
+        flag, separate from data provenance. Verify the address if the property facts look wrong.
       </p>
     </div>
   );

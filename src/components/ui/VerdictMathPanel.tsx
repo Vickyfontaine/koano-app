@@ -140,15 +140,15 @@ export default function VerdictMathPanel({ verdict }: VerdictMathPanelProps) {
   let findingDetail: string;
   if (movers.length === 0) {
     finding = "No directional signal.";
-    findingDetail = `All ${total} specialists returned a neutral (hold) call, so the score is 0.00 — hold.`;
+    findingDetail = `All ${total} specialists returned a neutral (hold) call, so the score is 0.00: hold.`;
   } else if (neutrals.length === 0) {
     finding = `Decided by all ${total} agents.`;
     findingDetail = `Every specialist returned a directional call; their confidence-weighted shares sum to the score above.`;
   } else {
     finding = `Decided by ${movers.length} of ${total} agents.`;
     findingDetail =
-      `${moverNames} set the direction. The other ${neutrals.length} returned no directional signal — ` +
-      `a neutral (hold) vote carries no weight, regardless of its confidence (up to ${maxNeutralConf} here). ` +
+      `${moverNames} set the direction. The other ${neutrals.length} returned no directional signal. ` +
+      `A neutral (hold) vote carries no weight, regardless of its confidence (up to ${maxNeutralConf} here). ` +
       `The ${movers.length} directional share${movers.length > 1 ? "s" : ""} sum to the score above.`;
   }
 
@@ -190,7 +190,7 @@ export default function VerdictMathPanel({ verdict }: VerdictMathPanelProps) {
                 borderRadius: "100px",
                 padding: "2px 9px",
               }}
-              title="This verdict's breakdown was not stored; it is re-derived now from the same stored agent votes. Identical arithmetic — but a re-derivation, not the original live computation."
+              title="This verdict's breakdown was not stored; it is re-derived now from the same stored agent votes. Identical arithmetic, but a re-derivation, not the original live computation."
             >
               Reconstructed from stored inputs
             </span>
@@ -207,7 +207,7 @@ export default function VerdictMathPanel({ verdict }: VerdictMathPanelProps) {
         >
           Each specialist casts a directional vote, weighted by its own confidence. The weighted
           votes average into one score, which falls into a threshold band that names the verdict.
-          It is deterministic code, not a judgment call — the same data always produces this exact
+          It is deterministic code, not a judgment call. The same data always produces this exact
           result.
         </p>
       </div>
@@ -243,7 +243,7 @@ export default function VerdictMathPanel({ verdict }: VerdictMathPanelProps) {
       {wb.structural_nudge != null && wb.structural_nudge !== 0 && (wb.structural_drivers?.length ?? 0) > 0 && (
         <div style={{ borderTop: "1px solid var(--border-light)", paddingTop: "20px" }}>
           <div style={{ ...monoLabel, marginBottom: "6px" }}>
-            Structural direction — from the facts ({fmtSigned(wb.structural_nudge, 2)} to the score)
+            Structural direction from the facts ({fmtSigned(wb.structural_nudge, 2)} to the score)
           </div>
           <p style={{ fontSize: "13px", lineHeight: 1.55, color: "var(--ink-muted)", margin: "0 0 12px", maxWidth: "660px" }}>
             The specialists lean neutral on weak signal by design; a clear structural fact adds this
@@ -297,7 +297,7 @@ export default function VerdictMathPanel({ verdict }: VerdictMathPanelProps) {
           </span>
         </div>
         <div style={{ color: "var(--ink-faint)", marginTop: "4px" }}>
-          thresholds — buy ≥ {fmtNum(wb.thresholds.buy)} · hold ≥ {fmtNum(wb.thresholds.hold)} · wait ≥{" "}
+          thresholds: buy ≥ {fmtNum(wb.thresholds.buy)} · hold ≥ {fmtNum(wb.thresholds.hold)} · wait ≥{" "}
           {fmtNum(wb.thresholds.wait)} · else sell · method {wb.method}
         </div>
       </div>

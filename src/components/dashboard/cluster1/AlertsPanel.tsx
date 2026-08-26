@@ -196,7 +196,7 @@ export default function AlertsPanel({ detail, detailError, id }: AlertsPanelProp
   if (feed && feed.length > 0) {
     return (
       <div style={panelStyle} id={id}>
-        <PanelHeader title="Recent changes — continuously monitored" />
+        <PanelHeader title="Recent changes: continuously monitored" />
         <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
           {feed.map((n) => {
             const w = n.data as { window_from?: string; window_to?: string };
@@ -228,7 +228,7 @@ export default function AlertsPanel({ detail, detailError, id }: AlertsPanelProp
 
   return (
     <div style={panelStyle} id={id}>
-      <PanelHeader title="Alerts — derived from this analysis" />
+      <PanelHeader title="Alerts: derived from this analysis" />
       {alerts.length === 0 ? (
         <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
           No notable signals in the fetched data.

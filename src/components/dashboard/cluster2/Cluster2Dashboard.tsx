@@ -256,7 +256,7 @@ export default function Cluster2Dashboard() {
                     Comparative Market Analysis
                   </h3>
                   <p style={{ fontSize: "12px", color: "var(--ink-faint)", margin: 0 }}>
-                    Not yet available — the CMA needs listing photos and geocoded comps, which KOANO
+                    Not yet available. The CMA needs listing photos and geocoded comps, which KOANO
                     does not source today.
                   </p>
                 </div>

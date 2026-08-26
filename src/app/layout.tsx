@@ -3,7 +3,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "KOANO — The Real Estate Reasoning Engine",
+  title: "KOANO: The Real Estate Reasoning Engine",
   description:
     "KOANO deploys five specialist AI agents that ingest the public record, reason autonomously, and deliver a single verdict, with every step of the thinking visible and auditable.",
   keywords: [

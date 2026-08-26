@@ -467,7 +467,7 @@ function TitlePage({ model, s }: { model: RenderModel; s: Styles }) {
             {model.documentProvenanceNote}
           </Text>
         ) : null}
-        <Text style={s.titleConfidential}>Confidential — decision support, not a decision</Text>
+        <Text style={s.titleConfidential}>Confidential: decision support, not a decision</Text>
       </View>
     </View>
   );

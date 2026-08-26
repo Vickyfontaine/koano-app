@@ -38,7 +38,7 @@ export function extractNetSheetFacts(
   const comps = data.blocks.mls_comps?.data as MlsCompsSummary | null | undefined;
   if (!zoning) return { ok: false, error: 'Zoning/PLUTO data unavailable for this address.' };
   if (!comps || comps.sales_count <= 0) {
-    return { ok: false, error: 'No recorded comparable sales available for this area — cannot derive an indicative price.' };
+    return { ok: false, error: 'No recorded comparable sales available for this area. Cannot derive an indicative price.' };
   }
   const area = zoning.building_area_sqft;
   return {
@@ -69,7 +69,7 @@ export function buildNetSheetModel(args: {
     heading: 'Assumed Sale Price',
     provenanceNote: {
       provenance: 'live',
-      text: 'THIS IS A KOANO-DERIVED INDICATIVE VALUE from recorded comparable sales — NOT an appraisal, a listing price, or an accepted offer. It is a starting figure for this estimate; replace it with your actual contract or list price.',
+      text: 'THIS IS A KOANO-DERIVED INDICATIVE VALUE from recorded comparable sales. NOT an appraisal, a listing price, or an accepted offer. It is a starting figure for this estimate; replace it with your actual contract or list price.',
     },
     highlight: {
       figures: [
@@ -82,13 +82,13 @@ export function buildNetSheetModel(args: {
       ],
     },
     paragraphs: [
-      'Every line below is estimated FROM this figure. If you have a contract price, a list price, or an appraised value, use that instead — this indicative value is only a placeholder so the sheet is usable before those exist.',
+      'Every line below is estimated FROM this figure. If you have a contract price, a list price, or an appraised value, use that instead. This indicative value is only a placeholder so the sheet is usable before those exist.',
     ],
   });
 
   // 2 — The fill-in cost lines: what KOANO cannot source.
   sections.push({
-    heading: 'Closing Costs — You Provide These',
+    heading: 'Closing Costs: You Provide These',
     provenanceNote: {
       provenance: 'representative',
       text: 'KOANO does not know these figures. Rates and amounts vary by property, party, lender, and contract. Fill them in from your closing statement, lender, and attorney.',
@@ -96,10 +96,10 @@ export function buildNetSheetModel(args: {
     table: {
       columns: ['Line item', 'Amount', 'Why KOANO cannot source it'],
       rows: [
-        ['Transfer taxes (NYC RPTT + NY State)', '_____________', 'Rate depends on price band, property type, and party — enter from your calculation.'],
+        ['Transfer taxes (NYC RPTT + NY State)', '_____________', 'Rate depends on price band, property type, and party. Enter from your calculation.'],
         ['Title insurance & search', '_____________', 'Set by the title company; not a public figure.'],
         ['Broker commission', '_____________', 'Negotiated per engagement; KOANO does not hold your agreement.'],
-        ['Mortgage payoff (seller)', '_____________', 'Your outstanding loan balance — from your lender.'],
+        ['Mortgage payoff (seller)', '_____________', 'Your outstanding loan balance, from your lender.'],
         ['Attorney / recording / misc.', '_____________', 'Varies by counsel and filing.'],
       ],
       caption: 'These are inputs, not KOANO outputs. Leave blank until you have the real figures.',
@@ -112,7 +112,7 @@ export function buildNetSheetModel(args: {
     paragraphs: [
       'Seller net proceeds  =  sale price  −  (transfer taxes  +  title  +  commission  +  mortgage payoff  +  attorney/misc.)',
       'Buyer cash to close  =  down payment  +  (transfer taxes  +  title  +  attorney/misc.)  −  credits',
-      `Using the assumed sale price of ${fmtMoney(f.indicativeValue)}, the net is that figure minus the totals you enter above. KOANO does not compute a net total, because the inputs are yours to supply — a number here would be false precision.`,
+      `Using the assumed sale price of ${fmtMoney(f.indicativeValue)}, the net is that figure minus the totals you enter above. KOANO does not compute a net total, because the inputs are yours to supply. A number here would be false precision.`,
     ],
   });
 

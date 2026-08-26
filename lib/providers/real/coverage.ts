@@ -32,7 +32,7 @@ export function outOfMarketMunicipal<T>(opts: {
     fetched_at: opts.fetched_at,
     error:
       `Out of coverage: ${opts.layer} is a NYC parcel-level layer queried by BBL. ` +
-      `This address resolved outside NYC, so no municipal record was retrieved — ` +
+      `This address resolved outside NYC, so no municipal record was retrieved: ` +
       `a coverage gap for this market, not a stand-in value.`,
   };
 }

@@ -72,7 +72,7 @@ export default function VerdictHistory({ id }: { id?: string }) {
 
   return (
     <div style={panelStyle} id={id}>
-      <PanelHeader title="Verdict history — append-only audit trail" />
+      <PanelHeader title="Verdict history: append-only audit trail" />
 
       {rows !== null && rows.length > 0 && (
         <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
@@ -130,7 +130,7 @@ export default function VerdictHistory({ id }: { id?: string }) {
       )}
       {rows !== null && rows.length > 0 && visible.length === 0 && (
         <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
-          {q ? `No history rows match "${filter.trim()}".` : "All rows are hidden — use “Show hidden”."}
+          {q ? `No history rows match "${filter.trim()}".` : "All rows are hidden. Use “Show hidden”."}
         </p>
       )}
       {rows !== null && visible.length > 0 && (
@@ -170,7 +170,7 @@ export default function VerdictHistory({ id }: { id?: string }) {
                   <ProvenanceBadge provenance={r.overall_provenance} />
                   {preGate && (
                     <span
-                      title="Generated before the grounding gate (2026-08-19). Its narrative was not checked claim-by-claim against the data, so the headline may contain unsourced assertions. The verdict math (Show math) is unaffected — it is deterministic from the stored votes."
+                      title="Generated before the grounding gate (2026-08-19). Its narrative was not checked claim-by-claim against the data, so the headline may contain unsourced assertions. The verdict math (Show math) is unaffected. It is deterministic from the stored votes."
                       style={{
                         fontFamily: "'DM Mono', monospace",
                         fontSize: "10px",

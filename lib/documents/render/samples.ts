@@ -117,7 +117,7 @@ export const STRESS_MODEL: RenderModel = {
     },
     {
       heading: 'Page-Spanning Table',
-      provenanceNote: { provenance: 'representative', text: 'Synthetic rows — representative, for pagination testing only.' },
+      provenanceNote: { provenance: 'representative', text: 'Synthetic rows: representative, for pagination testing only.' },
       table: {
         columns: ['Index', 'Address', 'Amount', 'Rate', 'Class'],
         rows: Array.from({ length: 40 }, (_, i) => [
@@ -216,9 +216,9 @@ function siteScreeningSample(): RenderModel {
         table: {
           columns: ['Item', 'Status'],
           rows: [
-            ['Zoning verification', 'Verified — NYC MapPLUTO (26v1)'],
-            ['Title examination', 'Open — requires a title company'],
-            ['Environmental assessment', 'Open — requires a Phase I/II'],
+            ['Zoning verification', 'Verified: NYC MapPLUTO (26v1)'],
+            ['Title examination', 'Open: requires a title company'],
+            ['Environmental assessment', 'Open: requires a Phase I/II'],
           ],
         },
       },
@@ -229,7 +229,7 @@ function siteScreeningSample(): RenderModel {
       },
       {
         heading: 'Risk & Mitigant',
-        table: { columns: ['Risk', 'Mitigant / note'], rows: [['No disqualifying public-record flags on the lot', 'Screening only — open due-diligence items still apply.']] },
+        table: { columns: ['Risk', 'Mitigant / note'], rows: [['No disqualifying public-record flags on the lot', 'Screening only. Open due-diligence items still apply.']] },
       },
       { heading: 'Reasoning', paragraphs: ['On the selection rule, this site is an ADVANCE at confidence 87. This is a screening read of public record, not a feasibility study.'] },
     ],
@@ -277,7 +277,7 @@ function comparisonSample(): RenderModel {
         table: {
           columns: ['Metric', '175 3rd Street', '70-33 260th St', '47-07 Vernon Blvd'],
           rows,
-          caption: 'Identical structure across all sites — every row is present for every site.',
+          caption: 'Identical structure across all sites. Every row is present for every site.',
         },
       },
       {
@@ -360,7 +360,7 @@ function propertyIntelligenceSample(): RenderModel {
         },
       },
       {
-        heading: 'Public Record — What to Watch',
+        heading: 'Public Record: What to Watch',
         table: {
           columns: ['Field', 'Value'],
           rows: [
@@ -508,7 +508,7 @@ function permitHistorySample(): RenderModel {
         },
       },
       {
-        heading: 'Open & Expired Permits — Why It Matters',
+        heading: 'Open & Expired Permits: Why It Matters',
         paragraphs: [
           'This building has 0 open (active) permits and 2 expired permits on record.',
           'An EXPIRED permit means DOB-authorized work was not signed off before the permit lapsed; a title company or expeditor should reconcile these against the actual condition of the building.',
@@ -604,7 +604,7 @@ function icMemoSample(): RenderModel {
         table: {
           columns: ['Indicator', 'Reading'],
           rows: [
-            ['House Price Index — YoY', '+5.6% (New York-Jersey City-White Plains)'],
+            ['House Price Index: YoY', '+5.6% (New York-Jersey City-White Plains)'],
             ['Recorded sale $/sq ft (median)', '$1,156'],
             ['Neighborhood permits (24 months)', '312'],
             ['Opportunity Zone', 'No'],
@@ -618,7 +618,7 @@ function icMemoSample(): RenderModel {
           columns: ['Risk factor', 'Mitigant / note'],
           rows: [
             ['Building violations — HPD 0 open of 3', 'Quantify remediation cost in diligence.'],
-            ['Flood — FEMA zone X', 'Outside SFHA — limited flood exposure.'],
+            ['Flood — FEMA zone X', 'Outside SFHA. Limited flood exposure.'],
           ],
           caption: 'Public-record risk read; not a substitute for third-party diligence.',
         },
@@ -626,13 +626,13 @@ function icMemoSample(): RenderModel {
       {
         number: '5',
         heading: 'Comparable Sales',
-        provenanceNote: { provenance: 'live', text: 'RESIDENTIAL recorded sales from NYC DOF Rolling Sales — NOT institutional CRE transactions.' },
+        provenanceNote: { provenance: 'live', text: 'RESIDENTIAL recorded sales from NYC DOF Rolling Sales. NOT institutional CRE transactions.' },
         paragraphs: ['144 qualifying residential recorded sales are in scope, at a median of $1,156/sq ft. The full comparable set is in Exhibit A.'],
       },
       ...placeholders,
       {
         number: 'A',
-        heading: 'Exhibit A — Comparable Recorded Sales (Full Set)',
+        heading: 'Exhibit A: Comparable Recorded Sales (Full Set)',
         pageBreakBefore: true,
         provenanceNote: { provenance: 'live', text: 'Residential recorded sales (NYC DOF Rolling Sales). Not institutional CRE comps.' },
         table: {
@@ -643,7 +643,7 @@ function icMemoSample(): RenderModel {
       },
       {
         number: 'B',
-        heading: 'Exhibit B — Verdict Math',
+        heading: 'Exhibit B: Verdict Math',
         paragraphs: ["KOANO's verdict is a confidence-weighted vote across five specialist agents (method: confidence-weighted v1)."],
         table: {
           columns: ['Agent', 'Verdict', 'Confidence (weight)', 'Direction', 'Contribution'],
@@ -708,7 +708,7 @@ function assetOnePagerSample(): RenderModel {
             ['Recorded sale $/sq ft (median)', '$1,156'],
             ['Recorded sales in scope / trend', '141 / rising'],
           ],
-          caption: 'Recorded residential sales (NYC DOF) — not institutional CRE transactions.',
+          caption: 'Recorded residential sales (NYC DOF), not institutional CRE transactions.',
         },
       },
       {
@@ -752,7 +752,7 @@ function mondayBriefingSample(): RenderModel {
     compactProvenance: true,
     sections: [
       { heading: 'Portfolio Summary', paragraphs: ['The portfolio of two tracked properties carries one HOLD and one BUY verdict as of the latest analyses. '.repeat(2)] },
-      { heading: 'Property Notes', paragraphs: ['175 3rd Street, Brooklyn — HOLD at confidence 67; 312 permits in the surrounding tract over 24 months; flood zone X.', '47-07 Vernon Blvd, Queens — BUY at confidence 74; active permit environment; worth reviewing the latest recorded sales.'] },
+      { heading: 'Property Notes', paragraphs: ['175 3rd Street, Brooklyn: HOLD at confidence 67; 312 permits in the surrounding tract over 24 months; flood zone X.', '47-07 Vernon Blvd, Queens: BUY at confidence 74; active permit environment; worth reviewing the latest recorded sales.'] },
       { heading: 'Risk Watch', paragraphs: ['No properties sit inside a Special Flood Hazard Area on current FEMA maps. Worth reviewing where verdict confidence was low.'] },
       { heading: 'The Week Ahead', paragraphs: ['Re-run analysis on any property whose verdict predates the last month. Flag the Vernon Blvd flood designation for diligence.'] },
     ],
@@ -890,12 +890,12 @@ function netSheetSample(): RenderModel {
     sections: [
       {
         heading: 'Assumed Sale Price',
-        provenanceNote: { provenance: 'live', text: 'THIS IS A KOANO-DERIVED INDICATIVE VALUE from recorded comparable sales — NOT an appraisal, a listing price, or an accepted offer.' },
+        provenanceNote: { provenance: 'live', text: 'THIS IS A KOANO-DERIVED INDICATIVE VALUE from recorded comparable sales. NOT an appraisal, a listing price, or an accepted offer.' },
         highlight: { figures: [{ label: 'KOANO indicative value (recorded sales)', value: '$3,660,000', sub: '$1,156/sq ft median × 3,166 sq ft · 141 recorded sales', emphasis: true }] },
         paragraphs: ['Every line below is estimated FROM this figure. If you have a contract or list price, use that instead.'],
       },
       {
-        heading: 'Closing Costs — You Provide These',
+        heading: 'Closing Costs: You Provide These',
         provenanceNote: { provenance: 'representative', text: 'KOANO does not know these figures. Fill them in from your closing statement, lender, and attorney.' },
         table: { columns: ['Line item', 'Amount', 'Why KOANO cannot source it'], rows: [['Transfer taxes (NYC RPTT + NY State)', '_____________', 'Rate depends on price band and party.'], ['Title insurance & search', '_____________', 'Set by the title company.'], ['Broker commission', '_____________', 'Negotiated per engagement.'], ['Mortgage payoff (seller)', '_____________', 'From your lender.']], caption: 'These are inputs, not KOANO outputs.' },
       },
@@ -914,8 +914,8 @@ function neighborhoodSample(): RenderModel {
     sections: [
       {
         heading: 'Neighborhood Snapshot',
-        provenanceNote: { provenance: 'live', text: 'Recorded residential sales (NYC DOF), FHFA price index, NYC DOB permits, FEMA flood — all live. Not an appraisal.' },
-        table: { columns: ['Indicator', 'Reading'], rows: [['Recorded home sales — median $/sq ft', '$1,156'], ['Recorded sales in scope / recent trend', '141 / rising'], ['Price index — past year / 5 years', '+5.6% / +45.0% — New York-Jersey City'], ['Building permits nearby (last 24 months)', '312'], ['FEMA flood zone', 'X']] },
+        provenanceNote: { provenance: 'live', text: 'Recorded residential sales (NYC DOF), FHFA price index, NYC DOB permits, FEMA flood. All live. Not an appraisal.' },
+        table: { columns: ['Indicator', 'Reading'], rows: [['Recorded home sales: median $/sq ft', '$1,156'], ['Recorded sales in scope / recent trend', '141 / rising'], ['Price index: past year / 5 years', '+5.6% / +45.0% — New York-Jersey City'], ['Building permits nearby (last 24 months)', '312'], ['FEMA flood zone', 'X']] },
       },
       { heading: 'Neighborhood Narrative', paragraphs: ['On price: recorded homes here have sold at a median of $1,156 per square foot across 141 recent sales; recent prices are rising. '.repeat(2), 'On flood risk: the property is in FEMA flood zone X, outside the higher-risk Special Flood Hazard Area.'] },
     ],
@@ -933,7 +933,7 @@ function entitlementMemoSample(): RenderModel {
       { heading: 'Zoning & Entitlement Context', band: { items: [{ label: 'Address', value: '175 3rd Street, Brooklyn' }, { label: 'Community district', value: '306' }, { label: 'Zoning district', value: 'M1-4/R7-2' }, { label: 'Unused FAR (headroom)', value: '97%' }, { label: 'Opportunity Zone', value: 'No' }] } },
       {
         heading: 'Community District Track Record',
-        provenanceNote: { provenance: 'live', text: 'A DISPOSITION TRACK RECORD from DOB Job Application Filings — not a prediction of any specific project.' },
+        provenanceNote: { provenance: 'live', text: 'A DISPOSITION TRACK RECORD from DOB Job Application Filings, not a prediction of any specific project.' },
         table: { columns: ['Measure', 'Value'], rows: [['Approval ratio (approved / decided)', '95%'], ['Approved', '2,981'], ['Disapproved', '148'], ['Withdrawn', '211'], ['Suspended', '64'], ['In process', '512'], ['Total filings in scope', '3,916'], ['Median filing timeline', '573 days']] },
       },
       { heading: 'Subject-Lot Filing History', table: { columns: ['Job', 'Type', 'Status', 'Latest action'], rows: [['302345678', 'NB', 'PERMIT ISSUED', '03/04/2026'], ['302233445', 'DM', 'SIGNED OFF', '07/03/2025']], caption: '2 filing(s) on record for this lot.' } },

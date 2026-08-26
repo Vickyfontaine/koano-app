@@ -141,7 +141,7 @@ export function buildViolationRecordModel(args: {
     );
   } else {
     coverageParas.push(
-      'This building is NOT registered with HPD as a multiple dwelling. HPD only records Housing Maintenance Code violations for registered buildings with 3 or more residential units, so an HPD count of zero here reflects that this building is outside HPD coverage — it is not evidence of a clean maintenance record. ECB and DOB records below apply regardless of HPD registration.',
+      'This building is NOT registered with HPD as a multiple dwelling. HPD only records Housing Maintenance Code violations for registered buildings with 3 or more residential units, so an HPD count of zero here reflects that this building is outside HPD coverage. It is not evidence of a clean maintenance record. ECB and DOB records below apply regardless of HPD registration.',
     );
   }
   coverageParas.push(`Scope: ${f.scopeNote}`);
@@ -172,7 +172,7 @@ export function buildViolationRecordModel(args: {
 
   // 4 — Portfolio-wide violation volume + the owner's other buildings.
   sections.push({
-    heading: "Owner Portfolio — Violation Volume",
+    heading: "Owner Portfolio: Violation Volume",
     table: {
       columns: ['Portfolio metric', 'Value'],
       rows: [
@@ -244,7 +244,7 @@ export function buildViolationRecordModel(args: {
       },
     };
     if (f.allItems.length > shown.length) {
-      recordSection.trimNote = `SAFETY-VALVE TRIM: showing the ${shown.length} most recent of ${fmtInt(f.allItems.length)} records. The remaining ${fmtInt(f.allItems.length - shown.length)} are omitted for document length only — request the full extract for a complete filing.`;
+      recordSection.trimNote = `SAFETY-VALVE TRIM: showing the ${shown.length} most recent of ${fmtInt(f.allItems.length)} records. The remaining ${fmtInt(f.allItems.length - shown.length)} are omitted for document length only. Request the full extract for a complete filing.`;
     }
     sections.push(recordSection);
   }

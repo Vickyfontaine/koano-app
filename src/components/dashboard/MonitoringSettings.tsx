@@ -57,7 +57,7 @@ export default function MonitoringSettings({ id }: { id?: string }) {
             Monitoring watches your properties and tells you when something material changes.
           </p>
           <p style={{ fontSize: 13, color: "var(--ink-secondary)", lineHeight: 1.6, margin: "0 0 16px" }}>
-            A new violation, an ownership change, a Superfund site nearby, comp price movement — diffed weekly against the archived
+            A new violation, an ownership change, a Superfund site nearby, comp price movement, diffed weekly against the archived
             record and pushed to your notifications and a weekly digest. Available on any paid plan.
           </p>
           <a href="/pricing" style={{ display: "inline-block", background: "var(--brand-blue)", color: "var(--near-black)", borderRadius: 100, padding: "10px 22px", fontSize: 14, fontWeight: 500, textDecoration: "none" }}>
@@ -113,7 +113,7 @@ export default function MonitoringSettings({ id }: { id?: string }) {
                   <span style={{ fontSize: 13, color: "var(--ink-secondary)" }}>{pr.address}</span>
                   <span style={{ display: "inline-flex", alignItems: "center", gap: 10 }}>
                     {pr.active && <span style={badge("var(--signal-positive)")}>Active</span>}
-                    {paused && <span style={badge("var(--signal-warning)")}>Paused — over {s.plan} limit</span>}
+                    {paused && <span style={badge("var(--signal-warning)")}>Paused: over {s.plan} limit</span>}
                     {!pr.monitoring_enabled && <span style={badge("var(--ink-faint)")}>Not watched</span>}
                     {!isFree && (
                       <button type="button" onClick={() => void toggleWatch(pr.id, !pr.monitoring_enabled)} style={{ border: "1px solid var(--border)", background: "transparent", borderRadius: 100, padding: "3px 12px", fontSize: 12, color: "var(--ink-muted)", cursor: "pointer" }}>

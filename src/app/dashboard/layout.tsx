@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Dashboard — KOANO",
+  title: "KOANO Dashboard",
   description: "The KOANO intelligence dashboard, from the real estate reasoning engine.",
 };
 

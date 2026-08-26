@@ -179,9 +179,9 @@ export default function RiskMonitor({ properties, id }: RiskMonitorProps) {
       )}
 
       <p style={{ fontSize: "11px", color: "var(--ink-faint)", margin: 0 }}>
-        Hazard signals are live federal data — EPA Superfund/brownfield proximity (2-mile radius),
+        Hazard signals are live federal data: EPA Superfund/brownfield proximity (2-mile radius),
         USGS seismic, and FEMA disaster declarations. These are point-in-time fetches; separately,
-        your portfolio is continuously monitored — material changes are diffed weekly against the
+        your portfolio is continuously monitored. Material changes are diffed weekly against the
         archived record and pushed to your notifications and weekly digest.
       </p>
     </div>

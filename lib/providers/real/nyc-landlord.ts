@@ -91,7 +91,7 @@ function soqlEscape(s: string): string {
 const REPRESENTATIVE_FALLBACK: LandlordPortfolioSummary = {
   subject_bbl: null,
   hpd_registered: true,
-  registered_owner: 'REPRESENTATIVE — live ownership lookup failed',
+  registered_owner: 'REPRESENTATIVE: live ownership lookup failed',
   registered_owner_address: null,
   owner_type: null,
   management_company: null,
@@ -115,7 +115,7 @@ export const nycLandlord: LandlordPortfolioProvider = {
     if (!addr.bbl || !/^\d{10}$/.test(addr.bbl)) {
       return outOfMarketMunicipal<LandlordPortfolioSummary>({
         layer: 'HPD landlord registrations',
-        dataset: 'NYC Open Data — HPD registrations (tesw-yqqr), contacts (feu5-w2e2), Speculation Watch List (adax-9mit)',
+        dataset: 'NYC Open Data: HPD registrations (tesw-yqqr), contacts (feu5-w2e2), Speculation Watch List (adax-9mit)',
         fetched_at,
       });
     }
@@ -153,13 +153,13 @@ export const nycLandlord: LandlordPortfolioProvider = {
             portfolio_total_hpd_violations: 0,
             on_speculation_watch_list: onWatch,
             match_caveat:
-              'Not an HPD-registered multiple dwelling (HPD registration covers rentals with 3+ units) — no registered-owner record exists to resolve. ' +
+              'Not an HPD-registered multiple dwelling (HPD registration covers rentals with 3+ units), so no registered-owner record exists to resolve. ' +
               MATCH_CAVEAT,
             buildings: [],
           },
           provenance: 'live',
           source:
-            'NYC Open Data — HPD registrations (tesw-yqqr), contacts (feu5-w2e2), Speculation Watch List (adax-9mit)',
+            'NYC Open Data: HPD registrations (tesw-yqqr), contacts (feu5-w2e2), Speculation Watch List (adax-9mit)',
           fetched_at,
         };
       }
@@ -285,7 +285,7 @@ export const nycLandlord: LandlordPortfolioProvider = {
         on_speculation_watch_list: onWatch,
         match_caveat:
           (truncated || detailTruncated
-            ? `Portfolio scan capped at ${MAX_REGISTRATIONS} registrations / ${MAX_BUILDINGS_DETAILED} buildings detailed — counts are a floor, not a ceiling. `
+            ? `Portfolio scan capped at ${MAX_REGISTRATIONS} registrations / ${MAX_BUILDINGS_DETAILED} buildings detailed. Counts are a floor, not a ceiling. `
             : '') + MATCH_CAVEAT,
         buildings,
       };
@@ -295,7 +295,7 @@ export const nycLandlord: LandlordPortfolioProvider = {
         data,
         provenance: 'live',
         source:
-          'NYC Open Data — HPD registrations (tesw-yqqr), contacts (feu5-w2e2), violations (wvxf-dwi5), Speculation Watch List (adax-9mit)',
+          'NYC Open Data: HPD registrations (tesw-yqqr), contacts (feu5-w2e2), violations (wvxf-dwi5), Speculation Watch List (adax-9mit)',
         fetched_at,
       };
     } catch (e) {

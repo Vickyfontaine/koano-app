@@ -33,7 +33,7 @@ export default function RunDegradationNote({ degradation }: { degradation?: RunD
       <p style={{ fontSize: "13px", lineHeight: 1.55, color: "var(--ink-secondary)", margin: 0 }}>
         {parts.join(" · ")} while fetching live sources ({hosts.join(", ")}). Those figures fell back
         and are badged individually. This is a <strong style={{ fontWeight: 500 }}>fixable</strong>{" "}
-        infrastructure condition — re-run, or confirm the source API tokens — not a real data limit.
+        infrastructure condition, not a real data limit. Re-run, or confirm the source API tokens.
       </p>
     </div>
   );

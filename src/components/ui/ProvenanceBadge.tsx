@@ -58,7 +58,7 @@ export default function ProvenanceBadge({
   // the other caveats use their own state-specific note.
   const note =
     provenance === "representative" && becomesLiveWith
-      ? `Representative data — becomes live with ${becomesLiveWith} integration`
+      ? `Representative data. Becomes live with ${becomesLiveWith} integration`
       : meta.note;
 
   return (

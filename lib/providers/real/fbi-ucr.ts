@@ -76,7 +76,7 @@ function parseFbiViolent(res: FbiCdeResponse, stateAbbr: string): CrimeStats | n
     property_incidents: null,
     total_incidents: null,
     rate_note:
-      'FBI Crime Data Explorer — statewide violent-crime offenses, latest complete year. Property-local data is not available for this market (NYPD covers NYC only).',
+      'FBI Crime Data Explorer: statewide violent-crime offenses, latest complete year. Property-local data is not available for this market (NYPD covers NYC only).',
     trend,
   };
 }
@@ -167,7 +167,7 @@ export const fbiUcr: CrimeProvider = {
             ok: true,
             data,
             provenance: 'live',
-            source: 'FBI Crime Data Explorer (UCR — summarized state violent crime)',
+            source: 'FBI Crime Data Explorer (UCR: summarized state violent crime)',
             endpoint: fbiUrl.replace(fbiKey, '***'),
             fetched_at,
           };
@@ -195,7 +195,7 @@ export const fbiUcr: CrimeProvider = {
       ok: true,
       data: null,
       provenance: 'live',
-      source: 'FBI Crime Data Explorer / NYPD — no crime source for this location',
+      source: 'FBI Crime Data Explorer / NYPD: no crime source for this location',
       fetched_at,
       error:
         'No live crime source for this address: FBI Crime Data Explorer needs FBI_CRIME_API_KEY (free), and NYPD complaint data covers NYC only.',

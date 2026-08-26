@@ -244,7 +244,7 @@ export const fhfaHpi: HpiProvider = {
           provenance: 'live',
           source: 'FHFA House Price Index (state-level)',
           fetched_at,
-          error: 'No US state resolved for this address — FHFA HPI not queried.',
+          error: 'No US state resolved for this address. FHFA HPI not queried.',
         };
       }
       try {

@@ -59,11 +59,11 @@ export default function ArchiveTrend({ id, previewData }: { id?: string; preview
 
   return (
     <div style={panelStyle} id={id}>
-      <PanelHeader title="The longitudinal record — weekly public-record snapshots" />
+      <PanelHeader title="The longitudinal record: weekly public-record snapshots" />
       <p style={{ fontSize: "13px", lineHeight: 1.6, color: "var(--ink-muted)", margin: 0, maxWidth: "680px" }}>
-        NYC Open Data gives current state, not history — nobody stores the time series. KOANO
+        NYC Open Data gives current state, not history. Nobody stores the time series. KOANO
         snapshots it weekly, so it accrues into a dataset that can&apos;t be acquired retroactively.
-        This shows exactly what has been captured. Gaps are shown as gaps — never interpolated or
+        This shows exactly what has been captured. Gaps are shown as gaps, never interpolated or
         backfilled.
       </p>
 
@@ -72,7 +72,7 @@ export default function ArchiveTrend({ id, previewData }: { id?: string; preview
 
       {data && data.observation.week_count === 0 && (
         <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
-          No snapshots captured yet — the weekly archive cron has not populated the record.
+          No snapshots captured yet. The weekly archive cron has not populated the record.
         </p>
       )}
 
@@ -118,7 +118,7 @@ export default function ArchiveTrend({ id, previewData }: { id?: string; preview
                           color: c.is_gap ? "var(--signal-warning)" : "var(--ink-primary)",
                           background: c.is_gap ? "rgba(245,158,11,0.06)" : "transparent",
                         }}
-                        title={c.is_gap ? "No capture this week — a gap, not zero activity" : `${fmt(c.rows_present)} rows captured`}
+                        title={c.is_gap ? "No capture this week: a gap, not zero activity" : `${fmt(c.rows_present)} rows captured`}
                       >
                         {c.is_gap ? "gap" : fmt(c.rows_present)}
                       </td>
@@ -131,7 +131,7 @@ export default function ArchiveTrend({ id, previewData }: { id?: string; preview
 
           <p style={{ fontSize: "12px", lineHeight: 1.55, color: "var(--ink-faint)", margin: 0, maxWidth: "680px" }}>
             An amber <span style={{ color: "var(--signal-warning)" }}>gap</span> is a week a dataset
-            was not captured (a cron outage, not zero real-world activity) — it is left as a hole, never
+            was not captured (a cron outage, not zero real-world activity). It is left as a hole, never
             filled with a guessed value. The record only ever contains real captures.
           </p>
         </>

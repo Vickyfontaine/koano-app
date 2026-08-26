@@ -112,7 +112,7 @@ export default function UpgradeScreen({
             You&apos;ve used all {detail.limit} free {noun}.
           </h1>
           <p style={{ fontSize: "15px", lineHeight: 1.6, color: "var(--ink-secondary)", margin: 0 }}>
-            Pick a plan to keep going. Every analysis runs the same engine — the plan sets how much
+            Pick a plan to keep going. Every analysis runs the same engine. The plan sets how much
             you can run. You can change or cancel anytime.
           </p>
         </div>

@@ -104,7 +104,7 @@ export function buildDigest(groups: AddressedGroup[], appUrl: string): { subject
   </body></html>`;
 
   const text = [
-    'KOANO — Weekly monitoring',
+    'KOANO Weekly monitoring',
     `${total} ${total === 1 ? 'change' : 'changes'} on the ${prepared.length === 1 ? 'property' : 'properties'} you monitor.`,
     '',
     ...prepared.flatMap((g) => {
@@ -135,7 +135,7 @@ async function resendSend(from: string, to: string, subject: string, html: strin
   if (!key) { console.error('[digest] RESEND_API_KEY not set'); return false; }
   // Hard guard: never send a digest whose links point at localhost.
   if (/localhost|127\.0\.0\.1/i.test(html) || /localhost|127\.0\.0\.1/i.test(text)) {
-    console.error('[digest] REFUSING to send — links resolve to localhost (set NEXT_PUBLIC_APP_URL to the prod origin)');
+    console.error('[digest] REFUSING to send. Links resolve to localhost (set NEXT_PUBLIC_APP_URL to the prod origin)');
     return false;
   }
   const res = await fetch('https://api.resend.com/emails', {
@@ -152,7 +152,7 @@ async function resendSend(from: string, to: string, subject: string, html: strin
 export async function sendWeeklyDigests(admin: SupabaseClient): Promise<{ usersEmailed: number; notificationsSent: number }> {
   const from = process.env.MONITORING_EMAIL_FROM;
   const appUrl = productionAppUrl();
-  if (!from) { console.error('[digest] MONITORING_EMAIL_FROM not set — skipping digests'); return { usersEmailed: 0, notificationsSent: 0 }; }
+  if (!from) { console.error('[digest] MONITORING_EMAIL_FROM not set, skipping digests'); return { usersEmailed: 0, notificationsSent: 0 }; }
 
   const { data: pending } = await admin
     .from('notifications')

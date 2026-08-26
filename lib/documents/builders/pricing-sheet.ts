@@ -58,7 +58,7 @@ export function extractPricingFacts(
   const comps = data.blocks.mls_comps?.data as MlsCompsSummary | null | undefined;
   if (!zoning) return { ok: false, error: 'Zoning/PLUTO data unavailable for this address.' };
   if (!comps || comps.sales_count <= 0 || comps.comps.length === 0) {
-    return { ok: false, error: 'No recorded comparable sales available for this area — cannot build a price band.' };
+    return { ok: false, error: 'No recorded comparable sales available for this area. Cannot build a price band.' };
   }
   const psf = comps.comps.map((c) => c.price_per_sqft).filter((n) => Number.isFinite(n) && n > 0).sort((a, b) => a - b);
   const p25 = percentile(psf, 25);
@@ -115,7 +115,7 @@ export function buildPricingModel(args: {
       ],
     },
     paragraphs: [
-      `Derivation: the ${fmtInt(f.salesCount)} qualifying recorded sales were reduced to their price-per-square-foot. The 25th and 75th percentiles of that distribution (${fmtMoney(f.p25Psf)} and ${fmtMoney(f.p75Psf)} per sq ft) set the low and high edges — the interquartile spread, the middle 50% of comparable sales, which deliberately excludes the cheapest and most expensive outliers on both ends. KOANO's trimmed median (${fmtMoney(f.medianPsf)} per sq ft) sets the midpoint. All three were applied to the subject's ${fmtInt(f.buildingAreaSqft)} sq ft of building area.`,
+      `Derivation: the ${fmtInt(f.salesCount)} qualifying recorded sales were reduced to their price-per-square-foot. The 25th and 75th percentiles of that distribution (${fmtMoney(f.p25Psf)} and ${fmtMoney(f.p75Psf)} per sq ft) set the low and high edges: the interquartile spread, the middle 50% of comparable sales, which deliberately excludes the cheapest and most expensive outliers on both ends. KOANO's trimmed median (${fmtMoney(f.medianPsf)} per sq ft) sets the midpoint. All three were applied to the subject's ${fmtInt(f.buildingAreaSqft)} sq ft of building area.`,
       `Local recorded-sale prices are ${f.priceTrend}, which the reviewer should weigh alongside the band.`,
     ],
   });
@@ -124,8 +124,8 @@ export function buildPricingModel(args: {
   sections.push({
     heading: 'How These Comparables Were Selected',
     paragraphs: [
-      'To keep the selection defensible rather than cherry-picked, KOANO applies a fixed rule to NYC DOF recorded sales — the analyst does not hand-pick the set:',
-      '• Residential recorded sales only (DOF building classes 01, 02, 03, 09, 10, 12, 13 — one- to three-family homes, condos, co-ops).',
+      'To keep the selection defensible rather than cherry-picked, KOANO applies a fixed rule to NYC DOF recorded sales. The analyst does not hand-pick the set:',
+      '• Residential recorded sales only (DOF building classes 01, 02, 03, 09, 10, 12, 13: one- to three-family homes, condos, co-ops).',
       '• A trailing window of recent recorded sales, ranked by true distance from the subject (recorded sale → PLUTO centroid), preferring the nearest.',
       '• Sales with a recorded gross square footage (so a $/sq ft can be computed); sales without it are excluded.',
       '• A trimmed median is used for the central figure to damp outliers.',

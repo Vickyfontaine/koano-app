@@ -114,7 +114,7 @@ function monthlySeries(rows: DobNowPermit[]): PermitMonth[] {
 const REPRESENTATIVE_FALLBACK: PermitsSummary = {
   bin: null,
   scope_note:
-    'REPRESENTATIVE — live NYC Open Data call failed. Typical 24-month permit profile for an active-development Brooklyn tract.',
+    'REPRESENTATIVE: live NYC Open Data call failed. Typical 24-month permit profile for an active-development Brooklyn tract.',
   total_permits_24mo: 350,
   new_building_permits: 12,
   demolition_permits: 6,
@@ -123,7 +123,7 @@ const REPRESENTATIVE_FALLBACK: PermitsSummary = {
   recent_permits: [],
   all_permits: [],
   all_permits_note:
-    'REPRESENTATIVE — live NYC Open Data call failed; no subject permit history retrieved.',
+    'REPRESENTATIVE: live NYC Open Data call failed; no subject permit history retrieved.',
 };
 
 // DOB NOW: Build began rolling out in 2021 and does not contain most permits
@@ -145,7 +145,7 @@ export const nycPermits: PermitsProvider = {
     if (!addr.bbl) {
       return outOfMarketMunicipal<PermitsSummary>({
         layer: 'DOB permits',
-        dataset: 'NYC Open Data — DOB permits (DOB NOW rbx6-tga4 + legacy ipu4-2q9a)',
+        dataset: 'NYC Open Data: DOB permits (DOB NOW rbx6-tga4 + legacy ipu4-2q9a)',
         fetched_at,
       });
     }
@@ -207,7 +207,7 @@ export const nycPermits: PermitsProvider = {
         .slice(0, 300);
 
       if (subjectRows.length === 0 && tractRows.length === 0 && !addr.bbl && !tractUrl) {
-        throw new Error('Neither BBL nor census tract resolved — nothing to query');
+        throw new Error('Neither BBL nor census tract resolved. Nothing to query');
       }
 
       const scope = tractRows.length > 0 ? tractRows : subjectRows;
@@ -235,7 +235,7 @@ export const nycPermits: PermitsProvider = {
         data,
         provenance: 'live',
         source:
-          'NYC Open Data — DOB permits (DOB NOW: Build rbx6-tga4 + legacy DOB Permit Issuance ipu4-2q9a)',
+          'NYC Open Data, DOB permits (DOB NOW: Build rbx6-tga4 + legacy DOB Permit Issuance ipu4-2q9a)',
         endpoint: tractUrl ?? subjectUrl,
         fetched_at,
       };
@@ -244,7 +244,7 @@ export const nycPermits: PermitsProvider = {
         ok: true,
         data: REPRESENTATIVE_FALLBACK,
         provenance: 'fetch_failed',
-        source: 'NYC Open Data — DOB NOW Approved Permits [FALLBACK]',
+        source: 'NYC Open Data: DOB NOW Approved Permits [FALLBACK]',
         endpoint: subjectUrl,
         fetched_at,
         error: `Live call failed: ${errMsg(e)}`,

@@ -4,7 +4,7 @@ import Footer from "@/components/marketing/Footer";
 import IntelligenceContent from "@/components/marketing/IntelligenceContent";
 
 export const metadata: Metadata = {
-  title: "How It Works — KOANO",
+  title: "How KOANO Works",
   description:
     "Five specialist AI agents that ingest the public record, reason independently, and converge on a single auditable verdict. The Russian doll architecture behind every KOANO decision.",
 };

@@ -45,25 +45,25 @@ export const PROVENANCE_META: Record<Provenance, ProvenanceMeta> = {
     label: "Partner",
     color: "var(--mid-blue)",
     background: "rgba(90, 155, 190, 0.10)",
-    note: "Supplied by a data partner — attributed to the named source, not verified by KOANO.",
+    note: "Supplied by a data partner. Attributed to the named source, not verified by KOANO.",
   },
   representative: {
     label: "Representative",
     color: "var(--signal-warning)",
     background: "rgba(245, 158, 11, 0.10)",
-    note: "Representative stand-in — not fetched live from the source.",
+    note: "Representative stand-in. Not fetched live from the source.",
   },
   fetch_failed: {
     label: "Fetch failed",
     color: "var(--signal-warning)",
     background: "rgba(245, 158, 11, 0.10)",
-    note: "The live call failed — usually transient; retry to refresh.",
+    note: "The live call failed. Usually transient; retry to refresh.",
   },
   coverage_absent: {
     label: "Not covered",
     color: "var(--ink-faint)",
     background: "rgba(138, 171, 184, 0.12)",
-    note: "Outside KOANO's coverage for this market — no data was queried.",
+    note: "Outside KOANO's coverage for this market. No data was queried.",
   },
 };
 

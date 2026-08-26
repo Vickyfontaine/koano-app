@@ -125,9 +125,9 @@ export const censusAcs: DemographicsProvider = {
         ok: true,
         data: null,
         provenance: 'live',
-        source: 'US Census ACS 5-year — not queried',
+        source: 'US Census ACS 5-year, not queried',
         fetched_at,
-        error: 'No census tract resolved for this address — ACS not queried.',
+        error: 'No census tract resolved for this address. ACS not queried.',
       };
     }
 
@@ -139,7 +139,7 @@ export const censusAcs: DemographicsProvider = {
           ok: true,
           data,
           provenance: 'live',
-          source: `US Census Bureau — api.census.gov ACS 5-year ${CENSUS_VINTAGE}`,
+          source: `US Census Bureau, api.census.gov ACS 5-year ${CENSUS_VINTAGE}`,
           endpoint,
           fetched_at,
         };

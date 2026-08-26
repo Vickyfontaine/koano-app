@@ -104,7 +104,7 @@ export function extractIcMemoFacts(
   verdict: IcMemoVerdict,
 ): { ok: true; facts: IcMemoFacts } | { ok: false; error: string } {
   const zoning = data.blocks.zoning?.data as ZoningInfo | null | undefined;
-  if (!zoning) return { ok: false, error: 'Zoning/PLUTO data unavailable — cannot build the property description.' };
+  if (!zoning) return { ok: false, error: 'Zoning/PLUTO data unavailable. Cannot build the property description.' };
 
   const demoLive = isLive(data.blocks.demographics);
   return {
@@ -277,8 +277,8 @@ export function buildIcMemoModel(args: {
   // appendix). Stated at the top so a representative document says so up front.
   const docProv = appendix.overall;
   const documentProvenanceNote = !isTrustedProvenance(docProv)
-    ? `PROVENANCE: NOT FULLY LIVE (${PROVENANCE_LABEL[docProv].toUpperCase()}) — this memo includes a verdict and/or figures that are not fully live. See Sources & Provenance.`
-    : 'PROVENANCE: LIVE — every rendered figure and the underlying verdict derive from live public data.';
+    ? `PROVENANCE: NOT FULLY LIVE (${PROVENANCE_LABEL[docProv].toUpperCase()}). This memo includes a verdict and/or figures that are not fully live. See Sources & Provenance.`
+    : 'PROVENANCE: LIVE. Every rendered figure and the underlying verdict derive from live public data.';
   const sections: RenderSection[] = [];
 
   // 1 — Executive Summary & Recommendation.
@@ -322,8 +322,8 @@ export function buildIcMemoModel(args: {
 
   // 3 — Market & Submarket Analysis.
   const marketRows: string[][] = [
-    ['House Price Index — YoY', f.hpi ? `${fmtPct(f.hpi.yoy_change_pct)}${f.hpi.region ? ` (${f.hpi.region})` : ''}` : '—'],
-    ['House Price Index — 5-year', fmtPct(f.hpi?.five_yr_change_pct)],
+    ['House Price Index: YoY', f.hpi ? `${fmtPct(f.hpi.yoy_change_pct)}${f.hpi.region ? ` (${f.hpi.region})` : ''}` : '—'],
+    ['House Price Index: 5-year', fmtPct(f.hpi?.five_yr_change_pct)],
     ['Recorded sale $/sq ft (median)', fmtMoney(f.comps?.median_price_per_sqft)],
     ['Recorded sales in scope / trend', f.comps ? `${fmtInt(f.comps.sales_count)} / ${f.comps.price_trend}` : '—'],
     ['Neighborhood permits (24 months)', fmtInt(f.permits?.total_permits_24mo)],
@@ -350,13 +350,13 @@ export function buildIcMemoModel(args: {
   if (f.violations) {
     riskRows.push([
       `Building violations — HPD ${fmtInt(f.violations.hpd.open)} open of ${fmtInt(f.violations.hpd.total)}; ECB ${fmtInt(f.violations.ecb.active)} active; DOB ${fmtInt(f.violations.dob_complaints.active)} active`,
-      f.violations.hpd_registered ? 'Quantify remediation cost in diligence; open Class C are immediately hazardous.' : 'Building outside HPD 3+-unit coverage — zeros are a coverage fact, not a clean record.',
+      f.violations.hpd_registered ? 'Quantify remediation cost in diligence; open Class C are immediately hazardous.' : 'Building outside HPD 3+-unit coverage. Zeros are a coverage fact, not a clean record.',
     ]);
   }
   if (f.flood) {
     riskRows.push([
       `Flood — FEMA zone ${f.flood.flood_zone ?? 'n/a'}${f.flood.in_special_flood_hazard_area ? ' (Special Flood Hazard Area)' : ''}`,
-      f.flood.in_special_flood_hazard_area ? 'Flood insurance required; model premium + resale impact into returns.' : 'Outside SFHA — limited flood exposure on current maps.',
+      f.flood.in_special_flood_hazard_area ? 'Flood insurance required; model premium + resale impact into returns.' : 'Outside SFHA. Limited flood exposure on current maps.',
     ]);
   }
   if (f.portfolio) {
@@ -383,7 +383,7 @@ export function buildIcMemoModel(args: {
       'Track record is community-district level; a project-specific pre-application read is still required.',
     ]);
   }
-  if (riskRows.length === 0) riskRows.push(['No public-record risk flags retrieved', 'Absence of flags is not clearance — complete standard diligence.']);
+  if (riskRows.length === 0) riskRows.push(['No public-record risk flags retrieved', 'Absence of flags is not clearance. Complete standard diligence.']);
   sections.push({
     number: '4',
     heading: 'Risk Factors & Mitigants',
@@ -397,7 +397,7 @@ export function buildIcMemoModel(args: {
     heading: 'Comparable Sales',
     provenanceNote: {
       provenance: 'live',
-      text: 'RESIDENTIAL recorded sales from NYC DOF Rolling Sales — NOT institutional CRE transactions. Recorded sales have no days-on-market.',
+      text: 'RESIDENTIAL recorded sales from NYC DOF Rolling Sales. NOT institutional CRE transactions. Recorded sales have no days-on-market.',
     },
     paragraphs: [
       compsCount > 0
@@ -422,7 +422,7 @@ export function buildIcMemoModel(args: {
   const shownComps = comps.slice(0, MAX_COMPS);
   const exhibitA: RenderSection = {
     number: 'A',
-    heading: 'Exhibit A — Comparable Recorded Sales (Full Set)',
+    heading: 'Exhibit A: Comparable Recorded Sales (Full Set)',
     pageBreakBefore: true,
     provenanceNote: { provenance: 'live', text: 'Residential recorded sales (NYC DOF Rolling Sales). Not institutional CRE comps.' },
     table: {
@@ -440,7 +440,7 @@ export function buildIcMemoModel(args: {
   const b = v.breakdown;
   sections.push({
     number: 'B',
-    heading: 'Exhibit B — Verdict Math',
+    heading: 'Exhibit B: Verdict Math',
     paragraphs: [
       `KOANO's verdict is a confidence-weighted vote across five specialist agents. Each agent's confidence is its weight; its verdict sets a direction; contribution = confidence × direction. The weighted score is compared to fixed thresholds (method: ${b.method}).`,
     ],

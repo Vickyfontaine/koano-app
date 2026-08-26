@@ -195,14 +195,14 @@ async function handle(req: Request) {
   if (status === 'partial') {
     await sendGapAlert(
       `KOANO archive run ${runWeek}${sharded ? ` shard ${shard}` : ''} was PARTIAL`,
-      `Datasets: ${JSON.stringify(datasets)}. A capture failed or fell below its plausibility floor — history may be incomplete.`,
+      `Datasets: ${JSON.stringify(datasets)}. A capture failed or fell below its plausibility floor. History may be incomplete.`,
     );
   }
   const gaps = sharded ? await missedShards(admin, runWeek, shard) : [];
   for (const gap of gaps) {
     await sendGapAlert(
       `KOANO archive GAP: ${gap.slice(0, 80)}`,
-      `${gap}. That slice of the public record is permanently missing unless re-captured while the source still holds it — re-trigger the cron for the missing shard.`,
+      `${gap}. That slice of the public record is permanently missing unless re-captured while the source still holds it. Re-trigger the cron for the missing shard.`,
     );
   }
 
@@ -212,7 +212,7 @@ async function handle(req: Request) {
   for (const ds of neverCaptured) {
     await sendGapAlert(
       `KOANO archive NEVER-CAPTURED: ${ds}`,
-      `Dataset "${ds}" has zero rows across all history — it has never captured, so it never appeared as a weekly gap. Its capture path is failing or was never reached. Investigate before more history is lost.`,
+      `Dataset "${ds}" has zero rows across all history. It has never captured, so it never appeared as a weekly gap. Its capture path is failing or was never reached. Investigate before more history is lost.`,
     );
   }
 

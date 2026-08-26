@@ -87,7 +87,7 @@ const REPRESENTATIVE_FALLBACK: EntitlementSummary = {
   cd_in_process: 0,
   cd_approval_ratio_pct: null,
   cd_median_timeline_days: null,
-  scope_note: 'REPRESENTATIVE — live DOB filings lookup failed. ' + SCOPE_NOTE,
+  scope_note: 'REPRESENTATIVE: live DOB filings lookup failed. ' + SCOPE_NOTE,
   subject_recent_items: [],
 };
 
@@ -102,7 +102,7 @@ export const nycDobFilings: EntitlementProvider = {
     if (!addr.bbl || !/^\d{10}$/.test(addr.bbl)) {
       return outOfMarketMunicipal<EntitlementSummary>({
         layer: 'DOB entitlement filings',
-        dataset: 'NYC Open Data — DOB Job Application Filings (ic3t-wcy2)',
+        dataset: 'NYC Open Data: DOB Job Application Filings (ic3t-wcy2)',
         fetched_at,
       });
     }
@@ -201,7 +201,7 @@ export const nycDobFilings: EntitlementProvider = {
         ok: true,
         data,
         provenance: 'live',
-        source: 'NYC Open Data — DOB Job Application Filings (ic3t-wcy2)',
+        source: 'NYC Open Data: DOB Job Application Filings (ic3t-wcy2)',
         fetched_at,
       };
     } catch (e) {
@@ -209,7 +209,7 @@ export const nycDobFilings: EntitlementProvider = {
         ok: true,
         data: REPRESENTATIVE_FALLBACK,
         provenance: 'fetch_failed',
-        source: 'NYC Open Data — DOB Job Application Filings (ic3t-wcy2) [FALLBACK]',
+        source: 'NYC Open Data: DOB Job Application Filings (ic3t-wcy2) [FALLBACK]',
         fetched_at,
         error: `Live call failed: ${errMsg(e)}`,
       };

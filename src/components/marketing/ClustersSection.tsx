@@ -70,7 +70,7 @@ export default function ClustersSection() {
           custom={0}
           style={{ marginBottom: "64px" }}
         >
-          <SectionNumber number="01" />
+          <SectionNumber number="05" />
           <h2
             className="text-h2"
             style={{

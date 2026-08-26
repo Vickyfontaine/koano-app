@@ -110,7 +110,7 @@ async function fetchLiveBps(stateFips: string, countyFips: string): Promise<Buil
       `${latest.total_units.toLocaleString()} units permitted in ${latest.year} ` +
       `(${latest.single_family_units.toLocaleString()} single-family, ${latest.multifamily_units.toLocaleString()} in 5+ unit buildings)` +
       `${yoy != null ? `, ${yoy >= 0 ? '+' : ''}${yoy}% vs ${prior?.year}` : ''}. ` +
-      `County-wide market supply — NOT parcel-level activity. Annual data lags the calendar ~12–18 months, ` +
+      `County-wide market supply, NOT parcel-level activity. Annual data lags the calendar ~12–18 months, ` +
       `so this is a structural supply read (the trend/level of new supply the market is adding), not a current-conditions signal.`,
   };
 }
@@ -164,7 +164,7 @@ export const censusBps: BuildingPermitsProvider = {
         provenance: 'live',
         source: 'Census Building Permits Survey (county)',
         fetched_at,
-        error: 'No county FIPS resolved for this address — Building Permits Survey not queried.',
+        error: 'No county FIPS resolved for this address. Building Permits Survey not queried.',
       };
     }
 

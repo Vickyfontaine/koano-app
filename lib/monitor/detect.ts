@@ -267,7 +267,7 @@ const TEMPLATES: Record<SignalType, (r: RawChange) => { title: string; body: str
           // Amendment: the sale-vs-re-registration ambiguity leads, not a parenthetical.
           title: 'Ownership record changed',
           body:
-            `This may be a sale OR the same owner re-registering under a slightly different name — KOANO matches names exactly and cannot tell the two apart. ` +
+            `This may be a sale, or the same owner re-registering under a slightly different name. KOANO matches names exactly and cannot tell the two apart. ` +
             `Registered owner: ${r.before} → ${r.after}.`,
         },
   permit: (r) => ({

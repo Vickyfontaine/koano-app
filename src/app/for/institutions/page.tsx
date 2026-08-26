@@ -4,7 +4,7 @@ import ClusterLanding from "@/components/marketing/ClusterLanding";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Portfolio Intelligence — KOANO",
+  title: "KOANO Portfolio Intelligence",
   description:
     "Monitor everything. Miss nothing. Make institutional decisions with intelligence infrastructure that was previously available only to the world's largest firms.",
 };
@@ -54,17 +54,17 @@ const ENTERPRISE_FEATURES = [
       "Portfolio data is never used to train KOANO's models, and row-level security scopes every record to your account.",
   },
   {
-    title: "SOC 2 Type II — enterprise roadmap",
+    title: "SOC 2 Type II: on the enterprise roadmap",
     description:
       "SOC 2 Type II certification lands with enterprise onboarding. The immutable audit trail that underpins it is already in production.",
   },
   {
-    title: "SSO & role-based access — enterprise roadmap",
+    title: "SSO & role-based access: on the enterprise roadmap",
     description:
       "Sign-in today is email and Google. Single sign-on and role-based access controls arrive with the enterprise tier.",
   },
   {
-    title: "Dedicated data isolation — enterprise roadmap",
+    title: "Dedicated data isolation: on the enterprise roadmap",
     description:
       "Row-level security isolates your records today; dedicated per-tenant environments arrive with enterprise onboarding.",
   },

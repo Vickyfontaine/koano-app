@@ -16,7 +16,7 @@ export default function SectionNumber({
   return (
     <span className={`section-number ${className}`}>
       {number}
-      {label && <> — {label}</>}
+      {label && <> · {label}</>}
     </span>
   );
 }

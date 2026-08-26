@@ -38,7 +38,7 @@ export const freddiePmms: MortgageRateProvider = {
             week: (f[iDate] ?? '').trim(),
             rate_30yr_pct: r30,
             rate_15yr_pct: Number.isFinite(r15) && f[i15]?.trim() ? r15 : null,
-            scope_note: 'National 30-yr / 15-yr fixed weekly average — Freddie Mac PMMS (published direct, attribution required).',
+            scope_note: 'National 30-yr / 15-yr fixed weekly average: Freddie Mac PMMS (published direct, attribution required).',
           };
           return {
             ok: true,

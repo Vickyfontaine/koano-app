@@ -181,7 +181,7 @@ export async function captureSales(admin: SupabaseClient, runWeek: string): Prom
         sale_price: price ? Number(price) : null,
         sale_date,
         captured_week: runWeek,
-        source: 'NYC Open Data — DOF Rolling Calendar Sales (usep-8jbt)',
+        source: 'NYC Open Data: DOF Rolling Calendar Sales (usep-8jbt)',
         capture_version: CAPTURE_VERSION.sales,
       });
     }
@@ -252,7 +252,7 @@ export async function captureTractPermits(admin: SupabaseClient, runWeek: string
       scope_type: 'tract',
       scope_key: key,
       captured_week: runWeek,
-      source: 'NYC Open Data — DOB NOW: Build Approved Permits (rbx6-tga4)',
+      source: 'NYC Open Data, DOB NOW: Build Approved Permits (rbx6-tga4)',
       provenance: 'live',
       capture_version: CAPTURE_VERSION.permitsTract,
       data,
@@ -297,7 +297,7 @@ export function computeShardGaps(
   let pShard = todayShard - 1;
   if (pShard < 0) { pShard = 6; pWeek = priorMonday(runWeek); }
   if (afterGenesis(pWeek, pShard) && !ran(pWeek, pShard)) {
-    gaps.push(`shard ${pShard} of week ${pWeek} did not run — a day of the public record is uncaptured`);
+    gaps.push(`shard ${pShard} of week ${pWeek} did not run. A day of the public record is uncaptured`);
   }
 
   // (2) On Monday, the prior week must be fully complete (all 7 shards) — so a
@@ -309,7 +309,7 @@ export function computeShardGaps(
       if (afterGenesis(prior, s) && !ran(prior, s)) missing.push(s);
     }
     if (missing.length > 0) {
-      gaps.push(`week ${prior} is INCOMPLETE — shard(s) ${missing.join(', ')} never ran (${missing.length}/7 days missing); those properties have no snapshot for that week`);
+      gaps.push(`week ${prior} is INCOMPLETE. Shard(s) ${missing.join(', ')} never ran (${missing.length}/7 days missing); those properties have no snapshot for that week`);
     }
   }
   return gaps;
@@ -508,7 +508,7 @@ export async function captureCdEntitlement(admin: SupabaseClient, runWeek: strin
     };
     out.push({
       dataset: 'entitlement_cd', scope_type: 'community_district', scope_key: cd, captured_week: runWeek,
-      source: 'NYC Open Data — DOB Job Application Filings (ic3t-wcy2)', provenance: 'live',
+      source: 'NYC Open Data: DOB Job Application Filings (ic3t-wcy2)', provenance: 'live',
       capture_version: CAPTURE_VERSION.entitlementCd, data, row_count: agg.total, content_hash: hash(data),
     });
   }
@@ -704,7 +704,7 @@ export async function capturePropertySnapshots(admin: SupabaseClient, runWeek: s
   // snapshotted, so the skip is visible (a gap by design), not silent.
   if (skippedUnconfirmed.length > 0) {
     console.warn(
-      `[archive] skipped ${skippedUnconfirmed.length} location-unconfirmed propert${skippedUnconfirmed.length === 1 ? 'y' : 'ies'} (not snapshotted — re-add with a confident address): ${skippedUnconfirmed.join('; ')}`,
+      `[archive] skipped ${skippedUnconfirmed.length} location-unconfirmed propert${skippedUnconfirmed.length === 1 ? 'y' : 'ies'} (not snapshotted, re-add with a confident address): ${skippedUnconfirmed.join('; ')}`,
     );
   }
 

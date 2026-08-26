@@ -47,7 +47,7 @@ export default function EarlyAccessSection() {
           variants={fadeUp}
           custom={0}
         >
-          <SectionNumber number="03" />
+          <SectionNumber number="06" />
         </motion.div>
 
         {/* Headline + subhead — approved copy (KOANO_COPY.md) */}

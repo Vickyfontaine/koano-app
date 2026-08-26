@@ -33,9 +33,9 @@ export const irsOpportunity: OpportunityZoneProvider = {
         ok: true,
         data: null,
         provenance: 'live',
-        source: 'IRS/Treasury QOZ designations — not queried',
+        source: 'IRS/Treasury QOZ designations, not queried',
         fetched_at,
-        error: 'No census tract resolved for this address — Opportunity Zone status not queried.',
+        error: 'No census tract resolved for this address. Opportunity Zone status not queried.',
       };
     }
 

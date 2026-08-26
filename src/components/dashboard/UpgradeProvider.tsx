@@ -132,7 +132,7 @@ function ConfirmingUpgrade() {
               Confirming your upgrade…
             </h2>
             <p style={{ fontSize: "14px", lineHeight: 1.6, color: "var(--ink-secondary)", margin: 0 }}>
-              Payment received. We&apos;re activating your plan — this usually takes a few seconds.
+              Payment received. We&apos;re activating your plan. This usually takes a few seconds.
             </p>
           </>
         )}

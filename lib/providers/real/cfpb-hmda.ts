@@ -47,7 +47,7 @@ export const cfpbHmda: MortgageDemandProvider = {
         ok: true,
         data: null,
         provenance: 'live',
-        source: 'CFPB HMDA (county) — not queried',
+        source: 'CFPB HMDA (county), not queried',
         fetched_at,
         error: 'No county FIPS resolved',
       };

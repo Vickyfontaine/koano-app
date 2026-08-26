@@ -107,9 +107,9 @@ export default function PropertyMap({
     const sfhaCount = fz.data.zones.filter((z) => z.sfha).length;
     const shadedCount = fz.data.zones.length - sfhaCount;
     if (sfhaCount > 0)
-      legend.push({ label: "Flood — SFHA (1% annual)", provenance: fz.provenance, count: sfhaCount, kind: "flood", accent: FLOOD_SFHA_FILL });
+      legend.push({ label: "Flood: SFHA (1% annual)", provenance: fz.provenance, count: sfhaCount, kind: "flood", accent: FLOOD_SFHA_FILL });
     if (shadedCount > 0)
-      legend.push({ label: "Flood — 0.2% annual", provenance: fz.provenance, count: shadedCount, kind: "flood", accent: FLOOD_SHADED_FILL });
+      legend.push({ label: "Flood: 0.2% annual", provenance: fz.provenance, count: shadedCount, kind: "flood", accent: FLOOD_SHADED_FILL });
   }
 
   // EPA cleanup sites — Superfund red, brownfield amber. Sites come from a wide

@@ -91,7 +91,7 @@ export default function PortfolioMap({
     const titleLines = [
       label,
       v ? `${v.verdict.toUpperCase()} · risk ${v.risk_score}/100 · conf ${v.confidence}` : "Not analyzed yet",
-      uncertain ? "Location unverified — resolved without a cross-check" : "",
+      uncertain ? "Location unverified: resolved without a cross-check" : "",
     ].filter(Boolean);
     return {
       id: p.id,
@@ -153,7 +153,7 @@ export default function PortfolioMap({
           }}
         >
           <p style={{ fontSize: "13px", color: "var(--ink-secondary)", margin: "0 0 6px", fontWeight: 500 }}>
-            {unpinnable.length} holding{unpinnable.length === 1 ? "" : "s"} not on the map — no stored coordinates.
+            {unpinnable.length} holding{unpinnable.length === 1 ? "" : "s"} not on the map. No stored coordinates.
           </p>
           <p style={{ fontSize: "12px", color: "var(--ink-muted)", margin: 0, lineHeight: 1.5 }}>
             {unpinnable.map((p) => p.address_normalized ?? p.address_input).join(" · ")}

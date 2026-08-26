@@ -123,7 +123,7 @@ export default function ReasoningChain({
           }}
         >
           <span style={monoLabel}>
-            Minority signals — {minoritySignals.length}
+            Minority signals: {minoritySignals.length}
           </span>
           {minoritySignals.map((m, i) => (
             <div key={i} style={{ fontSize: "14px", lineHeight: 1.6, color: "var(--ink-secondary)" }}>

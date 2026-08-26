@@ -86,7 +86,7 @@ const REPRESENTATIVE_FALLBACK: BuildingViolationsSummary = {
   bbl: null,
   bin: null,
   scope_note:
-    'REPRESENTATIVE — live NYC Open Data call failed. Typical profile for a mid-size registered multiple dwelling.',
+    'REPRESENTATIVE: live NYC Open Data call failed. Typical profile for a mid-size registered multiple dwelling.',
   hpd_registered: true,
   hpd: {
     total: 45,
@@ -116,7 +116,7 @@ export const nycViolations: BuildingViolationsProvider = {
     if (!parts && !bin) {
       return outOfMarketMunicipal<BuildingViolationsSummary>({
         layer: 'HPD/ECB/DOB violations',
-        dataset: 'NYC Open Data — HPD (wvxf-dwi5), ECB (6bgk-3dad), DOB complaints (eabe-havv)',
+        dataset: 'NYC Open Data: HPD (wvxf-dwi5), ECB (6bgk-3dad), DOB complaints (eabe-havv)',
         fetched_at,
       });
     }
@@ -266,13 +266,13 @@ export const nycViolations: BuildingViolationsProvider = {
 
       const binNote = bin
         ? `DOB complaints by BIN ${bin}`
-        : 'DOB complaints skipped — no assigned BIN on this lot';
+        : 'DOB complaints skipped, no assigned BIN on this lot';
       const data: BuildingViolationsSummary = {
         bbl: addr.bbl,
         bin,
         scope_note: hpdRegistered
           ? `HPD-registered multiple dwelling (BBL ${addr.bbl}) — HPD + ECB by lot; ${binNote}.`
-          : `Not an HPD-registered multiple dwelling — HPD covers rentals with 3+ units, so HPD zeros reflect coverage, not condition. ECB by lot; ${binNote}.`,
+          : `Not an HPD-registered multiple dwelling. HPD covers rentals with 3+ units, so HPD zeros reflect coverage, not condition. ECB by lot; ${binNote}.`,
         hpd_registered: hpdRegistered,
         hpd: {
           total: hpdRows.length,
@@ -303,7 +303,7 @@ export const nycViolations: BuildingViolationsProvider = {
         ok: true,
         data,
         provenance: 'live',
-        source: 'NYC Open Data — HPD violations (wvxf-dwi5), ECB violations (6bgk-3dad), DOB complaints (eabe-havv)',
+        source: 'NYC Open Data: HPD violations (wvxf-dwi5), ECB violations (6bgk-3dad), DOB complaints (eabe-havv)',
         fetched_at,
       };
     } catch (e) {
