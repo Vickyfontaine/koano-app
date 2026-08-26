@@ -761,7 +761,7 @@ CRON_SECRET=
 NYC_OPEN_DATA_APP_TOKEN=   # removes the Socrata per-IP throttle (recommended in prod)
 NOAA_CDO_TOKEN=            # NOAA climate normals (else that signal is omitted)
 HUD_USER_TOKEN=           # HUD Fair Market Rents (else omitted)
-FBI_CRIME_API_KEY=        # FBI CDE state-level crime, keyed to the address's OWN state. Free key: register at api.data.gov/signup (instant), add here AND in Vercel (redeploy). WITHOUT it: NYPD 1-mile live for NYC, and OMITTED elsewhere (data:null + coverage note — never a fabricated stand-in). WITH it: genuine national state-level crime.
+FBI_CRIME_API_KEY=        # FBI CDE state-level crime, keyed to the address's OWN state. Free key: api.data.gov/signup (instant), add here AND in Vercel (redeploy). Order: NYPD 1-mile is PREFERRED for NYC (property-local); FBI is the national FALLBACK (non-NYC) — do NOT put FBI first, or a key silently downgrades NYC to a whole-state estimate. Endpoint (verified 2026): /crime/fbi/cde/summarized/state/{ST}/violent-crime?from=MM-YYYY&to=MM-YYYY (the old /estimate/state/{ST}/... path 404s). Shape: offenses.actuals["<State> Offenses"] monthly; the API ZERO-PADS the requested range, so only use years with all 12 months NONZERO (else a partial current year reads as a crime drop). WITHOUT the key: NYPD live for NYC, OMITTED elsewhere (data:null — never a stand-in).
 CENSUS_API_KEY=           # NOT needed — keyless Census Reporter works with the UA header; only a higher-volume upgrade
 KOANO_RUNTIME_MODEL=      # optional override of the Sonnet-class runtime constant
 KOANO_DAILY_RUN_CAP=      # global spend breaker (default 50)
