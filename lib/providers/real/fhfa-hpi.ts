@@ -19,6 +19,7 @@ import { join } from 'node:path';
 import type { HpiProvider, HpiTrend, ProviderResult, ResolvedAddress } from '../types';
 import { errMsg, fetchText } from './http';
 import { supabaseAdmin } from '../../supabase/server';
+import { uspsFromFips } from './us-states';
 
 const CSV_URLS = [
   'https://www.fhfa.gov/hpi/download/monthly/hpi_master.csv',
@@ -74,10 +75,16 @@ function parseCsvLine(line: string): string[] {
   return out;
 }
 
-let cache: { rows: HpiRow[]; endpoint: string } | null = null;
+const cacheByPlace = new Map<string, { rows: HpiRow[]; endpoint: string }>();
 
-async function loadNyMsaRows(): Promise<{ rows: HpiRow[]; endpoint: string }> {
-  if (cache) return cache;
+// Load the quarterly all-transactions HPI series for a given place — an MSA id
+// (e.g. '35614') OR a State USPS code (e.g. 'IL'). `level` disambiguates a 2-letter
+// state place_id ('State') from an MSA. Parameterized so the SAME downloaded CSV
+// serves the NY metro (NYC) AND the address's own state (everywhere else) — never
+// one hardcoded region for all addresses.
+async function loadRows(placeId: string, level?: string): Promise<{ rows: HpiRow[]; endpoint: string }> {
+  const memo = cacheByPlace.get(placeId);
+  if (memo) return memo;
   let lastErr = '';
 
   // Try 24h disk cache first — FHFA rate-blocks repeated large downloads.
@@ -108,6 +115,7 @@ async function loadNyMsaRows(): Promise<{ rows: HpiRow[]; endpoint: string }> {
         hpi_type: header.indexOf('hpi_type'),
         hpi_flavor: header.indexOf('hpi_flavor'),
         frequency: header.indexOf('frequency'),
+        level: header.indexOf('level'),
         place_id: header.indexOf('place_id'),
         yr: header.indexOf('yr'),
         period: header.indexOf('period'),
@@ -116,10 +124,11 @@ async function loadNyMsaRows(): Promise<{ rows: HpiRow[]; endpoint: string }> {
       const rows: HpiRow[] = [];
       for (let i = 1; i < lines.length; i++) {
         const line = lines[i];
-        if (!line.includes(NY_MSA_ID)) continue;
+        if (!line.includes(placeId)) continue;
         const cols = parseCsvLine(line);
         if (
-          cols[idx.place_id] === NY_MSA_ID &&
+          cols[idx.place_id] === placeId &&
+          (level == null || cols[idx.level] === level) &&
           cols[idx.hpi_type] === 'traditional' &&
           cols[idx.hpi_flavor] === 'all-transactions' &&
           cols[idx.frequency] === 'quarterly'
@@ -130,10 +139,11 @@ async function loadNyMsaRows(): Promise<{ rows: HpiRow[]; endpoint: string }> {
           if (Number.isFinite(yr) && Number.isFinite(index_nsa)) rows.push({ yr, period, index_nsa });
         }
       }
-      if (rows.length === 0) throw new Error('No NY MSA rows found in FHFA master file');
+      if (rows.length === 0) throw new Error(`No HPI rows found for place ${placeId} in FHFA master file`);
       rows.sort((a, b) => a.yr - b.yr || a.period - b.period);
-      cache = { rows, endpoint: url };
-      return cache;
+      const result = { rows, endpoint: url };
+      cacheByPlace.set(placeId, result);
+      return result;
     } catch (e) {
       lastErr = errMsg(e);
     }
@@ -153,24 +163,32 @@ const REPRESENTATIVE_FALLBACK: HpiTrend = {
 // The live download + computation. Throws on failure. Called by the WEEKLY cron
 // (the one place the ~10MB download is acceptable) — never on the request hot
 // path, which reads the durable snapshot below.
-export async function fetchLiveHpi(): Promise<{ data: HpiTrend; endpoint: string }> {
-  const { rows, endpoint } = await loadNyMsaRows();
+function trendFromRows(rows: HpiRow[], region: string, region_type: string): HpiTrend {
   const latest = rows[rows.length - 1];
   const yearAgo = rows[rows.length - 5]; // 4 quarters back
   const fiveYrAgo = rows[rows.length - 21]; // 20 quarters back
   const pct = (from?: HpiRow) =>
     from ? Number((((latest.index_nsa - from.index_nsa) / from.index_nsa) * 100).toFixed(1)) : null;
   return {
-    data: {
-      region: 'New York-Jersey City-White Plains, NY-NJ',
-      region_type: 'Metropolitan Division (35614)',
-      latest_period: `${latest.yr} Q${latest.period}`,
-      latest_index: latest.index_nsa,
-      yoy_change_pct: pct(yearAgo),
-      five_yr_change_pct: pct(fiveYrAgo),
-    },
-    endpoint,
+    region,
+    region_type,
+    latest_period: `${latest.yr} Q${latest.period}`,
+    latest_index: latest.index_nsa,
+    yoy_change_pct: pct(yearAgo),
+    five_yr_change_pct: pct(fiveYrAgo),
   };
+}
+
+export async function fetchLiveHpi(): Promise<{ data: HpiTrend; endpoint: string }> {
+  const { rows, endpoint } = await loadRows(NY_MSA_ID);
+  return { data: trendFromRows(rows, 'New York-Jersey City-White Plains, NY-NJ', 'Metropolitan Division (35614)'), endpoint };
+}
+
+// State-level HPI for a non-NYC address (the address's OWN state, e.g. Illinois for
+// Chicago) — genuine national coverage, never the NY metro served for every address.
+async function fetchStateHpi(usps: string): Promise<{ data: HpiTrend; endpoint: string }> {
+  const { rows, endpoint } = await loadRows(usps, 'State');
+  return { data: trendFromRows(rows, `${usps} statewide`, 'State'), endpoint };
 }
 
 // Parse "YYYY QN" → a monotonic quarter index (year*4 + quarter). null if unparseable.
@@ -218,8 +236,41 @@ async function readArchivedHpi(): Promise<HpiTrend | null> {
 export const fhfaHpi: HpiProvider = {
   name: 'FHFA House Price Index',
 
-  async getHpi(_addr: ResolvedAddress): Promise<ProviderResult<HpiTrend>> {
+  async getHpi(addr: ResolvedAddress): Promise<ProviderResult<HpiTrend>> {
     const fetched_at = new Date().toISOString();
+
+    // NON-NYC: serve the address's OWN state HPI (Illinois for Chicago), live from
+    // the FHFA master file — NEVER the NY metro. The durable archive holds only the
+    // NY metro (the NYC demo path below), so a state read is a live fetch; on
+    // failure it OMITS (data:null, no fabricated NY figure), never a stand-in.
+    if (!addr.bbl) {
+      const usps = uspsFromFips(addr.state_fips);
+      if (!usps) {
+        return {
+          ok: true,
+          data: null,
+          provenance: 'live',
+          source: 'FHFA House Price Index (state-level)',
+          fetched_at,
+          error: 'No US state resolved for this address — FHFA HPI not queried.',
+        };
+      }
+      try {
+        const { data, endpoint } = await fetchStateHpi(usps);
+        return { ok: true, data, provenance: 'live', source: `FHFA House Price Index — ${usps} statewide (all-transactions, quarterly)`, endpoint, fetched_at };
+      } catch (e) {
+        return {
+          ok: true,
+          data: null,
+          provenance: 'fetch_failed',
+          source: `FHFA House Price Index — ${usps} statewide [live call failed]`,
+          fetched_at,
+          error: `Live FHFA state HPI call failed: ${errMsg(e)}`,
+        };
+      }
+    }
+
+    // NYC: the NY metro division via the durable archive (the demo hot path).
     const archived = await readArchivedHpi();
 
     // Hot path: a fresh archived quarter is genuine current FHFA data from our

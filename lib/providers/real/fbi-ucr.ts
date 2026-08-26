@@ -5,6 +5,7 @@
 
 import type { CrimeProvider, CrimeStats, ProviderResult, ResolvedAddress } from '../types';
 import { errMsg, fetchJson } from './http';
+import { uspsFromFips } from './us-states';
 
 const NYPD_CURRENT = 'https://data.cityofnewyork.us/resource/5uac-w243.json'; // complaints, current year to date
 const NYPD_HISTORIC = 'https://data.cityofnewyork.us/resource/qgea-i56i.json'; // complaints, historic
@@ -13,16 +14,6 @@ interface NypdGroupRow {
   law_cat_cd?: string;
   count?: string;
 }
-
-const REPRESENTATIVE_FALLBACK: CrimeStats = {
-  jurisdiction: 'Brooklyn, NY (REPRESENTATIVE — all live crime sources failed)',
-  period: 'last 12 months',
-  violent_incidents: 210,
-  property_incidents: 540,
-  total_incidents: 980,
-  rate_note: 'Typical 1-mile-radius complaint volume for a mixed-use Brooklyn neighborhood.',
-  trend: 'flat',
-};
 
 async function nypdCountsWithinMile(
   dataset: string,
@@ -47,11 +38,17 @@ export const fbiUcr: CrimeProvider = {
     const fetched_at = new Date().toISOString();
 
     // --- Attempt 1: FBI Crime Data Explorer (state-level UCR estimates) ---
+    // Keyed to the ADDRESS's state (derived from state_fips) — never hardcoded, or
+    // every address gets one state's crime. Needs FBI_CRIME_API_KEY (a free
+    // api.data.gov key); DEMO_KEY is heavily rate-limited, so without the key this
+    // usually falls through to the NYC-only NYPD source.
+    const stateAbbr = uspsFromFips(addr.state_fips);
     const fbiKey = process.env.FBI_CRIME_API_KEY ?? 'DEMO_KEY';
-    const fbiUrl =
-      `https://api.usa.gov/crime/fbi/cde/estimate/state/NY/violent-crime` +
-      `?from=2021&to=2023&API_KEY=${fbiKey}`;
+    const fbiUrl = stateAbbr
+      ? `https://api.usa.gov/crime/fbi/cde/estimate/state/${stateAbbr}/violent-crime?from=2021&to=2023&API_KEY=${fbiKey}`
+      : null;
     try {
+      if (!fbiUrl) throw new Error('no state resolved for FBI CDE');
       const res = await fetchJson<Record<string, unknown>>(fbiUrl, { retries: 0, timeoutMs: 15000 });
       const results = (res as { results?: Array<Record<string, unknown>> }).results;
       if (Array.isArray(results) && results.length > 0) {
@@ -63,7 +60,7 @@ export const fbiUcr: CrimeProvider = {
           return {
             ok: true,
             data: {
-              jurisdiction: 'New York State (FBI UCR estimate)',
+              jurisdiction: `${stateAbbr} statewide (FBI UCR estimate)`,
               period: String(latest.year ?? latest.data_year ?? '2023'),
               violent_incidents: latestCount,
               property_incidents: null,
@@ -89,7 +86,7 @@ export const fbiUcr: CrimeProvider = {
       // fall through to NYPD live data
     }
 
-    // --- Attempt 2 (still LIVE): NYPD complaints within 1 mile ---
+    // --- Attempt 2 (still LIVE, NYC ONLY): NYPD complaints within 1 mile ---
     const nypdEndpoint = `${NYPD_CURRENT} (+ ${NYPD_HISTORIC} for prior-year trend)`;
     try {
       const current = await nypdCountsWithinMile(NYPD_CURRENT, addr.latitude, addr.longitude);
@@ -97,52 +94,72 @@ export const fbiUcr: CrimeProvider = {
       const misd = current['MISDEMEANOR'] ?? 0;
       const viol = current['VIOLATION'] ?? 0;
       const total = violent + misd + viol;
-      if (total === 0) throw new Error('NYPD query returned zero rows — treating as failure');
 
-      // Prior-year same-scope count for a trend signal (best-effort)
-      let trend: CrimeStats['trend'] = 'unknown';
-      try {
-        const prior = await nypdCountsWithinMile(
-          NYPD_HISTORIC,
-          addr.latitude,
-          addr.longitude,
-          `cmplnt_fr_dt > '2023-01-01T00:00:00.000' AND cmplnt_fr_dt < '2024-01-01T00:00:00.000'`
-        );
-        const priorTotal = Object.values(prior).reduce((a, b) => a + b, 0);
-        if (priorTotal > 0) {
-          const annualized = total; // YTD vs full prior year — direction only
-          trend = annualized > priorTotal ? 'rising' : annualized < priorTotal * 0.5 ? 'falling' : 'flat';
+      if (total > 0) {
+        // Prior-year same-scope count for a trend signal (best-effort)
+        let trend: CrimeStats['trend'] = 'unknown';
+        try {
+          const prior = await nypdCountsWithinMile(
+            NYPD_HISTORIC,
+            addr.latitude,
+            addr.longitude,
+            `cmplnt_fr_dt > '2023-01-01T00:00:00.000' AND cmplnt_fr_dt < '2024-01-01T00:00:00.000'`
+          );
+          const priorTotal = Object.values(prior).reduce((a, b) => a + b, 0);
+          if (priorTotal > 0) {
+            const annualized = total; // YTD vs full prior year — direction only
+            trend = annualized > priorTotal ? 'rising' : annualized < priorTotal * 0.5 ? 'falling' : 'flat';
+          }
+        } catch {
+          trend = 'unknown';
         }
-      } catch {
-        trend = 'unknown';
+
+        return {
+          ok: true,
+          data: {
+            jurisdiction: `1-mile radius of ${addr.normalized}`,
+            period: 'current year to date',
+            violent_incidents: violent,
+            property_incidents: misd,
+            total_incidents: total,
+            rate_note:
+              'NYPD complaint counts by law category (FELONY/MISDEMEANOR/VIOLATION) within 1609m of the property. FBI CDE unavailable without API key; this is a live local substitute.',
+            trend,
+          },
+          provenance: 'live',
+          source: 'NYPD Complaint Data via NYC Open Data (5uac-w243)',
+          endpoint: nypdEndpoint,
+          fetched_at,
+        };
       }
 
+      // Zero rows = the address is OUTSIDE NYPD's geography (a non-NYC address).
+      // That is a coverage gap, NOT a failure and NOT a transient problem — so OMIT
+      // (data:null tagged live), never a fabricated NYC-flavored stand-in. The
+      // omission rule: with no FBI key, FBI CDE is unavailable and NYPD covers NYC
+      // only, so no free crime source applies here. A real FBI_CRIME_API_KEY lights
+      // this up nationally (see CLAUDE.md §14).
       return {
         ok: true,
-        data: {
-          jurisdiction: `1-mile radius of ${addr.normalized}`,
-          period: 'current year to date',
-          violent_incidents: violent,
-          property_incidents: misd,
-          total_incidents: total,
-          rate_note:
-            'NYPD complaint counts by law category (FELONY/MISDEMEANOR/VIOLATION) within 1609m of the property. FBI CDE unavailable without API key; this is a live local substitute.',
-          trend,
-        },
+        data: null,
         provenance: 'live',
-        source: 'NYPD Complaint Data via NYC Open Data (5uac-w243)',
+        source: 'FBI Crime Data Explorer / NYPD — no crime source for this location',
         endpoint: nypdEndpoint,
         fetched_at,
+        error:
+          'No live crime source for this address: FBI Crime Data Explorer needs FBI_CRIME_API_KEY (free), and NYPD complaint data covers NYC only.',
       };
     } catch (e) {
+      // A genuine transient failure of the live NYPD call → fetch_failed, data:null.
+      // Never a fabricated NYC-flavored stand-in.
       return {
         ok: true,
-        data: REPRESENTATIVE_FALLBACK,
+        data: null,
         provenance: 'fetch_failed',
-        source: 'FBI UCR / NYPD [FALLBACK]',
+        source: 'NYPD complaint data [live call failed]',
         endpoint: nypdEndpoint,
         fetched_at,
-        error: `All live crime sources failed: ${errMsg(e)}`,
+        error: `Live crime call failed: ${errMsg(e)}`,
       };
     }
   },
