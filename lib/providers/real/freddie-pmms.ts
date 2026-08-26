@@ -14,13 +14,6 @@ import { errMsg, fetchText } from './http';
 
 const PMMS_CSV = 'https://www.freddiemac.com/pmms/docs/PMMS_history.csv';
 
-const REPRESENTATIVE_FALLBACK: MortgageRateInfo = {
-  week: 'REPRESENTATIVE',
-  rate_30yr_pct: 6.7,
-  rate_15yr_pct: 6.0,
-  scope_note: 'REPRESENTATIVE — Freddie Mac PMMS was unreachable; a labeled recent-rate stand-in.',
-};
-
 export const freddiePmms: MortgageRateProvider = {
   name: 'Freddie Mac PMMS mortgage rate',
 
@@ -61,7 +54,7 @@ export const freddiePmms: MortgageRateProvider = {
     } catch (e) {
       return {
         ok: true,
-        data: REPRESENTATIVE_FALLBACK,
+        data: null,
         provenance: 'fetch_failed',
         source: 'Freddie Mac PMMS [FALLBACK]',
         endpoint: PMMS_CSV,

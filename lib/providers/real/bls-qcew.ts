@@ -8,16 +8,6 @@ import { errMsg, fetchText } from './http';
 
 const QCEW = 'https://data.bls.gov/cew/data/api';
 
-const REPRESENTATIVE_FALLBACK: EmploymentInfo = {
-  period: 'REPRESENTATIVE',
-  total_employment: 900000,
-  avg_weekly_wage_usd: 1200,
-  employment_yoy_pct: 2,
-  avg_weekly_wage_yoy_pct: 3,
-  establishments: 70000,
-  scope_note: 'REPRESENTATIVE — BLS QCEW was unreachable or no county resolved; a labeled large-county stand-in.',
-};
-
 // The most recent ~6 quarters, newest first. QCEW publishes ~2 quarters in
 // arrears, so the first candidate(s) 404 until we hit the latest published one.
 function recentQuarters(): Array<{ year: number; qtr: number }> {
@@ -74,9 +64,9 @@ export const blsQcew: EmploymentProvider = {
     if (!addr.state_fips || !addr.county_fips) {
       return {
         ok: true,
-        data: { ...REPRESENTATIVE_FALLBACK, scope_note: 'No county FIPS resolved — BLS QCEW could not be queried.' },
-        provenance: 'fetch_failed',
-        source: 'BLS QCEW [no FIPS]',
+        data: null,
+        provenance: 'live',
+        source: 'BLS QCEW (county) — not queried',
         fetched_at,
         error: 'No county FIPS resolved',
       };
@@ -110,7 +100,7 @@ export const blsQcew: EmploymentProvider = {
     } catch (e) {
       return {
         ok: true,
-        data: REPRESENTATIVE_FALLBACK,
+        data: null,
         provenance: 'fetch_failed',
         source: 'BLS QCEW [FALLBACK]',
         endpoint: lastEndpoint,

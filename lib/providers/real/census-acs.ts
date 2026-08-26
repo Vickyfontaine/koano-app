@@ -13,17 +13,6 @@ function num(v: unknown): number | null {
   return Number.isFinite(n) && n >= 0 ? n : null;
 }
 
-const REPRESENTATIVE_FALLBACK: AcsDemographics = {
-  tract_geoid: 'unknown',
-  tract_name: 'REPRESENTATIVE — live Census ACS calls failed (typical Brownstone-Brooklyn tract)',
-  population: 3800,
-  median_household_income: 128000,
-  median_gross_rent: 2900,
-  median_home_value: 1250000,
-  bachelors_or_higher_pct: 68,
-  vintage: 'ACS 5-year [REPRESENTATIVE]',
-};
-
 // --- Census Reporter (keyless) ---
 
 interface CensusReporterResponse {
@@ -134,11 +123,11 @@ export const censusAcs: DemographicsProvider = {
     if (!addr.tract_geoid) {
       return {
         ok: true,
-        data: REPRESENTATIVE_FALLBACK,
-        provenance: 'fetch_failed',
-        source: 'US Census ACS 5-year [FALLBACK]',
+        data: null,
+        provenance: 'live',
+        source: 'US Census ACS 5-year — not queried',
         fetched_at,
-        error: 'No census tract resolved for address',
+        error: 'No census tract resolved for this address — ACS not queried.',
       };
     }
 
@@ -167,7 +156,7 @@ export const censusAcs: DemographicsProvider = {
     } catch (e) {
       return {
         ok: true,
-        data: REPRESENTATIVE_FALLBACK,
+        data: null,
         provenance: 'fetch_failed',
         source: 'US Census ACS 5-year [FALLBACK]',
         fetched_at,

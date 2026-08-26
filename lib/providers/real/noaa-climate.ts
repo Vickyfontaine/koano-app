@@ -24,15 +24,6 @@ interface DataResponse {
   results?: Array<{ datatype?: string; value?: number }>;
 }
 
-const REPRESENTATIVE_FALLBACK: ClimateInfo = {
-  station_id: null,
-  station_name: 'REPRESENTATIVE — live NOAA call failed',
-  normals_period: '1991-2020',
-  annual_avg_temp_f: 55,
-  annual_precip_in: 46,
-  scope_note: 'REPRESENTATIVE — NOAA NCEI was unreachable; a labeled Northeast-metro climate stand-in.',
-};
-
 export const noaaClimate: ClimateProvider = {
   name: 'NOAA NCEI climate normals (1991–2020)',
 
@@ -108,7 +99,7 @@ export const noaaClimate: ClimateProvider = {
     } catch (e) {
       return {
         ok: true,
-        data: REPRESENTATIVE_FALLBACK,
+        data: null,
         provenance: 'fetch_failed',
         source: 'NOAA NCEI climate normals [FALLBACK]',
         fetched_at,

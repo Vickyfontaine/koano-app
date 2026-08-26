@@ -38,13 +38,6 @@ const SFHA_ZONES = new Set(['A', 'AE', 'AH', 'AO', 'AR', 'A99', 'V', 'VE']);
 // Half-width of the map query box, in degrees (~1 mi at NYC latitude).
 const ZONE_BOX_DEG = 0.013;
 
-const REPRESENTATIVE_FALLBACK: FloodInfo = {
-  flood_zone: 'X (REPRESENTATIVE — live FEMA NFHL call failed)',
-  zone_subtype: 'AREA OF MINIMAL FLOOD HAZARD',
-  in_special_flood_hazard_area: false,
-  static_bfe_ft: null,
-};
-
 export const femaFlood: FloodProvider = {
   name: 'FEMA National Flood Hazard Layer',
 
@@ -85,7 +78,7 @@ export const femaFlood: FloodProvider = {
     } catch (e) {
       return {
         ok: true,
-        data: REPRESENTATIVE_FALLBACK,
+        data: null,
         provenance: 'fetch_failed',
         source: 'FEMA National Flood Hazard Layer [FALLBACK]',
         endpoint: url,
@@ -147,19 +140,17 @@ export const femaFlood: FloodProvider = {
         fetched_at,
       };
     } catch (e) {
-      // A failed geometry fetch must not read as "no flood zones here": return
-      // an empty, representative-labeled result the map surfaces as unavailable.
+      // A failed geometry fetch must not read as "no flood zones here" — OMIT
+      // (data:null, fetch_failed) so the map surfaces boundaries as unavailable,
+      // never an empty set that reads as "no flood zones".
       return {
         ok: true,
-        data: {
-          zones: [],
-          scope_note: 'REPRESENTATIVE — FEMA NFHL geometry call failed; flood-zone boundaries unavailable.',
-        },
+        data: null,
         provenance: 'fetch_failed',
-        source: 'FEMA National Flood Hazard Layer [FALLBACK]',
+        source: 'FEMA National Flood Hazard Layer [live call failed]',
         endpoint: url,
         fetched_at,
-        error: `Live call failed: ${errMsg(e)}`,
+        error: `Live geometry call failed: ${errMsg(e)}`,
       };
     }
   },

@@ -26,15 +26,6 @@ interface HmdaResponse {
   aggregations?: Aggregation[];
 }
 
-const REPRESENTATIVE_FALLBACK: MortgageDemandInfo = {
-  year: HMDA_YEAR,
-  originations: 9000,
-  denials: 2600,
-  denial_rate_pct: 22,
-  originations_yoy_pct: -8,
-  scope_note: 'REPRESENTATIVE — CFPB HMDA was unreachable or no county resolved; a labeled urban-county stand-in.',
-};
-
 async function originationsAndDenials(fips: string, year: number): Promise<{ orig: number; denied: number }> {
   const res = await fetchJson<HmdaResponse>(
     `${HMDA}?counties=${fips}&years=${year}&actions_taken=1,3`,
@@ -54,9 +45,9 @@ export const cfpbHmda: MortgageDemandProvider = {
     if (!addr.state_fips || !addr.county_fips) {
       return {
         ok: true,
-        data: { ...REPRESENTATIVE_FALLBACK, scope_note: 'No county FIPS resolved — CFPB HMDA could not be queried.' },
-        provenance: 'fetch_failed',
-        source: 'CFPB HMDA [no FIPS]',
+        data: null,
+        provenance: 'live',
+        source: 'CFPB HMDA (county) — not queried',
         fetched_at,
         error: 'No county FIPS resolved',
       };
@@ -98,7 +89,7 @@ export const cfpbHmda: MortgageDemandProvider = {
     } catch (e) {
       return {
         ok: true,
-        data: REPRESENTATIVE_FALLBACK,
+        data: null,
         provenance: 'fetch_failed',
         source: 'CFPB HMDA [FALLBACK]',
         fetched_at,

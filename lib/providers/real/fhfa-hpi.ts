@@ -151,14 +151,6 @@ async function loadRows(placeId: string, level?: string): Promise<{ rows: HpiRow
   throw new Error(lastErr);
 }
 
-const REPRESENTATIVE_FALLBACK: HpiTrend = {
-  region: 'New York-Jersey City-White Plains, NY-NJ (REPRESENTATIVE — live FHFA download failed)',
-  region_type: 'MSA',
-  latest_period: 'recent quarter',
-  latest_index: 400,
-  yoy_change_pct: 4.5,
-  five_yr_change_pct: 38,
-};
 
 // The live download + computation. Throws on failure. Called by the WEEKLY cron
 // (the one place the ~10MB download is acceptable) — never on the request hot
@@ -314,9 +306,9 @@ export const fhfaHpi: HpiProvider = {
       }
       return {
         ok: true,
-        data: REPRESENTATIVE_FALLBACK,
+        data: null,
         provenance: 'fetch_failed',
-        source: 'FHFA House Price Index [FALLBACK]',
+        source: 'FHFA House Price Index [live call failed]',
         fetched_at,
         error: `Live call failed: ${errMsg(e)}`,
       };

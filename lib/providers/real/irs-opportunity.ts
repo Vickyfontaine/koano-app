@@ -31,16 +31,11 @@ export const irsOpportunity: OpportunityZoneProvider = {
     if (!geoid) {
       return {
         ok: true,
-        data: {
-          tract_geoid: 'unknown',
-          is_opportunity_zone: false,
-          designation_note:
-            'REPRESENTATIVE — census tract could not be resolved; defaulting to non-OZ (most NYC tracts are not designated).',
-        },
-        provenance: 'fetch_failed',
-        source: 'IRS/Treasury QOZ list [FALLBACK]',
+        data: null,
+        provenance: 'live',
+        source: 'IRS/Treasury QOZ designations — not queried',
         fetched_at,
-        error: 'No tract GEOID resolved for address',
+        error: 'No census tract resolved for this address — Opportunity Zone status not queried.',
       };
     }
 
@@ -74,16 +69,11 @@ export const irsOpportunity: OpportunityZoneProvider = {
 
     return {
       ok: true,
-      data: {
-        tract_geoid: geoid,
-        is_opportunity_zone: false,
-        designation_note:
-          'REPRESENTATIVE — live QOZ lookup failed; defaulting to non-OZ (most NYC tracts are not designated). Verify against the CDFI Fund list.',
-      },
+      data: null,
       provenance: 'fetch_failed',
-      source: 'IRS/Treasury QOZ list [FALLBACK]',
+      source: 'IRS/Treasury QOZ designations [live call failed]',
       fetched_at,
-      error: `Live calls failed: ${lastError}`,
+      error: `Live QOZ lookup failed: ${lastError}`,
     };
   },
 };

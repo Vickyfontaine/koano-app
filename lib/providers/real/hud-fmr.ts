@@ -45,17 +45,6 @@ function num(v: unknown): number | null {
   return Number.isFinite(n) && n > 0 ? n : null;
 }
 
-const REPRESENTATIVE_FALLBACK: FairMarketRentInfo = {
-  area_name: 'REPRESENTATIVE',
-  fiscal_year: 'unknown',
-  fmr_studio: 1900,
-  fmr_1br: 2100,
-  fmr_2br: 2500,
-  fmr_3br: 3200,
-  fmr_4br: 3500,
-  scope_note: `REPRESENTATIVE — HUD USER FMR was unreachable; a labeled metro stand-in. ${HUD_DISCLAIMER}`,
-};
-
 export const hudFmr: FairMarketRentProvider = {
   name: 'HUD Fair Market Rents',
 
@@ -120,7 +109,7 @@ export const hudFmr: FairMarketRentProvider = {
     } catch (e) {
       return {
         ok: true,
-        data: REPRESENTATIVE_FALLBACK,
+        data: null,
         provenance: 'fetch_failed',
         source: 'HUD Fair Market Rents [FALLBACK]',
         fetched_at,

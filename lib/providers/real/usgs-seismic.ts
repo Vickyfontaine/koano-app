@@ -23,16 +23,6 @@ interface ComcatResponse {
   features?: Array<{ properties?: { mag?: number | null } }>;
 }
 
-const REPRESENTATIVE_FALLBACK: SeismicInfo = {
-  pga_g: 0.06,
-  ss_g: 0.28,
-  s1_g: 0.07,
-  design_reference: 'REPRESENTATIVE — live USGS call failed (typical low-seismic Northeast profile)',
-  historical_quakes_50km_m3plus: null,
-  largest_nearby_magnitude: null,
-  scope_note: 'REPRESENTATIVE — USGS building-codes service was unreachable; a labeled low-seismic stand-in.',
-};
-
 async function fetchDesign(lat: number, lon: number): Promise<DesignResponse['response']> {
   const url = `${DESIGN}?latitude=${lat}&longitude=${lon}&riskCategory=II&siteClass=D&title=KOANO`;
   const res = await fetchJson<DesignResponse>(url, { timeoutMs: 25000 });
@@ -95,7 +85,7 @@ export const usgsSeismic: SeismicProvider = {
     } catch (e) {
       return {
         ok: true,
-        data: REPRESENTATIVE_FALLBACK,
+        data: null,
         provenance: 'fetch_failed',
         source: 'USGS seismic hazard [FALLBACK]',
         fetched_at,

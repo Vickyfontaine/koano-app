@@ -32,17 +32,6 @@ interface OpenFemaResponse {
   DisasterDeclarationsSummaries?: DeclarationRow[];
 }
 
-const REPRESENTATIVE_FALLBACK: DisasterHistoryInfo = {
-  fips_state: null,
-  fips_county: null,
-  total_declarations: 12,
-  declarations_last_10yr: 4,
-  distinct_incident_types: ['Severe Storm', 'Flood', 'Hurricane'],
-  most_common_incident: 'Severe Storm',
-  most_recent_declaration: 'REPRESENTATIVE — live OpenFEMA call failed',
-  scope_note: `REPRESENTATIVE — OpenFEMA was unreachable; a labeled coastal-metro stand-in. ${FEMA_DISCLAIMER}`,
-};
-
 export const openFemaDisasters: DisasterHistoryProvider = {
   name: 'OpenFEMA disaster declaration history',
 
@@ -52,15 +41,11 @@ export const openFemaDisasters: DisasterHistoryProvider = {
     if (!addr.state_fips || !addr.county_fips) {
       return {
         ok: true,
-        data: {
-          ...REPRESENTATIVE_FALLBACK,
-          most_recent_declaration: null,
-          scope_note: `No county FIPS resolved for this address, so disaster history could not be queried. ${FEMA_DISCLAIMER}`,
-        },
-        provenance: 'fetch_failed',
-        source: 'OpenFEMA DisasterDeclarationsSummaries [no FIPS]',
+        data: null,
+        provenance: 'live',
+        source: 'OpenFEMA DisasterDeclarationsSummaries — not queried',
         fetched_at,
-        error: 'No state/county FIPS resolved',
+        error: `No county FIPS resolved for this address — disaster history not queried. ${FEMA_DISCLAIMER}`,
       };
     }
 
@@ -114,9 +99,9 @@ export const openFemaDisasters: DisasterHistoryProvider = {
     } catch (e) {
       return {
         ok: true,
-        data: { ...REPRESENTATIVE_FALLBACK, fips_state: addr.state_fips, fips_county: addr.county_fips },
+        data: null,
         provenance: 'fetch_failed',
-        source: 'FEMA OpenFEMA [FALLBACK]',
+        source: 'FEMA OpenFEMA [live call failed]',
         endpoint: url,
         fetched_at,
         error: `Live call failed: ${errMsg(e)}`,
