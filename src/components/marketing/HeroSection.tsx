@@ -20,9 +20,9 @@ const fadeUp = {
 };
 
 const STATS = [
-  { value: "Dozens", label: "Data sources" },
-  { value: "5", label: "Specialist agents" },
-  { value: "6–18mo", label: "Signal advantage" },
+  { value: "Every figure", label: "Data-Sourced" },
+  { value: "Every verdict", label: "Reproducible" },
+  { value: "Every step", label: "Auditable" },
 ];
 
 export default function HeroSection() {
@@ -128,9 +128,10 @@ export default function HeroSection() {
             marginBottom: "40px",
           }}
         >
-          KOANO deploys five specialist AI agents that ingest dozens of data
-          sources, reason autonomously, and deliver a single verdict, with
-          every step of the thinking visible and auditable.
+          KOANO deploys five specialist agents that read every public record
+          touching a property, scattered across federal, state and city
+          agencies. Each weighs its own evidence, and the verdict they produce
+          shows its arithmetic figure by figure.
         </motion.p>
 
         {/* CTA row */}

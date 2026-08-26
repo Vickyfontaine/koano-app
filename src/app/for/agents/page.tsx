@@ -13,50 +13,50 @@ const FEATURES = [
   {
     title: "Velocity heatmap",
     description:
-      "See the fastest-changing neighborhoods at a glance, where prices are moving before anyone notices.",
+      "See the fastest-changing neighborhoods at a glance, where recorded sale prices are moving first.",
   },
   {
-    title: "Absorption rate analysis",
+    title: "Absorption analysis",
     description:
-      "Absorption rate by micro-market, so you know which neighborhoods are soaking up inventory.",
+      "Sales velocity by micro-market, drawn from live NYC recorded sales, so you know which neighborhoods are soaking up inventory.",
   },
   {
-    title: "DOM trend detection",
+    title: "Price trend detection",
     description:
-      "Where days-on-market is compressing. It is the early signal that a market is about to heat up.",
+      "Where recorded sale prices are climbing or softening across a submarket, read from live DOF sales.",
   },
   {
-    title: "Price reduction patterns",
+    title: "Distance-ranked comps",
     description:
-      "Detect price reduction patterns before they become trends. Spot motivated sellers early.",
+      "Recorded sales joined to their parcel centroids and ranked by true distance from the subject, then time-adjusted to today.",
   },
   {
     title: "CMA builder",
     description:
-      "Comparative market analysis builder with KOANO's early-signal overlay for more accurate comps.",
+      "Comparative market analysis with KOANO's early-signal overlay, every comp sourced and dated.",
   },
   {
-    title: "Pricing recommendation engine",
+    title: "Pricing recommendation",
     description:
-      "AI-powered pricing recommendations that factor in signals your competitors don't have access to.",
+      "A pricing recommendation with the comps, the price trend, and the reasoning shown alongside it.",
   },
 ];
 
 const CLIENT_TOOLS = [
   {
-    title: "Client-ready PDF reports",
+    title: "Client neighborhood report",
     description:
-      "Generate polished, branded PDF reports with KOANO intelligence that make you look like the smartest agent in the room.",
+      "A polished, client-ready report that turns the live record into a narrative you can hand over, with every figure sourced.",
   },
   {
-    title: "Neighborhood narrative generator",
+    title: "Pricing recommendation sheet",
     description:
-      "AI-written neighborhood narratives that turn data into compelling stories for your clients.",
+      "The recommended price, the comps behind it, and the price trend, laid out for a listing conversation.",
   },
   {
-    title: "Lead generation signals",
+    title: "Buyer and seller net sheets",
     description:
-      "Identify likely sellers from infrastructure signals, price pattern detection, and ownership tenure analysis.",
+      "The numbers a client needs to decide, generated from the analysis and labeled with where each figure came from.",
   },
 ];
 
@@ -72,7 +72,7 @@ export default function AgentsPage() {
         price="From $149 / month"
         priceRange="$149–$299 / month"
         headline="The MLS tells you what already happened."
-        subhead="KOANO reads the signals that move first. Permit filings, price momentum, search interest, the things that show up in the data months before they show up in a comp."
+        subhead="KOANO reads the signals that move first. Permit filings, price momentum, and lending activity, the things that show up in the public record before they show up in a comp."
         users="agents, brokers, and mortgage officers"
         features={FEATURES}
         secondaryFeatures={{

@@ -8,31 +8,31 @@ const AGENTS = [
   {
     number: "01",
     name: "Market timing",
-    description: "Analyzes pricing velocity, DOM trends, and absorption rates to determine optimal timing.",
+    description: "Reads recorded-sale prices, sales velocity, mortgage rates, and rents to judge whether conditions favor buying, selling, or waiting.",
     output: "Timing verdict · Confidence score · Signal window",
   },
   {
     number: "02",
     name: "Infrastructure pipeline",
-    description: "Tracks DOT data, permits, zoning variances, and municipal bonds for price-moving infrastructure.",
+    description: "Tracks approved building permits and zoning around a site for the construction and development that moves value.",
     output: "Infrastructure impact · Price effect · Timeline",
   },
   {
     number: "03",
     name: "Demand sentiment",
-    description: "Monitors foot traffic, search trends, and review velocity for real-time demand signals.",
+    description: "Reads mortgage lending, employment and wages, and household migration for where housing demand is heading.",
     output: "Demand momentum · Gentrification stage",
   },
   {
     number: "04",
     name: "Risk & volatility",
-    description: "Evaluates climate risk, crime data, and STR saturation for comprehensive risk assessment.",
-    output: "Risk score · Risk breakdown · Risk-adjusted return",
+    description: "Weighs flood and climate risk, crime, environmental contamination, and building violations into a single risk score.",
+    output: "Risk score · Dominant risk factors",
   },
   {
     number: "05",
     name: "Regulatory & policy",
-    description: "Monitors zoning changes, city council decisions, FEMA updates, and opportunity zones.",
+    description: "Reads zoning, Opportunity Zone status, and landlord and violation records for the regulatory risk on a property.",
     output: "Regulatory risk · Entitlement timeline",
   },
 ];
@@ -295,7 +295,7 @@ export default function AgentsSection() {
                   marginBottom: "8px",
                 }}
               >
-                Buy — High Confidence
+                Buy · High confidence
               </h3>
               <p
                 style={{

@@ -16,52 +16,47 @@ const FEATURES = [
       "Sites ranked by risk-adjusted opportunity. The single number tells you where to look first.",
   },
   {
-    title: "Zoning & entitlement risk",
+    title: "Entitlement risk, from the facts",
     description:
-      "Zoning and entitlement risk breakdown per site, including variance history and approval likelihood.",
+      "An entitlement risk score computed from live PLUTO facts: FAR headroom, special-district and mixed-use constraints, with the model adjusting the number rather than pinning it to the middle.",
   },
   {
-    title: "BSA approval rate history",
+    title: "As-of-right envelope",
     description:
-      "Board of Standards and Appeals approval rate history by submarket. Know your odds before you apply.",
+      "What the zoning actually allows on the lot, read from live MapPLUTO, so you see the buildable envelope before you commit.",
   },
   {
-    title: "Community board sentiment",
+    title: "Permit and violation history",
     description:
-      "Predicted opposition level from community boards, based on historical patterns and current sentiment.",
+      "The site's full DOB permit and job-filing record and its HPD and ECB violation history, pulled live.",
   },
   {
-    title: "Permitting timeline benchmarks",
+    title: "Opportunity Zone and incentive status",
     description:
-      "Permitting timeline benchmarks by jurisdiction. Plan your schedule with data, not guesswork.",
+      "Live Opportunity Zone designation and LIHTC eligibility from IRS and HUD, tied to the parcel's own geography.",
   },
   {
     title: "Multi-site comparison",
     description:
-      "Compare multiple development sites side-by-side with KOANO's composite scoring across all risk factors.",
+      "Compare up to three sites side by side, each run through all five agents, ranked by composite score with the reasoning attached.",
   },
 ];
 
 const PRO_FORMA_FEATURES = [
   {
-    title: "Land cost benchmarks",
+    title: "Land and construction benchmarks",
     description:
-      "Land cost benchmarks by micro-market and zoning class. Know what you should be paying.",
+      "Representative benchmarks for the market today, labeled as representative on every figure. A CoStar or HouseCanary license turns them live.",
   },
   {
-    title: "Construction cost per SF",
+    title: "Pro forma inputs, sourced",
     description:
-      "Construction cost per square foot benchmarks updated with real permit data from Shovels.ai.",
+      "Every input the model uses carries its provenance, so a representative stand-in is never mistaken for a live number.",
   },
   {
-    title: "Absorption projection",
+    title: "What funding unlocks",
     description:
-      "How fast will your units sell or lease? Projections based on real-time demand signals.",
-  },
-  {
-    title: "Exit cap rate estimate",
-    description:
-      "Exit cap rate estimates informed by KOANO's 5 agents, not just historical averages.",
+      "The upgrade is a one-line change in the provider registry. No rework, no re-architecture, the moment the data is funded.",
   },
 ];
 
@@ -77,7 +72,7 @@ export default function DevelopersPage() {
         price="From $499 / month"
         priceRange="$499–$1,499 / month"
         headline="You already know the site. The question is what happens next to it."
-        subhead="Five agents read the zoning, the permit history, and the public investment around a parcel. They converge on a single verdict, and the reasoning comes with it."
+        subhead="Five agents read the zoning, the permit history, and the development activity around a parcel. They converge on a single verdict, and the reasoning comes with it."
         users="CRE brokers, developers, and contractors"
         features={FEATURES}
         secondaryFeatures={{

@@ -32,10 +32,10 @@ const TIERS = [
     features: [
       "Automated valuation model with velocity indicator",
       "Equity position & 12-month projection",
-      "Neighborhood signal feed — permits, zoning, infrastructure",
+      "Neighborhood signal feed: permits, zoning, and nearby development",
       "KOANO verdict: Hold / prepare to sell / sell now",
       "Scenario modeling for nearby developments",
-      "Push alert feed for significant signals",
+      "Weekly change feed for your building",
     ],
     addOn: "Cap rate, ARV modeling & cash-on-cash projections at $49/mo",
     href: "/for/community",
@@ -68,13 +68,13 @@ const TIERS = [
     priceRange: "$499–$1,499 / month",
     users: "CRE brokers · Developers · Contractors",
     features: [
-      "Multi-site comparison — KOANO composite score",
-      "Zoning & entitlement risk breakdown per site",
-      "BSA approval rate history by submarket",
-      "Community board sentiment & opposition prediction",
-      "Pro forma intelligence — land costs, construction benchmarks",
+      "Multi-site comparison, ranked by KOANO composite score",
+      "Entitlement risk computed from live PLUTO facts",
+      "As-of-right envelope from live zoning",
+      "Permit and violation history per site",
+      "Opportunity Zone and LIHTC eligibility, live",
     ],
-    addOn: "Permitting timeline benchmarks & absorption projections",
+    addOn: "Pro forma benchmarks, representative until a CoStar or HouseCanary license is funded",
     href: "/for/developers",
   },
   {
@@ -86,10 +86,10 @@ const TIERS = [
     priceRange: "$1,499–$4,999 / month + custom",
     users: "CEOs · CFOs · CIOs · REITs · PE firms",
     features: [
-      "Real-time NAV tracking across entire portfolio",
+      "NAV tracking across the portfolio",
       "FFO and NOI monitoring by asset, market, asset class",
       "Portfolio risk score with per-asset breakdown",
-      "Monday morning briefing — what changed overnight",
+      "Monday morning briefing on what changed this week",
       "Hold / sell / reposition analysis per asset",
       "Your portfolio data is never used to train KOANO's models",
     ],
@@ -441,12 +441,12 @@ export default function PricingContent() {
                 {
                   question: "What data sources power the verdict?",
                   answer:
-                    "Roughly a dozen sources today. The live ones are public and real: NYC zoning and permit records, Census demographics, FHFA price indices, FEMA flood data, IRS Opportunity Zone tracts, FBI crime statistics. The ones that cost money are not funded yet, so KOANO runs on representative stand-ins for MLS comps, foot traffic, and premium hazard data. Anywhere that happens, the product says so on the figure itself. The full catalog is on the data page.",
+                    "Most of them are live public data: NYC zoning, permit, and violation records, Census demographics, FHFA price indices, FEMA and EPA hazard data, IRS Opportunity Zones, FBI and NYPD crime, mortgage lending, and recorded sales. Two licensed sources are not funded yet, so KOANO uses clearly labeled representative stand-ins for pro-forma benchmarks and institutional deal comps, and says so on every figure. The full list is generated from the live registry on the data page.",
                 },
                 {
                   question: "How often is data updated?",
                   answer:
-                    "Every analysis pulls its sources at the moment you run it. There is no cached market report sitting behind the answer. What KOANO does not do yet is watch anything continuously. Alerts and the portfolio monitor are point in time, and they say so. Continuous monitoring is a funded capability, not a demo one.",
+                    "Every analysis pulls its sources at the moment you run it, so there is no cached market report sitting behind the answer. Monitoring runs weekly: KOANO diffs each watched property's public record week over week and tells you what changed, in the app and in a Monday digest. It does not watch continuously, and it does not claim to.",
                 },
                 {
                   question:

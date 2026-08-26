@@ -47,46 +47,46 @@ const AGENTS_DETAIL = [
     number: "01",
     name: "Market timing",
     file: "market-timing.ts",
-    inputs: "Pricing velocity · DOM trends · Absorption rates",
+    inputs: "NYC recorded sales · FHFA HPI · Freddie Mac PMMS · HUD Fair Market Rents",
     outputs: "Timing verdict · Confidence score · Signal window",
     description:
-      "Analyzes how fast prices are moving, how long properties sit on the market, and how quickly inventory absorbs, to determine whether conditions favor buying, selling, or waiting.",
+      "Reads recorded-sale prices ranked by true distance from the site, the FHFA price index, mortgage rates, and rents, to judge whether conditions favor buying, selling, or waiting.",
   },
   {
     number: "02",
     name: "Infrastructure pipeline",
     file: "infrastructure.ts",
-    inputs: "DOT data · Permits (Shovels.ai) · Zoning variances · Municipal bonds",
+    inputs: "NYC DOB permits · MapPLUTO zoning · Census Building Permits Survey",
     outputs: "Infrastructure impact · Price effect · Timeline",
     description:
-      "Tracks every permitted project, infrastructure bond, and zoning change within a subject area to surface price-moving signals 6–18 months before they appear in comparable sales.",
+      "Tracks approved building permits and the zoning around a parcel, with county new-supply as context, to read the construction and development shaping a site.",
   },
   {
     number: "03",
     name: "Demand sentiment",
     file: "demand-sentiment.ts",
-    inputs: "Foot traffic (Placer.ai) · Search trends · Review velocity",
+    inputs: "CFPB HMDA · BLS QCEW · IRS migration · Census ACS",
     outputs: "Demand momentum · Gentrification stage (1–7)",
     description:
-      "Measures foot traffic patterns, search interest, and review velocity to detect demand shifts in real time, before they appear in listing prices.",
+      "Reads mortgage lending, employment and wages, household migration, and demographic change to gauge where housing demand is strengthening or softening.",
   },
   {
     number: "04",
     name: "Risk & volatility",
     file: "risk-volatility.ts",
-    inputs: "Climate risk (First Street) · Crime (FBI UCR) · STR saturation",
-    outputs: "Risk score (1–100) · Risk breakdown · Risk-adjusted return",
+    inputs: "FEMA flood + National Risk Index · FBI / NYPD crime · EPA contamination · USGS seismic · violations",
+    outputs: "Risk score (1–100) · Risk breakdown",
     description:
-      "Aggregates climate vulnerability, crime patterns, and short-term rental saturation into a single risk score, with a full breakdown of the dominant risk factors.",
+      "Aggregates flood and multi-peril hazard, crime, environmental contamination, seismic exposure, and building violations into a single risk score with a full breakdown of the dominant factors.",
   },
   {
     number: "05",
     name: "Regulatory & policy",
     file: "regulatory-policy.ts",
-    inputs: "Zoning (Zoneomics) · City council decisions · FEMA · Opportunity zones",
+    inputs: "NYC zoning / PLUTO · IRS Opportunity Zones · HUD QCT/DDA · HPD landlord records",
     outputs: "Regulatory risk · Entitlement timeline",
     description:
-      "Monitors the regulatory environment for changes that could affect property value, from city council votes to federal opportunity zone designations.",
+      "Reads zoning and land-use, Opportunity Zone and LIHTC eligibility, and landlord and violation records for the regulatory risk and entitlement picture on a property.",
   },
 ];
 
@@ -118,11 +118,11 @@ const ARBITRATION = [
 ];
 
 const REASONING_DEMO = [
-  { agent: "Market timing", verdict: "Strong buy signal — absorption at 18-year high" },
-  { agent: "Infrastructure", verdict: "2 transit projects within 0.5mi — 18-month timeline" },
-  { agent: "Demand sentiment", verdict: "Foot traffic up 34% YoY — gentrification stage 4" },
-  { agent: "Risk & volatility", verdict: "Risk score 22/100 — low flood, low crime, low STR" },
-  { agent: "Regulatory", verdict: "Opportunity zone — tax benefits through 2026" },
+  { agent: "Market timing", verdict: "Recorded-sale prices rising, sales velocity steady" },
+  { agent: "Infrastructure", verdict: "Active DOB permits nearby, multi-year build pipeline" },
+  { agent: "Demand sentiment", verdict: "Mortgage lending and in-migration both rising" },
+  { agent: "Risk & volatility", verdict: "Risk score 22/100, low flood and crime exposure" },
+  { agent: "Regulatory", verdict: "Opportunity Zone tract, FAR headroom on the lot" },
 ];
 
 export default function IntelligenceContent() {
@@ -293,9 +293,10 @@ export default function IntelligenceContent() {
                   marginBottom: "32px",
                 }}
               >
-                Dozens of sources ingested: census, permits, climate risk,
-                foot traffic, crime data, zoning changes, and more. Every
-                signal normalized and timestamped.
+                Public data queried in real time: census demographics,
+                building permits, zoning, hazard and climate data, crime,
+                mortgage lending, and recorded sales. Every signal normalized,
+                timestamped, and labeled with its source.
               </p>
 
               {/* Layer 2 — middle */}
@@ -869,7 +870,7 @@ export default function IntelligenceContent() {
                 marginBottom: "24px",
               }}
             >
-              The intelligence is ready.
+              See it on a building you know.
             </h2>
             <p
               style={{
@@ -879,8 +880,9 @@ export default function IntelligenceContent() {
                 marginBottom: "40px",
               }}
             >
-              KOANO is currently in private early access. Request access and
-              we&apos;ll notify you when your cluster is ready.
+              Sign up and run three full analyses free. Every verdict arrives
+              with its reasoning and its sources, so you can check the work
+              against what you already know about the address.
             </p>
             <div
               className="flex flex-wrap items-center justify-center"

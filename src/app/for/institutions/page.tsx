@@ -11,9 +11,9 @@ export const metadata: Metadata = {
 
 const FEATURES = [
   {
-    title: "Real-time NAV tracking",
+    title: "NAV tracking",
     description:
-      "Real-time net asset value tracking across your entire portfolio. Every asset, every market, always current.",
+      "Net asset value tracking across your entire portfolio, every asset and every market, refreshed weekly.",
   },
   {
     title: "FFO & NOI monitoring",
@@ -23,7 +23,7 @@ const FEATURES = [
   {
     title: "Portfolio risk score",
     description:
-      "A single portfolio risk score powered by all 5 KOANO agents, updated continuously.",
+      "A single portfolio risk score powered by all 5 KOANO agents, updated weekly.",
   },
   {
     title: "Hold / sell / reposition analysis",
@@ -33,7 +33,7 @@ const FEATURES = [
   {
     title: "Monday morning briefing",
     description:
-      "What changed overnight. What is at risk and why. What opportunities are emerging. Every Monday.",
+      "What changed this week. What is at risk and why. What opportunities are emerging. Every Monday.",
   },
   {
     title: "Regulatory change alerts",

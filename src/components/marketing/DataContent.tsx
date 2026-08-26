@@ -4,6 +4,11 @@ import React, { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import SectionNumber from "@/components/ui/SectionNumber";
 import Button from "@/components/ui/Button";
+import {
+  LIVE_SOURCE_GROUPS,
+  REPRESENTATIVE_SOURCES,
+  type ProviderCatalogEntry,
+} from "../../../lib/providers/catalog";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -20,111 +25,118 @@ const fadeUp = {
   }),
 };
 
-const FREE_SOURCES = [
-  { name: "US Census ACS", category: "Demographics" },
-  { name: "BLS", category: "Economics" },
-  { name: "Redfin Data Center", category: "Market data" },
-  { name: "Freddie Mac", category: "Mortgage rates" },
-  { name: "FHFA", category: "Price indices" },
-  { name: "FBI UCR", category: "Crime data" },
-  { name: "EPA / FEMA", category: "Environmental" },
-  { name: "NOAA", category: "Climate" },
-  { name: "IRS Opportunity Zones", category: "Tax policy" },
-  { name: "HUD USER", category: "Housing policy" },
-  { name: "SEC EDGAR", category: "REIT filings" },
-  { name: "World Bank", category: "Global economics" },
-  { name: "OECD", category: "Global economics" },
-  { name: "OpenStreetMap", category: "Geography" },
-  { name: "USGS", category: "Terrain & geology" },
-  { name: "NYC Open Data", category: "City data" },
-  {
-    name: "NYC HPD / ECB / DOB violations (wvxf-dwi5, 6bgk-3dad, eabe-havv)",
-    category: "Building violations",
-  },
-  {
-    name: "NYC HPD registrations + Speculation Watch List (tesw-yqqr, feu5-w2e2, adax-9mit)",
-    category: "Ownership records",
-  },
-  { name: "LA GeoHub", category: "City data" },
-  { name: "Chicago Data Portal", category: "City data" },
-  { name: "OpenFEMA", category: "Disaster data" },
-  { name: "Google Trends", category: "Search demand" },
-  { name: "Reddit API", category: "Sentiment" },
-  { name: "Municipode", category: "Zoning codes" },
-  { name: "HUD Fair Housing", category: "Compliance" },
-  { name: "CDC PLACES", category: "Health data" },
-  { name: "MSRB EMMA", category: "Municipal bonds" },
+// Non-staling replacements for the old source counts. These describe the system,
+// so they never go out of date as the underlying list grows.
+const HERO_STATS = [
+  { stat: "Five", label: "Provenance states" },
+  { stat: "Sourced", label: "Every figure, every verdict" },
+  { stat: "Daily", label: "Archive of the public record" },
 ];
 
-const PAID_SOURCES = [
-  { name: "ATTOM", category: "Property data" },
-  { name: "Shovels.ai", category: "Permits" },
-  { name: "Zoneomics", category: "Zoning" },
-  { name: "First Street Foundation", category: "Climate risk" },
-  { name: "Placer.ai", category: "Foot traffic" },
-  { name: "SafeGraph", category: "Mobility" },
-  { name: "Walk Score", category: "Walkability" },
-  { name: "Yelp Fusion", category: "Business data" },
-  { name: "Google Places", category: "Business data" },
-  { name: "AirDNA", category: "Short-term rental" },
-  { name: "BatchData", category: "Property ownership" },
-  { name: "SpotCrime", category: "Crime (real-time)" },
-  { name: "GreatSchools", category: "Education" },
-  { name: "Regrid", category: "Parcel data" },
-  { name: "Mapbox", category: "Mapping" },
-  { name: "HouseCanary", category: "AVM" },
-  { name: "CoreLogic / Trestle", category: "MLS data" },
-  { name: "Reonomy", category: "Commercial data" },
-  { name: "CoStar / LoopNet", category: "Commercial listings" },
+// The five provenance states, verbatim in spirit from lib/providers/provenance.ts,
+// the integrity layer stated plainly. This is descriptive prose, not a source
+// list, so it cannot drift from the registry the way a hand-kept vendor list did.
+const PROVENANCE_STATES = [
   {
-    name: "MSCI Real Capital Analytics",
-    category: "Institutional (Cluster 5)",
+    key: "live",
+    label: "Live",
+    description:
+      "Fetched in real time from an authoritative public source KOANO queried when you ran the analysis. Full trust.",
+  },
+  {
+    key: "partner",
+    label: "Partner",
+    description:
+      "A third-party partner feed. It carries that partner's trust profile and is attributed to them by name, never shown as something KOANO verified itself.",
+  },
+  {
+    key: "representative",
+    label: "Representative",
+    description:
+      "A labeled placeholder for a licensed source KOANO has not funded. You can inspect it, and it is never shown as real.",
+  },
+  {
+    key: "fetch_failed",
+    label: "Fetch failed",
+    description:
+      "A source KOANO covers and attempted, that failed on this run. The figure is shown as missing, never guessed, and it usually clears on a retry.",
+  },
+  {
+    key: "coverage_absent",
+    label: "Not covered",
+    description:
+      "A market or layer KOANO does not cover yet, such as the municipal record outside NYC. Nothing was queried, and the gap is named honestly.",
   },
 ];
 
+// How a verdict is actually produced, corrected from the pre-Phase-1 copy, which
+// described a 24/7 ingestion pipeline and per-tenant schemas that do not exist.
 const PIPELINE_STEPS = [
   {
     number: "01",
-    title: "Continuous ingestion",
+    title: "Sources called at request time",
     description:
-      "Free sources are ingested via GitHub Actions cron jobs running 24/7. Paid sources are called on-demand and cached for 24 hours to minimize API costs.",
+      "When you run an analysis, KOANO queries its live sources right then. There is no cached market report sitting behind the answer. Each figure carries the source it came from and the time it was fetched.",
   },
   {
     number: "02",
     title: "Normalization",
     description:
-      "Every signal is normalized to a common schema: location (lat/lng + census tract), timestamp, data type, confidence level, and source attribution.",
+      "Every signal is normalized to a common shape: location (lat/lng and census tract), timestamp, provenance state, and source attribution. Nothing enters the reasoning without a label.",
   },
   {
     number: "03",
     title: "Storage",
     description:
-      "Normalized signals are stored in Supabase with Row Level Security enforced. Cluster 5 data lives in an isolated schema per enterprise client, never co-mingled.",
+      "Records are stored in Supabase with Row Level Security enforced, scoping every record to the account that owns it. Dedicated per-tenant isolation is on the enterprise roadmap, not live today.",
   },
   {
     number: "04",
-    title: "Agent reasoning",
+    title: "The daily archive",
     description:
-      "When a verdict is requested, relevant signals are assembled and passed to the five specialist agents simultaneously. Each agent reasons independently.",
+      "Separately, a daily job snapshots the free public record, such as permits, violations, zoning, and ownership, into a weekly time series the source datasets themselves do not keep. Only live data is ever archived.",
   },
   {
     number: "05",
-    title: "Synthesis",
+    title: "Reasoning and synthesis",
     description:
-      "The synthesis agent receives all five structured outputs, arbitrates conflicts, and issues the final verdict with a full reasoning chain.",
+      "The assembled signals go to the five specialist agents at once. The synthesis agent arbitrates and issues one verdict, whose overall provenance equals the weakest input it used.",
   },
 ];
 
+function CoverageChip({ coverage }: { coverage: ProviderCatalogEntry["coverage"] }) {
+  return (
+    <span
+      style={{
+        fontFamily: "'DM Mono', monospace",
+        fontSize: "10px",
+        fontWeight: 500,
+        color: coverage === "nyc" ? "var(--mid-blue)" : "var(--ink-muted)",
+        letterSpacing: "0.08em",
+        textTransform: "uppercase",
+        border: "1px solid var(--border)",
+        borderRadius: "6px",
+        padding: "1px 6px",
+        flexShrink: 0,
+      }}
+    >
+      {coverage === "nyc" ? "NYC" : "US"}
+    </span>
+  );
+}
+
 export default function DataContent() {
   const heroRef = useRef<HTMLElement>(null);
-  const freeRef = useRef<HTMLElement>(null);
-  const paidRef = useRef<HTMLElement>(null);
+  const liveRef = useRef<HTMLElement>(null);
+  const repRef = useRef<HTMLElement>(null);
+  const provRef = useRef<HTMLElement>(null);
   const pipelineRef = useRef<HTMLElement>(null);
   const ctaRef = useRef<HTMLElement>(null);
 
   const heroInView = useInView(heroRef, { once: true, amount: 0.15 });
-  const freeInView = useInView(freeRef, { once: true, amount: 0.05 });
-  const paidInView = useInView(paidRef, { once: true, amount: 0.05 });
+  const liveInView = useInView(liveRef, { once: true, amount: 0.05 });
+  const repInView = useInView(repRef, { once: true, amount: 0.1 });
+  const provInView = useInView(provRef, { once: true, amount: 0.1 });
   const pipelineInView = useInView(pipelineRef, { once: true, amount: 0.1 });
   const ctaInView = useInView(ctaRef, { once: true, amount: 0.15 });
 
@@ -161,7 +173,7 @@ export default function DataContent() {
               marginBottom: "24px",
             }}
           >
-            Every source. Every signal. Fully auditable.
+            Every source, on the record.
           </motion.h1>
 
           <motion.p
@@ -172,14 +184,15 @@ export default function DataContent() {
             className="text-body-lg"
             style={{
               color: "var(--ink-secondary)",
-              maxWidth: "640px",
+              maxWidth: "660px",
               margin: "0 auto 40px",
             }}
           >
-            KOANO ingests data from dozens of sources. Free public datasets are
-            live today, plus commercial providers that come online as they are
-            licensed. Every verdict cites its top data sources. We publish the
-            full list here because trust requires transparency.
+            This page is generated straight from the registry the engine runs on,
+            so it always shows exactly what KOANO queries and can never drift into
+            naming a source we do not use. Most of it is live public data. Some
+            figures are honest stand-ins for licensed data we have not funded yet,
+            and they say so wherever they appear.
           </motion.p>
 
           <motion.div
@@ -194,12 +207,7 @@ export default function DataContent() {
               gap: "12px",
             }}
           >
-            {[
-              { stat: "25+", label: "Free sources" },
-              { stat: "20+", label: "Paid sources" },
-              { stat: "24h", label: "Max data age" },
-              { stat: "100%", label: "Source-cited verdicts" },
-            ].map((item) => (
+            {HERO_STATS.map((item) => (
               <div
                 key={item.label}
                 style={{
@@ -208,11 +216,12 @@ export default function DataContent() {
                   borderRadius: "16px",
                   padding: "16px 24px",
                   textAlign: "center",
+                  minWidth: "160px",
                 }}
               >
                 <p
                   style={{
-                    fontSize: "24px",
+                    fontSize: "22px",
                     fontWeight: 700,
                     color: "var(--ink-primary)",
                     letterSpacing: "-0.02em",
@@ -238,90 +247,268 @@ export default function DataContent() {
         </div>
       </section>
 
-      {/* Free sources */}
+      {/* Live sources, grouped into named families */}
       <section
-        ref={freeRef}
+        ref={liveRef}
         style={{ background: "var(--pale-wash)", padding: "120px 32px" }}
       >
         <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
           <motion.div
             initial="hidden"
-            animate={freeInView ? "visible" : "hidden"}
+            animate={liveInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={0}
             style={{ marginBottom: "64px" }}
           >
-            <SectionNumber number="02" label="Free sources" />
+            <SectionNumber number="02" label="Live sources" />
             <h2
               className="text-h2"
               style={{
                 color: "var(--ink-primary)",
                 marginTop: "16px",
-                maxWidth: "560px",
+                maxWidth: "640px",
               }}
             >
-              Public datasets, ingested continuously.
+              Live public data, queried in real time.
             </h2>
             <p
               className="text-body-lg"
               style={{
                 color: "var(--ink-secondary)",
-                maxWidth: "560px",
+                maxWidth: "660px",
                 marginTop: "24px",
               }}
             >
-              These sources are ingested on a rolling schedule via GitHub
-              Actions cron jobs and stored in Supabase. They form the backbone
-              of every verdict.
+              KOANO calls authoritative public data at the moment you run an
+              analysis: municipal building records, parcel and zoning data,
+              recorded sales, federal hazard and climate data, environmental
+              contamination records, crime statistics, mortgage and lending
+              activity, employment and migration. National sources run anywhere in
+              the US. The NYC-tagged municipal layers are the deep local record
+              that lets a New York verdict roll up fully live.
+            </p>
+          </motion.div>
+
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "36px",
+            }}
+          >
+            {LIVE_SOURCE_GROUPS.map((family, gi) => (
+              <motion.div
+                key={family.group}
+                custom={gi + 1}
+                initial="hidden"
+                animate={liveInView ? "visible" : "hidden"}
+                variants={fadeUp}
+              >
+                <p
+                  style={{
+                    fontFamily: "'DM Mono', monospace",
+                    fontSize: "11px",
+                    fontWeight: 500,
+                    color: "var(--brand-blue)",
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    marginBottom: "16px",
+                    paddingBottom: "12px",
+                    borderBottom: "1px solid var(--border)",
+                  }}
+                >
+                  {family.group}
+                </p>
+                <div
+                  className="data-source-grid"
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(3, 1fr)",
+                    gap: "12px",
+                  }}
+                >
+                  {family.entries.map((source) => (
+                    <div
+                      key={source.source}
+                      style={{
+                        background: "var(--white)",
+                        border: "1px solid var(--border)",
+                        borderRadius: "12px",
+                        padding: "14px 16px",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "6px",
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "flex-start",
+                          justifyContent: "space-between",
+                          gap: "8px",
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontSize: "14px",
+                            fontWeight: 500,
+                            color: "var(--ink-primary)",
+                            lineHeight: 1.35,
+                          }}
+                        >
+                          {source.source}
+                        </span>
+                        <CoverageChip coverage={source.coverage} />
+                      </div>
+                      <span
+                        style={{
+                          fontSize: "12px",
+                          color: "var(--ink-muted)",
+                        }}
+                      >
+                        {source.usedBy}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Representative sources, the honest gap made the pitch */}
+      <section
+        ref={repRef}
+        style={{ background: "var(--white)", padding: "120px 32px" }}
+      >
+        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
+          <motion.div
+            initial="hidden"
+            animate={repInView ? "visible" : "hidden"}
+            variants={fadeUp}
+            custom={0}
+            style={{ marginBottom: "64px" }}
+          >
+            <SectionNumber number="03" label="Representative sources" />
+            <h2
+              className="text-h2"
+              style={{
+                color: "var(--ink-primary)",
+                marginTop: "16px",
+                maxWidth: "640px",
+              }}
+            >
+              The sources KOANO does not run live.
+            </h2>
+            <p
+              className="text-body-lg"
+              style={{
+                color: "var(--ink-secondary)",
+                maxWidth: "660px",
+                marginTop: "24px",
+              }}
+            >
+              KOANO runs live everywhere it can. Where a source is licensed
+              commercial data we have not funded, it uses a clearly labeled
+              representative stand-in and names the license that turns it live.
+              These never feed a verdict. They support documents only, and they
+              are never shown as real.
             </p>
           </motion.div>
 
           <motion.div
             initial="hidden"
-            animate={freeInView ? "visible" : "hidden"}
+            animate={repInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={1}
           >
             <div
+              className="data-rep-grid"
               style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: "10px",
+                display: "grid",
+                gridTemplateColumns: "repeat(2, 1fr)",
+                gap: "20px",
               }}
             >
-              {FREE_SOURCES.map((source) => (
+              {REPRESENTATIVE_SOURCES.map((source) => (
                 <div
-                  key={source.name}
-                  style={{
-                    background: "var(--white)",
-                    border: "1px solid var(--border)",
-                    borderRadius: "12px",
-                    padding: "10px 16px",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "2px",
-                  }}
+                  key={source.source}
+                  className="card"
+                  style={{ background: "var(--pale-wash)" }}
                 >
-                  <span
+                  <div
                     style={{
-                      fontSize: "14px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      marginBottom: "10px",
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontFamily: "'DM Mono', monospace",
+                        fontSize: "10px",
+                        fontWeight: 500,
+                        color: "var(--signal-warning)",
+                        letterSpacing: "0.08em",
+                        textTransform: "uppercase",
+                        border: "1px solid var(--signal-warning)",
+                        borderRadius: "6px",
+                        padding: "1px 6px",
+                      }}
+                    >
+                      Representative
+                    </span>
+                    <span
+                      style={{
+                        fontFamily: "'DM Mono', monospace",
+                        fontSize: "10px",
+                        color: "var(--ink-faint)",
+                        letterSpacing: "0.08em",
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      {source.category}
+                    </span>
+                  </div>
+                  <h3
+                    style={{
+                      fontSize: "18px",
                       fontWeight: 500,
                       color: "var(--ink-primary)",
+                      marginBottom: "8px",
+                      lineHeight: 1.3,
                     }}
                   >
-                    {source.name}
-                  </span>
-                  <span
+                    {source.source}
+                  </h3>
+                  <p
                     style={{
-                      fontFamily: "'DM Mono', monospace",
-                      fontSize: "10px",
-                      color: "var(--ink-faint)",
-                      letterSpacing: "0.08em",
-                      textTransform: "uppercase",
+                      fontSize: "14px",
+                      color: "var(--ink-secondary)",
+                      lineHeight: 1.55,
+                      marginBottom: "14px",
                     }}
                   >
-                    {source.category}
-                  </span>
+                    {source.usedBy}
+                  </p>
+                  {source.swapNote && (
+                    <p
+                      style={{
+                        fontFamily: "'DM Mono', monospace",
+                        fontSize: "12px",
+                        color: "var(--ink-muted)",
+                        letterSpacing: "0.04em",
+                        lineHeight: 1.5,
+                        margin: 0,
+                        paddingTop: "12px",
+                        borderTop: "1px solid var(--border)",
+                      }}
+                    >
+                      {source.swapNote}
+                    </p>
+                  )}
                 </div>
               ))}
             </div>
@@ -329,101 +516,97 @@ export default function DataContent() {
         </div>
       </section>
 
-      {/* Paid sources */}
+      {/* Provenance model, the five states */}
       <section
-        ref={paidRef}
-        style={{ background: "var(--white)", padding: "120px 32px" }}
+        ref={provRef}
+        style={{ background: "var(--pale-wash)", padding: "120px 32px" }}
       >
         <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
           <motion.div
             initial="hidden"
-            animate={paidInView ? "visible" : "hidden"}
+            animate={provInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={0}
             style={{ marginBottom: "64px" }}
           >
-            <SectionNumber number="03" label="Licensed sources" />
+            <SectionNumber number="04" label="Provenance" />
             <h2
               className="text-h2"
               style={{
                 color: "var(--ink-primary)",
                 marginTop: "16px",
-                maxWidth: "560px",
+                maxWidth: "640px",
               }}
             >
-              Commercial providers, called on-demand.
+              Every figure carries one of five labels.
             </h2>
             <p
               className="text-body-lg"
               style={{
                 color: "var(--ink-secondary)",
-                maxWidth: "560px",
+                maxWidth: "660px",
                 marginTop: "24px",
               }}
             >
-              These sources are called when a verdict is requested and cached
-              for 24 hours. Their data is the signal layer that makes the
-              reasoning accurate at the neighborhood level.
+              A figure is only as trustworthy as where it came from, so KOANO tags
+              each one and keeps the states distinct. A verdict&apos;s overall
+              label equals the weakest input it used, so a computed score can never
+              hide a stand-in inside a tidy average.
             </p>
           </motion.div>
 
-          <motion.div
-            initial="hidden"
-            animate={paidInView ? "visible" : "hidden"}
-            variants={fadeUp}
-            custom={1}
+          <div
+            className="data-prov-grid"
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(2, 1fr)",
+              gap: "16px",
+            }}
           >
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: "10px",
-              }}
-            >
-              {PAID_SOURCES.map((source) => (
-                <div
-                  key={source.name}
+            {PROVENANCE_STATES.map((state, i) => (
+              <motion.div
+                key={state.key}
+                custom={i + 1}
+                initial="hidden"
+                animate={provInView ? "visible" : "hidden"}
+                variants={fadeUp}
+                className="card"
+                style={{ background: "var(--white)" }}
+              >
+                <span
                   style={{
-                    background: "var(--pale-wash)",
-                    border: "1px solid var(--border)",
-                    borderRadius: "12px",
-                    padding: "10px 16px",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "2px",
+                    fontFamily: "'DM Mono', monospace",
+                    fontSize: "11px",
+                    fontWeight: 500,
+                    color: "var(--brand-blue)",
+                    letterSpacing: "0.08em",
+                    textTransform: "uppercase",
+                    display: "block",
+                    marginBottom: "10px",
                   }}
                 >
-                  <span
-                    style={{
-                      fontSize: "14px",
-                      fontWeight: 500,
-                      color: "var(--ink-primary)",
-                    }}
-                  >
-                    {source.name}
-                  </span>
-                  <span
-                    style={{
-                      fontFamily: "'DM Mono', monospace",
-                      fontSize: "10px",
-                      color: "var(--ink-faint)",
-                      letterSpacing: "0.08em",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    {source.category}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
+                  {state.label}
+                </span>
+                <p
+                  style={{
+                    fontSize: "15px",
+                    color: "var(--ink-secondary)",
+                    lineHeight: 1.55,
+                    margin: 0,
+                  }}
+                >
+                  {state.description}
+                </p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Pipeline architecture */}
       <section
         ref={pipelineRef}
-        style={{ background: "var(--pale-wash)", padding: "120px 32px" }}
+        style={{ background: "var(--white)", padding: "120px 32px" }}
       >
         <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
           <motion.div
@@ -433,7 +616,7 @@ export default function DataContent() {
             custom={0}
             style={{ marginBottom: "64px" }}
           >
-            <SectionNumber number="04" label="The pipeline" />
+            <SectionNumber number="05" label="The pipeline" />
             <h2
               className="text-h2"
               style={{
@@ -497,13 +680,13 @@ export default function DataContent() {
                       height: "12px",
                       borderRadius: "50%",
                       border: "2px solid var(--brand-blue)",
-                      background: "var(--pale-wash)",
+                      background: "var(--white)",
                     }}
                   />
 
                   <div
                     className="card"
-                    style={{ background: "var(--white)", flex: 1 }}
+                    style={{ background: "var(--pale-wash)", flex: 1 }}
                   >
                     <span
                       className="section-number"
@@ -543,7 +726,7 @@ export default function DataContent() {
       {/* CTA */}
       <section
         ref={ctaRef}
-        style={{ background: "var(--white)", padding: "120px 32px" }}
+        style={{ background: "var(--pale-wash)", padding: "120px 32px" }}
       >
         <div
           style={{
@@ -558,7 +741,7 @@ export default function DataContent() {
             variants={fadeUp}
             custom={0}
           >
-            <SectionNumber number="05" />
+            <SectionNumber number="06" />
             <h2
               className="text-h2"
               style={{
@@ -567,7 +750,7 @@ export default function DataContent() {
                 marginBottom: "24px",
               }}
             >
-              See it in action.
+              See it on a building you know.
             </h2>
             <p
               style={{
@@ -577,9 +760,9 @@ export default function DataContent() {
                 marginBottom: "40px",
               }}
             >
-              Every KOANO verdict cites its top data sources. Request early
-              access to see how dozens of sources come together in a single
-              verdict.
+              Every KOANO verdict cites its sources and labels every figure. Sign
+              up, run three analyses free, and check the work against an address
+              you already understand.
             </p>
             <div
               className="flex flex-wrap items-center justify-center"
@@ -599,6 +782,21 @@ export default function DataContent() {
           </motion.div>
         </div>
       </section>
+
+      <style jsx>{`
+        @media (max-width: 1024px) {
+          .data-source-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+        }
+        @media (max-width: 768px) {
+          .data-source-grid,
+          .data-rep-grid,
+          .data-prov-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </>
   );
 }

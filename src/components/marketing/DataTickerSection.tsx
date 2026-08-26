@@ -1,15 +1,11 @@
 "use client";
 
 import React from "react";
+import { LIVE_SOURCE_GROUP_ORDER } from "../../../lib/providers/catalog";
 
-const DATA_SOURCES = [
-  "Census", "Shovels.ai", "Placer.ai", "First Street", "FBI UCR",
-  "ATTOM", "AirDNA", "Zoneomics", "Redfin", "FHFA", "FEMA",
-  "Walk Score", "CoStar", "Regrid", "HouseCanary", "CoreLogic",
-  "SafeGraph", "Google Trends", "OpenStreetMap", "NOAA",
-  "IRS Opportunity Zones", "HUD USER", "SEC EDGAR", "Yelp Fusion",
-  "BatchData", "GreatSchools", "MSCI RCA",
-];
+// The named source families, pulled straight from the provider catalog so this
+// ticker can never list a category KOANO does not actually query.
+const DATA_SOURCES = [...LIVE_SOURCE_GROUP_ORDER];
 
 export default function DataTickerSection() {
   // Duplicate sources for seamless infinite scroll
@@ -34,7 +30,7 @@ export default function DataTickerSection() {
           marginBottom: "28px",
         }}
       >
-        Dozens of data sources powering every verdict
+        The public record behind every verdict
       </p>
 
       {/* Ticker track */}

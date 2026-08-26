@@ -6,7 +6,7 @@ import DataContent from "@/components/marketing/DataContent";
 export const metadata: Metadata = {
   title: "Data — KOANO",
   description:
-    "Full transparency on the dozens of data sources behind every KOANO verdict. Free public datasets are live today, and the commercial providers come online as they are licensed.",
+    "The exact data sources behind every KOANO verdict, generated from the live provider registry so the list can never drift. Most are public sources queried in real time. The rest are labeled stand-ins for licensed data not yet funded.",
 };
 
 export default function DataPage() {

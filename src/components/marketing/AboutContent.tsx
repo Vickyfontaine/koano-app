@@ -534,7 +534,7 @@ export default function AboutContent() {
                 marginBottom: "24px",
               }}
             >
-              Join us early.
+              See it for yourself.
             </h2>
             <p
               style={{
@@ -544,9 +544,8 @@ export default function AboutContent() {
                 marginBottom: "40px",
               }}
             >
-              KOANO is in private early access. We&apos;re onboarding users
-              cluster by cluster, starting with those who will help us build the
-              most accurate reasoning engine in real estate.
+              KOANO is live to try today. Sign up, run three analyses free, and
+              read the reasoning on a building you already know.
             </p>
             <div
               className="flex flex-wrap items-center justify-center"
