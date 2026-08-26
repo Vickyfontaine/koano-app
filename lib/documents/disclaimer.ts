@@ -30,6 +30,7 @@ const BLOCK_LABELS: Record<BlockKey, string> = {
   flood_zones: 'Flood-zone boundaries (FEMA NFHL)',
   demographics: 'Demographics (ACS)',
   hpi: 'House Price Index',
+  building_permits_supply: 'New housing supply (Census Building Permits Survey)',
   mls_comps: 'Comparable sales',
   crime: 'Crime statistics',
   building_violations: 'Building violations',

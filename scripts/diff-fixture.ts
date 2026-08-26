@@ -26,8 +26,19 @@ const RUNS = Number(process.argv[2] ?? 2);
   // leaf path changed — so stable (every-run) changes separate from wobble.
   const seen = new Map<string, number>();
   const perRun: string[][] = [];
+  let ok = 0;
   for (let i = 1; i <= RUNS; i++) {
-    const result = await runKoanoPipeline(fx.address);
+    // A transient LLM/API timeout is infra noise, not a code result — skip that
+    // run and keep going, so one hiccup doesn't waste the whole batch. The
+    // stable/wobble tally is computed over the runs that COMPLETED.
+    let result;
+    try {
+      result = await runKoanoPipeline(fx.address);
+    } catch (e) {
+      console.log(`\n[run ${i}] SKIPPED — transient failure: ${e instanceof Error ? e.message : String(e)}`);
+      continue;
+    }
+    ok++;
     const actual = decisionSurface(result);
     const lines = diffPaths(fx.expected, actual);
     perRun.push(lines);
@@ -41,10 +52,10 @@ const RUNS = Number(process.argv[2] ?? 2);
 
   const e = fx.expected;
   console.log(`\n──────── baseline (committed fixture): ${e.verdict.toUpperCase()} conf ${e.confidence} risk ${e.risk_score} prov ${e.overall_provenance} | era ${e.breakdown.inputs_era ?? '(none)'}`);
-  console.log(`──────── change classification across ${RUNS} run(s):`);
+  console.log(`──────── change classification across ${ok}/${RUNS} completed run(s):`);
   const paths = Array.from(seen.entries()).sort((a, b) => b[1] - a[1]);
   for (const [path, count] of paths) {
-    const tag = count === RUNS ? 'STABLE (every run — code change)' : `wobble (${count}/${RUNS} runs — sampling noise)`;
+    const tag = count === ok ? `STABLE (${count}/${ok} — code change)` : `wobble (${count}/${ok} runs — sampling noise)`;
     console.log(`    ${path}  —  ${tag}`);
   }
   console.log(`\nIf every STABLE change is intended and sensible, re-record: npx tsx scripts/record-fixture.ts\n`);

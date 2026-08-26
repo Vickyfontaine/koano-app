@@ -1,12 +1,12 @@
 {
   "note": "KOANO Phase 5 regression fixture. Frozen provider results + raw LLM completions + the expected DECISION SURFACE. Replayed offline by scripts/test-fixture.ts. Re-record only on an intended decision change or a model change; never hand-edit.",
   "address": "175 3rd Street, Brooklyn, NY",
-  "recorded_at": "2026-08-25T23:13:23.275Z",
-  "git_commit": "a72efda5a9ab355b3fcd4fd2f07eee3e8a535840",
+  "recorded_at": "2026-08-26T12:53:20.841Z",
+  "git_commit": "69c398f2d9b51fa58f18c5a59c3a8153c5c93659",
   "record_counts": {
-    "providers": 22,
+    "providers": 23,
     "llm": 8,
-    "total": 30
+    "total": 31
   },
   "expected": {
     "address": {
@@ -16,7 +16,7 @@
       "location_confidence": "confirmed"
     },
     "verdict": "buy",
-    "confidence": 68,
+    "confidence": 69,
     "risk_score": 51,
     "signal_window_months": 12,
     "overall_provenance": "live",
@@ -40,7 +40,7 @@
       {
         "agent": "market-timing",
         "verdict": "hold",
-        "confidence": 79,
+        "confidence": 80,
         "risk_score": 50,
         "signal_window_months": 12,
         "overall_provenance": "live"
@@ -56,9 +56,9 @@
       {
         "agent": "risk-volatility",
         "verdict": "hold",
-        "confidence": 75,
+        "confidence": 80,
         "risk_score": 50,
-        "signal_window_months": 12,
+        "signal_window_months": 24,
         "overall_provenance": "live"
       }
     ],
@@ -77,7 +77,7 @@
         "hold": -0.3,
         "wait": -1.2
       },
-      "total_weight": 385,
+      "total_weight": 391,
       "agents": [
         {
           "agent": "demand-sentiment",
@@ -98,9 +98,9 @@
         {
           "agent": "market-timing",
           "verdict": "hold",
-          "confidence": 79,
+          "confidence": 80,
           "direction": 0,
-          "weight": 79,
+          "weight": 80,
           "contribution": 0
         },
         {
@@ -114,9 +114,9 @@
         {
           "agent": "risk-volatility",
           "verdict": "hold",
-          "confidence": 75,
+          "confidence": 80,
           "direction": 0,
-          "weight": 75,
+          "weight": 80,
           "contribution": 0
         }
       ]
@@ -144,7 +144,7 @@
         },
         "provenance": "live",
         "source": "NYC GeoSearch + US Census Geocoder",
-        "fetched_at": "2026-08-25T23:12:17.454Z"
+        "fetched_at": "2026-08-26T12:52:10.798Z"
       }
     },
     {
@@ -164,7 +164,7 @@
         "provenance": "live",
         "source": "US Census ACS via Census Reporter (ACS 2024 5-year)",
         "endpoint": "https://api.censusreporter.org/1.0/data/show/latest?table_ids=B01003,B19013,B25064,B25077,B15003&geo_ids=14000US36047011901",
-        "fetched_at": "2026-08-25T23:12:17.847Z"
+        "fetched_at": "2026-08-26T12:52:11.301Z"
       }
     },
     {
@@ -180,150 +180,7 @@
         "provenance": "live",
         "source": "Freddie Mac Primary Mortgage Market Survey (PMMS)",
         "endpoint": "https://www.freddiemac.com/pmms/docs/PMMS_history.csv",
-        "fetched_at": "2026-08-25T23:12:17.845Z"
-      }
-    },
-    {
-      "key": "provider:flood.getFloodZone#37b03b0374f3cbd2202f75deb10bc2f94eedbf28",
-      "value": {
-        "ok": true,
-        "data": {
-          "flood_zone": "X",
-          "zone_subtype": "AREA OF MINIMAL FLOOD HAZARD",
-          "in_special_flood_hazard_area": false,
-          "static_bfe_ft": null
-        },
-        "provenance": "live",
-        "source": "FEMA National Flood Hazard Layer (S_FLD_HAZ_AR)",
-        "endpoint": "https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer/28/query?geometry=-73.9888,40.67596&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=FLD_ZONE,ZONE_SUBTY,STATIC_BFE&returnGeometry=false&f=json",
-        "fetched_at": "2026-08-25T23:12:17.850Z"
-      }
-    },
-    {
-      "key": "provider:mlsComps.getComps#c9ee62c7689c6cc277b609785d3b610b51e5cec2",
-      "value": {
-        "ok": true,
-        "data": {
-          "comps": [
-            {
-              "address": "281 3RD AVE",
-              "sale_price": 1725000,
-              "sale_date": "2025-12-22",
-              "price_per_sqft": 575,
-              "gross_square_feet": 3000,
-              "building_class": "02 TWO FAMILY DWELLINGS",
-              "distance_mi": 0.18,
-              "latitude": 40.677299,
-              "longitude": -73.9858567
-            },
-            {
-              "address": "171 8 STREET",
-              "sale_price": 2358305,
-              "sale_date": "2026-05-04",
-              "price_per_sqft": 1128,
-              "gross_square_feet": 2090,
-              "building_class": "02 TWO FAMILY DWELLINGS",
-              "distance_mi": 0.28,
-              "latitude": 40.6719333,
-              "longitude": -73.9897151
-            },
-            {
-              "address": "173 8TH STREET",
-              "sale_price": 3150000,
-              "sale_date": "2025-10-21",
-              "price_per_sqft": 1507,
-              "gross_square_feet": 2090,
-              "building_class": "02 TWO FAMILY DWELLINGS",
-              "distance_mi": 0.28,
-              "latitude": 40.6719059,
-              "longitude": -73.9896574
-            },
-            {
-              "address": "124 8 STREET",
-              "sale_price": 1840000,
-              "sale_date": "2026-06-10",
-              "price_per_sqft": 1072,
-              "gross_square_feet": 1716,
-              "building_class": "02 TWO FAMILY DWELLINGS",
-              "distance_mi": 0.29,
-              "latitude": 40.6724687,
-              "longitude": -73.9918852
-            },
-            {
-              "address": "576 CARROLL STREET",
-              "sale_price": 3745000,
-              "sale_date": "2026-04-07",
-              "price_per_sqft": 1628,
-              "gross_square_feet": 2300,
-              "building_class": "02 TWO FAMILY DWELLINGS",
-              "distance_mi": 0.3,
-              "latitude": 40.67566,
-              "longitude": -73.9831316
-            },
-            {
-              "address": "290 5TH STREET",
-              "sale_price": 2700000,
-              "sale_date": "2025-11-25",
-              "price_per_sqft": 974,
-              "gross_square_feet": 2772,
-              "building_class": "03 THREE FAMILY DWELLINGS",
-              "distance_mi": 0.3,
-              "latitude": 40.6721855,
-              "longitude": -73.9860489
-            },
-            {
-              "address": "244A 7TH STREET",
-              "sale_price": 2983913,
-              "sale_date": "2026-05-12",
-              "price_per_sqft": 1895,
-              "gross_square_feet": 1575,
-              "building_class": "02 TWO FAMILY DWELLINGS",
-              "distance_mi": 0.3,
-              "latitude": 40.6715846,
-              "longitude": -73.9883057
-            },
-            {
-              "address": "246 7TH STREET",
-              "sale_price": 2969313,
-              "sale_date": "2026-05-12",
-              "price_per_sqft": 1885,
-              "gross_square_feet": 1575,
-              "building_class": "02 TWO FAMILY DWELLINGS",
-              "distance_mi": 0.31,
-              "latitude": 40.6715626,
-              "longitude": -73.9882588
-            },
-            {
-              "address": "34 GARFIELD PLACE",
-              "sale_price": 2851100,
-              "sale_date": "2026-06-17",
-              "price_per_sqft": 634,
-              "gross_square_feet": 4500,
-              "building_class": "01 ONE FAMILY DWELLINGS",
-              "distance_mi": 0.31,
-              "latitude": 40.6749353,
-              "longitude": -73.9830957
-            },
-            {
-              "address": "418 4TH AVENUE",
-              "sale_price": 3956600,
-              "sale_date": "2026-05-12",
-              "price_per_sqft": 1704,
-              "gross_square_feet": 2322,
-              "building_class": "03 THREE FAMILY DWELLINGS",
-              "distance_mi": 0.31,
-              "latitude": 40.6715242,
-              "longitude": -73.9881182
-            }
-          ],
-          "median_price_per_sqft": 1154,
-          "sales_count": 102,
-          "price_trend": "rising",
-          "scope_note": "Comparables are recorded residential sales ranked by true distance from the subject (DOF sale → PLUTO centroid), last 12 months. 102 within 1 mi. Condos/co-ops without recorded square footage are excluded, so comps skew to 1-3 family homes. NYC only."
-        },
-        "provenance": "live",
-        "source": "NYC Open Data — DOF Rolling Calendar Sales (usep-8jbt)",
-        "fetched_at": "2026-08-25T23:12:17.844Z"
+        "fetched_at": "2026-08-26T12:52:11.298Z"
       }
     },
     {
@@ -341,451 +198,23 @@
         "provenance": "live",
         "source": "CFPB HMDA Data Browser (2024, county aggregations)",
         "endpoint": "https://ffiec.cfpb.gov/v2/data-browser-api/view/aggregations?counties=36047&years=2024&actions_taken=1,3",
-        "fetched_at": "2026-08-25T23:12:17.848Z"
+        "fetched_at": "2026-08-26T12:52:11.302Z"
       }
     },
     {
-      "key": "provider:disasterHistory.getDisasterHistory#a1f04791efbdf70ee9b33ddea16e1820dd8bab5d",
+      "key": "provider:flood.getFloodZone#37b03b0374f3cbd2202f75deb10bc2f94eedbf28",
       "value": {
         "ok": true,
         "data": {
-          "fips_state": "36",
-          "fips_county": "047",
-          "total_declarations": 24,
-          "declarations_last_10yr": 6,
-          "distinct_incident_types": [
-            "Hurricane",
-            "Flood",
-            "Severe Storm",
-            "Snowstorm",
-            "Biological"
-          ],
-          "most_common_incident": "Hurricane",
-          "most_recent_declaration": "2024-01 — Flood",
-          "scope_note": "Federally-declared disasters for this county (OpenFEMA), all years. Historical multi-peril frequency — complements, not duplicates, the FEMA NFHL regulatory flood zone. This product uses the FEMA OpenFEMA API but is not endorsed by FEMA; the Federal Government / FEMA cannot vouch for data or analyses derived from it after retrieval."
+          "flood_zone": "X",
+          "zone_subtype": "AREA OF MINIMAL FLOOD HAZARD",
+          "in_special_flood_hazard_area": false,
+          "static_bfe_ft": null
         },
         "provenance": "live",
-        "source": "FEMA OpenFEMA — DisasterDeclarationsSummaries",
-        "endpoint": "https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$filter=fipsStateCode%20eq%20'36'%20and%20fipsCountyCode%20eq%20'047'&$orderby=declarationDate desc&$top=1000",
-        "fetched_at": "2026-08-25T23:12:17.850Z"
-      }
-    },
-    {
-      "key": "provider:fairMarketRent.getFairMarketRent#f4f69c28a38e302519b6765a9fcf369aab4f7b02",
-      "value": {
-        "ok": true,
-        "data": {
-          "area_name": "New York, NY HUD Metro FMR Area",
-          "fiscal_year": "2026",
-          "fmr_studio": 2529,
-          "fmr_1br": 2655,
-          "fmr_2br": 2910,
-          "fmr_3br": 3644,
-          "fmr_4br": 3959,
-          "scope_note": "HUD Fair Market Rents FY2026 for the county/metro (public domain). This product uses the HUD User Data API but is not endorsed or certified by HUD User."
-        },
-        "provenance": "live",
-        "source": "HUD USER — Fair Market Rents",
-        "endpoint": "https://www.huduser.gov/hudapi/public/fmr/data/3604799999",
-        "fetched_at": "2026-08-25T23:12:17.846Z"
-      }
-    },
-    {
-      "key": "provider:opportunityZones.getOpportunityZone#4c384ae2061ebda5e006b7940ced3cb088cdfbda",
-      "value": {
-        "ok": true,
-        "data": {
-          "tract_geoid": "36047011901",
-          "is_opportunity_zone": false,
-          "designation_note": "Tract not found on the QOZ designation list."
-        },
-        "provenance": "live",
-        "source": "IRS/Treasury QOZ designations (public ArcGIS mirror)",
-        "endpoint": "https://services.arcgis.com/VTyQ9soqVukalItT/arcgis/rest/services/Opportunity_Zones/FeatureServer/13/query?where=GEOID10%3D'36047011901'&outFields=GEOID10,STATE_NAME,Rural&returnGeometry=false&f=json",
-        "fetched_at": "2026-08-25T23:12:17.853Z"
-      }
-    },
-    {
-      "key": "provider:zoning.getZoning#55c0deca2f0cc9e1252dded723155f1226eaa741",
-      "value": {
-        "ok": true,
-        "data": {
-          "bbl": "3009720058",
-          "zoning_district": "M1-4/R7-2",
-          "commercial_overlay": null,
-          "special_district": "G",
-          "land_use_code": "7",
-          "building_class": "G9",
-          "lot_area_sqft": 120793,
-          "building_area_sqft": 13518,
-          "built_far": 0.11,
-          "max_residential_far": 3.44,
-          "max_commercial_far": 2,
-          "unused_far_pct": 97,
-          "year_built": 1973,
-          "residential_units": 0,
-          "assessed_total_usd": 4185900,
-          "assessed_land_usd": 3261600,
-          "max_affordable_residential_far": 5.01,
-          "max_facility_far": 6.5,
-          "owner_name": "GOWANUS 3RD STREET OWNER LLC",
-          "community_district": "306"
-        },
-        "provenance": "live",
-        "source": "NYC Open Data — MapPLUTO (64uk-42ks)",
-        "endpoint": "https://data.cityofnewyork.us/resource/64uk-42ks.json?$where=bbl%3D'3009720058'&$limit=1",
-        "fetched_at": "2026-08-25T23:12:17.853Z"
-      }
-    },
-    {
-      "key": "provider:nationalRisk.getNationalRisk#0c6fedc36df16f0c1a51204b52392c19549da665",
-      "value": {
-        "ok": true,
-        "data": {
-          "tract_fips": "36047011901",
-          "risk_score": 9,
-          "risk_rating": "Very Low",
-          "expected_annual_loss_usd": 506026,
-          "eal_rating": "Very Low",
-          "social_vulnerability_rating": "Relatively Moderate",
-          "community_resilience_rating": "Very Low",
-          "notable_hazards": [
-            {
-              "hazard": "Coastal Flooding",
-              "rating": "Relatively Moderate"
-            }
-          ],
-          "scope_note": "FEMA National Risk Index, census tract 36047011901. Composite risk is a national percentile weighted by expected annual loss, combined with social vulnerability and community resilience; a low composite can still carry a moderate single-hazard rating (see notable hazards). Notable hazards (≥ moderate): Coastal Flooding (Relatively Moderate)."
-        },
-        "provenance": "live",
-        "source": "FEMA National Risk Index (Census tract) via FEMA ArcGIS",
-        "endpoint": "https://services.arcgis.com/XG15cJAlne2vxtgt/arcgis/rest/services/National_Risk_Index_Census_Tracts/FeatureServer/0/query?where=TRACTFIPS%3D'36047011901'&outFields=TRACTFIPS%2CRISK_SCORE%2CRISK_RATNG%2CEAL_VALT%2CEAL_RATNG%2CSOVI_RATNG%2CRESL_RATNG%2CAVLN_RISKR%2CCFLD_RISKR%2CCWAV_RISKR%2CDRGT_RISKR%2CERQK_RISKR%2CHAIL_RISKR%2CHWAV_RISKR%2CHRCN_RISKR%2CISTM_RISKR%2CLNDS_RISKR%2CLTNG_RISKR%2CIFLD_RISKR%2CSWND_RISKR%2CTRND_RISKR%2CTSUN_RISKR%2CVLCN_RISKR%2CWFIR_RISKR%2CWNTW_RISKR&returnGeometry=false&f=json",
-        "fetched_at": "2026-08-25T23:12:17.852Z"
-      }
-    },
-    {
-      "key": "provider:buildingViolations.getViolations#de154728cefef59bf641da4f050a6d9d9cbf8f29",
-      "value": {
-        "ok": true,
-        "data": {
-          "bbl": "3009720058",
-          "bin": null,
-          "scope_note": "Not an HPD-registered multiple dwelling — HPD covers rentals with 3+ units, so HPD zeros reflect coverage, not condition. ECB by lot; DOB complaints skipped — no assigned BIN on this lot.",
-          "hpd_registered": false,
-          "hpd": {
-            "total": 0,
-            "open": 0,
-            "open_by_class": {
-              "A": 0,
-              "B": 0,
-              "C": 0,
-              "I": 0
-            },
-            "last_24mo": 0,
-            "prior_24mo": 0,
-            "most_recent_inspection": null
-          },
-          "ecb": {
-            "total": 1,
-            "active": 0,
-            "active_by_severity": {},
-            "most_recent_issue": "2025-11-13"
-          },
-          "dob_complaints": {
-            "total": 0,
-            "active": 0,
-            "last_24mo": 0,
-            "most_recent": null,
-            "top_categories": []
-          },
-          "recent_items": [
-            {
-              "source": "ECB",
-              "date": "2025-11-13",
-              "label": "CLASS - 1 Construction — FAILURE TO SAFEGUARD THE PUBLIC AND PROPERTY AFFECTED BY CONSTRUCTION OPERATIONS. NOTED: AT THE TIME OF INSPECTION OBSER",
-              "status": "RESOLVE",
-              "violation_id": "39166964H"
-            }
-          ],
-          "all_items": [
-            {
-              "source": "ECB",
-              "date": "2025-11-13",
-              "label": "CLASS - 1 Construction — FAILURE TO SAFEGUARD THE PUBLIC AND PROPERTY AFFECTED BY CONSTRUCTION OPERATIONS. NOTED: AT THE TIME OF INSPECTION OBSER",
-              "status": "RESOLVE",
-              "violation_id": "39166964H"
-            }
-          ]
-        },
-        "provenance": "live",
-        "source": "NYC Open Data — HPD violations (wvxf-dwi5), ECB violations (6bgk-3dad), DOB complaints (eabe-havv)",
-        "fetched_at": "2026-08-25T23:12:17.851Z"
-      }
-    },
-    {
-      "key": "provider:lihtcEligibility.getLihtcEligibility#95b896f828c3f81831759f560cb4a377a30e190a",
-      "value": {
-        "ok": true,
-        "data": {
-          "is_qct": false,
-          "is_dda": true,
-          "dda_name": "New York, NY HUD Metro FMR Area",
-          "dda_type": "Small Area DDA",
-          "scope_note": "HUD LIHTC eligibility (QCT 2026 by tract, DDA by area). Not in a Qualified Census Tract. In a Difficult Development Area (New York, NY HUD Metro FMR Area, Small Area DDA). A QCT or DDA designation qualifies a Low-Income Housing Tax Credit project for a 30% eligible-basis boost (affordable-housing feasibility signal)."
-        },
-        "provenance": "live",
-        "source": "HUD Qualified Census Tracts (2026) + Difficult Development Areas (HUD Official Content ArcGIS)",
-        "endpoint": "https://services.arcgis.com/VTyQ9soqVukalItT/arcgis/rest/services/QUALIFIED_CENSUS_TRACTS_2026/FeatureServer/0/query?where=GEOID%3D'36047011901'&returnCountOnly=true&f=json",
-        "fetched_at": "2026-08-25T23:12:17.854Z"
-      }
-    },
-    {
-      "key": "provider:landlordPortfolio.getPortfolio#ed4a7d2264e0b8f2b114c2190377eefa34c378e8",
-      "value": {
-        "ok": true,
-        "data": {
-          "subject_bbl": "3009720058",
-          "hpd_registered": false,
-          "registered_owner": null,
-          "registered_owner_address": null,
-          "owner_type": null,
-          "management_company": null,
-          "portfolio_building_count": 0,
-          "portfolio_truncated": false,
-          "portfolio_open_hpd_violations": 0,
-          "portfolio_total_hpd_violations": 0,
-          "on_speculation_watch_list": false,
-          "match_caveat": "Not an HPD-registered multiple dwelling (HPD registration covers rentals with 3+ units) — no registered-owner record exists to resolve. Exact-match on the registered entity name only (v1): portfolios held through separate LLCs per building are undercounted. Ownership as registered with HPD; registrations lag reality.",
-          "buildings": []
-        },
-        "provenance": "live",
-        "source": "NYC Open Data — HPD registrations (tesw-yqqr), contacts (feu5-w2e2), Speculation Watch List (adax-9mit)",
-        "fetched_at": "2026-08-25T23:12:17.853Z"
-      }
-    },
-    {
-      "key": "provider:climate.getClimate#1fa9c0f9799195c1ccbfe7250d18a2eb94ab0f57",
-      "value": {
-        "ok": true,
-        "data": {
-          "station_id": "GHCND:USC00305796",
-          "station_name": "NEW YORK, NY US",
-          "normals_period": "1991-2020",
-          "annual_avg_temp_f": 55.4,
-          "annual_precip_in": 46.6,
-          "scope_note": "NOAA NCEI 1991–2020 climate normals at the nearest county station (NEW YORK, NY US)."
-        },
-        "provenance": "live",
-        "source": "NOAA NCEI Climate Data Online — 1991–2020 normals",
-        "endpoint": "https://www.ncdc.noaa.gov/cdo-web/api/v2/data?datasetid=NORMAL_ANN&stationid=GHCND:USC00305796",
-        "fetched_at": "2026-08-25T23:12:17.851Z"
-      }
-    },
-    {
-      "key": "provider:seismic.getSeismic#eaffa075d5da7af6f3e54e9e7f586aa3505b3c8f",
-      "value": {
-        "ok": true,
-        "data": {
-          "pga_g": 0.17,
-          "ss_g": 0.27,
-          "s1_g": 0.05,
-          "design_reference": "ASCE 7-22, Risk Category II, Site Class D (default) — Seismic Design Category B",
-          "historical_quakes_50km_m3plus": 7,
-          "largest_nearby_magnitude": 3.6,
-          "scope_note": "USGS mapped seismic design values (ASCE 7-22) at the point, plus M3+ earthquakes within 50 km since 1970 (USGS ComCat). Design values are modeled hazard, not events."
-        },
-        "provenance": "live",
-        "source": "USGS Earthquake Hazards (ASCE 7-22 building-codes + ComCat catalog)",
-        "endpoint": "https://earthquake.usgs.gov/ws/building-codes/asce7-22/calculate?latitude=40.67596&longitude=-73.9888&riskCategory=II&siteClass=D",
-        "fetched_at": "2026-08-25T23:12:17.850Z"
-      }
-    },
-    {
-      "key": "provider:hpi.getHpi#cc88bdc04869d56564f37084e7249f93f9f57efc",
-      "value": {
-        "ok": true,
-        "data": {
-          "region": "New York-Jersey City-White Plains, NY-NJ",
-          "region_type": "Metropolitan Division (35614)",
-          "latest_index": 442.18,
-          "latest_period": "2026 Q1",
-          "yoy_change_pct": 5.6,
-          "five_yr_change_pct": 45
-        },
-        "provenance": "live",
-        "source": "FHFA House Price Index (via KOANO durable archive, 2026 Q1)",
-        "fetched_at": "2026-08-25T23:12:17.840Z"
-      }
-    },
-    {
-      "key": "provider:migration.getMigration#ad8e6155dfae1da68df880c015d84150859ac2e4",
-      "value": {
-        "ok": true,
-        "data": {
-          "vintage": "IRS SOI 2021-2022",
-          "inflow_returns": 66853,
-          "outflow_returns": 78370,
-          "net_migration_returns": -11517,
-          "inflow_agi_per_return_usd": 94892,
-          "outflow_agi_per_return_usd": 92760,
-          "scope_note": "IRS SOI county-to-county migration (2021-2022). Returns ≈ households; AGI-per-return ≈ average income of movers. Net = in − out. Address = filing address (not necessarily residence); ~2-year vintage."
-        },
-        "provenance": "live",
-        "source": "IRS SOI county migration (2021-2022)",
-        "fetched_at": "2026-08-25T23:12:17.849Z"
-      }
-    },
-    {
-      "key": "provider:contamination.getContamination#86fef07ff4fc6e2fbed46ab133f780d22c561c3d",
-      "value": {
-        "ok": true,
-        "data": {
-          "sites": [
-            {
-              "name": "543 UNION STREET",
-              "program": "SEMS (Superfund)",
-              "latitude": 40.67928,
-              "longitude": -73.98744,
-              "distance_mi": 0.24
-            },
-            {
-              "name": "GOWANUS CANAL",
-              "program": "SEMS (Superfund)",
-              "latitude": 40.681639,
-              "longitude": -73.987333,
-              "distance_mi": 0.4
-            },
-            {
-              "name": "PITTSBURGH WHITE METAL",
-              "program": "SEMS (Superfund)",
-              "latitude": 40.67658,
-              "longitude": -74.00198,
-              "distance_mi": 0.69
-            },
-            {
-              "name": "NYC DEPT OF PARKS-COLUMBIA SMELTING & REFINING WORKS SITE",
-              "program": "SEMS (Superfund)",
-              "latitude": 40.6739,
-              "longitude": -74.00524,
-              "distance_mi": 0.87
-            },
-            {
-              "name": "RED HOOK PARK",
-              "program": "SEMS (Superfund)",
-              "latitude": 40.67224,
-              "longitude": -74.00637,
-              "distance_mi": 0.96
-            },
-            {
-              "name": "ULANO CORP",
-              "program": "SEMS (Superfund)",
-              "latitude": 40.6798,
-              "longitude": -73.97009,
-              "distance_mi": 1.02
-            },
-            {
-              "name": "ATLAS WHITE METAL CO.",
-              "program": "SEMS (Superfund)",
-              "latitude": 40.680061,
-              "longitude": -74.00852,
-              "distance_mi": 1.07
-            },
-            {
-              "name": "RED HOOK GREEN STREET EXPANSION",
-              "program": "ACRES (brownfield)",
-              "latitude": 40.671774,
-              "longitude": -74.009114,
-              "distance_mi": 1.1
-            },
-            {
-              "name": "NYC-TA 370 JAY ST",
-              "program": "ACRES (brownfield)",
-              "latitude": 40.69296,
-              "longitude": -73.98724,
-              "distance_mi": 1.18
-            },
-            {
-              "name": "US INFORMATION AGENCY",
-              "program": "SEMS (Superfund)",
-              "latitude": 40.65954,
-              "longitude": -74.00245,
-              "distance_mi": 1.34
-            },
-            {
-              "name": "THEODORE ROOSEVELT U.S. COURTHOUSE (FORMERLY EMANUEL CELLLARD FEDERAL BUILDING)",
-              "program": "SEMS (Superfund)",
-              "latitude": 40.697055,
-              "longitude": -73.989991,
-              "distance_mi": 1.46
-            },
-            {
-              "name": "1194 PROSPECT AVENUE",
-              "program": "ACRES (brownfield)",
-              "latitude": 40.65425,
-              "longitude": -73.97637,
-              "distance_mi": 1.64
-            },
-            {
-              "name": "GOVERNORS ISLAND CORP D/B/A THE TRUST FOR GOVERNORS ISLAND",
-              "program": "SEMS (Superfund)",
-              "latitude": 40.69325,
-              "longitude": -74.01528,
-              "distance_mi": 1.83
-            },
-            {
-              "name": "BUSH TERMINAL",
-              "program": "ACRES (brownfield)",
-              "latitude": 40.656313,
-              "longitude": -74.013027,
-              "distance_mi": 1.86
-            },
-            {
-              "name": "NMCRC-FLOYD BENNETT",
-              "program": "SEMS (Superfund)",
-              "latitude": 40.69772,
-              "longitude": -73.96775,
-              "distance_mi": 1.86
-            },
-            {
-              "name": "CON-ED FARRAGUT SUBSTATION PCB SPILL",
-              "program": "SEMS (Superfund)",
-              "latitude": 40.70435,
-              "longitude": -73.984813,
-              "distance_mi": 1.97
-            }
-          ],
-          "radius_mi": 2,
-          "scope_note": "EPA Facility Registry Service — cleanup sites within 2 mi of the point. SEMS = Superfund program sites (NPL and non-NPL); ACRES = brownfield sites. Zero within the radius is a real coverage result, not \"no risk\".",
-          "nearest_site_name": "543 UNION STREET",
-          "nearest_site_program": "SEMS (Superfund)",
-          "brownfield_within_radius": 4,
-          "nearest_site_distance_mi": 0.24,
-          "superfund_sites_within_radius": 12,
-          "total_cleanup_sites_within_radius": 16
-        },
-        "provenance": "live",
-        "source": "EPA Facility Registry Service (SEMS Superfund + ACRES brownfields) — via KOANO per-BBL cache",
-        "endpoint": "https://ofmpub.epa.gov/frs_public2/frs_rest_services.get_facilities?latitude83=40.67596&longitude83=-73.9888&search_radius=2&pgm_sys_acrnm=SEMS|ACRES&output=JSON",
-        "fetched_at": "2026-08-25T23:12:17.850Z"
-      }
-    },
-    {
-      "key": "provider:employment.getEmployment#92aa2d3595d723075974e71f59fdd73364a13143",
-      "value": {
-        "ok": true,
-        "data": {
-          "period": "2025 Q4",
-          "total_employment": 928387,
-          "avg_weekly_wage_usd": 1242,
-          "employment_yoy_pct": -2.9,
-          "avg_weekly_wage_yoy_pct": 4.6,
-          "establishments": 75628,
-          "scope_note": "BLS QCEW county totals (all ownerships & industries): month-3 employment, average weekly wage, and their over-the-year % change (from the QCEW file). Quarterly, ~5-month lag."
-        },
-        "provenance": "live",
-        "source": "BLS QCEW (2025 Q4, county totals)",
-        "endpoint": "https://data.bls.gov/cew/data/api/2025/4/area/36047.csv",
-        "fetched_at": "2026-08-25T23:12:17.849Z"
+        "source": "FEMA National Flood Hazard Layer (S_FLD_HAZ_AR)",
+        "endpoint": "https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer/28/query?geometry=-73.9888,40.67596&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=FLD_ZONE,ZONE_SUBTY,STATIC_BFE&returnGeometry=false&f=json",
+        "fetched_at": "2026-08-26T12:52:11.303Z"
       }
     },
     {
@@ -794,8 +223,8 @@
         "ok": true,
         "data": {
           "bin": "3000000",
-          "scope_note": "Census tract 11901, Brooklyn — permits issued last 24 months (677 in tract; 13 on subject BBL 3009720058)",
-          "total_permits_24mo": 677,
+          "scope_note": "Census tract 11901, Brooklyn — permits issued last 24 months (675 in tract; 13 on subject BBL 3009720058)",
+          "total_permits_24mo": 675,
           "new_building_permits": 0,
           "demolition_permits": 10,
           "alteration_permits": 206,
@@ -955,19 +384,11 @@
               "borough": "Brooklyn"
             },
             {
-              "job_type": "Standpipe",
-              "work_type": "Standpipe",
-              "permit_status": "Permit Issued",
-              "issuance_date": "2026-08-18T00:00:00.000",
-              "address": "241 THIRD AVENUE",
-              "borough": "Brooklyn"
-            },
-            {
               "job_type": "Sprinklers",
               "work_type": "Sprinklers",
               "permit_status": "Permit Issued",
               "issuance_date": "2026-08-18T00:00:00.000",
-              "address": "241 THIRD AVENUE",
+              "address": "610 SACKETT STREET",
               "borough": "Brooklyn"
             },
             {
@@ -975,7 +396,15 @@
               "work_type": "Standpipe",
               "permit_status": "Permit Issued",
               "issuance_date": "2026-08-18T00:00:00.000",
-              "address": "241 THIRD AVENUE",
+              "address": "610 SACKETT STREET",
+              "borough": "Brooklyn"
+            },
+            {
+              "job_type": "Standpipe",
+              "work_type": "Standpipe",
+              "permit_status": "Permit Issued",
+              "issuance_date": "2026-08-18T00:00:00.000",
+              "address": "610 SACKETT STREET",
               "borough": "Brooklyn"
             }
           ],
@@ -1185,8 +614,582 @@
         },
         "provenance": "live",
         "source": "NYC Open Data — DOB permits (DOB NOW: Build rbx6-tga4 + legacy DOB Permit Issuance ipu4-2q9a)",
-        "endpoint": "https://data.cityofnewyork.us/resource/rbx6-tga4.json?$where=census_tract%3D'11901'%20AND%20upper(borough)%3Dupper('Brooklyn')%20AND%20issued_date%20%3E%20'2024-08-25T00%3A00%3A00.000'&$order=issued_date%20DESC&$limit=2000",
-        "fetched_at": "2026-08-25T23:12:17.846Z"
+        "endpoint": "https://data.cityofnewyork.us/resource/rbx6-tga4.json?$where=census_tract%3D'11901'%20AND%20upper(borough)%3Dupper('Brooklyn')%20AND%20issued_date%20%3E%20'2024-08-26T00%3A00%3A00.000'&$order=issued_date%20DESC&$limit=2000",
+        "fetched_at": "2026-08-26T12:52:11.300Z"
+      }
+    },
+    {
+      "key": "provider:mlsComps.getComps#c9ee62c7689c6cc277b609785d3b610b51e5cec2",
+      "value": {
+        "ok": true,
+        "data": {
+          "comps": [
+            {
+              "address": "281 3RD AVE",
+              "sale_price": 1725000,
+              "sale_date": "2025-12-22",
+              "price_per_sqft": 575,
+              "gross_square_feet": 3000,
+              "building_class": "02 TWO FAMILY DWELLINGS",
+              "distance_mi": 0.18,
+              "latitude": 40.677299,
+              "longitude": -73.9858567
+            },
+            {
+              "address": "171 8 STREET",
+              "sale_price": 2358305,
+              "sale_date": "2026-05-04",
+              "price_per_sqft": 1128,
+              "gross_square_feet": 2090,
+              "building_class": "02 TWO FAMILY DWELLINGS",
+              "distance_mi": 0.28,
+              "latitude": 40.6719333,
+              "longitude": -73.9897151
+            },
+            {
+              "address": "173 8TH STREET",
+              "sale_price": 3150000,
+              "sale_date": "2025-10-21",
+              "price_per_sqft": 1507,
+              "gross_square_feet": 2090,
+              "building_class": "02 TWO FAMILY DWELLINGS",
+              "distance_mi": 0.28,
+              "latitude": 40.6719059,
+              "longitude": -73.9896574
+            },
+            {
+              "address": "124 8 STREET",
+              "sale_price": 1840000,
+              "sale_date": "2026-06-10",
+              "price_per_sqft": 1072,
+              "gross_square_feet": 1716,
+              "building_class": "02 TWO FAMILY DWELLINGS",
+              "distance_mi": 0.29,
+              "latitude": 40.6724687,
+              "longitude": -73.9918852
+            },
+            {
+              "address": "576 CARROLL STREET",
+              "sale_price": 3745000,
+              "sale_date": "2026-04-07",
+              "price_per_sqft": 1628,
+              "gross_square_feet": 2300,
+              "building_class": "02 TWO FAMILY DWELLINGS",
+              "distance_mi": 0.3,
+              "latitude": 40.67566,
+              "longitude": -73.9831316
+            },
+            {
+              "address": "290 5TH STREET",
+              "sale_price": 2700000,
+              "sale_date": "2025-11-25",
+              "price_per_sqft": 974,
+              "gross_square_feet": 2772,
+              "building_class": "03 THREE FAMILY DWELLINGS",
+              "distance_mi": 0.3,
+              "latitude": 40.6721855,
+              "longitude": -73.9860489
+            },
+            {
+              "address": "244A 7TH STREET",
+              "sale_price": 2983913,
+              "sale_date": "2026-05-12",
+              "price_per_sqft": 1895,
+              "gross_square_feet": 1575,
+              "building_class": "02 TWO FAMILY DWELLINGS",
+              "distance_mi": 0.3,
+              "latitude": 40.6715846,
+              "longitude": -73.9883057
+            },
+            {
+              "address": "246 7TH STREET",
+              "sale_price": 2969313,
+              "sale_date": "2026-05-12",
+              "price_per_sqft": 1885,
+              "gross_square_feet": 1575,
+              "building_class": "02 TWO FAMILY DWELLINGS",
+              "distance_mi": 0.31,
+              "latitude": 40.6715626,
+              "longitude": -73.9882588
+            },
+            {
+              "address": "34 GARFIELD PLACE",
+              "sale_price": 2851100,
+              "sale_date": "2026-06-17",
+              "price_per_sqft": 634,
+              "gross_square_feet": 4500,
+              "building_class": "01 ONE FAMILY DWELLINGS",
+              "distance_mi": 0.31,
+              "latitude": 40.6749353,
+              "longitude": -73.9830957
+            },
+            {
+              "address": "418 4TH AVENUE",
+              "sale_price": 3956600,
+              "sale_date": "2026-05-12",
+              "price_per_sqft": 1704,
+              "gross_square_feet": 2322,
+              "building_class": "03 THREE FAMILY DWELLINGS",
+              "distance_mi": 0.31,
+              "latitude": 40.6715242,
+              "longitude": -73.9881182
+            }
+          ],
+          "median_price_per_sqft": 1154,
+          "sales_count": 100,
+          "price_trend": "rising",
+          "scope_note": "Comparables are recorded residential sales ranked by true distance from the subject (DOF sale → PLUTO centroid), last 12 months. 100 within 1 mi. Condos/co-ops without recorded square footage are excluded, so comps skew to 1-3 family homes. NYC only."
+        },
+        "provenance": "live",
+        "source": "NYC Open Data — DOF Rolling Calendar Sales (usep-8jbt)",
+        "fetched_at": "2026-08-26T12:52:11.298Z"
+      }
+    },
+    {
+      "key": "provider:lihtcEligibility.getLihtcEligibility#95b896f828c3f81831759f560cb4a377a30e190a",
+      "value": {
+        "ok": true,
+        "data": {
+          "is_qct": false,
+          "is_dda": true,
+          "dda_name": "New York, NY HUD Metro FMR Area",
+          "dda_type": "Small Area DDA",
+          "scope_note": "HUD LIHTC eligibility (QCT 2026 by tract, DDA by area). Not in a Qualified Census Tract. In a Difficult Development Area (New York, NY HUD Metro FMR Area, Small Area DDA). A QCT or DDA designation qualifies a Low-Income Housing Tax Credit project for a 30% eligible-basis boost (affordable-housing feasibility signal)."
+        },
+        "provenance": "live",
+        "source": "HUD Qualified Census Tracts (2026) + Difficult Development Areas (HUD Official Content ArcGIS)",
+        "endpoint": "https://services.arcgis.com/VTyQ9soqVukalItT/arcgis/rest/services/QUALIFIED_CENSUS_TRACTS_2026/FeatureServer/0/query?where=GEOID%3D'36047011901'&returnCountOnly=true&f=json",
+        "fetched_at": "2026-08-26T12:52:11.308Z"
+      }
+    },
+    {
+      "key": "provider:opportunityZones.getOpportunityZone#4c384ae2061ebda5e006b7940ced3cb088cdfbda",
+      "value": {
+        "ok": true,
+        "data": {
+          "tract_geoid": "36047011901",
+          "is_opportunity_zone": false,
+          "designation_note": "Tract not found on the QOZ designation list."
+        },
+        "provenance": "live",
+        "source": "IRS/Treasury QOZ designations (public ArcGIS mirror)",
+        "endpoint": "https://services.arcgis.com/VTyQ9soqVukalItT/arcgis/rest/services/Opportunity_Zones/FeatureServer/13/query?where=GEOID10%3D'36047011901'&outFields=GEOID10,STATE_NAME,Rural&returnGeometry=false&f=json",
+        "fetched_at": "2026-08-26T12:52:11.307Z"
+      }
+    },
+    {
+      "key": "provider:fairMarketRent.getFairMarketRent#f4f69c28a38e302519b6765a9fcf369aab4f7b02",
+      "value": {
+        "ok": true,
+        "data": {
+          "area_name": "New York, NY HUD Metro FMR Area",
+          "fiscal_year": "2026",
+          "fmr_studio": 2529,
+          "fmr_1br": 2655,
+          "fmr_2br": 2910,
+          "fmr_3br": 3644,
+          "fmr_4br": 3959,
+          "scope_note": "HUD Fair Market Rents FY2026 for the county/metro (public domain). This product uses the HUD User Data API but is not endorsed or certified by HUD User."
+        },
+        "provenance": "live",
+        "source": "HUD USER — Fair Market Rents",
+        "endpoint": "https://www.huduser.gov/hudapi/public/fmr/data/3604799999",
+        "fetched_at": "2026-08-26T12:52:11.299Z"
+      }
+    },
+    {
+      "key": "provider:zoning.getZoning#55c0deca2f0cc9e1252dded723155f1226eaa741",
+      "value": {
+        "ok": true,
+        "data": {
+          "bbl": "3009720058",
+          "zoning_district": "M1-4/R7-2",
+          "commercial_overlay": null,
+          "special_district": "G",
+          "land_use_code": "7",
+          "building_class": "G9",
+          "lot_area_sqft": 120793,
+          "building_area_sqft": 13518,
+          "built_far": 0.11,
+          "max_residential_far": 3.44,
+          "max_commercial_far": 2,
+          "unused_far_pct": 97,
+          "year_built": 1973,
+          "residential_units": 0,
+          "assessed_total_usd": 4185900,
+          "assessed_land_usd": 3261600,
+          "max_affordable_residential_far": 5.01,
+          "max_facility_far": 6.5,
+          "owner_name": "GOWANUS 3RD STREET OWNER LLC",
+          "community_district": "306"
+        },
+        "provenance": "live",
+        "source": "NYC Open Data — MapPLUTO (64uk-42ks)",
+        "endpoint": "https://data.cityofnewyork.us/resource/64uk-42ks.json?$where=bbl%3D'3009720058'&$limit=1",
+        "fetched_at": "2026-08-26T12:52:11.306Z"
+      }
+    },
+    {
+      "key": "provider:nationalRisk.getNationalRisk#0c6fedc36df16f0c1a51204b52392c19549da665",
+      "value": {
+        "ok": true,
+        "data": {
+          "tract_fips": "36047011901",
+          "risk_score": 9,
+          "risk_rating": "Very Low",
+          "expected_annual_loss_usd": 506026,
+          "eal_rating": "Very Low",
+          "social_vulnerability_rating": "Relatively Moderate",
+          "community_resilience_rating": "Very Low",
+          "notable_hazards": [
+            {
+              "hazard": "Coastal Flooding",
+              "rating": "Relatively Moderate"
+            }
+          ],
+          "scope_note": "FEMA National Risk Index, census tract 36047011901. Composite risk is a national percentile weighted by expected annual loss, combined with social vulnerability and community resilience; a low composite can still carry a moderate single-hazard rating (see notable hazards). Notable hazards (≥ moderate): Coastal Flooding (Relatively Moderate)."
+        },
+        "provenance": "live",
+        "source": "FEMA National Risk Index (Census tract) via FEMA ArcGIS",
+        "endpoint": "https://services.arcgis.com/XG15cJAlne2vxtgt/arcgis/rest/services/National_Risk_Index_Census_Tracts/FeatureServer/0/query?where=TRACTFIPS%3D'36047011901'&outFields=TRACTFIPS%2CRISK_SCORE%2CRISK_RATNG%2CEAL_VALT%2CEAL_RATNG%2CSOVI_RATNG%2CRESL_RATNG%2CAVLN_RISKR%2CCFLD_RISKR%2CCWAV_RISKR%2CDRGT_RISKR%2CERQK_RISKR%2CHAIL_RISKR%2CHWAV_RISKR%2CHRCN_RISKR%2CISTM_RISKR%2CLNDS_RISKR%2CLTNG_RISKR%2CIFLD_RISKR%2CSWND_RISKR%2CTRND_RISKR%2CTSUN_RISKR%2CVLCN_RISKR%2CWFIR_RISKR%2CWNTW_RISKR&returnGeometry=false&f=json",
+        "fetched_at": "2026-08-26T12:52:11.306Z"
+      }
+    },
+    {
+      "key": "provider:disasterHistory.getDisasterHistory#a1f04791efbdf70ee9b33ddea16e1820dd8bab5d",
+      "value": {
+        "ok": true,
+        "data": {
+          "fips_state": "36",
+          "fips_county": "047",
+          "total_declarations": 24,
+          "declarations_last_10yr": 6,
+          "distinct_incident_types": [
+            "Hurricane",
+            "Flood",
+            "Severe Storm",
+            "Snowstorm",
+            "Biological"
+          ],
+          "most_common_incident": "Hurricane",
+          "most_recent_declaration": "2024-01 — Flood",
+          "scope_note": "Federally-declared disasters for this county (OpenFEMA), all years. Historical multi-peril frequency — complements, not duplicates, the FEMA NFHL regulatory flood zone. This product uses the FEMA OpenFEMA API but is not endorsed by FEMA; the Federal Government / FEMA cannot vouch for data or analyses derived from it after retrieval."
+        },
+        "provenance": "live",
+        "source": "FEMA OpenFEMA — DisasterDeclarationsSummaries",
+        "endpoint": "https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$filter=fipsStateCode%20eq%20'36'%20and%20fipsCountyCode%20eq%20'047'&$orderby=declarationDate desc&$top=1000",
+        "fetched_at": "2026-08-26T12:52:11.304Z"
+      }
+    },
+    {
+      "key": "provider:migration.getMigration#ad8e6155dfae1da68df880c015d84150859ac2e4",
+      "value": {
+        "ok": true,
+        "data": {
+          "vintage": "IRS SOI 2021-2022",
+          "inflow_returns": 66853,
+          "outflow_returns": 78370,
+          "net_migration_returns": -11517,
+          "inflow_agi_per_return_usd": 94892,
+          "outflow_agi_per_return_usd": 92760,
+          "scope_note": "IRS SOI county-to-county migration (2021-2022). Returns ≈ households; AGI-per-return ≈ average income of movers. Net = in − out. Address = filing address (not necessarily residence); ~2-year vintage."
+        },
+        "provenance": "live",
+        "source": "IRS SOI county migration (2021-2022)",
+        "fetched_at": "2026-08-26T12:52:11.303Z"
+      }
+    },
+    {
+      "key": "provider:contamination.getContamination#86fef07ff4fc6e2fbed46ab133f780d22c561c3d",
+      "value": {
+        "ok": true,
+        "data": {
+          "sites": [
+            {
+              "name": "543 UNION STREET",
+              "program": "SEMS (Superfund)",
+              "latitude": 40.67928,
+              "longitude": -73.98744,
+              "distance_mi": 0.24
+            },
+            {
+              "name": "GOWANUS CANAL",
+              "program": "SEMS (Superfund)",
+              "latitude": 40.681639,
+              "longitude": -73.987333,
+              "distance_mi": 0.4
+            },
+            {
+              "name": "PITTSBURGH WHITE METAL",
+              "program": "SEMS (Superfund)",
+              "latitude": 40.67658,
+              "longitude": -74.00198,
+              "distance_mi": 0.69
+            },
+            {
+              "name": "NYC DEPT OF PARKS-COLUMBIA SMELTING & REFINING WORKS SITE",
+              "program": "SEMS (Superfund)",
+              "latitude": 40.6739,
+              "longitude": -74.00524,
+              "distance_mi": 0.87
+            },
+            {
+              "name": "RED HOOK PARK",
+              "program": "SEMS (Superfund)",
+              "latitude": 40.67224,
+              "longitude": -74.00637,
+              "distance_mi": 0.96
+            },
+            {
+              "name": "ULANO CORP",
+              "program": "SEMS (Superfund)",
+              "latitude": 40.6798,
+              "longitude": -73.97009,
+              "distance_mi": 1.02
+            },
+            {
+              "name": "ATLAS WHITE METAL CO.",
+              "program": "SEMS (Superfund)",
+              "latitude": 40.680061,
+              "longitude": -74.00852,
+              "distance_mi": 1.07
+            },
+            {
+              "name": "RED HOOK GREEN STREET EXPANSION",
+              "program": "ACRES (brownfield)",
+              "latitude": 40.671774,
+              "longitude": -74.009114,
+              "distance_mi": 1.1
+            },
+            {
+              "name": "NYC-TA 370 JAY ST",
+              "program": "ACRES (brownfield)",
+              "latitude": 40.69296,
+              "longitude": -73.98724,
+              "distance_mi": 1.18
+            },
+            {
+              "name": "US INFORMATION AGENCY",
+              "program": "SEMS (Superfund)",
+              "latitude": 40.65954,
+              "longitude": -74.00245,
+              "distance_mi": 1.34
+            },
+            {
+              "name": "THEODORE ROOSEVELT U.S. COURTHOUSE (FORMERLY EMANUEL CELLLARD FEDERAL BUILDING)",
+              "program": "SEMS (Superfund)",
+              "latitude": 40.697055,
+              "longitude": -73.989991,
+              "distance_mi": 1.46
+            },
+            {
+              "name": "1194 PROSPECT AVENUE",
+              "program": "ACRES (brownfield)",
+              "latitude": 40.65425,
+              "longitude": -73.97637,
+              "distance_mi": 1.64
+            },
+            {
+              "name": "GOVERNORS ISLAND CORP D/B/A THE TRUST FOR GOVERNORS ISLAND",
+              "program": "SEMS (Superfund)",
+              "latitude": 40.69325,
+              "longitude": -74.01528,
+              "distance_mi": 1.83
+            },
+            {
+              "name": "BUSH TERMINAL",
+              "program": "ACRES (brownfield)",
+              "latitude": 40.656313,
+              "longitude": -74.013027,
+              "distance_mi": 1.86
+            },
+            {
+              "name": "NMCRC-FLOYD BENNETT",
+              "program": "SEMS (Superfund)",
+              "latitude": 40.69772,
+              "longitude": -73.96775,
+              "distance_mi": 1.86
+            },
+            {
+              "name": "CON-ED FARRAGUT SUBSTATION PCB SPILL",
+              "program": "SEMS (Superfund)",
+              "latitude": 40.70435,
+              "longitude": -73.984813,
+              "distance_mi": 1.97
+            }
+          ],
+          "radius_mi": 2,
+          "scope_note": "EPA Facility Registry Service — cleanup sites within 2 mi of the point. SEMS = Superfund program sites (NPL and non-NPL); ACRES = brownfield sites. Zero within the radius is a real coverage result, not \"no risk\".",
+          "nearest_site_name": "543 UNION STREET",
+          "nearest_site_program": "SEMS (Superfund)",
+          "brownfield_within_radius": 4,
+          "nearest_site_distance_mi": 0.24,
+          "superfund_sites_within_radius": 12,
+          "total_cleanup_sites_within_radius": 16
+        },
+        "provenance": "live",
+        "source": "EPA Facility Registry Service (SEMS Superfund + ACRES brownfields) — via KOANO per-BBL cache",
+        "endpoint": "https://ofmpub.epa.gov/frs_public2/frs_rest_services.get_facilities?latitude83=40.67596&longitude83=-73.9888&search_radius=2&pgm_sys_acrnm=SEMS|ACRES&output=JSON",
+        "fetched_at": "2026-08-26T12:52:11.304Z"
+      }
+    },
+    {
+      "key": "provider:buildingViolations.getViolations#de154728cefef59bf641da4f050a6d9d9cbf8f29",
+      "value": {
+        "ok": true,
+        "data": {
+          "bbl": "3009720058",
+          "bin": null,
+          "scope_note": "Not an HPD-registered multiple dwelling — HPD covers rentals with 3+ units, so HPD zeros reflect coverage, not condition. ECB by lot; DOB complaints skipped — no assigned BIN on this lot.",
+          "hpd_registered": false,
+          "hpd": {
+            "total": 0,
+            "open": 0,
+            "open_by_class": {
+              "A": 0,
+              "B": 0,
+              "C": 0,
+              "I": 0
+            },
+            "last_24mo": 0,
+            "prior_24mo": 0,
+            "most_recent_inspection": null
+          },
+          "ecb": {
+            "total": 1,
+            "active": 0,
+            "active_by_severity": {},
+            "most_recent_issue": "2025-11-13"
+          },
+          "dob_complaints": {
+            "total": 0,
+            "active": 0,
+            "last_24mo": 0,
+            "most_recent": null,
+            "top_categories": []
+          },
+          "recent_items": [
+            {
+              "source": "ECB",
+              "date": "2025-11-13",
+              "label": "CLASS - 1 Construction — FAILURE TO SAFEGUARD THE PUBLIC AND PROPERTY AFFECTED BY CONSTRUCTION OPERATIONS. NOTED: AT THE TIME OF INSPECTION OBSER",
+              "status": "RESOLVE",
+              "violation_id": "39166964H"
+            }
+          ],
+          "all_items": [
+            {
+              "source": "ECB",
+              "date": "2025-11-13",
+              "label": "CLASS - 1 Construction — FAILURE TO SAFEGUARD THE PUBLIC AND PROPERTY AFFECTED BY CONSTRUCTION OPERATIONS. NOTED: AT THE TIME OF INSPECTION OBSER",
+              "status": "RESOLVE",
+              "violation_id": "39166964H"
+            }
+          ]
+        },
+        "provenance": "live",
+        "source": "NYC Open Data — HPD violations (wvxf-dwi5), ECB violations (6bgk-3dad), DOB complaints (eabe-havv)",
+        "fetched_at": "2026-08-26T12:52:11.305Z"
+      }
+    },
+    {
+      "key": "provider:seismic.getSeismic#eaffa075d5da7af6f3e54e9e7f586aa3505b3c8f",
+      "value": {
+        "ok": true,
+        "data": {
+          "pga_g": 0.17,
+          "ss_g": 0.27,
+          "s1_g": 0.05,
+          "design_reference": "ASCE 7-22, Risk Category II, Site Class D (default) — Seismic Design Category B",
+          "historical_quakes_50km_m3plus": 7,
+          "largest_nearby_magnitude": 3.6,
+          "scope_note": "USGS mapped seismic design values (ASCE 7-22) at the point, plus M3+ earthquakes within 50 km since 1970 (USGS ComCat). Design values are modeled hazard, not events."
+        },
+        "provenance": "live",
+        "source": "USGS Earthquake Hazards (ASCE 7-22 building-codes + ComCat catalog)",
+        "endpoint": "https://earthquake.usgs.gov/ws/building-codes/asce7-22/calculate?latitude=40.67596&longitude=-73.9888&riskCategory=II&siteClass=D",
+        "fetched_at": "2026-08-26T12:52:11.304Z"
+      }
+    },
+    {
+      "key": "provider:landlordPortfolio.getPortfolio#ed4a7d2264e0b8f2b114c2190377eefa34c378e8",
+      "value": {
+        "ok": true,
+        "data": {
+          "subject_bbl": "3009720058",
+          "hpd_registered": false,
+          "registered_owner": null,
+          "registered_owner_address": null,
+          "owner_type": null,
+          "management_company": null,
+          "portfolio_building_count": 0,
+          "portfolio_truncated": false,
+          "portfolio_open_hpd_violations": 0,
+          "portfolio_total_hpd_violations": 0,
+          "on_speculation_watch_list": false,
+          "match_caveat": "Not an HPD-registered multiple dwelling (HPD registration covers rentals with 3+ units) — no registered-owner record exists to resolve. Exact-match on the registered entity name only (v1): portfolios held through separate LLCs per building are undercounted. Ownership as registered with HPD; registrations lag reality.",
+          "buildings": []
+        },
+        "provenance": "live",
+        "source": "NYC Open Data — HPD registrations (tesw-yqqr), contacts (feu5-w2e2), Speculation Watch List (adax-9mit)",
+        "fetched_at": "2026-08-26T12:52:11.307Z"
+      }
+    },
+    {
+      "key": "provider:hpi.getHpi#cc88bdc04869d56564f37084e7249f93f9f57efc",
+      "value": {
+        "ok": true,
+        "data": {
+          "region": "New York-Jersey City-White Plains, NY-NJ",
+          "region_type": "Metropolitan Division (35614)",
+          "latest_index": 442.18,
+          "latest_period": "2026 Q1",
+          "yoy_change_pct": 5.6,
+          "five_yr_change_pct": 45
+        },
+        "provenance": "live",
+        "source": "FHFA House Price Index (via KOANO durable archive, 2026 Q1)",
+        "fetched_at": "2026-08-26T12:52:11.293Z"
+      }
+    },
+    {
+      "key": "provider:buildingPermitsSupply.getBuildingPermits#acbe446928c76f9e82ade892aeee97ea5b7289bf",
+      "value": {
+        "ok": true,
+        "data": {
+          "fips_state": "36",
+          "prior_year": 2024,
+          "scope_note": "Census Building Permits Survey — Kings County residential building permits, 6,844 units permitted in 2025 (25 single-family, 6,573 in 5+ unit buildings), -32% vs 2024. County-wide market supply — NOT parcel-level activity. Annual data lags the calendar ~12–18 months, so this is a structural supply read (the trend/level of new supply the market is adding), not a current-conditions signal.",
+          "county_name": "Kings County",
+          "fips_county": "047",
+          "latest_year": 2025,
+          "yoy_change_pct": -32,
+          "total_units_prior": 10063,
+          "total_units_latest": 6844,
+          "multifamily_units_latest": 6573,
+          "single_family_units_latest": 25
+        },
+        "provenance": "live",
+        "source": "Census Building Permits Survey (county 36047, 2025, via KOANO durable cache)",
+        "fetched_at": "2026-08-26T12:52:11.299Z"
+      }
+    },
+    {
+      "key": "provider:climate.getClimate#1fa9c0f9799195c1ccbfe7250d18a2eb94ab0f57",
+      "value": {
+        "ok": true,
+        "data": {
+          "station_id": "GHCND:USC00305796",
+          "station_name": "NEW YORK, NY US",
+          "normals_period": "1991-2020",
+          "annual_avg_temp_f": 55.4,
+          "annual_precip_in": 46.6,
+          "scope_note": "NOAA NCEI 1991–2020 climate normals at the nearest county station (NEW YORK, NY US)."
+        },
+        "provenance": "live",
+        "source": "NOAA NCEI Climate Data Online — 1991–2020 normals",
+        "endpoint": "https://www.ncdc.noaa.gov/cdo-web/api/v2/data?datasetid=NORMAL_ANN&stationid=GHCND:USC00305796",
+        "fetched_at": "2026-08-26T12:52:11.305Z"
       }
     },
     {
@@ -1205,40 +1208,59 @@
         "provenance": "live",
         "source": "NYPD Complaint Data via NYC Open Data (5uac-w243)",
         "endpoint": "https://data.cityofnewyork.us/resource/5uac-w243.json (+ https://data.cityofnewyork.us/resource/qgea-i56i.json for prior-year trend)",
-        "fetched_at": "2026-08-25T23:12:17.849Z"
+        "fetched_at": "2026-08-26T12:52:11.303Z"
       }
     },
     {
-      "key": "llm#16a48e96c8c2d8600d77dc59a851fec0bcd731e4",
-      "value": "{\n  \"verdict\": \"hold\",\n  \"conviction\": \"medium\",\n  \"risk_band\": \"moderate\",\n  \"window_band\": \"medium\",\n  \"headline\": \"Local comp prices are rising and printing above tract median on a $/sqft basis, but a 45% five-year run and 6.65% mortgage rates signal mid-to-late cycle caution.\",\n  \"reasoning\": [\n    {\n      \"observation\": \"The metro HPI has appreciated 45% over five years with YoY growth now at 5.6% — a strong cumulative run that is visibly moderating. This pattern (large 5-yr gain, decelerating annual pace) is characteristic of mid-to-late cycle positioning, where further upside exists but the easy gains are behind us.\",\n      \"sources\": [\"FHFA House Price Index (via KOANO durable archive, 2026 Q1)\"]\n    },\n    {\n      \"observation\": \"Recorded local sales show a 'rising' price trend, and the comps median of $1,154/sqft sits well above the tract median home value of $1,629,900 on an implied per-sqft basis for typical two-family stock — indicating recent closed transactions are repricing the local market upward. This is a seller's momentum signal at the micro level.\",\n      \"sources\": [\"NYC Open Data — DOF Rolling Calendar Sales (usep-8jbt)\", \"US Census ACS via Census Reporter (ACS 2024 5-year)\"]\n    },\n    {\n      \"observation\": \"Individual comp data shows wide $/sqft dispersion — from $575/sqft (281 3rd Ave, Dec 2025) to $1,507/sqft (173 8th St, Oct 2025) for similarly classified two-family dwellings. This spread suggests pricing is highly condition- and location-sensitive within the submarket, adding execution risk to any transaction.\",\n      \"sources\": [\"NYC Open Data — DOF Rolling Calendar Sales (usep-8jbt)\"]\n    },\n    {\n      \"observation\": \"The 30-year fixed mortgage rate at 6.65% is a meaningful affordability headwind. At this rate, financing a $2M+ two-family property requires substantial debt service, compressing the buyer pool and limiting price acceleration even in a rising local market.\",\n      \"sources\": [\"Freddie Mac Primary Mortgage Market Survey (PMMS)\"]\n    },\n    {\n      \"observation\": \"HUD FMR for a 2BR is $2,910/month (FY2026). Against comp sale prices in the $1.7M–$3.15M range, gross rent yields are thin (roughly 2–4% on a two-family basis), meaning investor yield support is weak and price sustainability depends heavily on continued appreciation rather than income fundamentals.\",\n      \"sources\": [\"HUD USER — Fair Market Rents\", \"NYC Open Data — DOF Rolling Calendar Sales (usep-8jbt)\"]\n    }\n  ],\n  \"minority_signals\": [\n    {\n      \"signal\": \"Comps price trend is 'rising' with 102 recorded sales in 12 months, indicating active local liquidity and upward price momentum.\",\n      \"note\": \"Momentum is real but occurs against a backdrop of a 45% five-year run and elevated rates — mid-cycle momentum does not override the late-cycle macro context. A buyer entering now captures less upside and faces more rate-driven downside than one who entered earlier in the cycle.\"\n    }\n  ]\n}"
+      "key": "provider:employment.getEmployment#92aa2d3595d723075974e71f59fdd73364a13143",
+      "value": {
+        "ok": true,
+        "data": {
+          "period": "2025 Q4",
+          "total_employment": 928387,
+          "avg_weekly_wage_usd": 1242,
+          "employment_yoy_pct": -2.9,
+          "avg_weekly_wage_yoy_pct": 4.6,
+          "establishments": 75628,
+          "scope_note": "BLS QCEW county totals (all ownerships & industries): month-3 employment, average weekly wage, and their over-the-year % change (from the QCEW file). Quarterly, ~5-month lag."
+        },
+        "provenance": "live",
+        "source": "BLS QCEW (2025 Q4, county totals)",
+        "endpoint": "https://data.bls.gov/cew/data/api/2025/4/area/36047.csv",
+        "fetched_at": "2026-08-26T12:52:11.302Z"
+      }
     },
     {
-      "key": "llm#c4f139736dc0c37b5eae8b1cf6b12e171826f9c1",
-      "value": "{\n  \"verdict\": \"buy\",\n  \"conviction\": \"high\",\n  \"risk_band\": \"moderate\",\n  \"window_band\": \"medium\",\n  \"headline\": \"A Foundation permit issued March 2026 on the subject parcel confirms ground-up redevelopment is already underway, not hypothetical.\",\n  \"reasoning\": [\n    {\n      \"observation\": \"A Foundation permit was issued on 2026-03-04 at 175 3 Street, Brooklyn — the subject parcel. This is the strongest possible pipeline signal: capital has been committed and construction has broken ground.\",\n      \"sources\": [\"NYC Open Data — DOB permits (DOB NOW: Build rbx6-tga4 + legacy DOB Permit Issuance ipu4-2q9a)\"]\n    },\n    {\n      \"observation\": \"Multiple Construction Fence permits (2026-01-06, 2026-03-19, 2026-05-22) and a Protection and Mechanical Methods permit (2026-05-19) on the subject parcel confirm active, ongoing site work sequencing around the foundation permit — the project is progressing, not stalled.\",\n      \"sources\": [\"NYC Open Data — DOB permits (DOB NOW: Build rbx6-tga4 + legacy DOB Permit Issuance ipu4-2q9a)\"]\n    },\n    {\n      \"observation\": \"The subject BBL accounts for 13 of the 677 total permits in the tract over 24 months — a disproportionately high concentration of activity on a single parcel, reinforcing that this is a major development event, not routine maintenance.\",\n      \"sources\": [\"NYC Open Data — DOB permits (DOB NOW: Build rbx6-tga4 + legacy DOB Permit Issuance ipu4-2q9a)\"]\n    },\n    {\n      \"observation\": \"Tract-wide alteration volume of 206 permits over 24 months indicates sustained renovation and improvement activity across the surrounding area, consistent with a neighborhood in active transition rather than stagnation.\",\n      \"sources\": [\"NYC Open Data — DOB permits (DOB NOW: Build rbx6-tga4 + legacy DOB Permit Issuance ipu4-2q9a)\"]\n    },\n    {\n      \"observation\": \"Nearby permits including General Construction at 270 3 Avenue (2026-08-24) and Standpipe permits at 610 Sackett Street and 241 Third Avenue (2026-08-18/19) indicate broader construction activity in the immediate vicinity, suggesting the subject development is part of a wider capital deployment wave in the tract.\",\n      \"sources\": [\"NYC Open Data — DOB permits (DOB NOW: Build rbx6-tga4 + legacy DOB Permit Issuance ipu4-2q9a)\"]\n    }\n  ],\n  \"minority_signals\": [\n    {\n      \"signal\": \"Zero new-building permits recorded in the tract over 24 months, and 10 demolition permits with no corresponding new-building permits at the tract level.\",\n      \"note\": \"The subject parcel's own Foundation permit is the most direct evidence of new ground-up construction; the tract-level new-building count may reflect a classification or timing lag (foundation permits can precede new-building permit issuance in DOB sequencing). The demolitions without visible tract-level rebuilds introduce some uncertainty about net supply addition, but the subject parcel's active pipeline outweighs this concern.\"\n    }\n  ]\n}"
+      "key": "llm#89c67888c46696eac5d3a3c3941026154e3b0d17",
+      "value": "{\n  \"verdict\": \"buy\",\n  \"conviction\": \"high\",\n  \"risk_band\": \"moderate\",\n  \"window_band\": \"medium\",\n  \"headline\": \"A Foundation permit issued March 2026 on the subject parcel confirms ground-up redevelopment is already underway, not hypothetical.\",\n  \"reasoning\": [\n    {\n      \"observation\": \"A Foundation permit was issued on 2026-03-04 at 175 3 Street, Brooklyn — the subject parcel. This is the strongest possible pipeline signal: capital has been committed and physical construction has begun at the site itself.\",\n      \"sources\": [\"NYC Open Data — DOB permits (DOB NOW: Build rbx6-tga4 + legacy DOB Permit Issuance ipu4-2q9a)\"]\n    },\n    {\n      \"observation\": \"Multiple Construction Fence permits (2026-01-06, 2026-03-19, 2026-05-22) and a Protection and Mechanical Methods permit (2026-05-19) on the subject BBL confirm active, ongoing site work sequencing around the foundation pour — these are standard pre- and during-construction permits consistent with a live build.\",\n      \"sources\": [\"NYC Open Data — DOB permits (DOB NOW: Build rbx6-tga4 + legacy DOB Permit Issuance ipu4-2q9a)\"]\n    },\n    {\n      \"observation\": \"The subject parcel accounts for 13 of 675 total permits in the tract over 24 months — a disproportionately high concentration of activity on a single BBL, reinforcing that this is an active development site rather than routine maintenance.\",\n      \"sources\": [\"NYC Open Data — DOB permits (DOB NOW: Build rbx6-tga4 + legacy DOB Permit Issuance ipu4-2q9a)\"]\n    },\n    {\n      \"observation\": \"Tract-level alteration volume of 206 permits over 24 months indicates sustained renovation and improvement activity across the surrounding area, signaling a neighborhood in active capital deployment beyond just the subject parcel.\",\n      \"sources\": [\"NYC Open Data — DOB permits (DOB NOW: Build rbx6-tga4 + legacy DOB Permit Issuance ipu4-2q9a)\"]\n    },\n    {\n      \"observation\": \"Nearby permits at 270 3 Avenue (General Construction, 2026-08-24) and 610 Sackett Street (Standpipe and Sprinklers, 2026-08-18 and 2026-08-19) indicate concurrent construction activity in the immediate vicinity, consistent with a broader neighborhood build-out.\",\n      \"sources\": [\"NYC Open Data — DOB permits (DOB NOW: Build rbx6-tga4 + legacy DOB Permit Issuance ipu4-2q9a)\"]\n    }\n  ],\n  \"minority_signals\": [\n    {\n      \"signal\": \"Zero new-building permits recorded in the tract over 24 months, and 10 demolition permits with no corresponding rebuild permits visible in the data.\",\n      \"note\": \"The subject parcel's own Foundation permit is the functional equivalent of a new-building start for that lot; the tract-level zero on new-building permits may reflect permit classification differences (foundation vs. NB filing type) rather than absence of development. The demolition-without-rebuild pattern in the broader tract introduces some execution risk but does not outweigh the confirmed on-site construction activity.\"\n    }\n  ]\n}"
     },
     {
       "key": "llm#98a327eb5ffd1ac20d770a80741b788b0a6599cb",
-      "value": "{\n  \"verdict\": \"hold\",\n  \"conviction\": \"medium\",\n  \"risk_band\": \"moderate\",\n  \"window_band\": \"medium\",\n  \"headline\": \"Late-stage, high-income neighborhood with stable but constrained demand: a -2.9% employment drop is the key risk offsetting strong demographics and modest mortgage origination growth.\",\n  \"reasoning\": [\n    {\n      \"observation\": \"The tract exhibits classic late-stage gentrification characteristics (stage 6-7): median household income of $165,179, median home value of $1,629,900, and 79% of residents holding a bachelor's degree or higher. This is a fully transitioned, high-wealth enclave with limited remaining upside from demographic upgrading — price support is strong but appreciation driven by gentrification arc is largely exhausted.\",\n      \"sources\": [\"US Census ACS via Census Reporter (ACS 2024 5-year)\"]\n    },\n    {\n      \"observation\": \"Mortgage originations grew modestly at +2.1% year-over-year, indicating purchase demand is still positive but not accelerating. However, the county-level denial rate of 31.9% is elevated, signaling meaningful credit access friction that caps the pool of qualified buyers and suppresses demand conversion — particularly relevant given the $1.6M+ median home value requiring substantial borrower qualification.\",\n      \"sources\": [\"CFPB HMDA Data Browser (2024, county aggregations)\"]\n    },\n    {\n      \"observation\": \"County employment fell -2.9% year-over-year as of 2025 Q4, a meaningful contraction that is a leading indicator of demand softening. This is the most significant demand-side risk in the dataset: job losses reduce the household formation and purchasing power that sustain high-price markets. Average weekly wages rose +4.6% YoY, which partially offsets the employment decline — those still employed are earning more — but the net effect on aggregate demand is negative.\",\n      \"sources\": [\"BLS QCEW (2025 Q4, county totals)\"]\n    },\n    {\n      \"observation\": \"IRS SOI migration data (2021-2022) shows net out-migration of -11,517 returns from the county, a substantial demand headwind. Critically, inflow AGI per return ($94,892) only marginally exceeds outflow AGI per return ($92,760), meaning the county is not attracting meaningfully wealthier in-movers to replace departing households — there is no income-upgrading migration dynamic to support further price appreciation. Note this data is from 2021-2022 and should be treated as directionally informative but potentially dated.\",\n      \"sources\": [\"IRS SOI county migration (2021-2022)\"]\n    },\n    {\n      \"observation\": \"The combination of $2,633 median gross rent and $1,629,900 median home value implies a gross rent yield of approximately 1.9% annually — consistent with a late-stage, appreciation-driven market where rental income alone does not justify entry at current prices. Demand is sustained by wealth and equity, not yield-seeking investors, making the market more sensitive to employment and wealth-effect shocks.\",\n      \"sources\": [\"US Census ACS via Census Reporter (ACS 2024 5-year)\"]\n    }\n  ],\n  \"minority_signals\": [\n    {\n      \"signal\": \"Average weekly wages rose +4.6% YoY, and the tract's $165,179 median household income suggests the resident base is insulated from moderate economic softening.\",\n      \"note\": \"Wage growth among employed workers is a positive signal, but it cannot fully offset a -2.9% employment contraction at the county level, which reduces the total buyer pool and weakens aggregate demand momentum.\"\n    },\n    {\n      \"signal\": \"Mortgage originations are still growing (+2.1% YoY), indicating purchase demand has not yet reversed.\",\n      \"note\": \"The growth rate is marginal and the 31.9% denial rate indicates significant credit friction; origination growth at this pace in a $1.6M median market reflects a very narrow qualified-buyer pool, not broad demand strength.\"\n    }\n  ]\n}"
+      "value": "{\n  \"verdict\": \"hold\",\n  \"conviction\": \"medium\",\n  \"risk_band\": \"moderate\",\n  \"window_band\": \"medium\",\n  \"headline\": \"Late-stage, high-income neighborhood with stable but constrained demand: county employment fell 2.9% YoY while mortgage originations grew only 2.1% against a 31.9% denial rate.\",\n  \"reasoning\": [\n    {\n      \"observation\": \"The tract is firmly in late-stage gentrification (stage 6-7 of 7): median household income of $165,179, median home value of $1,629,900, and 79% of residents holding a bachelor's degree or higher signal a fully arrived, high-wealth demographic with little remaining upward-arc appreciation to capture.\",\n      \"sources\": [\"US Census ACS via Census Reporter (ACS 2024 5-year)\"]\n    },\n    {\n      \"observation\": \"Mortgage originations grew only 2.1% YoY — a marginal positive — but a 31.9% denial rate is materially elevated, indicating that credit access is a binding constraint on purchase demand even among applicants who are motivated enough to apply. These two signals together point to demand that is present but structurally capped.\",\n      \"sources\": [\"CFPB HMDA Data Browser (2024, county aggregations)\"]\n    },\n    {\n      \"observation\": \"County employment fell 2.9% YoY as of 2025 Q4, a meaningful negative for the demand foundation. This is a leading indicator of softening purchase demand and reduced household formation in the county. The average weekly wage rose 4.6% YoY, which partially offsets the employment decline by supporting purchasing power for those who remain employed, but cannot fully compensate for a shrinking employed base.\",\n      \"sources\": [\"BLS QCEW (2025 Q4, county totals)\"]\n    },\n    {\n      \"observation\": \"Net migration was negative at -11,517 returns for 2021-2022, confirming net household outflow from the county. Critically, inflow AGI per return ($94,892) only marginally exceeded outflow AGI per return ($92,760), meaning the county is not experiencing a meaningful income-upgrading migration dynamic — the households leaving and arriving are of nearly identical income profile, so there is no gentrification-pressure inflow to drive further price appreciation.\",\n      \"sources\": [\"IRS SOI county migration (2021-2022)\"]\n    },\n    {\n      \"observation\": \"The combination of a late-stage demographic profile (high income, high education, very high home values) and net out-migration means demand upside is limited. The neighborhood is in a stability-to-mild-softening regime rather than an appreciation regime. A 'hold' verdict is appropriate: existing owners are protected by high asset values and strong wage levels, but new buyers face high entry prices, tight credit, and a weakening employment base.\",\n      \"sources\": [\"US Census ACS via Census Reporter (ACS 2024 5-year)\", \"BLS QCEW (2025 Q4, county totals)\", \"IRS SOI county migration (2021-2022)\"]\n    }\n  ],\n  \"minority_signals\": [\n    {\n      \"signal\": \"Average weekly wages rose 4.6% YoY, suggesting that employed residents are gaining real purchasing power.\",\n      \"note\": \"Wage growth for the employed is a positive, but it is outweighed by the 2.9% employment decline (fewer buyers in the market), the 31.9% denial rate (credit access constraint), and net out-migration — the wage signal supports stability but not a 'buy' call.\"\n    },\n    {\n      \"signal\": \"Mortgage originations did grow 2.1% YoY, indicating some positive purchase momentum.\",\n      \"note\": \"The growth rate is too modest, and the denial rate too high, to read this as a strengthening demand signal. It is consistent with a 'hold' rather than a 'buy'.\"\n    }\n  ]\n}"
+    },
+    {
+      "key": "llm#94742af3aaf1879368940c21b5012267ecbc73e9",
+      "value": "{\n  \"verdict\": \"hold\",\n  \"conviction\": \"medium\",\n  \"risk_band\": \"moderate\",\n  \"window_band\": \"medium\",\n  \"headline\": \"Local recorded sales are trending higher and the metro HPI is up 5.6% YoY, but a 6.65% 30-yr rate and a tract median near $1.63M create meaningful affordability drag that limits near-term upside urgency.\",\n  \"reasoning\": [\n    {\n      \"observation\": \"The NY-NJ metro HPI has risen 45% over five years and is still printing +5.6% YoY as of 2026 Q1 — a strong five-year run with YoY appreciation moderating relative to that base, a classic mid-to-late cycle signature. There is no imminent collapse signal, but the easy-appreciation phase is likely behind us.\",\n      \"sources\": [\"FHFA House Price Index (via KOANO durable archive, 2026 Q1)\"]\n    },\n    {\n      \"observation\": \"Recorded local sales show a 'rising' price trend, and the comps median of $1,154/sqft sits well above the tract median home value of $1,629,900 when considered on a per-sqft basis for 1,400–2,100 sqft two-family stock — indicating recent closed transactions are repricing the local market upward. Seller momentum is intact at the micro level.\",\n      \"sources\": [\"NYC Open Data — DOF Rolling Calendar Sales (usep-8jbt)\", \"US Census ACS via Census Reporter (ACS 2024 5-year)\"]\n    },\n    {\n      \"observation\": \"Individual comp dispersion is wide: $575/sqft (281 3rd Ave, Dec 2025) to $1,507/sqft (173 8th St, Oct 2025) for similar two-family dwellings. This spread signals heterogeneous deal quality and condition rather than a uniform market price, which elevates execution risk — a buyer must underwrite carefully to avoid overpaying relative to the lower end of the range.\",\n      \"sources\": [\"NYC Open Data — DOF Rolling Calendar Sales (usep-8jbt)\"]\n    },\n    {\n      \"observation\": \"The 30-yr fixed rate at 6.65% is a meaningful affordability headwind on a $1.6M+ asset class. At this rate, a conventional 80% LTV mortgage on a $1.7M purchase implies ~$9,100/month in principal and interest alone — well above the HUD FMR 2BR benchmark of $2,910/month, compressing investor yield support and limiting the pool of leveraged buyers.\",\n      \"sources\": [\"Freddie Mac Primary Mortgage Market Survey (PMMS)\", \"HUD USER — Fair Market Rents\"]\n    },\n    {\n      \"observation\": \"Kings County permitted units fell -32% YoY in 2025 to 6,844 total (6,573 in 5+ unit buildings, only 25 single-family). Per the scope note, this is a lagged, county-wide structural read — not current conditions. The supply pullback modestly supports pricing for 1–3 family stock over the medium term, but the near-zero single-family pipeline is the more relevant shade for this asset type. This shades conviction toward hold rather than wait, but does not flip the verdict.\",\n      \"sources\": [\"Census Building Permits Survey (county 36047, 2025, via KOANO durable cache)\", \"Census Building Permits Survey (county 36047, 2025, via KOANO durable cache)\"]\n    }\n  ],\n  \"minority_signals\": [\n    {\n      \"signal\": \"Recorded sales price trend is 'rising' with 100 comps in 12 months and the metro HPI still positive — one could argue for a 'buy' on momentum.\",\n      \"note\": \"The 45% five-year run and 6.65% rate environment mean the market is mid-to-late cycle with compressed affordability. Momentum is real but the risk-adjusted entry is not compelling enough to upgrade from hold to buy without a clearer rate tailwind or a specific below-median comp opportunity.\"\n    }\n  ]\n}"
     },
     {
       "key": "llm#8be84fe8380716d7953e77cd38295d3d54c413b6",
-      "value": "{\n  \"verdict\": \"wait\",\n  \"conviction\": \"medium\",\n  \"risk_band\": \"high\",\n  \"window_band\": \"long\",\n  \"headline\": \"Massive 97% unused FAR on a 120,793 sq ft lot under M1-4/R7-2 zoning signals extraordinary latent residential value, but special district G and entitlement complexity demand patience before committing capital.\",\n  \"reasoning\": [\n    {\n      \"observation\": \"The site carries 97% unused FAR on a 120,793 sq ft lot — built FAR of only 0.11 against a max residential FAR of 3.44 — representing one of the largest development headroom profiles possible. This is a textbook redevelopment candidate: a 1973-vintage industrial building (building class G9, land use code 7) consuming a tiny fraction of its allowable envelope.\",\n      \"sources\": [\n        \"NYC Open Data — MapPLUTO (64uk-42ks)\"\n      ]\n    },\n    {\n      \"observation\": \"The zoning designation is M1-4/R7-2 — a manufacturing district with a residential overlay component — which means residential development rights exist as-of-right under the R7-2 component, a material distinction from pure M- zoning. However, the residential FAR of 3.44 and commercial FAR of 2.0 are subject to the rules of the overlay, and the actual as-of-right envelope must be confirmed through entitlement review, not assumed.\",\n      \"sources\": [\n        \"NYC Open Data — MapPLUTO (64uk-42ks)\"\n      ]\n    },\n    {\n      \"observation\": \"Special district G is in effect per the zoning source. This designation affects what can be built as-of-right and introduces regulatory constraints or requirements beyond the base zoning. The specific rules of special district G are not supplied by the data; they must be independently verified before any development program is underwritten.\",\n      \"sources\": [\n        \"NYC Open Data — MapPLUTO (64uk-42ks)\"\n      ]\n    },\n    {\n      \"observation\": \"The site is in a HUD Difficult Development Area (New York, NY HUD Metro FMR Area), qualifying any LIHTC project here for a 30% eligible-basis boost. This is a material affordable-housing feasibility signal: if a residential program includes affordable or mixed-income components, the DDA designation meaningfully improves tax-credit economics. The site is not in a Qualified Census Tract, but DDA status alone triggers the boost.\",\n      \"sources\": [\n        \"HUD Qualified Census Tracts (2026) + Difficult Development Areas (HUD Official Content ArcGIS)\"\n      ]\n    },\n    {\n      \"observation\": \"The property is not an HPD-registered multiple dwelling, carries zero open or total HPD violations, and is not on the NYC Speculation Watch List. There is no registered-owner record to evaluate operator regulatory exposure. The absence of HPD registration is consistent with the current industrial/garage use (building class G9, 0 residential units) and is not a negative signal — it simply means no rental-housing regulatory history exists.\",\n      \"sources\": [\n        \"NYC Open Data — HPD registrations (tesw-yqqr), contacts (feu5-w2e2), Speculation Watch List (adax-9mit)\"\n      ]\n    },\n    {\n      \"observation\": \"The site is not a federal Opportunity Zone, meaning the 10-year capital-gains basis step-up incentive is unavailable to QOZ investors. This is a neutral finding — it does not impair the development thesis — but it removes one category of tax-advantaged capital that might otherwise accelerate a transaction.\",\n      \"sources\": [\n        \"IRS/Treasury QOZ designations (public ArcGIS mirror)\"\n      ]\n    }\n  ],\n  \"minority_signals\": [\n    {\n      \"signal\": \"Max residential FAR of 3.44 on a 120,793 sq ft lot implies a theoretical buildable envelope exceeding 415,000 sq ft of residential space — an extraordinary scale that, if realizable, would represent transformative value.\",\n      \"note\": \"Special district G constraints and the entitlement process under M1-4/R7-2 may materially reduce the as-of-right program. The theoretical FAR cannot be underwritten without resolving special district G rules, making a 'buy' verdict premature despite the headline numbers.\"\n    },\n    {\n      \"signal\": \"DDA designation provides a 30% LIHTC basis boost, which could make an affordable or mixed-income residential program financially viable at scale.\",\n      \"note\": \"This is a genuine tailwind, but it only matters if the entitlement path to residential use is confirmed. Special district G uncertainty outweighs this incentive at the current stage of diligence.\"\n    }\n  ]\n}"
+      "value": "{\n  \"verdict\": \"wait\",\n  \"conviction\": \"medium\",\n  \"risk_band\": \"high\",\n  \"window_band\": \"long\",\n  \"headline\": \"Massive 97% unused FAR on a 120,793 sq ft lot under M1-4/R7-2 zoning signals extraordinary latent residential value, but special district G imposes as-of-right constraints that require entitlement diligence before acting.\",\n  \"reasoning\": [\n    {\n      \"observation\": \"The site carries a built FAR of only 0.11 against a max residential FAR of 3.44, yielding 97% unused development headroom on a 120,793 sq ft lot — implying roughly 400,000+ sq ft of potential residential buildout. This is a textbook large-scale redevelopment candidate, but realization is entirely subject to entitlement.\",\n      \"sources\": [\"NYC Open Data — MapPLUTO (64uk-42ks)\"]\n    },\n    {\n      \"observation\": \"The zoning designation is M1-4/R7-2, a manufacturing district with a residential overlay. This dual designation confirms residential development rights exist as-of-right within the R7-2 envelope, distinguishing this from a pure M- site where residential plays would face entitlement risk. However, the manufacturing base district (M1-4) means the regulatory framework is more complex than a straight residential zone.\",\n      \"sources\": [\"NYC Open Data — MapPLUTO (64uk-42ks)\"]\n    },\n    {\n      \"observation\": \"Special district G is coded on this parcel, per the zoning source. This designation affects what can be built as-of-right and must be reviewed against the specific district rules before any development program is underwritten. The code alone does not confirm or deny residential permissibility beyond the base zoning — it is a material entitlement variable.\",\n      \"sources\": [\"NYC Open Data — MapPLUTO (64uk-42ks)\"]\n    },\n    {\n      \"observation\": \"The current building class is G9 (a garage/storage-type industrial use) with land use code 7 (industrial/manufacturing), zero residential units, and a 1973 year-built structure covering only 13,518 sq ft of a 120,793 sq ft lot. This profile — old, low-coverage industrial use on a very large lot — is a classic redevelopment candidate where the existing improvement has minimal retention value.\",\n      \"sources\": [\"NYC Open Data — MapPLUTO (64uk-42ks)\"]\n    },\n    {\n      \"observation\": \"The site is in a HUD Difficult Development Area (New York, NY HUD Metro FMR Area), qualifying any LIHTC project here for a 30% eligible-basis boost. This is a material affordable-housing feasibility signal: if a mixed-income or affordable residential program is pursued under the M1-4/R7-2 residential rights, the DDA designation enhances tax credit economics meaningfully.\",\n      \"sources\": [\"HUD Qualified Census Tracts (2026) + Difficult Development Areas (HUD Official Content ArcGIS)\"]\n    },\n    {\n      \"observation\": \"The property is not HPD-registered as a multiple dwelling, has no registered owner record on file, and is not on the NYC Speculation Watch List. The absence of HPD registration is consistent with the current industrial use (no rental units). There is no operator-level regulatory exposure visible from HPD data, though ownership structure cannot be confirmed through this source.\",\n      \"sources\": [\"NYC Open Data — HPD registrations (tesw-yqqr), contacts (feu5-w2e2), Speculation Watch List (adax-9mit)\"]\n    }\n  ],\n  \"minority_signals\": [\n    {\n      \"signal\": \"No federal Opportunity Zone designation (tract not found on QOZ list).\",\n      \"note\": \"Absence is neutral — it removes a capital-gains tax incentive for OZ-fund investors but does not impair the underlying development rights or DDA-based LIHTC economics.\"\n    },\n    {\n      \"signal\": \"Special district G could restrict or condition the residential development program beyond what the R7-2 overlay alone would permit.\",\n      \"note\": \"This is the primary reason for a 'wait' rather than 'buy' verdict — the district code must be resolved against actual district rules before the FAR headroom can be treated as actionable. The latent value is real but not yet bankable.\"\n    }\n  ]\n}"
     },
     {
       "key": "llm#f804f9927b0c75de5ed867755f1b2b0c3a7cc253",
-      "value": "{\n  \"verdict\": \"hold\",\n  \"conviction\": \"medium\",\n  \"risk_band\": \"moderate\",\n  \"window_band\": \"medium\",\n  \"headline\": \"12 Superfund sites within 2 miles — including one SEMS site just 0.24 miles away — combined with a county disaster history dominated by hurricanes and a Coastal Flooding hazard rated Relatively Moderate make this a moderate-risk hold despite a clean flood zone and low composite NRI.\",\n  \"reasoning\": [\n    {\n      \"observation\": \"The property sits in FEMA Zone X (Area of Minimal Flood Hazard), meaning no mandatory flood insurance and no Special Flood Hazard Area designation applies today. This is the regulatory baseline — a genuine positive for current financing and insurance cost.\",\n      \"sources\": [\"FEMA National Flood Hazard Layer (S_FLD_HAZ_AR)\"]\n    },\n    {\n      \"observation\": \"Despite the Zone X designation, the county has 24 total federal disaster declarations — most commonly Hurricane — with 6 in the last 10 years and the most recent a Flood declaration in January 2024. This realized multi-peril frequency, especially hurricane and flood, signals tail risk that the current regulatory zone may understate. A property outside the SFHA in a county with this declaration cadence carries meaningful residual exposure.\",\n      \"sources\": [\"FEMA OpenFEMA — DisasterDeclarationsSummaries\"]\n    },\n    {\n      \"observation\": \"The NRI composite for census tract 36047011901 is rated Very Low (9th national percentile), but the composite does not clear the Coastal Flooding hazard, which is independently rated Relatively Moderate. Community resilience is rated Very Low, meaning the tract has limited capacity to absorb and recover from loss events — amplifying the effective impact of any realized hazard.\",\n      \"sources\": [\"FEMA National Risk Index (Census tract) via FEMA ArcGIS\"]\n    },\n    {\n      \"observation\": \"There are 12 SEMS Superfund program sites and 4 ACRES brownfield sites within 2 miles of the property. The nearest cleanup site (SEMS/Superfund) is at 543 Union Street, just 0.24 miles away. This density of active cleanup sites is a material financing, insurance, and liability risk factor and can complicate due diligence for lenders and buyers.\",\n      \"sources\": [\"EPA Facility Registry Service (SEMS Superfund + ACRES brownfields) — via KOANO per-BBL cache\"]\n    },\n    {\n      \"observation\": \"Crime within 1 mile is elevated in absolute terms (5,254 total incidents YTD; 1,420 violent, 2,882 property), but the trend is flat — no compression or acceleration signal. Flat crime in a dense urban area is a stable-risk reading, not a leading indicator of value erosion or improvement.\",\n      \"sources\": [\"NYPD Complaint Data via NYC Open Data (5uac-w243)\"]\n    },\n    {\n      \"observation\": \"The building is not an HPD-registered multiple dwelling; HPD zeros reflect coverage scope, not a clean bill of health. However, ECB active violations are zero and DOB active complaints are zero, providing a partial positive signal on regulatory standing. Seismic Design Category B (PGA 0.17g, Ss 0.27g) with only 7 historical M3+ earthquakes within 50km represents low but non-zero structural risk — standard for the NYC metro.\",\n      \"sources\": [\"NYC Open Data — HPD violations (wvxf-dwi5), ECB violations (6bgk-3dad), DOB complaints (eabe-havv)\", \"USGS Earthquake Hazards (ASCE 7-22 building-codes + ComCat catalog)\"]\n    }\n  ],\n  \"minority_signals\": [\n    {\n      \"signal\": \"FEMA NRI composite is Very Low (9th percentile nationally) and the property is in Zone X with no SFHA designation.\",\n      \"note\": \"The low composite is loss-weighted at the tract level and does not neutralize the Coastal Flooding moderate single-hazard rating, the county's hurricane-dominated disaster history, or the dense Superfund site cluster — all of which represent risks the composite aggregation can obscure.\"\n    },\n    {\n      \"signal\": \"Zero ECB active violations and zero DOB active complaints.\",\n      \"note\": \"Positive regulatory signal, but HPD non-registration means the HPD zeros are a coverage artifact; the building's condition cannot be fully assessed from this data alone.\"\n    }\n  ]\n}"
+      "value": "{\n  \"verdict\": \"hold\",\n  \"conviction\": \"medium\",\n  \"risk_band\": \"moderate\",\n  \"window_band\": \"long\",\n  \"headline\": \"Contamination density is the dominant risk signal: 12 Superfund sites within 2 miles with the nearest SEMS site at 0.24 miles, compounded by a coastal flooding tail risk that the low NRI composite understates.\",\n  \"reasoning\": [\n    {\n      \"observation\": \"The property sits in FEMA Zone X (Area of Minimal Flood Hazard) with no Special Flood Hazard Area designation and no base flood elevation requirement — regulatory flood exposure is low today and mandatory flood insurance is not triggered.\",\n      \"sources\": [\"FEMA National Flood Hazard Layer (S_FLD_HAZ_AR)\"]\n    },\n    {\n      \"observation\": \"Despite the low NRI composite (9th national percentile, 'Very Low'), the tract carries a 'Relatively Moderate' Coastal Flooding hazard rating — the composite does not clear this single-peril signal. The county's disaster history reinforces it: 24 total federal declarations including Hurricane and Flood as the most common and most recent incident types (Flood, January 2024), indicating realized multi-peril frequency that the current Zone X designation may understate for tail events.\",\n      \"sources\": [\"FEMA National Risk Index (Census tract) via FEMA ArcGIS\", \"FEMA OpenFEMA — DisasterDeclarationsSummaries\"]\n    },\n    {\n      \"observation\": \"Contamination exposure is elevated: 12 SEMS Superfund sites and 4 brownfield sites lie within 2 miles, and the nearest SEMS (Superfund program) site is at 543 Union Street, just 0.24 miles away. Proximity to active cleanup sites can gate financing and insurance and represents a latent value/liability risk.\",\n      \"sources\": [\"EPA Facility Registry Service (SEMS Superfund + ACRES brownfields) — via KOANO per-BBL cache\"]\n    },\n    {\n      \"observation\": \"Crime within 1 mile is high in absolute volume (5,254 total incidents YTD including 1,420 violent and 2,882 property incidents) but the trend is flat — no compression or acceleration signal is present, so crime is a stable pricing factor rather than a directional risk driver.\",\n      \"sources\": [\"NYPD Complaint Data via NYC Open Data (5uac-w243)\"]\n    },\n    {\n      \"observation\": \"Seismic exposure is low: PGA of 0.17g, Ss of 0.27g, S1 of 0.05g, and Seismic Design Category B under ASCE 7-22 Risk Category II Site Class D. Only 7 historical M3+ earthquakes within 50 km with a maximum magnitude of 3.6 — seismic risk does not materially contribute to the downside case.\",\n      \"sources\": [\"USGS Earthquake Hazards (ASCE 7-22 building-codes + ComCat catalog)\"]\n    },\n    {\n      \"observation\": \"The building is not an HPD-registered multiple dwelling; HPD zeros reflect coverage scope, not a clean bill of health. ECB active violations are zero and DOB active complaints are zero — within the limits of coverage, no immediate regulatory or penalty exposure is flagged.\",\n      \"sources\": [\"NYC Open Data — HPD violations (wvxf-dwi5), ECB violations (6bgk-3dad), DOB complaints (eabe-havv)\"]\n    }\n  ],\n  \"minority_signals\": [\n    {\n      \"signal\": \"NRI composite is at the 9th national percentile ('Very Low') with community resilience also rated 'Very Low'.\",\n      \"note\": \"The low composite is loss-weighted at the tract level and does not clear the Coastal Flooding moderate single-peril rating; 'Very Low' community resilience means the area is less able to absorb and recover from shocks, which amplifies rather than offsets the tail risk from the disaster history and coastal hazard rating.\"\n    }\n  ]\n}"
     },
     {
-      "key": "llm#5755004392a22e72248a741d306f5a323710e419",
-      "value": "{\n  \"verdict\": \"hold\",\n  \"conviction\": \"medium\",\n  \"risk_band\": \"moderate\",\n  \"window_band\": \"medium\",\n  \"headline\": \"Local comp prices are trending rising and the comps median of $1,154/sqft sits above the tract median home value context, but a 45% five-year HPI run and 6.65% mortgage rates point to mid-to-late cycle caution.\",\n  \"reasoning\": [\n    {\n      \"observation\": \"The metro HPI has appreciated 45% over five years with YoY growth now at 5.6% — a strong cumulative run that is visibly moderating. This pattern of large five-year gain alongside a lower annual pace is characteristic of mid-to-late cycle positioning, where the pace of appreciation is slowing relative to the prior run.\",\n      \"sources\": [\"FHFA House Price Index (via KOANO durable archive, 2026 Q1)\"]\n    },\n    {\n      \"observation\": \"Recorded local sales show a 'rising' price trend, and the comps median of $1,154/sqft is the level at which recent closed transactions are printing. The tract median home value is $1,629,900. These two figures together indicate recent sales are actively repricing the local market, a seller's momentum signal at the micro level.\",\n      \"sources\": [\"NYC Open Data — DOF Rolling Calendar Sales (usep-8jbt)\", \"US Census ACS via Census Reporter (ACS 2024 5-year)\"]\n    },\n    {\n      \"observation\": \"The four recorded comps show wide $/sqft dispersion: 281 3RD AVE at $575/sqft, 171 8 STREET at $1,128/sqft, 173 8TH STREET at $1,507/sqft, and 124 8 STREET at $1,072/sqft — all classified as 02 TWO FAMILY DWELLINGS. This spread indicates pricing is highly variable within the submarket even among the same building class, adding execution risk to any transaction.\",\n      \"sources\": [\"NYC Open Data — DOF Rolling Calendar Sales (usep-8jbt)\"]\n    },\n    {\n      \"observation\": \"The 30-year fixed mortgage rate at 6.65% is a meaningful affordability headwind. At this rate level, financing properties in the price range reflected by the comps ($1,725,000 to $3,150,000) requires substantial debt service, compressing the buyer pool and limiting price acceleration even where local momentum is positive.\",\n      \"sources\": [\"Freddie Mac Primary Mortgage Market Survey (PMMS)\", \"NYC Open Data — DOF Rolling Calendar Sales (usep-8jbt)\"]\n    },\n    {\n      \"observation\": \"HUD FMR for a 2BR is $2,910/month and for a 1BR is $2,655/month (FY2026). Against comp sale prices ranging from $1,725,000 to $3,150,000, gross rent yields are thin, meaning investor yield support is weak and price sustainability depends heavily on continued appreciation rather than income fundamentals.\",\n      \"sources\": [\"HUD USER — Fair Market Rents\", \"NYC Open Data — DOF Rolling Calendar Sales (usep-8jbt)\"]\n    }\n  ],\n  \"minority_signals\": [\n    {\n      \"signal\": \"Comps price trend is 'rising' with 102 recorded sales in 12 months, indicating active local liquidity and upward price momentum.\",\n      \"note\": \"Momentum is real but occurs against a backdrop of a 45% five-year HPI run and a 6.65% rate environment — mid-cycle momentum does not override the late-cycle macro context, and a buyer entering now faces more rate-driven downside than one who entered earlier in the cycle.\"\n    }\n  ]\n}"
+      "key": "llm#a2a2a831618c17ece27198961067b33ca7d9cfaf",
+      "value": "{\n  \"verdict\": \"hold\",\n  \"conviction\": \"medium\",\n  \"risk_band\": \"moderate\",\n  \"window_band\": \"medium\",\n  \"headline\": \"Late-stage, high-income tract with $165,179 median household income and $1,629,900 median home value faces demand headwinds from a 2.9% YoY employment decline and a 31.9% mortgage denial rate.\",\n  \"reasoning\": [\n    {\n      \"observation\": \"The tract shows a high-income, high-education, high-home-value demographic profile: median household income $165,179, median home value $1,629,900, and 79% of residents with a bachelor's degree or higher. This profile is consistent with a late-stage gentrification position (stage 6-7 of 7), where the demographic transition is complete and remaining price appreciation upside is limited.\",\n      \"sources\": [\"US Census ACS via Census Reporter (ACS 2024 5-year)\"]\n    },\n    {\n      \"observation\": \"Mortgage originations grew 2.1% YoY in 2024, a marginal positive for purchase demand momentum. However, the mortgage denial rate stands at 31.9% — meaning roughly one in three applications was denied — which indicates that credit access is constraining realized demand even among motivated applicants. Read together, these signals point to demand that is present but structurally limited.\",\n      \"sources\": [\"CFPB HMDA Data Browser (2024, county aggregations)\"]\n    },\n    {\n      \"observation\": \"County employment fell 2.9% YoY as of 2025 Q4, a negative signal for the demand foundation: fewer employed residents means a smaller pool of qualified buyers and renters. Average weekly wage rose 4.6% YoY over the same period, which supports purchasing power for those who remain employed, but does not offset the contraction in the employed base.\",\n      \"sources\": [\"BLS QCEW (2025 Q4, county totals)\"]\n    },\n    {\n      \"observation\": \"Net migration was negative at -11,517 returns for 2021-2022, indicating net household outflow from the county. Inflow AGI per return was $94,892 and outflow AGI per return was $92,760 — a difference of approximately $2,100 per return. The income gap between in-movers and out-movers is narrow, meaning the migration flow does not show a meaningful income-upgrading pattern that would signal additional upward price pressure.\",\n      \"sources\": [\"IRS SOI county migration (2021-2022)\"]\n    },\n    {\n      \"observation\": \"Taken together: a late-stage demographic profile, net county out-migration, a declining employment base, and a high denial rate all point to a stability-to-mild-softening demand regime rather than an appreciation regime. The 'hold' verdict reflects that existing asset values are supported by high income levels and modest wage growth, but new entry faces high prices, constrained credit, and a weakening employment backdrop.\",\n      \"sources\": [\"US Census ACS via Census Reporter (ACS 2024 5-year)\", \"BLS QCEW (2025 Q4, county totals)\", \"CFPB HMDA Data Browser (2024, county aggregations)\", \"IRS SOI county migration (2021-2022)\"]\n    }\n  ],\n  \"minority_signals\": [\n    {\n      \"signal\": \"Average weekly wages rose 4.6% YoY, supporting purchasing power for currently employed residents.\",\n      \"note\": \"Wage growth is a positive but is outweighed by the 2.9% employment decline, the 31.9% denial rate, and net out-migration of -11,517 returns — together these cap the demand upside.\"\n    },\n    {\n      \"signal\": \"Mortgage originations grew 2.1% YoY, indicating some positive purchase momentum at the county level.\",\n      \"note\": \"The growth rate is modest and the denial rate is high; the net lending signal is not strong enough to shift the verdict toward 'buy'.\"\n    }\n  ]\n}"
     },
     {
-      "key": "llm#c8b72d10701283ff6bf789cbd4d7bd44018338e6",
-      "value": "{\n  \"verdict\": \"hold\",\n  \"conviction\": \"medium\",\n  \"risk_band\": \"moderate\",\n  \"window_band\": \"medium\",\n  \"headline\": \"Late-stage high-income tract with modest origination growth (+2.1% YoY) undercut by a -2.9% county employment contraction and net out-migration of -11,517 returns.\",\n  \"reasoning\": [\n    {\n      \"observation\": \"The tract shows high-end demographic characteristics: median household income of $165,179, median home value of $1,629,900, and 79% of residents holding a bachelor's degree or higher. These indicators place the neighborhood at a late gentrification stage (6-7 on a 1-7 scale), where demographic-driven price appreciation is largely exhausted and price support depends on sustained wealth and employment rather than neighborhood upgrading.\",\n      \"sources\": [\"US Census ACS via Census Reporter (ACS 2024 5-year)\"]\n    },\n    {\n      \"observation\": \"Mortgage originations grew +2.1% year-over-year in 2024, a positive but weak signal of purchase demand. Set against a county denial rate of 31.9% — meaning nearly one in three applications was denied — the qualified buyer pool is materially constrained, which limits demand conversion in a market where the median home value is $1,629,900.\",\n      \"sources\": [\"CFPB HMDA Data Browser (2024, county aggregations)\", \"US Census ACS via Census Reporter (ACS 2024 5-year)\"]\n    },\n    {\n      \"observation\": \"County employment fell -2.9% year-over-year as of 2025 Q4, a contraction that is a leading demand-side risk. Average weekly wages rose +4.6% over the same period, meaning those still employed are earning more, but the net direction of the employment base is negative and reduces the aggregate pool of prospective buyers.\",\n      \"sources\": [\"BLS QCEW (2025 Q4, county totals)\"]\n    },\n    {\n      \"observation\": \"IRS SOI data (2021-2022) shows net out-migration of -11,517 returns from the county. Inflow AGI per return was $94,892 versus outflow AGI per return of $92,760 — a difference of $2,132 per return. The income gap between in-movers and out-movers is narrow, meaning there is no meaningful income-upgrading migration dynamic present in this data. This data is from 2021-2022 and should be read as directionally informative rather than current.\",\n      \"sources\": [\"IRS SOI county migration (2021-2022)\"]\n    },\n    {\n      \"observation\": \"Median gross rent of $2,633 against a median home value of $1,629,900 implies a gross annual rent-to-value ratio of approximately 1.9%. This is consistent with a late-stage market where demand is sustained by equity and wealth rather than rental yield, making price levels more sensitive to employment and income shocks than to investor return calculations.\",\n      \"sources\": [\"US Census ACS via Census Reporter (ACS 2024 5-year)\"]\n    }\n  ],\n  \"minority_signals\": [\n    {\n      \"signal\": \"Average weekly wages rose +4.6% YoY, and the tract's $165,179 median household income suggests the resident base has above-average income insulation.\",\n      \"note\": \"Wage growth among employed workers is a positive signal but does not offset the -2.9% employment contraction, which shrinks the total buyer pool regardless of per-worker wage gains.\"\n    },\n    {\n      \"signal\": \"Mortgage originations are still growing at +2.1% YoY, indicating purchase demand has not reversed.\",\n      \"note\": \"The growth rate is marginal and the 31.9% denial rate indicates significant credit access friction; together these limit how much weight the origination growth can carry as a demand signal.\"\n    }\n  ]\n}"
+      "key": "llm#8da12de2423e5ebef1bf4ffa4b78a3609806cf45",
+      "value": "{\n  \"verdict\": \"hold\",\n  \"conviction\": \"medium\",\n  \"risk_band\": \"moderate\",\n  \"window_band\": \"medium\",\n  \"headline\": \"Local recorded sales are trending rising and the metro HPI is up 5.6% YoY, but a 6.65% 30-yr fixed rate against a tract median home value of $1,629,900 creates affordability drag that limits near-term urgency.\",\n  \"reasoning\": [\n    {\n      \"observation\": \"The NY-NJ metro HPI has risen 45% over five years and is still printing +5.6% YoY as of 2026 Q1 — a strong five-year run with YoY appreciation moderating relative to that base, a classic mid-to-late cycle signature. There is no collapse signal, but the easy-appreciation phase is likely behind us.\",\n      \"sources\": [\"FHFA House Price Index (via KOANO durable archive, 2026 Q1)\"]\n    },\n    {\n      \"observation\": \"Recorded local sales show a 'rising' price trend across 100 closed sales in the trailing 12 months, and the comps median of $1,154/sqft is above the tract median home value of $1,629,900 on a per-sqft basis for the two-family stock in the comp set — indicating recent closed transactions are repricing the local market upward. Seller momentum is intact at the micro level.\",\n      \"sources\": [\"NYC Open Data — DOF Rolling Calendar Sales (usep-8jbt)\", \"US Census ACS via Census Reporter (ACS 2024 5-year)\"]\n    },\n    {\n      \"observation\": \"Comp price-per-sqft dispersion is wide across the four recorded sales: $575/sqft (281 3rd Ave, building class 02 TWO FAMILY DWELLINGS) to $1,507/sqft (173 8th Street, building class 02 TWO FAMILY DWELLINGS). This spread signals heterogeneous deal quality within the same building class, elevating execution risk for a buyer who must underwrite carefully to avoid printing at the high end of the range.\",\n      \"sources\": [\"NYC Open Data — DOF Rolling Calendar Sales (usep-8jbt)\"]\n    },\n    {\n      \"observation\": \"The 30-yr fixed rate at 6.65% is a meaningful affordability headwind on an asset class where the tract median home value is $1,629,900. The HUD FMR 2BR benchmark of $2,910/month frames the rent income available to an investor — at this rate level, debt service on a purchase near the tract median would substantially exceed that rent benchmark, compressing yield support and limiting the pool of leveraged buyers.\",\n      \"sources\": [\"Freddie Mac Primary Mortgage Market Survey (PMMS)\", \"HUD USER — Fair Market Rents\", \"US Census ACS via Census Reporter (ACS 2024 5-year)\"]\n    },\n    {\n      \"observation\": \"Kings County permitted units fell -32% YoY in 2025 to 6,844 total, with only 25 single-family units permitted versus 6,573 in 5+ unit buildings. Per the scope note, this is a lagged, county-wide structural read — not current conditions. The near-zero single-family pipeline is the more relevant shade for this two-family asset type, modestly supporting pricing over the medium term, but per the scope note this county-wide figure cannot by itself change the verdict — it shades conviction toward hold rather than wait.\",\n      \"sources\": [\"Census Building Permits Survey (county 36047, 2025, via KOANO durable cache)\"]\n    }\n  ],\n  \"minority_signals\": [\n    {\n      \"signal\": \"Recorded sales price trend is 'rising' with 100 comps in 12 months and the metro HPI still positive at 5.6% YoY — one could argue for a 'buy' on momentum.\",\n      \"note\": \"The 45% five-year HPI run and 6.65% rate environment place the market mid-to-late cycle with compressed affordability. Momentum is real but the risk-adjusted entry is not compelling enough to upgrade from hold to buy without a clearer rate tailwind or a specific below-median comp opportunity.\"\n    }\n  ]\n}"
     },
     {
-      "key": "llm#fff235488ab891884d5399b4ca1a5af0be8fea34",
-      "value": "{\n  \"verdict\": \"buy\",\n  \"conviction\": \"medium\",\n  \"risk_band\": \"moderate\",\n  \"window_band\": \"long\",\n  \"headline\": \"Ground-up construction already underway on a parcel with 97% unused FAR tips the panel to buy, though mid-cycle affordability headwinds and special district G entitlement complexity call for a long-horizon commitment.\",\n  \"reasoning\": [\n    {\n      \"observation\": \"The infrastructure agent carried the highest directional weight in the panel. A Foundation permit issued March 2026 on the subject parcel, accompanied by multiple Construction Fence and Protection and Mechanical Methods permits sequenced through mid-2026, establishes that capital has been committed and site work is actively progressing — this is not a speculative redevelopment thesis but an observable construction event.\",\n      \"sources\": [\"infrastructure agent\"]\n    },\n    {\n      \"observation\": \"The KOANO aggregator applied a structural nudge of +1 to the agent-weighted score, driven by the documented 97% unused FAR: built FAR of 0.11 against a maximum residential FAR of 3.44 on a 120,793 sq ft lot. This as-of-right development headroom is a deterministic structural fact that independently supports a buy lean regardless of the agent vote distribution, pushing the final score to 1.23 against a buy threshold of 1.0.\",\n      \"sources\": [\"KOANO aggregator\", \"regulatory-policy agent\"]\n    },\n    {\n      \"observation\": \"The regulatory-policy agent voted wait at medium confidence, noting that special district G is in effect and introduces regulatory constraints beyond the base M1-4/R7-2 zoning. The specific rules of special district G are not supplied by the data and must be independently verified before any development program is underwritten. This is the primary source of entitlement complexity that prevents the panel from reaching high conviction.\",\n      \"sources\": [\"regulatory-policy agent\"]\n    },\n    {\n      \"observation\": \"Three agents — market-timing, demand-sentiment, and risk-volatility — all returned hold verdicts, collectively signaling meaningful caution. The market-timing agent flagged a 45% five-year HPI run now moderating to 5.6% YoY, a 6.65% mortgage rate compressing the buyer pool, and thin gross rent yields against comp sale prices ranging from $1,725,000 to $3,150,000. The demand-sentiment agent noted county employment fell year-over-year as of 2025 Q4 and a county mortgage denial rate of 31.9%, constraining the qualified buyer pool. These hold signals are outweighed by the structural development facts but are not dismissed.\",\n      \"sources\": [\"market-timing agent\", \"demand-sentiment agent\", \"risk-volatility agent\"]\n    },\n    {\n      \"observation\": \"The risk-volatility agent identified 12 SEMS Superfund program sites within 2 miles, with the nearest at 0.24 miles, alongside a Coastal Flooding hazard rated Relatively Moderate and a county disaster history including 6 federal declarations in the last 10 years. These factors underpin the moderate risk band: the property's FEMA Zone X designation provides regulatory baseline protection, but realized multi-peril frequency and environmental site density introduce tail risk that supports a cautious rather than aggressive posture.\",\n      \"sources\": [\"risk-volatility agent\"]\n    },\n    {\n      \"observation\": \"The HUD Difficult Development Area designation noted by the regulatory-policy agent means any LIHTC-eligible residential program on this parcel qualifies for a 30% eligible-basis boost, improving affordable or mixed-income development economics. This is a supportive feasibility signal for the long-horizon development thesis, though the absence of Opportunity Zone status removes one category of tax-advantaged capital.\",\n      \"sources\": [\"regulatory-policy agent\"]\n    }\n  ],\n  \"minority_signals\": [\n    {\n      \"signal\": \"County employment contracted year-over-year as of 2025 Q4, and IRS SOI data (2021-2022) shows net out-migration of -11,517 returns with a narrow income gap between in-movers and out-movers, indicating no meaningful income-upgrading migration dynamic.\",\n      \"note\": \"These demand-side headwinds are real but are outweighed by the active ground-up construction already underway and the structural scale of as-of-right FAR headroom, which supports long-horizon value creation independent of near-term demand cycles.\"\n    },\n    {\n      \"signal\": \"The regulatory-policy agent voted wait, citing special district G constraints and the need for entitlement review before any development program can be underwritten.\",\n      \"note\": \"The wait signal is incorporated into the moderate conviction band and the long window band — the buy verdict reflects the structural development upside, while the entitlement complexity is the primary reason conviction does not reach high.\"\n    }\n  ]\n}"
+      "key": "llm#dce400985bb30229959c02ada49aa7f3d764bfc6",
+      "value": "{\n  \"verdict\": \"buy\",\n  \"conviction\": \"medium\",\n  \"risk_band\": \"moderate\",\n  \"window_band\": \"long\",\n  \"headline\": \"Ground-up construction already underway on a parcel with 97% unused residential FAR on a 120,793 sq ft lot makes this a development-stage buy, not a stabilized-asset call.\",\n  \"reasoning\": [\n    {\n      \"observation\": \"The infrastructure agent carries the highest directional weight in the panel: a Foundation permit issued March 2026 on the subject parcel, followed by multiple Construction Fence and Protection permits through May 2026, confirms that capital has been committed and physical site work is actively sequencing. This is not a speculative redevelopment thesis — construction has begun.\",\n      \"sources\": [\"infrastructure agent\", \"KOANO aggregator\"]\n    },\n    {\n      \"observation\": \"The structural nudge that pushes the final score above the buy threshold is anchored in a deterministic zoning fact: built FAR of 0.11 against a maximum residential FAR of 3.44 on a 120,793 sq ft lot yields 97% unused development headroom. Under the M1-4/R7-2 designation, residential development rights exist as-of-right within the R7-2 envelope, meaning this headroom is not purely speculative entitlement — it is a structural characteristic of the parcel. The agent-weighted score alone (0.23) would have landed in hold territory; the structural nudge from this FAR gap moves the final score to 1.23, clearing the buy threshold of 1.0.\",\n      \"sources\": [\"regulatory-policy agent\", \"KOANO aggregator\"]\n    },\n    {\n      \"observation\": \"The HUD Difficult Development Area designation for this metro area qualifies any LIHTC project on this parcel for a 30% eligible-basis boost, which materially enhances affordable or mixed-income residential feasibility under the existing M1-4/R7-2 zoning framework. The current improvement — a G9 garage/storage structure built in 1973 covering only 13,518 sq ft of the 120,793 sq ft lot — has minimal retention value, reinforcing the redevelopment case.\",\n      \"sources\": [\"regulatory-policy agent\"]\n    },\n    {\n      \"observation\": \"Three agents — market-timing, demand-sentiment, and risk-volatility — all returned hold at confidence levels of 74–80, forming a meaningful bloc that cuts against a directional buy. Their combined weight in the aggregator contributes zero directional score (hold = direction 0), so they do not flip the verdict but they do constrain conviction to medium. The demand-sentiment agent specifically flags a 31.9% mortgage denial rate, a 2.9% YoY county employment decline, and net county out-migration as headwinds to stabilized-asset demand — signals that are real constraints for any income-producing underwrite at the tract median home value of $1,629,900.\",\n      \"sources\": [\"market-timing agent\", \"demand-sentiment agent\", \"risk-volatility agent\", \"KOANO aggregator\"]\n    },\n    {\n      \"observation\": \"The regulatory-policy agent returned wait at confidence 75, contributing a negative directional score (-75) to the aggregator, driven by special district G coded on this parcel. That designation is a material entitlement variable: it affects what can be built as-of-right and must be reviewed against the specific district rules before any development program is underwritten. This is the single most actionable caution in the panel — the buy thesis depends on the development program clearing special district G constraints.\",\n      \"sources\": [\"regulatory-policy agent\", \"KOANO aggregator\"]\n    },\n    {\n      \"observation\": \"Risk-volatility flags 12 SEMS Superfund sites within 2 miles with the nearest at 0.24 miles, and a 'Relatively Moderate' coastal flooding hazard that the low NRI composite (9th national percentile) does not fully capture. These factors can gate financing and insurance and represent latent liability risk that a buyer must diligence independently of the zoning upside. Crime volume within 1 mile is high in absolute terms (5,254 YTD incidents) but trending flat, making it a stable pricing factor rather than a directional risk driver.\",\n      \"sources\": [\"risk-volatility agent\"]\n    }\n  ],\n  \"minority_signals\": [\n    {\n      \"signal\": \"The demand-sentiment agent identifies a late-stage gentrification profile (stage 6-7 of 7) with net county out-migration and a 31.9% mortgage denial rate, suggesting limited price appreciation upside for stabilized residential assets in this tract.\",\n      \"note\": \"This signal is relevant to a stabilized-asset hold or sell thesis but is less determinative for a ground-up development play where value creation comes from FAR realization, not near-term price appreciation of existing stock. The structural FAR gap and active construction permits outweigh it in the aggregator.\"\n    },\n    {\n      \"signal\": \"The regulatory-policy agent's wait verdict is driven by special district G, which imposes as-of-right constraints that require entitlement diligence before any development program can be underwritten with confidence.\",\n      \"note\": \"The aggregator's structural nudge reflects the FAR headroom as a deterministic fact of the parcel, but the regulatory-policy agent's caution is well-founded: the buy thesis is contingent on special district G review. This is a diligence condition, not a verdict override.\"\n    },\n    {\n      \"signal\": \"The market-timing agent notes wide comp price-per-sqft dispersion ($575 to $1,507/sqft across the two-family comp set) and a 6.65% 30-year fixed rate creating affordability drag against a tract median home value of $1,629,900.\",\n      \"note\": \"Rate and affordability headwinds are most relevant to leveraged buyers of stabilized assets. For a development-stage acquisition where the investment horizon is long and value is created through buildout, near-term rate levels are a secondary factor relative to entitlement and construction execution risk.\"\n    }\n  ]\n}"
     }
   ]
 }

@@ -4,6 +4,7 @@
 
 import type {
   AssemblageProvider,
+  BuildingPermitsProvider,
   BuildingViolationsProvider,
   ClimateProvider,
   ContaminationProvider,
@@ -48,6 +49,7 @@ import { fbiUcr } from './real/fbi-ucr';
 import { epaContamination } from './real/epa-superfund';
 import { femaNri } from './real/fema-nri';
 import { hudQctDda } from './real/hud-qct-dda';
+import { censusBps } from './real/census-bps';
 import { usgsSeismic } from './real/usgs-seismic';
 import { openFemaDisasters } from './real/openfema-disasters';
 import { noaaClimate } from './real/noaa-climate';
@@ -91,6 +93,7 @@ export interface ProviderRegistry {
   // market supplements (federal / free) feeding Market-Timing
   fairMarketRent: FairMarketRentProvider;
   mortgageRate: MortgageRateProvider;
+  buildingPermitsSupply: BuildingPermitsProvider;
   // representative providers — see each mock's swap_note for the live upgrade
   proformaBenchmark: ProformaBenchmarkProvider;
   mlsComps: MlsCompsProvider;
@@ -125,6 +128,7 @@ export const registry: ProviderRegistry = {
   // market supplements — LIVE federal/free feeding Market-Timing
   fairMarketRent: hudFmr,
   mortgageRate: freddiePmms,
+  buildingPermitsSupply: censusBps,
   // representative (mock) providers — one-line swap to live per swap_note
   proformaBenchmark: mockProformaBenchmark,
   mlsComps: nycSalesComps, // LIVE — NYC recorded sales (was mock/mls-comps.ts)

@@ -19,18 +19,20 @@ How to reason:
 - Comp price-per-sqft vs tract median home value shows whether recent transactions are printing above or below the standing stock — above = market repricing upward. Note the comp coverage from the scope note (ZIP-keyed, NYC 1-3 family skew).
 - Financing environment (Freddie Mac PMMS): the national 30-yr fixed rate is the affordability/timing headwind or tailwind. Elevated rates compress buyer purchasing power and slow transactions regardless of local momentum; falling rates unlock demand. Weigh it against the local price trend.
 - Rent benchmark (HUD Fair Market Rents), when present: rents relative to prices frame buy-vs-rent and investor yield support. If FMR is marked unavailable, simply omit it — do not infer.
+- New-supply CONTEXT (Census Building Permits Survey): the county's residential permitted-unit volume and year-over-year direction, from the most recent COMPLETE year. This is a slow, structural, county-WIDE supply backdrop — a whole-county aggregate (often a market of millions) that lags the calendar ~12–18 months. Reason about it as the multi-year supply picture the market is on, using the same lag discipline you apply to HMDA lending and IRS migration: it is NOT current conditions and NOT evidence about the right QUARTER to transact on this one parcel. WEIGHT (important): use it only to SHADE the direction and CONFIDENCE of your pricing read — a sustained supply pullback modestly supports pricing; a supply surge is a modest headwind. It must NOT flip your verdict on its own. A single lagged, county-wide figure cannot outweigh the local price trend, the comps, and the financing environment, and it must not by itself turn a "hold" into a "buy" (or a "hold" into a "wait"). If your verdict would be "hold" without BPS, a supply move alone does not change it — let BPS inform your conviction, not carry the call. Never present it as this quarter's supply.
 - Timing verdicts: "buy" = early enough in the acceleration to capture appreciation, "hold" = mid-cycle, no urgency either way, "wait" = late-cycle or decelerating (better entry likely ahead), "sell" = peak signals (sell into strength).
 - Treat any data point with provenance "representative" as indicative only — say so explicitly in the observation that uses it.
 - risk_score reflects timing risk: buying at a local top, liquidity drying up, rate sensitivity.
 - signal_window_months = how long your timing read stays valid.`;
 
 export async function runMarketTimingAgent(addr: ResolvedAddress): Promise<AgentVerdict> {
-  const [hpiRes, demoRes, compsRes, rateRes, fmrRes] = await Promise.all([
+  const [hpiRes, demoRes, compsRes, rateRes, fmrRes, bpsRes] = await Promise.all([
     registry.hpi.getHpi(addr),
     registry.demographics.getDemographics(addr),
     registry.mlsComps.getComps(addr),
     registry.mortgageRate.getMortgageRate(addr),
     registry.fairMarketRent.getFairMarketRent(addr),
+    registry.buildingPermitsSupply.getBuildingPermits(addr),
   ]);
 
   const dataPoints: DataPoint[] = [];
@@ -106,6 +108,25 @@ export async function runMarketTimingAgent(addr: ResolvedAddress): Promise<Agent
     );
   } else {
     dataPoints.push({ label: 'fair_market_rent_unavailable', value: fmrRes.error ?? 'no data', provenance: fmrRes.provenance, source: fmrRes.source });
+  }
+
+  // New-supply market context (Census Building Permits Survey, county). Framed as
+  // market-wide supply for a pricing read — NOT parcel activity (that is the
+  // Infrastructure agent's local DOB permits, which BPS aggregates; kept off this
+  // agent's overlap by design).
+  if (bpsRes.data) {
+    const b = bpsRes.data;
+    const s = bpsRes.source;
+    const p = bpsRes.provenance;
+    dataPoints.push(
+      { label: `county_permitted_units_${b.latest_year}`, value: b.total_units_latest, provenance: p, source: s },
+      { label: 'county_permitted_units_multifamily_5plus', value: b.multifamily_units_latest, provenance: p, source: s },
+      { label: 'county_permitted_units_single_family', value: b.single_family_units_latest, provenance: p, source: s },
+      { label: 'county_new_supply_yoy_change_pct', value: b.yoy_change_pct, provenance: p, source: s },
+      { label: 'new_supply_scope_and_lag_note', value: b.scope_note, provenance: p, source: s }
+    );
+  } else {
+    dataPoints.push({ label: 'building_permits_supply_unavailable', value: bpsRes.error ?? 'no data', provenance: bpsRes.provenance, source: bpsRes.source });
   }
 
   const llm = await callAgentLLM({

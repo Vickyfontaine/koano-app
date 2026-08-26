@@ -8,6 +8,7 @@ import { registry } from './registry';
 import type {
   AcsDemographics,
   AssemblageSummary,
+  BuildingPermitsSupply,
   BuildingViolationsSummary,
   ClimateInfo,
   ContaminationInfo,
@@ -71,6 +72,7 @@ export interface SiteDetailResponse {
   flood_zones?: SiteDetailBlock<FloodZonesInfo>;
   demographics?: SiteDetailBlock<AcsDemographics>;
   hpi?: SiteDetailBlock<HpiTrend>;
+  building_permits_supply?: SiteDetailBlock<BuildingPermitsSupply>;
   mls_comps?: SiteDetailBlock<MlsCompsSummary>;
   crime?: SiteDetailBlock<CrimeStats>;
   building_violations?: SiteDetailBlock<BuildingViolationsSummary>;
@@ -104,6 +106,7 @@ export const BLOCK_FETCHERS: Record<
   flood_zones: (a) => registry.flood.getFloodZones(a),
   demographics: (a) => registry.demographics.getDemographics(a),
   hpi: (a) => registry.hpi.getHpi(a),
+  building_permits_supply: (a) => registry.buildingPermitsSupply.getBuildingPermits(a),
   mls_comps: (a) => registry.mlsComps.getComps(a),
   crime: (a) => registry.crime.getCrimeStats(a),
   building_violations: (a) => registry.buildingViolations.getViolations(a),

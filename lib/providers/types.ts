@@ -456,6 +456,34 @@ export interface LihtcEligibilityProvider {
   getLihtcEligibility(addr: ResolvedAddress): Promise<ProviderResult<LihtcEligibilityInfo>>;
 }
 
+// Census Building Permits Survey — county-level residential NEW-SUPPLY volume.
+// National, keyless. A MARKET-WIDE supply frame for the Market-Timing agent (what
+// new supply and its direction imply for price/absorption), NOT parcel construction
+// activity. It is aggregate county data and is nested same-source with the local
+// NYC DOB permits the Infrastructure agent reads (DOB filings feed BPS), which is
+// exactly why it lives on Market-Timing (no permit overlap there) and never on
+// Infrastructure. LAG is structural and honest: annual county files trail the
+// calendar by ~12–18 months, so this is a structural supply read, not current
+// conditions (same discipline as HMDA / IRS migration).
+export interface BuildingPermitsSupply {
+  county_name: string | null;
+  fips_state: string;
+  fips_county: string;
+  latest_year: number;
+  total_units_latest: number; // permitted housing units, all structure types
+  single_family_units_latest: number; // 1-unit
+  multifamily_units_latest: number; // 5+ unit
+  prior_year: number | null;
+  total_units_prior: number | null;
+  yoy_change_pct: number | null; // total permitted units, latest vs prior year
+  scope_note: string; // INCLUDES the lag disclaimer
+}
+
+export interface BuildingPermitsProvider {
+  name: string;
+  getBuildingPermits(addr: ResolvedAddress): Promise<ProviderResult<BuildingPermitsSupply>>;
+}
+
 // OpenFEMA — federally-declared disaster HISTORY for the county (multi-peril,
 // historical frequency). Explicitly complements NFHL: not a regulatory zone, but
 // how often this county has actually been declared a disaster and for what.
