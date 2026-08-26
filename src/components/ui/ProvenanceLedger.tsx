@@ -47,7 +47,10 @@ export default function ProvenanceLedger({ dataPoints, locationConfidence, addre
   if (points.length === 0) return null;
 
   const liveCount = points.filter((d) => d.provenance === "live").length;
-  const repCount = points.length - liveCount;
+  // Non-live figures span coverage_absent / fetch_failed / representative — the
+  // Coverage map above breaks them down by state; here we just count them, never
+  // mislabeling all of them "representative".
+  const nonLiveCount = points.length - liveCount;
   const unconfirmed = locationConfidence === "unconfirmed";
 
   const shown = nonLiveOnly ? points.filter((d) => d.provenance !== "live") : points;
@@ -76,7 +79,7 @@ export default function ProvenanceLedger({ dataPoints, locationConfidence, addre
         <span>
           <span style={{ ...mono, textTransform: "uppercase", color: "var(--ink-faint)" }}>Provenance ledger</span>
           <span style={{ fontSize: "13px", color: "var(--ink-muted)", marginLeft: "10px" }}>
-            {points.length} figures · {liveCount} live{repCount > 0 ? ` · ${repCount} representative` : ""}
+            {points.length} figures · {liveCount} live{nonLiveCount > 0 ? ` · ${nonLiveCount} non-live` : ""}
           </span>
         </span>
         <span style={{ ...mono, color: "var(--mid-blue)" }}>{open ? "Hide" : "Show every source"}</span>

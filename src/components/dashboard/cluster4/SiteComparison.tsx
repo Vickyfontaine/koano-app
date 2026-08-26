@@ -12,6 +12,7 @@ import VerdictCard from "@/components/ui/VerdictCard";
 import VerdictMathPanel from "@/components/ui/VerdictMathPanel";
 import ReasoningChain from "@/components/ui/ReasoningChain";
 import ProvenanceLedger from "@/components/ui/ProvenanceLedger";
+import CoverageMap from "@/components/ui/CoverageMap";
 import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
 import CandidatePicker from "@/components/ui/CandidatePicker";
 import { VERDICT_COLORS, type SynthesisResult, type Verdict, type AddressCandidate } from "@/components/ui/verdict";
@@ -476,6 +477,8 @@ export default function SiteComparison() {
                   minoritySignals={r.verdict.minority_signals}
                   agentSummaries={r.verdict.agent_summaries}
                 />
+                <CoverageMap dataPoints={r.verdict.data_points} />
+
                 <ProvenanceLedger
                   dataPoints={r.verdict.data_points}
                   locationConfidence={r.resolved_address.location_confidence}

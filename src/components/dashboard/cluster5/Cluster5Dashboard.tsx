@@ -11,6 +11,7 @@ import LoadingState from "@/components/ui/LoadingState";
 import VerdictCard from "@/components/ui/VerdictCard";
 import RunDegradationNote from "@/components/ui/RunDegradationNote";
 import ProvenanceLedger from "@/components/ui/ProvenanceLedger";
+import CoverageMap from "@/components/ui/CoverageMap";
 import VerdictMathPanel from "@/components/ui/VerdictMathPanel";
 import ReasoningChain from "@/components/ui/ReasoningChain";
 import { CLUSTERS } from "../clusters";
@@ -164,6 +165,8 @@ export default function Cluster5Dashboard() {
             minoritySignals={result.verdict.minority_signals}
             agentSummaries={result.verdict.agent_summaries}
           />
+          <CoverageMap dataPoints={result.verdict.data_points} />
+
           <ProvenanceLedger
             dataPoints={result.verdict.data_points}
             locationConfidence={result.resolved_address.location_confidence}

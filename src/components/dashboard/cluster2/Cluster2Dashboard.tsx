@@ -16,6 +16,7 @@ import LocationConfidenceNote from "@/components/ui/LocationConfidenceNote";
 import CandidatePicker from "@/components/ui/CandidatePicker";
 import RunDegradationNote from "@/components/ui/RunDegradationNote";
 import ProvenanceLedger from "@/components/ui/ProvenanceLedger";
+import CoverageMap from "@/components/ui/CoverageMap";
 import ReasoningChain from "@/components/ui/ReasoningChain";
 import type { AddressCandidate } from "@/components/ui/verdict";
 import { CLUSTERS } from "../clusters";
@@ -300,6 +301,8 @@ export default function Cluster2Dashboard() {
                 minoritySignals={result.verdict.minority_signals}
                 agentSummaries={result.verdict.agent_summaries}
               />
+              <CoverageMap dataPoints={result.verdict.data_points} />
+
               <ProvenanceLedger
                 dataPoints={result.verdict.data_points}
                 locationConfidence={result.resolved_address.location_confidence}
