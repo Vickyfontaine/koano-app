@@ -15,6 +15,7 @@ import {
   summarizeDegradations,
   type DegradationSummary,
 } from '../providers/degradation';
+import { isTrustedProvenance } from '../providers/provenance';
 import {
   callAgentLLM,
   clamp,
@@ -117,7 +118,11 @@ export function aggregate(agents: AgentVerdict[]): Aggregate {
   const matchWeight = contribs.filter((c) => c.verdict === modalVerdict).reduce((s, c) => s + c.weight, 0);
   const agreementFrac = matchWeight / totalWeight;
   const weightedAvgConf = contribs.reduce((s, c) => s + c.confidence * c.weight, 0) / totalWeight;
-  const cap = overall_provenance === 'representative' ? 74 : 95;
+  // A NOT-fully-trusted verdict (a stand-in, a failed fetch, or an uncovered
+  // market among its inputs) can't earn high confidence. All-live rolls up `live`
+  // → cap 95 (unchanged for a fully-live NYC verdict); a Chicago verdict rolls up
+  // `coverage_absent` → capped at 74.
+  const cap = isTrustedProvenance(overall_provenance) ? 95 : 74;
   const confidence = Math.min(cap, clamp(20 + 55 * agreementFrac + 0.2 * weightedAvgConf, 40, 95));
 
   // Risk anchored on the risk-volatility specialist, tempered by the panel mean.
@@ -271,9 +276,7 @@ export async function runSynthesis(
       provenance:
         cited.length === 0
           ? agg.overall_provenance
-          : cited.some((s) => provenanceByAgentSource.get(s) === 'representative')
-            ? 'representative'
-            : 'live',
+          : weakestProvenance(cited.map((s) => ({ provenance: provenanceByAgentSource.get(s)! }))),
     });
   }
 

@@ -7,6 +7,7 @@
 import { buildProvenanceAppendix, type ProvenanceAppendix } from '../disclaimer';
 import type { BlockKey, SiteDetailBlock } from '../../providers/blocks';
 import type { Provenance } from '../../providers/types';
+import { weakestProvenance, isTrustedProvenance } from '../../providers/provenance';
 import type { DocumentData, Letterhead } from '../types';
 import type { RenderModel, RenderSection } from '../render/model';
 import { getAnthropicClient, KOANO_RUNTIME_MODEL } from '../../agents/shared';
@@ -70,14 +71,15 @@ function combinedAppendix(sites: ComparisonSite[]): ProvenanceAppendix {
     for (const s of sites) {
       const b = s.data.blocks[k];
       if (!b) continue;
-      if (b.provenance === 'representative') { chosen = b; break; }
+      // Surface the weakest (least-trusted) instance of this block across sites.
+      if (!isTrustedProvenance(b.provenance)) { chosen = b; break; }
       chosen = chosen ?? b;
     }
     if (chosen) blocks[k] = chosen;
   }
-  const overall: Provenance = Object.values(blocks).some((b) => b && b.provenance === 'representative')
-    ? 'representative'
-    : 'live';
+  const overall: Provenance = weakestProvenance(
+    Object.values(blocks).filter((b): b is NonNullable<typeof b> => !!b),
+  );
   // Use the first site's resolved_address only to satisfy the shape; the
   // appendix renders block rows, not the address.
   return buildProvenanceAppendix({ ...sites[0].data, blocks, overall_provenance: overall });

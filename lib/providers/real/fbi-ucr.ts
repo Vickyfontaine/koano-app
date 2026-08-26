@@ -138,7 +138,7 @@ export const fbiUcr: CrimeProvider = {
       return {
         ok: true,
         data: REPRESENTATIVE_FALLBACK,
-        provenance: 'representative',
+        provenance: 'fetch_failed',
         source: 'FBI UCR / NYPD [FALLBACK]',
         endpoint: nypdEndpoint,
         fetched_at,

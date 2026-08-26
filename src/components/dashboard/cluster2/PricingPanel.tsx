@@ -8,7 +8,7 @@
 
 import React from "react";
 import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
-import { VERDICT_COLORS, type SynthesisResult } from "@/components/ui/verdict";
+import { VERDICT_COLORS, weakestProvenance, type SynthesisResult } from "@/components/ui/verdict";
 import { BlockError, PanelHeader, Row, fmtInt, fmtMoney, panelStyle } from "../panels";
 import type { SiteDetailResponse } from "@/app/api/site-detail/route";
 
@@ -37,10 +37,9 @@ export default function PricingPanel({ detail, detailError, verdict, id }: Prici
   // The band leans on BOTH the comp benchmark and the PLUTO area, so its
   // provenance is the weaker of the two — never just the comps'.
   const areaLive = zoning?.provenance === "live";
-  const pricingProvenance =
-    comps?.provenance === "representative" || zoning?.provenance === "representative"
-      ? "representative"
-      : (comps?.provenance ?? zoning?.provenance);
+  const pricingProvenance = weakestProvenance(
+    [comps, zoning].filter((b): b is NonNullable<typeof b> => !!b).map((b) => ({ provenance: b.provenance })),
+  );
 
   // Transparent banding rule keyed to recorded-sale price movement: rising →
   // price toward the top of the band; falling → toward the bottom; flat →
@@ -85,9 +84,9 @@ export default function PricingPanel({ detail, detailError, verdict, id }: Prici
           </div>
           <p style={{ fontSize: "12px", color: "var(--ink-muted)", margin: 0 }}>
             Benchmark {fmtMoney(psf)}/sq ft (median recorded sale) × {fmtInt(sqft)} sq ft
-            building area ({areaLive ? "live PLUTO" : "representative"}) = {fmtMoney(Math.round(base))}; {bandNote}.
+            building area ({areaLive ? "live PLUTO" : "non-live area"}) = {fmtMoney(Math.round(base))}; {bandNote}.
             {pricingProvenance !== "live" && (
-              <> Representative fallback — a fully live band needs live recorded sales and live PLUTO area.</>
+              <> Not fully live — a fully live band needs live recorded sales and live PLUTO area.</>
             )}
           </p>
         </>

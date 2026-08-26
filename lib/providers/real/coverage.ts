@@ -9,14 +9,13 @@
 // fabrication for the WRONG market: technically labeled, but a fabricated figure
 // presented for a building it does not describe.
 //
-// Provenance stays 'representative' so the verdict still rolls up "not fully
-// live" for an out-of-market address (§07) — but it carries NO invented figure.
-//
-// This is DISTINCT from a live-call FAILURE on a real NYC BBL, which keeps the
-// existing representative fallback (labeled degradation of an attempted call).
-// The discriminator downstream is `provenance === 'representative' && data === null`
-// = out of market; the coverage map (Phase 5, Slice 5) keys off exactly this to
-// name which layers a given market is missing.
+// Provenance is 'coverage_absent' (Slice 4) — a FIRST-CLASS state, no longer a
+// shade of 'representative': we do not cover this market/layer, so nothing was
+// queried and there is no figure to evaluate. It is DISTINCT from a live-call
+// FAILURE on a real NYC BBL (which is 'fetch_failed' — we cover it, the call
+// failed, retry may fix it) and from 'representative' (a deliberate stand-in for
+// an unfunded paid source). The coverage map (Slice 5) keys off provenance
+// === 'coverage_absent' to name exactly which layers a given market is missing.
 
 import type { ProviderResult } from '../types';
 
@@ -28,7 +27,7 @@ export function outOfMarketMunicipal<T>(opts: {
   return {
     ok: true,
     data: null,
-    provenance: 'representative',
+    provenance: 'coverage_absent',
     source: `${opts.dataset} — outside NYC coverage (not queried)`,
     fetched_at: opts.fetched_at,
     error:

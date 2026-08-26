@@ -9,7 +9,26 @@
 
 import type { BlockKey, SiteDetailBlock } from '../providers/blocks';
 import type { Provenance } from '../providers/types';
+import { weakestProvenance, isTrustedProvenance, PROVENANCE_LABEL } from '../providers/provenance';
 import type { DocumentData } from './types';
+
+// One plain-language caveat sentence per non-live overall state — so a document's
+// appendix names WHY it is not fully live (a stand-in vs a failed fetch vs an
+// uncovered market vs partner data), never collapsing them to "representative".
+function notFullyLiveNote(p: Provenance): string {
+  switch (p) {
+    case 'partner':
+      return 'This document includes one or more partner-sourced figures (attributed to the named data partner below), alongside live public data.';
+    case 'representative':
+      return 'This document contains one or more representative figures (labeled below): a plausible stand-in for a paid data source not yet integrated. It is not fully live.';
+    case 'fetch_failed':
+      return 'One or more live sources failed to fetch at generation time (labeled below) — usually transient. It is not fully live; regenerate to refresh.';
+    case 'coverage_absent':
+      return "One or more data layers are outside KOANO's coverage for this market (labeled below) and were not available. It is not fully live.";
+    case 'live':
+      return 'Every figure in this document was fetched live from an authoritative public source at generation time.';
+  }
+}
 
 // VERBATIM — do not edit. This is a legal safeguard, not copy. It renders on
 // every page of every document. Documents are forwardable and leave the
@@ -73,9 +92,11 @@ export function buildProvenanceAppendix(data: DocumentData): ProvenanceAppendix 
   for (const key of Object.keys(data.blocks) as BlockKey[]) {
     const block = data.blocks[key];
     if (!block) continue;
-    // A normally-live block that errored fell back to representative: label it
-    // as such rather than hiding the transient failure (Principle 2).
-    const fellBack = block.provenance === 'representative' && !!block.error;
+    // A normally-live block whose live call FAILED (fetch_failed) is a transient
+    // degradation — surface it as fixable, not a silent gap (Principle 2). A
+    // coverage_absent block is surfaced by its own provenance label (it is not a
+    // failure), so it needs no fallback note.
+    const fellBack = block.provenance === 'fetch_failed';
     rows.push({
       block: BLOCK_LABELS[key],
       source: block.source,
@@ -83,15 +104,12 @@ export function buildProvenanceAppendix(data: DocumentData): ProvenanceAppendix 
       fetched_at: block.fetched_at,
       ...(block.swap_note ? { swap_note: block.swap_note } : {}),
       ...(fellBack
-        ? { fallback_note: 'Live source was unavailable this request; a representative value was used.' }
+        ? { fallback_note: 'Live source failed this request (usually transient); regenerate to refresh.' }
         : {}),
     });
   }
 
-  const provenanceNote =
-    data.overall_provenance === 'live'
-      ? 'Every figure in this document was fetched live from an authoritative public source at generation time.'
-      : 'This document contains one or more representative figures (labeled below). It is not fully live: any figure marked representative is a plausible stand-in for a paid data source that is not yet integrated.';
+  const provenanceNote = notFullyLiveNote(data.overall_provenance);
 
   // Coordinate-confidence is a SEPARATE flag from provenance: 'unconfirmed' means
   // the subject point was resolved from a single geocoder without a cross-check,
@@ -127,9 +145,9 @@ export function appendixWithVerdict(
     const blk = data.blocks[key];
     if (blk) blocks[key] = blk;
   }
-  const blockOverall: Provenance = Object.values(blocks).some((b) => b && b.provenance === 'representative')
-    ? 'representative'
-    : 'live';
+  const blockOverall: Provenance = weakestProvenance(
+    Object.values(blocks).filter((b): b is SiteDetailBlock<unknown> => !!b),
+  );
   const base = buildProvenanceAppendix({ ...data, blocks, overall_provenance: blockOverall });
 
   // No verdict → the plain block-only appendix (property intelligence report).
@@ -144,17 +162,21 @@ export function appendixWithVerdict(
       fetched_at: opts.verdict.generatedAt,
     },
   ];
-  const overall: Provenance =
-    blockOverall === 'representative' || opts.verdict.provenance === 'representative' ? 'representative' : 'live';
+  const overall: Provenance = weakestProvenance([
+    { provenance: blockOverall },
+    { provenance: opts.verdict.provenance },
+  ]);
   const overall_note =
     overall === 'live'
       ? 'Every rendered figure AND the underlying KOANO verdict were derived from live, authoritative public data at generation time.'
       : `This document is NOT fully live. ${
-          opts.verdict.provenance === 'representative'
-            ? 'The underlying KOANO verdict drew on one or more representative agent inputs (a plausible stand-in for a paid source not yet integrated). '
+          !isTrustedProvenance(opts.verdict.provenance)
+            ? `The underlying KOANO verdict is ${PROVENANCE_LABEL[opts.verdict.provenance]} (see below). `
             : ''
         }${
-          blockOverall === 'representative' ? 'One or more rendered figures are representative. ' : ''
-        }Any representative input is labeled below.`;
+          !isTrustedProvenance(blockOverall)
+            ? `One or more rendered figures are ${PROVENANCE_LABEL[blockOverall]}. `
+            : ''
+        }Each is labeled below.`;
   return { overall, overall_note, rows };
 }

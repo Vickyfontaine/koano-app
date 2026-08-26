@@ -4,7 +4,32 @@
 // provenance: "representative" = labeled stand-in data (mock provider, or a
 // live call that failed and fell back). NEVER a silent fake.
 
-export type Provenance = 'live' | 'representative';
+// Provenance — the trust/attribution taxonomy (CLAUDE.md §06). Five GENUINELY
+// DISTINCT states, not shades of one:
+//   live            — fetched in real time from an authoritative public source
+//                     KOANO itself queried. Full trust. Data present.
+//   partner         — a third-party PARTNER feed. Carries the PARTNER's trust
+//                     profile, not ours — attributed to them by name (the `source`
+//                     field). Trusted, but not "live from a source we verified".
+//                     Data present.
+//   representative  — a deliberate STAND-IN for an unfunded paid source (proforma
+//                     benchmarks, CoStar deals). Wrong-but-inspectable; labeled,
+//                     never presented as live. Data present.
+//   fetch_failed    — we COVER this and attempted the live call, and it FAILED.
+//                     Fixable, usually transient (resolves on retry). Data absent.
+//   coverage_absent — we do NOT cover this market/layer; nothing was queried
+//                     (e.g. NYC-municipal for a non-NYC address; comps outside
+//                     NYC). Structural — permanent until the coverage is built.
+//                     Data absent.
+// There is intentionally no 'modeled': a value KOANO COMPUTES (a risk score, a
+// confidence) carries its weakest INPUT's provenance, so a computed number can
+// never hide a stand-in behind a tidy label. See weakestProvenance (the rollup).
+export type Provenance =
+  | 'live'
+  | 'partner'
+  | 'representative'
+  | 'fetch_failed'
+  | 'coverage_absent';
 
 export interface ProviderResult<T> {
   ok: boolean;

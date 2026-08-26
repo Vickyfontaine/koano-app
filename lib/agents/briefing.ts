@@ -213,7 +213,7 @@ export async function generateBriefing(properties: BriefingProperty[]): Promise<
   const bySource = new Map<string, Provenance>();
   for (const d of dataPoints) {
     const prev = bySource.get(d.source);
-    bySource.set(d.source, prev === 'representative' || d.provenance === 'representative' ? 'representative' : d.provenance);
+    bySource.set(d.source, prev ? weakestProvenance([{ provenance: prev }, { provenance: d.provenance }]) : d.provenance);
   }
 
   return {

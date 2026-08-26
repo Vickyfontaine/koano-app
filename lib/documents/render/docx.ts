@@ -27,6 +27,8 @@ import {
 import { DOCUMENT_DISCLAIMER } from '../disclaimer';
 import type { RenderModel, RenderSection, RenderTable } from './model';
 import type { Letterhead } from '../types';
+import type { Provenance } from '../../providers/types';
+import { isTrustedProvenance } from '../../providers/provenance';
 
 const INK = '0D2B3E';
 const INK_MUTED = '5A7A8C';
@@ -43,8 +45,18 @@ const BORDER = 'D6EBF7';
 // it is licensed for embedding later, this is the one constant to change.)
 const DOCX_FONT = 'Arial';
 
-function provColor(p: 'live' | 'representative'): string {
-  return p === 'live' ? GREEN : AMBER;
+function provColor(p: Provenance): string {
+  switch (p) {
+    case 'live':
+      return GREEN;
+    case 'partner':
+      return BRAND;
+    case 'representative':
+    case 'fetch_failed':
+      return AMBER;
+    case 'coverage_absent':
+      return INK_MUTED;
+  }
 }
 
 function letterheadParagraphs(lh: Letterhead): Paragraph[] {
@@ -277,7 +289,7 @@ function longFormFrontMatter(model: RenderModel): (Paragraph | TableOfContents)[
     );
   }
   if (model.documentProvenanceNote) {
-    const rep = model.documentProvenance === 'representative';
+    const rep = model.documentProvenance != null && !isTrustedProvenance(model.documentProvenance);
     out.push(
       new Paragraph({
         spacing: { before: 200 },

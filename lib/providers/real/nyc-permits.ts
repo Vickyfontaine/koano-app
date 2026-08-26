@@ -243,7 +243,7 @@ export const nycPermits: PermitsProvider = {
       return {
         ok: true,
         data: REPRESENTATIVE_FALLBACK,
-        provenance: 'representative',
+        provenance: 'fetch_failed',
         source: 'NYC Open Data — DOB NOW Approved Permits [FALLBACK]',
         endpoint: subjectUrl,
         fetched_at,

@@ -16,6 +16,8 @@ import DivergingBar, { type DivergingDatum } from "./charts/DivergingBar";
 import {
   AGENT_LABELS,
   VERDICT_COLORS,
+  PROVENANCE_META,
+  isTrustedProvenance,
   breakdownFromSummaries,
   type AgentName,
   type Provenance,
@@ -63,14 +65,8 @@ function fmtNum(n: number, dp = 1): string {
 // A compact provenance dot for dense chart rows (the full pill stays where
 // there is room — the card and the reasoning chain).
 function ProvDot({ provenance }: { provenance: Provenance }) {
-  const color =
-    provenance === "live"
-      ? "var(--signal-positive)"
-      : provenance === "representative"
-        ? "var(--signal-warning)"
-        : "var(--ink-faint)";
-  const title =
-    provenance === "live" ? "Live data" : provenance === "representative" ? "Representative data" : "Modeled";
+  const color = PROVENANCE_META[provenance].color;
+  const title = PROVENANCE_META[provenance].label;
   return (
     <span
       title={title}
@@ -130,7 +126,7 @@ export default function VerdictMathPanel({ verdict }: VerdictMathPanelProps) {
     sublabel: `${a.verdict} · conf ${a.confidence}`,
     value: a.normalized,
     color: VERDICT_COLORS[a.verdict] ?? "var(--ink-muted)",
-    muted: a.prov === "representative",
+    muted: !isTrustedProvenance(a.prov),
     neutral: a.isNeutral,
     valueLabel: a.isNeutral ? undefined : fmtSigned(a.normalized),
     badge: <ProvDot provenance={a.prov} />,

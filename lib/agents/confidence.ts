@@ -11,25 +11,31 @@
 //                converging evidence raises it.
 
 import type { DataPoint } from '../providers/types';
+import { isTrustedProvenance } from '../providers/provenance';
 
 export const CONFIDENCE_FACT_WEIGHT = 0.65;
 
-// ~this many live signals reads as a fully-rich evidence base.
+// ~this many trusted signals reads as a fully-rich evidence base.
 const RICHNESS_SATURATION = 20;
 // Converging → conflicted, by minority-signal count (0,1,2,3+).
 const AGREEMENT_BY_MINORITY = [1.0, 0.75, 0.5, 0.35];
 
 export function deterministicConfidence(dataPoints: DataPoint[], minoritySignalCount: number): number {
   const total = dataPoints.length || 1;
-  const live = dataPoints.filter((d) => d.provenance === 'live').length;
-  const repFrac = dataPoints.filter((d) => d.provenance === 'representative').length / total;
+  // TRUSTED = present real data (live or partner). Everything else is a caveat —
+  // a stand-in, a failed fetch, or an uncovered market — none of which supports
+  // high confidence. (A pure-live run has caveatFrac 0, so this is unchanged for a
+  // fully-live NYC verdict; a non-NYC verdict with coverage_absent inputs is now
+  // correctly penalized, not treated as fully evidenced.)
+  const trusted = dataPoints.filter((d) => isTrustedProvenance(d.provenance)).length;
+  const caveatFrac = dataPoints.filter((d) => !isTrustedProvenance(d.provenance)).length / total;
 
   const agreement = AGREEMENT_BY_MINORITY[Math.min(minoritySignalCount, 3)];
-  const richness = Math.max(0, Math.min(1, live / RICHNESS_SATURATION));
+  const richness = Math.max(0, Math.min(1, trusted / RICHNESS_SATURATION));
 
-  // base 50 + up to 30 (agreement) + up to 12 (richness) − up to 28 (representative)
-  let det = 50 + 30 * agreement + 12 * richness - 28 * repFrac;
-  if (repFrac > 0) det = Math.min(det, 74); // representative evidence caps confidence
+  // base 50 + up to 30 (agreement) + up to 12 (richness) − up to 28 (caveat evidence)
+  let det = 50 + 30 * agreement + 12 * richness - 28 * caveatFrac;
+  if (caveatFrac > 0) det = Math.min(det, 74); // non-trusted evidence caps confidence
   return Math.max(40, Math.min(92, Math.round(det)));
 }
 

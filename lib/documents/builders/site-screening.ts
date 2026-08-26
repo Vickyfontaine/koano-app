@@ -22,6 +22,7 @@ import type {
   ZoningInfo,
 } from '../../providers/types';
 import type { BlockKey, SiteDetailBlock } from '../../providers/blocks';
+import { weakestProvenance } from '../../providers/provenance';
 import { buildProvenanceAppendix, type ProvenanceAppendix } from '../disclaimer';
 import type { DocumentData, Letterhead } from '../types';
 import type { RenderModel, RenderSection } from '../render/model';
@@ -340,9 +341,9 @@ function usedAppendix(data: DocumentData, demoLive: boolean): ProvenanceAppendix
     const blk = data.blocks[key];
     if (blk) blocks[key] = blk;
   }
-  const overall: Provenance = Object.values(blocks).some((b) => b && b.provenance === 'representative')
-    ? 'representative'
-    : 'live';
+  const overall: Provenance = weakestProvenance(
+    Object.values(blocks).filter((b): b is NonNullable<typeof b> => !!b),
+  );
   return buildProvenanceAppendix({ ...data, blocks, overall_provenance: overall });
 }
 

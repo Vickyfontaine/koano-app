@@ -135,7 +135,7 @@ export const censusAcs: DemographicsProvider = {
       return {
         ok: true,
         data: REPRESENTATIVE_FALLBACK,
-        provenance: 'representative',
+        provenance: 'fetch_failed',
         source: 'US Census ACS 5-year [FALLBACK]',
         fetched_at,
         error: 'No census tract resolved for address',
@@ -168,7 +168,7 @@ export const censusAcs: DemographicsProvider = {
       return {
         ok: true,
         data: REPRESENTATIVE_FALLBACK,
-        provenance: 'representative',
+        provenance: 'fetch_failed',
         source: 'US Census ACS 5-year [FALLBACK]',
         fetched_at,
         error: `Live call failed: ${errMsg(e)}`,

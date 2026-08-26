@@ -207,19 +207,27 @@ If a live provider call fails at runtime, it must fall back to a clearly-labeled
 
 This is what makes KOANO trustworthy and legally defensible. It is also what turns the missing paid data from a weakness into a demonstration of rigor.
 
-### The three provenance levels
+### The five provenance states (Phase 5 Slice 4 — taxonomy in `lib/providers/provenance.ts`)
 
-- `live` — fetched in real time from a real, authoritative source. Example: an actual NYC DOB permit record pulled from NYC Open Data at request time.
-- `representative` — realistic sample data standing in for a paid source not yet funded. Clearly modeled to be plausible, never presented as real. Example: a NYC cap rate benchmark before CoStar is integrated.
-- `modeled` — a value computed or estimated by KOANO's own logic or the LLM, derived from other inputs rather than fetched. Example: a synthesized risk score.
+The type is `live | partner | representative | fetch_failed | coverage_absent` (`lib/providers/types.ts`). These are GENUINELY DISTINCT states, not shades of one — a user and a data partner both need to tell them apart, and before Slice 4 everything non-live collapsed to `representative`, which is only honest for one of them.
+
+- `live` — fetched in real time from an authoritative public source KOANO itself queried. Full trust. Example: an actual NYC DOB permit record from NYC Open Data at request time.
+- `partner` — a third-party PARTNER feed. Carries the PARTNER's trust profile, not ours — attributed to them BY NAME (the `source` field), never presented as "live from a source we verified". Trusted, present data. (The ready seam for a partner adapter: a provider sets `provenance:'partner'` + `source:'<Partner Name>'`; no provider emits it yet.)
+- `representative` — a deliberate STAND-IN for an unfunded paid source (pro-forma benchmarks, CoStar deals). Wrong-but-inspectable; labeled, never presented as real. The ONLY two providers that emit it are the two mocks.
+- `fetch_failed` — we COVER this and attempted the live call, and it FAILED. Fixable, usually transient (resolves on retry). Data absent (`data:null`). Example: a NYC DOB call that timed out.
+- `coverage_absent` — we do NOT cover this market/layer; nothing was queried. Structural — permanent until the coverage is built. Data absent. Example: NYC-municipal layers (or comps) for a non-NYC address.
+
+There is intentionally **no `modeled`** (the old third level, never implemented in code). A value KOANO COMPUTES — a risk score, a confidence — carries its **weakest input's** provenance, so a computed number can never hide a stand-in behind a tidy "modeled" label. This is the honest reconciliation of the earlier three-level doc drift.
+
+**Rollup ordering** (`weakestProvenance`): overall = the weakest (loudest-caveat) input, severity `live(0) < partner(1) < representative(2) < fetch_failed(3) < coverage_absent(4)`. Absence (no data to evaluate) is a louder caveat than a stand-in (wrong but inspectable); structural absence (coverage_absent) outranks transient (fetch_failed). `partner` sits just below `live`, so a mostly-live run with one partner figure rolls up `partner` (attributed), NEVER collapsing to `representative` — a mixed run is handled sensibly. An all-live run rolls up `live` (so a pure-live NYC verdict is unaffected by the taxonomy — verified byte-identical). `isTrustedProvenance` = live|partner (present real data); use it, never `=== 'representative'`, for "is this figure reliable?" checks, or out-of-market / fetch-failed cases get silently missed.
 
 ### Rules
 
 1. Every data point in every verdict carries a provenance tag.
 2. The reasoning chain cites which provider each fact came from.
-3. A verdict's overall provenance equals the weakest of its inputs. If any input is `representative`, the whole verdict is flagged as not fully live.
-4. The UI must visibly badge anything not `live`. A small, clear label ("Representative data — becomes live with [source] integration") next to the figure.
-5. Never present representative or modeled data as live. This is the one rule with no exceptions.
+3. A verdict's overall provenance equals the weakest of its inputs (the severity order above). A non-NYC address rolls up `coverage_absent` (not `representative`): the municipal/comps layers are structurally uncovered, not stand-ins.
+4. The UI must visibly badge anything not `live`, DISTINCTLY per state (`ProvenanceBadge` + `PROVENANCE_META`): a partner attribution, a representative "becomes live with [source]" note, a fetch-failed retry note, a coverage-absent "not covered" note.
+5. Never present representative, fetch_failed, or coverage_absent data as live, and never present partner data as KOANO-verified. This is the one rule with no exceptions.
 
 ### Why this is a feature, not an apology
 
@@ -262,14 +270,14 @@ Agents run in parallel via Promise.all. Synthesis runs on their collected output
 A cost-effective Sonnet-class model, asked for a score, regresses to the safe middle: every entitlement risk came back ~50, confidence pinned at 72, and 14 of 15 sites returned a neutral `hold`. Flat output is not calibration — it is the model refusing to commit. The fix, applied identically in three places, is structural, not a prompt tweak: **compute the score deterministically from the facts the agent already fetched, then blend the LLM's coarse band in at a minority weight.** When an LLM band regresses to the middle, do not prompt-soften (that trades one uncalibratable bias for another) — derive from the facts and let the model only adjust. Fire the deterministic component ONLY on clear structural facts, so a genuine weak-signal hold/medium survives; and feed the narrator the computed math so the prose never contradicts the number.
 
 - **Entitlement risk** — `lib/agents/entitlement.ts`. `deterministicEntitlementRisk(zoning, provenance)` scores from real PLUTO facts (over-max or zero FAR headroom +35, ≥50% headroom −12, special district +22, M/R mixed-use +10, …); `blendEntitlementRisk` combines at `ENTITLEMENT_FACT_WEIGHT = 0.7`. Applied in `regulatory-policy.ts` after the LLM call. Returns null (no blend) when zoning is not live. Fixed a flat 50 → 55/64/40 across three real sites.
-- **Confidence** — `lib/agents/confidence.ts`. `deterministicConfidence(dataPoints, minoritySignalCount)` from evidence STRENGTH (any representative input caps confidence at 74), RICHNESS (live-datapoint count / 20), and AGREEMENT (fewer minority signals → higher); `blendConfidence` at weight 0.65. Applied in `assembleAgentVerdict` (`shared.ts`). Broke the pinned-72 → a real 68–85 spread.
+- **Confidence** — `lib/agents/confidence.ts`. `deterministicConfidence(dataPoints, minoritySignalCount)` from evidence STRENGTH (any NON-TRUSTED input — a stand-in, a failed fetch, or an uncovered market; i.e. `!isTrustedProvenance` — caps confidence at 74), RICHNESS (trusted-datapoint count / 20), and AGREEMENT (fewer minority signals → higher); `blendConfidence` at weight 0.65. Applied in `assembleAgentVerdict` (`shared.ts`). Broke the pinned-72 → a real 68–85 spread. (A fully-live run has caveatFrac 0, so this is unchanged for an all-live NYC verdict; Slice 4.)
 - **Verdict direction** — `lib/agents/direction.ts` + `synthesis.ts` `aggregate()`. `extractStructuralFacts(agents)` scans the collected data points by label regex (use `Array.from(byLabel)`, never Map iteration — TS target); `structuralDirection(f)` produces a nudge (over-max / zero headroom −0.7; ≥80% unused FAR +1.0; ≥50% +0.6; the 15–49% middle gets NO nudge so an ambiguous site stays `hold`; new-building tract signal +0.3; clamp ±1.5). `aggregate()` adds `dir.nudge` to the agent-consensus score; the breakdown carries `structural_nudge` / `structural_drivers` / `final_score` (and `aggregate_score` stays agent-only). The narrator and system prompt are fed `agentScore + nudge [drivers] = final` so the prose can never say "hold" while the computed verdict is "buy". Verified: 175 3rd St → BUY, 74 Grand Ave → WAIT, 176 Johnson St → HOLD (unchanged).
 
 ### Geographic scope
 
 Live data is deepest for New York City (free permits, PLUTO zoning, violations). Build and demo against real NYC addresses — Long Island City, Bushwick, Gowanus make the strongest live demos. A NYC address rolls up fully live.
 
-The geocoder now resolves ANY US address (Census fallback), so the national agents (Risk-Volatility, Demand-Sentiment) and the national macro sources (HPI, demographics, flood, OZ, hazard, lending, employment) run genuinely live anywhere. But a non-NYC address still rolls up `representative` OVERALL, because comparable sales (NYC DOF-only; national MLS is the paid gap) and the NYC-municipal layer (permits, zoning, violations, landlord, entitlement) fall back to representative outside NYC. That is the honest, correct result — Phase 1 made non-NYC hazard + demand + macro live, not the comps/municipal layer, which have no free national equivalent.
+The geocoder now resolves ANY US address (Census fallback), so the national agents (Risk-Volatility, Demand-Sentiment) and the national macro sources (HPI, demographics, flood, OZ, hazard, lending, employment) run genuinely live anywhere. But a non-NYC address rolls up `coverage_absent` OVERALL (Slice 4 — previously mislabeled `representative`), because comparable sales (NYC DOF-only; national MLS is the paid gap) and the NYC-municipal layer (permits, zoning, violations, landlord, entitlement) are structurally uncovered outside NYC. That is the honest, correct result — it is a coverage gap (we don't cover that market's parcel layer), NOT a stand-in and NOT a transient failure. Verified live: a Chicago verdict rolls up `coverage_absent` with the federal datapoints `live` and the municipal ones `coverage_absent` (demand-sentiment, being pure-federal, stays `live`).
 
 ---
 
@@ -682,9 +690,9 @@ Each step verified before the next (Principle 3).
 - Every data point carries provenance. Every non-live figure is badged in the UI.
 - A verdict's overall provenance equals its weakest input.
 - Agents never call data sources directly; only through provider interfaces.
-- A failed live call falls back to labeled `representative`, never a silent fake. A *missing free credential / unseeded store* omits (data:null tagged live), never fabricates — the omission rule (Section 06).
-- The archive stores ONLY `live` provenance data — never snapshot a representative fallback into the time series (a permanent falsification of the record).
-- A non-NYC address resolves with bbl/bin/borough EXPLICITLY null; NYC providers must return coverage-absent, never a live zero, for a null key. Do not regress this.
+- Provenance has FIVE distinct states (§06): a failed live call → `fetch_failed` (we cover it, retry may fix), an out-of-market/uncovered layer → `coverage_absent`, a deliberate paid-source stand-in → `representative`, a partner feed → `partner`. Never collapse them; never present any of them as `live`. A *missing free credential / unseeded store* omits (data:null tagged `live`), never fabricates — the omission rule. Use `isTrustedProvenance`, never `=== 'representative'`, for "is this reliable?" checks.
+- The archive stores ONLY `live` provenance data — never snapshot a non-live fallback (representative / fetch_failed / coverage_absent) into the time series (a permanent falsification of the record).
+- A non-NYC address resolves with bbl/bin/borough EXPLICITLY null; NYC providers must return `coverage_absent`, never a live zero, for a null key. Do not regress this.
 - The keyless Census ACS call must send a project-specific `User-Agent` header (Census Reporter 403s generic UAs). Losing this silently drags every verdict representative.
 
 ### Architecture

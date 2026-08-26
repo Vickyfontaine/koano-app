@@ -118,7 +118,7 @@ export const hudQctDda: LihtcEligibilityProvider = {
       return {
         ok: true,
         data: null,
-        provenance: 'representative',
+        provenance: 'fetch_failed',
         source: 'HUD QCT + DDA [live call failed]',
         endpoint: qctUrl ?? ddaUrl ?? undefined,
         fetched_at,

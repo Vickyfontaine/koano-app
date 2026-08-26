@@ -15,6 +15,7 @@ import { IMPLEMENTED_DOC_TYPE_SET } from '../../../../lib/documents/implemented'
 import { guardDocument } from '../../../../lib/documents/guard';
 import { assembleDocumentData, getLetterhead } from '../../../../lib/documents/assembler';
 import type { DocumentData } from '../../../../lib/documents/types';
+import { weakestProvenance } from '../../../../lib/providers/provenance';
 import { buildProvenanceAppendix, appendixWithVerdict } from '../../../../lib/documents/disclaimer';
 import { renderPdf } from '../../../../lib/documents/render/pdf';
 import { renderDocx } from '../../../../lib/documents/render/docx';
@@ -410,7 +411,7 @@ export async function POST(req: Request) {
         if (!r.ok) continue;
         rows.push(extractPortfolioRiskRow(r.data));
         appendixData = appendixData ?? r.data;
-        if (r.data.overall_provenance === 'representative') weakest = 'representative';
+        weakest = weakestProvenance([{ provenance: weakest }, { provenance: r.data.overall_provenance }]);
       }
       if (rows.length === 0 || !appendixData) {
         return NextResponse.json({ error: 'None of your portfolio addresses could be resolved for a risk read.' }, { status: 422 });

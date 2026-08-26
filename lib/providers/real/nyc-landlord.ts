@@ -302,7 +302,7 @@ export const nycLandlord: LandlordPortfolioProvider = {
       return {
         ok: true,
         data: REPRESENTATIVE_FALLBACK,
-        provenance: 'representative',
+        provenance: 'fetch_failed',
         source: 'NYC landlord portfolio [FALLBACK]',
         fetched_at,
         error: `Live call failed: ${errMsg(e)}`,

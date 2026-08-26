@@ -161,7 +161,7 @@ export const femaNri: NationalRiskProvider = {
       return {
         ok: true,
         data: null,
-        provenance: 'representative',
+        provenance: 'fetch_failed',
         source: 'FEMA National Risk Index (Census tract) [live call failed]',
         endpoint: url,
         fetched_at,

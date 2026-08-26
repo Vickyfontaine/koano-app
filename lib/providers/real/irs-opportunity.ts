@@ -37,7 +37,7 @@ export const irsOpportunity: OpportunityZoneProvider = {
           designation_note:
             'REPRESENTATIVE — census tract could not be resolved; defaulting to non-OZ (most NYC tracts are not designated).',
         },
-        provenance: 'representative',
+        provenance: 'fetch_failed',
         source: 'IRS/Treasury QOZ list [FALLBACK]',
         fetched_at,
         error: 'No tract GEOID resolved for address',
@@ -80,7 +80,7 @@ export const irsOpportunity: OpportunityZoneProvider = {
         designation_note:
           'REPRESENTATIVE — live QOZ lookup failed; defaulting to non-OZ (most NYC tracts are not designated). Verify against the CDFI Fund list.',
       },
-      provenance: 'representative',
+      provenance: 'fetch_failed',
       source: 'IRS/Treasury QOZ list [FALLBACK]',
       fetched_at,
       error: `Live calls failed: ${lastError}`,

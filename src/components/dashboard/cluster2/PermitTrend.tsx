@@ -9,6 +9,7 @@ import React from "react";
 import BarChart, { type BarDatum } from "@/components/ui/charts/BarChart";
 import { DOMAIN_DEVELOPMENT, DOMAIN_DEVELOPMENT_EDGE } from "@/components/ui/charts/domains";
 import { panelStyle, PanelHeader } from "../panels";
+import { isTrustedProvenance } from "@/components/ui/verdict";
 import type { SiteDetailResponse } from "@/app/api/site-detail/route";
 
 function fmtMonth(m: string): string {
@@ -39,7 +40,7 @@ export default function PermitTrend({
     );
   }
 
-  const muted = block!.provenance === "representative";
+  const muted = !isTrustedProvenance(block!.provenance);
   const bars: BarDatum[] = months.map((m) => ({
     key: m.month,
     label: fmtMonth(m.month),

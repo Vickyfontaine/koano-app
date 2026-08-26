@@ -255,7 +255,7 @@ export const fhfaHpi: HpiProvider = {
             ...archived,
             region: `${archived.region} (STALE as of ${archived.latest_period} — live refresh failed)`,
           },
-          provenance: 'representative',
+          provenance: 'fetch_failed',
           source: `FHFA House Price Index (durable archive, STALE ${archived.latest_period} — refresh failed)`,
           fetched_at,
           error: `Live refresh failed and archived HPI is older than a quarter: ${errMsg(e)}`,
@@ -264,7 +264,7 @@ export const fhfaHpi: HpiProvider = {
       return {
         ok: true,
         data: REPRESENTATIVE_FALLBACK,
-        provenance: 'representative',
+        provenance: 'fetch_failed',
         source: 'FHFA House Price Index [FALLBACK]',
         fetched_at,
         error: `Live call failed: ${errMsg(e)}`,

@@ -86,7 +86,7 @@ export const femaFlood: FloodProvider = {
       return {
         ok: true,
         data: REPRESENTATIVE_FALLBACK,
-        provenance: 'representative',
+        provenance: 'fetch_failed',
         source: 'FEMA National Flood Hazard Layer [FALLBACK]',
         endpoint: url,
         fetched_at,
@@ -155,7 +155,7 @@ export const femaFlood: FloodProvider = {
           zones: [],
           scope_note: 'REPRESENTATIVE — FEMA NFHL geometry call failed; flood-zone boundaries unavailable.',
         },
-        provenance: 'representative',
+        provenance: 'fetch_failed',
         source: 'FEMA National Flood Hazard Layer [FALLBACK]',
         endpoint: url,
         fetched_at,

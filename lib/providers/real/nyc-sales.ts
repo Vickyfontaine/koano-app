@@ -131,7 +131,7 @@ export const nycSalesComps: MlsCompsProvider = {
               'Recorded-sales comps cover NYC only (DOF Rolling Sales). This address is outside NYC, ' +
               'so no live comparable set is available — a national MLS integration would fill this.',
           },
-          provenance: 'representative',
+          provenance: 'coverage_absent',
           source: 'NYC Open Data — DOF Rolling Calendar Sales (usep-8jbt) — outside NYC coverage',
           fetched_at,
         };
@@ -310,7 +310,7 @@ export const nycSalesComps: MlsCompsProvider = {
       return {
         ok: true,
         data: REPRESENTATIVE_FALLBACK,
-        provenance: 'representative',
+        provenance: 'fetch_failed',
         source: 'NYC recorded sales comps [FALLBACK]',
         fetched_at,
         error: `Live call failed: ${errMsg(e)}`,

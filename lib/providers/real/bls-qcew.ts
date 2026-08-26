@@ -75,7 +75,7 @@ export const blsQcew: EmploymentProvider = {
       return {
         ok: true,
         data: { ...REPRESENTATIVE_FALLBACK, scope_note: 'No county FIPS resolved — BLS QCEW could not be queried.' },
-        provenance: 'representative',
+        provenance: 'fetch_failed',
         source: 'BLS QCEW [no FIPS]',
         fetched_at,
         error: 'No county FIPS resolved',
@@ -111,7 +111,7 @@ export const blsQcew: EmploymentProvider = {
       return {
         ok: true,
         data: REPRESENTATIVE_FALLBACK,
-        provenance: 'representative',
+        provenance: 'fetch_failed',
         source: 'BLS QCEW [FALLBACK]',
         endpoint: lastEndpoint,
         fetched_at,

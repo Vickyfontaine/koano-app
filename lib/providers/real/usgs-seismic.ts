@@ -96,7 +96,7 @@ export const usgsSeismic: SeismicProvider = {
       return {
         ok: true,
         data: REPRESENTATIVE_FALLBACK,
-        provenance: 'representative',
+        provenance: 'fetch_failed',
         source: 'USGS seismic hazard [FALLBACK]',
         fetched_at,
         error: `Live call failed: ${errMsg(e)}`,

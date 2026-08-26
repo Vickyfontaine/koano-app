@@ -63,9 +63,12 @@ export interface AgentVerdict extends KoanoVerdict {
   overall_provenance: Provenance; // WEAKEST provenance among inputs
 }
 
-export function weakestProvenance(points: { provenance: Provenance }[]): Provenance {
-  return points.some((p) => p.provenance === 'representative') ? 'representative' : 'live';
-}
+// The provenance rollup lives in the pure, client-safe ./providers/provenance
+// module (one source of truth for agents, documents, and UI). Imported for local
+// use AND re-exported so existing `import { weakestProvenance } from './shared'`
+// call sites are untouched.
+import { weakestProvenance } from '../providers/provenance';
+export { weakestProvenance };
 
 export function clamp(n: number, lo: number, hi: number): number {
   return Math.min(hi, Math.max(lo, Math.round(n)));
@@ -318,10 +321,10 @@ export function assembleAgentVerdict(args: {
   const provenanceBySource = new Map<string, Provenance>();
   for (const d of dataPoints) {
     const existing = provenanceBySource.get(d.source);
-    // a source is representative if ANY of its points are
+    // a source's provenance is the WEAKEST of its points (across all five states)
     provenanceBySource.set(
       d.source,
-      existing === 'representative' || d.provenance === 'representative' ? 'representative' : d.provenance
+      existing ? weakestProvenance([{ provenance: existing }, { provenance: d.provenance }]) : d.provenance,
     );
   }
 
@@ -330,9 +333,7 @@ export function assembleAgentVerdict(args: {
     const stepProvenance: Provenance =
       cited.length === 0
         ? weakestProvenance(dataPoints)
-        : cited.some((s) => provenanceBySource.get(s) === 'representative')
-          ? 'representative'
-          : 'live';
+        : weakestProvenance(cited.map((s) => ({ provenance: provenanceBySource.get(s)! })));
     return {
       step: i + 1,
       agent,

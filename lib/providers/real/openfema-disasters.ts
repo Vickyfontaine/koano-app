@@ -57,7 +57,7 @@ export const openFemaDisasters: DisasterHistoryProvider = {
           most_recent_declaration: null,
           scope_note: `No county FIPS resolved for this address, so disaster history could not be queried. ${FEMA_DISCLAIMER}`,
         },
-        provenance: 'representative',
+        provenance: 'fetch_failed',
         source: 'OpenFEMA DisasterDeclarationsSummaries [no FIPS]',
         fetched_at,
         error: 'No state/county FIPS resolved',
@@ -115,7 +115,7 @@ export const openFemaDisasters: DisasterHistoryProvider = {
       return {
         ok: true,
         data: { ...REPRESENTATIVE_FALLBACK, fips_state: addr.state_fips, fips_county: addr.county_fips },
-        provenance: 'representative',
+        provenance: 'fetch_failed',
         source: 'FEMA OpenFEMA [FALLBACK]',
         endpoint: url,
         fetched_at,

@@ -310,7 +310,7 @@ export const nycViolations: BuildingViolationsProvider = {
       return {
         ok: true,
         data: REPRESENTATIVE_FALLBACK,
-        provenance: 'representative',
+        provenance: 'fetch_failed',
         source: 'NYC building violations [FALLBACK]',
         fetched_at,
         error: `Live call failed: ${errMsg(e)}`,

@@ -21,6 +21,8 @@ import {
 import { PDF_FONT_FAMILY, PDF_FONT_FAMILY_BOLD, registerPdfFonts } from './fonts';
 import { DOCUMENT_DISCLAIMER } from '../disclaimer';
 import type { RenderModel, RenderSection, RenderTable } from './model';
+import type { Provenance } from '../../providers/types';
+import { isTrustedProvenance } from '../../providers/provenance';
 import type { Letterhead } from '../types';
 
 // Coastal-Intelligence palette (subset used in print).
@@ -226,8 +228,18 @@ function sanitizeModelForPdf(model: RenderModel): RenderModel {
   ) as RenderModel;
 }
 
-function provColor(p: 'live' | 'representative'): string {
-  return p === 'live' ? '#22C55E' : '#F59E0B';
+function provColor(p: Provenance): string {
+  switch (p) {
+    case 'live':
+      return '#22C55E';
+    case 'partner':
+      return '#5A9BBE';
+    case 'representative':
+    case 'fetch_failed':
+      return '#F59E0B';
+    case 'coverage_absent':
+      return '#8AABB8';
+  }
 }
 
 function LetterheadBlock({ lh, s }: { lh: Letterhead; s: Styles }) {
@@ -451,7 +463,7 @@ function TitlePage({ model, s }: { model: RenderModel; s: Styles }) {
         </View>
         {model.stalenessBanner ? <Text style={s.staleBanner}>{model.stalenessBanner}</Text> : null}
         {model.documentProvenanceNote ? (
-          <Text style={model.documentProvenance === 'representative' ? s.docProvRep : s.docProvLive}>
+          <Text style={model.documentProvenance != null && !isTrustedProvenance(model.documentProvenance) ? s.docProvRep : s.docProvLive}>
             {model.documentProvenanceNote}
           </Text>
         ) : null}

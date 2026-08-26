@@ -208,7 +208,7 @@ export const nycDobFilings: EntitlementProvider = {
       return {
         ok: true,
         data: REPRESENTATIVE_FALLBACK,
-        provenance: 'representative',
+        provenance: 'fetch_failed',
         source: 'NYC Open Data — DOB Job Application Filings (ic3t-wcy2) [FALLBACK]',
         fetched_at,
         error: `Live call failed: ${errMsg(e)}`,

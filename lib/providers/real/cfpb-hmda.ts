@@ -55,7 +55,7 @@ export const cfpbHmda: MortgageDemandProvider = {
       return {
         ok: true,
         data: { ...REPRESENTATIVE_FALLBACK, scope_note: 'No county FIPS resolved — CFPB HMDA could not be queried.' },
-        provenance: 'representative',
+        provenance: 'fetch_failed',
         source: 'CFPB HMDA [no FIPS]',
         fetched_at,
         error: 'No county FIPS resolved',
@@ -99,7 +99,7 @@ export const cfpbHmda: MortgageDemandProvider = {
       return {
         ok: true,
         data: REPRESENTATIVE_FALLBACK,
-        provenance: 'representative',
+        provenance: 'fetch_failed',
         source: 'CFPB HMDA [FALLBACK]',
         fetched_at,
         error: `Live call failed: ${errMsg(e)}`,

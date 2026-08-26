@@ -62,7 +62,7 @@ export const freddiePmms: MortgageRateProvider = {
       return {
         ok: true,
         data: REPRESENTATIVE_FALLBACK,
-        provenance: 'representative',
+        provenance: 'fetch_failed',
         source: 'Freddie Mac PMMS [FALLBACK]',
         endpoint: PMMS_CSV,
         fetched_at,

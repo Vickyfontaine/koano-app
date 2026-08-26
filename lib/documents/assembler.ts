@@ -9,14 +9,14 @@ import { registry } from '../providers/registry';
 import { fetchBlocks, type BlockKey, type SiteDetailBlock } from '../providers/blocks';
 import { supabaseAdmin } from '../supabase/server';
 import type { Provenance } from '../providers/types';
+import { weakestProvenance } from '../providers/provenance';
 import type { DocumentData, Letterhead } from './types';
 
-// weakest = any representative input makes the whole document representative.
-// Kept local so the documents module carries no dependency on the agent layer.
+// weakest = the document's overall provenance is the weakest of its blocks (the
+// pure shared rollup — one source of truth with the agents + UI; the documents
+// module still carries no dependency on the agent layer).
 function weakest(blocks: Partial<Record<BlockKey, SiteDetailBlock<unknown>>>): Provenance {
-  return Object.values(blocks).some((b) => b && b.provenance === 'representative')
-    ? 'representative'
-    : 'live';
+  return weakestProvenance(Object.values(blocks).filter((b): b is SiteDetailBlock<unknown> => !!b));
 }
 
 export type AssembleResult =

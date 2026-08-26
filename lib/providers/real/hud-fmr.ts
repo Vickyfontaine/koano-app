@@ -121,7 +121,7 @@ export const hudFmr: FairMarketRentProvider = {
       return {
         ok: true,
         data: REPRESENTATIVE_FALLBACK,
-        provenance: 'representative',
+        provenance: 'fetch_failed',
         source: 'HUD Fair Market Rents [FALLBACK]',
         fetched_at,
         error: `Live call failed: ${errMsg(e)}`,

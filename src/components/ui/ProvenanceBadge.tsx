@@ -1,11 +1,14 @@
 "use client";
 
 // ProvenanceBadge — the integrity layer made visible (CLAUDE.md Section 06).
-// Mandatory anywhere a non-live figure is displayed. `live` renders a quiet
-// confirmation; `representative` renders a visible amber badge, optionally
-// followed by the "becomes live with [source] integration" note.
+// Mandatory anywhere a non-live figure is displayed. Renders each of the five
+// provenance states DISTINCTLY (PROVENANCE_META): `live` a quiet green
+// confirmation, `partner` a blue attributed badge, `representative` /
+// `fetch_failed` amber caveats, `coverage_absent` a muted structural gap — so a
+// not-covered or fetch-failed figure is never mislabeled "Representative".
 
 import React from "react";
+import { PROVENANCE_META } from "./verdict";
 import type { Provenance } from "./verdict";
 
 interface ProvenanceBadgeProps {
@@ -36,61 +39,39 @@ export default function ProvenanceBadge({
   becomesLiveWith,
   showNote = false,
 }: ProvenanceBadgeProps) {
+  const meta = PROVENANCE_META[provenance];
+
+  // `live` is a quiet standalone confirmation (no note needed).
   if (provenance === "live") {
     return (
-      <span
-        style={{
-          ...pillBase,
-          color: "var(--signal-positive)",
-          background: "rgba(34, 197, 94, 0.08)",
-        }}
-      >
+      <span style={{ ...pillBase, color: meta.color, background: meta.background }}>
         <span
           aria-hidden="true"
-          style={{
-            width: "6px",
-            height: "6px",
-            borderRadius: "50%",
-            background: "var(--signal-positive)",
-          }}
+          style={{ width: "6px", height: "6px", borderRadius: "50%", background: meta.color }}
         />
-        Live
+        {meta.label}
       </span>
     );
   }
 
+  // A representative stand-in keeps its "becomes live with [paid source]" note;
+  // the other caveats use their own state-specific note.
+  const note =
+    provenance === "representative" && becomesLiveWith
+      ? `Representative data — becomes live with ${becomesLiveWith} integration`
+      : meta.note;
+
   return (
     <span style={{ display: "inline-flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-      <span
-        style={{
-          ...pillBase,
-          color: "var(--signal-warning)",
-          background: "rgba(245, 158, 11, 0.10)",
-        }}
-      >
+      <span style={{ ...pillBase, color: meta.color, background: meta.background }}>
         <span
           aria-hidden="true"
-          style={{
-            width: "6px",
-            height: "6px",
-            borderRadius: "50%",
-            background: "var(--signal-warning)",
-          }}
+          style={{ width: "6px", height: "6px", borderRadius: "50%", background: meta.color }}
         />
-        Representative
+        {meta.label}
       </span>
       {showNote && (
-        <span
-          style={{
-            fontSize: "12px",
-            color: "var(--ink-muted)",
-            whiteSpace: "normal",
-          }}
-        >
-          {becomesLiveWith
-            ? `Representative data — becomes live with ${becomesLiveWith} integration`
-            : "Representative data — not fetched live from the source"}
-        </span>
+        <span style={{ fontSize: "12px", color: "var(--ink-muted)", whiteSpace: "normal" }}>{note}</span>
       )}
     </span>
   );

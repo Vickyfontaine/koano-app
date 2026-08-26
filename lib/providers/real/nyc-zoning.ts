@@ -126,7 +126,7 @@ export const nycZoning: ZoningProvider = {
       return {
         ok: true,
         data: { ...REPRESENTATIVE_FALLBACK, bbl },
-        provenance: 'representative',
+        provenance: 'fetch_failed',
         source: 'NYC Open Data — MapPLUTO (64uk-42ks) [FALLBACK]',
         endpoint: url,
         fetched_at,

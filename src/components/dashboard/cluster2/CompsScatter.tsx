@@ -9,6 +9,7 @@ import React from "react";
 import Scatter, { type AxisTick, type ScatterPoint } from "@/components/ui/charts/Scatter";
 import { compDivergingColor } from "@/components/ui/map/mapColors";
 import { panelStyle, PanelHeader } from "../panels";
+import { isTrustedProvenance } from "@/components/ui/verdict";
 import type { SiteDetailResponse } from "@/app/api/site-detail/route";
 
 const money = (n: number) => `$${Math.round(n).toLocaleString()}`;
@@ -56,7 +57,7 @@ export default function CompsScatter({
   const padY = (yHi - yLo) * 0.12 || yHi * 0.1;
   const yDomain: [number, number] = [Math.max(0, yLo - padY), yHi + padY];
 
-  const muted = block!.provenance === "representative";
+  const muted = !isTrustedProvenance(block!.provenance);
   const points: ScatterPoint[] = comps.map((c, i) => ({
     key: `${c.sale_date}-${c.price_per_sqft}-${i}`,
     x: new Date(c.sale_date).getTime(),

@@ -109,7 +109,7 @@ export const noaaClimate: ClimateProvider = {
       return {
         ok: true,
         data: REPRESENTATIVE_FALLBACK,
-        provenance: 'representative',
+        provenance: 'fetch_failed',
         source: 'NOAA NCEI climate normals [FALLBACK]',
         fetched_at,
         error: `Live call failed: ${errMsg(e)}`,

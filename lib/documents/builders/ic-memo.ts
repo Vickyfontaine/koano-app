@@ -25,6 +25,7 @@ import type {
   Provenance,
 } from '../../providers/types';
 import type { SiteDetailBlock } from '../../providers/blocks';
+import { isTrustedProvenance, PROVENANCE_LABEL } from '../../providers/provenance';
 import type { DocumentData, Letterhead } from '../types';
 import type { RenderModel, RenderSection } from '../render/model';
 import { appendixWithVerdict, type ProvenanceAppendix } from '../disclaimer';
@@ -275,10 +276,9 @@ export function buildIcMemoModel(args: {
   // Document provenance = weakest of blocks AND verdict (computed in the
   // appendix). Stated at the top so a representative document says so up front.
   const docProv = appendix.overall;
-  const documentProvenanceNote =
-    docProv === 'representative'
-      ? 'PROVENANCE: REPRESENTATIVE — this memo includes a verdict and/or figures that are not fully live. See Sources & Provenance.'
-      : 'PROVENANCE: LIVE — every rendered figure and the underlying verdict derive from live public data.';
+  const documentProvenanceNote = !isTrustedProvenance(docProv)
+    ? `PROVENANCE: NOT FULLY LIVE (${PROVENANCE_LABEL[docProv].toUpperCase()}) — this memo includes a verdict and/or figures that are not fully live. See Sources & Provenance.`
+    : 'PROVENANCE: LIVE — every rendered figure and the underlying verdict derive from live public data.';
   const sections: RenderSection[] = [];
 
   // 1 — Executive Summary & Recommendation.

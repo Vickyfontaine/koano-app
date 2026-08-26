@@ -18,6 +18,7 @@ import type {
   Popup as MapboxPopup,
 } from "mapbox-gl";
 import type { Provenance } from "../verdict";
+import { isTrustedProvenance, PROVENANCE_META } from "../verdict";
 import {
   BASE_GREEN,
   BASE_GREEN_CLASSES,
@@ -121,7 +122,7 @@ const NAVY = "#1A4F6E";
 const INK_MUTED = "#5A7A8C";
 
 function markerSvg(kind: MarkerKind, provenance: Provenance, accent?: string, uncertain = false): string {
-  const rep = provenance === "representative";
+  const rep = !isTrustedProvenance(provenance);
   const dash = rep ? ` stroke-dasharray="3 2"` : "";
   if (kind === "holding") {
     // A portfolio holding, colored by risk (accent). Uncertain location → hollow,
@@ -171,7 +172,7 @@ function markerSvg(kind: MarkerKind, provenance: Provenance, accent?: string, un
 }
 
 function provDotColor(p: Provenance): string {
-  return p === "live" ? "var(--signal-positive)" : p === "representative" ? "var(--signal-warning)" : "var(--ink-faint)";
+  return PROVENANCE_META[p].color;
 }
 
 function legendGlyph(
@@ -180,7 +181,7 @@ function legendGlyph(
   accent?: string,
   uncertain = false,
 ): React.ReactNode {
-  const rep = provenance === "representative";
+  const rep = !isTrustedProvenance(provenance);
   const common: React.CSSProperties = { flexShrink: 0 };
   if (kind === "holding") {
     const c = accent ?? INK_MUTED;
@@ -358,7 +359,7 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
           })),
         };
         map.addSource(layer.id, { type: "geojson", data: fc as unknown as GeoJSON.FeatureCollection });
-        const rep = layer.provenance === "representative";
+        const rep = !isTrustedProvenance(layer.provenance);
 
         if (layer.kind === "flood") {
           // SFHA (1%-annual) blue and 0.2%-annual teal differ by hue, not just

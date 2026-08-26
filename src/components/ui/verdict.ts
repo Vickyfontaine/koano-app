@@ -22,6 +22,56 @@ export { deterministicEntitlementRisk } from "../../../lib/agents/entitlement";
 export type { EntitlementRisk } from "../../../lib/agents/entitlement";
 
 import type { AgentName, Verdict } from "../../../lib/agents/shared";
+import type { Provenance } from "../../../lib/providers/types";
+
+// Display metadata for each of the five provenance states (CLAUDE.md §06). One
+// source of truth so every badge/label renders the SAME distinct treatment —
+// `live` and `partner` are trusted (green / blue), `representative` and
+// `fetch_failed` are amber caveats, `coverage_absent` is a muted structural gap.
+export interface ProvenanceMeta {
+  label: string;
+  color: string;
+  background: string;
+  note: string; // the explanatory line when a badge shows its note
+}
+export const PROVENANCE_META: Record<Provenance, ProvenanceMeta> = {
+  live: {
+    label: "Live",
+    color: "var(--signal-positive)",
+    background: "rgba(34, 197, 94, 0.08)",
+    note: "Fetched live from the source.",
+  },
+  partner: {
+    label: "Partner",
+    color: "var(--mid-blue)",
+    background: "rgba(90, 155, 190, 0.10)",
+    note: "Supplied by a data partner — attributed to the named source, not verified by KOANO.",
+  },
+  representative: {
+    label: "Representative",
+    color: "var(--signal-warning)",
+    background: "rgba(245, 158, 11, 0.10)",
+    note: "Representative stand-in — not fetched live from the source.",
+  },
+  fetch_failed: {
+    label: "Fetch failed",
+    color: "var(--signal-warning)",
+    background: "rgba(245, 158, 11, 0.10)",
+    note: "The live call failed — usually transient; retry to refresh.",
+  },
+  coverage_absent: {
+    label: "Not covered",
+    color: "var(--ink-faint)",
+    background: "rgba(138, 171, 184, 0.12)",
+    note: "Outside KOANO's coverage for this market — no data was queried.",
+  },
+};
+
+// TRUSTED = carries real present data (live or partner). Use instead of
+// `=== 'representative'` for "is this figure fully reliable?" checks, so
+// out-of-market / fetch-failed cases are not silently missed. Re-exported from the
+// pure shared module (one source of truth with the agents + document renderers).
+export { isTrustedProvenance, PROVENANCE_LABEL, weakestProvenance } from "../../../lib/providers/provenance";
 
 // Section 07 agent names, as displayed.
 export const AGENT_LABELS: Record<AgentName, string> = {
