@@ -28,7 +28,7 @@ export function outOfMarketMunicipal<T>(opts: {
     ok: true,
     data: null,
     provenance: 'coverage_absent',
-    source: `${opts.dataset} — outside NYC coverage (not queried)`,
+    source: `${opts.dataset}: outside NYC coverage (not queried)`,
     fetched_at: opts.fetched_at,
     error:
       `Out of coverage: ${opts.layer} is a NYC parcel-level layer queried by BBL. ` +

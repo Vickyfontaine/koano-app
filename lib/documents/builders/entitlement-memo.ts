@@ -142,7 +142,7 @@ Rules:
 export function deterministicEntitlementNarrative(f: EntitlementFacts): string[] {
   const paras: string[] = [];
   paras.push(
-    `Community district ${f.communityDistrict ?? '(unknown)'} shows an approval ratio of ${fmtPct(f.approvalRatioPct)} across ${fmtInt(f.cdTotalFilings)} DOB job filings — ${fmtInt(f.cdApproved)} approved, ${fmtInt(f.cdDisapproved)} disapproved, ${fmtInt(f.cdWithdrawn)} withdrawn, ${fmtInt(f.cdSuspended)} suspended, and ${fmtInt(f.cdInProcess)} in process. The median filing timeline is ${f.medianTimelineDays != null ? fmtInt(f.medianTimelineDays) + ' days' : 'not available'}.`,
+    `Community district ${f.communityDistrict ?? '(unknown)'} shows an approval ratio of ${fmtPct(f.approvalRatioPct)} across ${fmtInt(f.cdTotalFilings)} DOB job filings: ${fmtInt(f.cdApproved)} approved, ${fmtInt(f.cdDisapproved)} disapproved, ${fmtInt(f.cdWithdrawn)} withdrawn, ${fmtInt(f.cdSuspended)} suspended, and ${fmtInt(f.cdInProcess)} in process. The median filing timeline is ${f.medianTimelineDays != null ? fmtInt(f.medianTimelineDays) + ' days' : 'not available'}.`,
   );
   paras.push(
     `The subject lot has ${fmtInt(f.subjectFilingCount)} filing(s) of its own on record. Read together, these are base-rate context for how the approvals landscape has behaved in this district. They are a disposition track record, not a prediction. A specific project's outcome turns on its own design, review, and merits, which this record does not forecast.`,

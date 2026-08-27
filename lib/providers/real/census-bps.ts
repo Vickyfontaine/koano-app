@@ -201,7 +201,7 @@ export const censusBps: BuildingPermitsProvider = {
             scope_note: `STALE (${cached.data.latest_year}; live refresh failed) — ${cached.data.scope_note}`,
           },
           provenance: 'fetch_failed',
-          source: `Census Building Permits Survey (STALE ${cached.data.latest_year} — refresh failed)`,
+          source: `Census Building Permits Survey (STALE ${cached.data.latest_year}, refresh failed)`,
           fetched_at,
           error: `Live BPS refresh failed and cache is stale: ${errMsg(e)}`,
         };

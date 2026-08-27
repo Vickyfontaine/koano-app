@@ -249,13 +249,13 @@ export const fhfaHpi: HpiProvider = {
       }
       try {
         const { data, endpoint } = await fetchStateHpi(usps);
-        return { ok: true, data, provenance: 'live', source: `FHFA House Price Index — ${usps} statewide (all-transactions, quarterly)`, endpoint, fetched_at };
+        return { ok: true, data, provenance: 'live', source: `FHFA House Price Index: ${usps} statewide (all-transactions, quarterly)`, endpoint, fetched_at };
       } catch (e) {
         return {
           ok: true,
           data: null,
           provenance: 'fetch_failed',
-          source: `FHFA House Price Index — ${usps} statewide [live call failed]`,
+          source: `FHFA House Price Index: ${usps} statewide [live call failed]`,
           fetched_at,
           error: `Live FHFA state HPI call failed: ${errMsg(e)}`,
         };
@@ -299,7 +299,7 @@ export const fhfaHpi: HpiProvider = {
             region: `${archived.region} (STALE as of ${archived.latest_period} — live refresh failed)`,
           },
           provenance: 'fetch_failed',
-          source: `FHFA House Price Index (durable archive, STALE ${archived.latest_period} — refresh failed)`,
+          source: `FHFA House Price Index (durable archive, STALE ${archived.latest_period}, refresh failed)`,
           fetched_at,
           error: `Live refresh failed and archived HPI is older than a quarter: ${errMsg(e)}`,
         };

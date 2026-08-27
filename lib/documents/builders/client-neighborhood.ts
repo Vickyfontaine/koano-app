@@ -181,9 +181,9 @@ export function buildNeighborhoodModel(args: {
   const snapshotRows: string[][] = [
     ['Recorded home sales: median $/sq ft', fmtMoney(f.medianPsf)],
     ['Recorded sales in scope / recent trend', f.priceTrend ? `${fmtInt(f.salesCount)} / ${f.priceTrend}` : '—'],
-    ['Price index: past year / 5 years', `${fmtPct(f.hpiYoY)} / ${fmtPct(f.hpi5yr)}${f.hpiRegion ? ` — ${f.hpiRegion}` : ''}`],
+    ['Price index: past year / 5 years', `${fmtPct(f.hpiYoY)} / ${fmtPct(f.hpi5yr)}${f.hpiRegion ? ` (${f.hpiRegion})` : ''}`],
     ['Building permits nearby (last 24 months)', fmtInt(f.permits24mo)],
-    ['FEMA flood zone', f.floodZone ? `${f.floodZone}${f.inSFHA ? ' — Special Flood Hazard Area' : ''}` : '—'],
+    ['FEMA flood zone', f.floodZone ? `${f.floodZone}${f.inSFHA ? ' (Special Flood Hazard Area)' : ''}` : '—'],
   ];
   if (f.demoLive) {
     snapshotRows.push(['Median household income (area)', fmtMoney(f.medianIncome)]);

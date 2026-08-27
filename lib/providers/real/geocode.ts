@@ -399,7 +399,7 @@ export const nycGeoSearch: GeocodeProvider = {
         return {
           ...rc,
           data: { ...rc.data, location_confidence: 'unconfirmed' },
-          source: `${rc.source} — auto-selected among ${r.candidates.length} candidates (unverified; no user disambiguation)`,
+          source: `${rc.source}: auto-selected among ${r.candidates.length} candidates (unverified; no user disambiguation)`,
         };
       }
       return {

@@ -75,8 +75,8 @@ const LAYER_RULES: LayerRule[] = [
 function layerForSource(source: string): { layer: string; unlock?: string } {
   const rule = LAYER_RULES.find((r) => r.match.test(source));
   if (rule) return { layer: rule.layer, unlock: rule.unlock };
-  // Fallback: the source up to its first " — " / " (" — never "unknown".
-  const clean = source.split(/ — | \(/)[0].trim();
+  // Fallback: the source up to its first separator (" — ", ": ", or " ("). Never "unknown".
+  const clean = source.split(/ — |: | \(/)[0].trim();
   return { layer: clean || source };
 }
 

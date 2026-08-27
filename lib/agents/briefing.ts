@@ -63,7 +63,7 @@ const MAX_PROPERTIES = 5;
 
 export async function generateBriefing(properties: BriefingProperty[]): Promise<BriefingResult> {
   if (properties.length === 0) {
-    throw new Error('No properties in the portfolio — add properties first');
+    throw new Error('No properties in the portfolio. Add properties first.');
   }
   const covered = properties.slice(0, MAX_PROPERTIES);
 
@@ -85,12 +85,12 @@ export async function generateBriefing(properties: BriefingProperty[]): Promise<
       if (prop.latest_verdict) {
         const v = prop.latest_verdict;
         push(
-          `${label} — latest KOANO verdict (${v.created_at.slice(0, 10)})`,
+          `${label}: latest KOANO verdict (${v.created_at.slice(0, 10)})`,
           `${v.verdict}, confidence ${v.confidence}, risk ${v.risk_score}: ${v.headline}`,
           { provenance: v.overall_provenance, source: 'KOANO verdict audit trail' },
         );
       } else {
-        push(`${label} — latest KOANO verdict`, 'none yet — analysis not run', {
+        push(`${label}: latest KOANO verdict`, 'none yet, analysis not run', {
           provenance: 'live',
           source: 'KOANO verdict audit trail',
         });
@@ -104,14 +104,14 @@ export async function generateBriefing(properties: BriefingProperty[]): Promise<
       ]);
       if (permits.data) {
         push(
-          `${label} — construction permits last 24 months`,
+          `${label}: construction permits last 24 months`,
           `${permits.data.total_permits_24mo} total, ${permits.data.new_building_permits} new-building, ${permits.data.demolition_permits} demolition`,
           permits,
         );
       }
       if (flood.data) {
         push(
-          `${label} — FEMA flood status`,
+          `${label}: FEMA flood status`,
           `zone ${flood.data.flood_zone ?? 'unknown'}, ${flood.data.in_special_flood_hazard_area ? 'INSIDE' : 'outside'} Special Flood Hazard Area`,
           flood,
         );
@@ -125,7 +125,7 @@ export async function generateBriefing(properties: BriefingProperty[]): Promise<
     const hpi = await registry.hpi.getHpi(firstGeo.data);
     if (hpi.data) {
       push(
-        `Metro price index — ${hpi.data.region} (${hpi.data.latest_period})`,
+        `Metro price index: ${hpi.data.region} (${hpi.data.latest_period})`,
         `${hpi.data.yoy_change_pct}% yoy, ${hpi.data.five_yr_change_pct}% 5yr`,
         hpi,
       );

@@ -349,13 +349,13 @@ export function buildIcMemoModel(args: {
   const riskRows: string[][] = [];
   if (f.violations) {
     riskRows.push([
-      `Building violations — HPD ${fmtInt(f.violations.hpd.open)} open of ${fmtInt(f.violations.hpd.total)}; ECB ${fmtInt(f.violations.ecb.active)} active; DOB ${fmtInt(f.violations.dob_complaints.active)} active`,
+      `Building violations: HPD ${fmtInt(f.violations.hpd.open)} open of ${fmtInt(f.violations.hpd.total)}; ECB ${fmtInt(f.violations.ecb.active)} active; DOB ${fmtInt(f.violations.dob_complaints.active)} active`,
       f.violations.hpd_registered ? 'Quantify remediation cost in diligence; open Class C are immediately hazardous.' : 'Building outside HPD 3+-unit coverage. Zeros are a coverage fact, not a clean record.',
     ]);
   }
   if (f.flood) {
     riskRows.push([
-      `Flood — FEMA zone ${f.flood.flood_zone ?? 'n/a'}${f.flood.in_special_flood_hazard_area ? ' (Special Flood Hazard Area)' : ''}`,
+      `Flood: FEMA zone ${f.flood.flood_zone ?? 'n/a'}${f.flood.in_special_flood_hazard_area ? ' (Special Flood Hazard Area)' : ''}`,
       f.flood.in_special_flood_hazard_area ? 'Flood insurance required; model premium + resale impact into returns.' : 'Outside SFHA. Limited flood exposure on current maps.',
     ]);
   }
@@ -367,19 +367,19 @@ export function buildIcMemoModel(args: {
     // named PLUTO owner.
     if (f.portfolio.hpd_registered && f.portfolio.portfolio_building_count > 0) {
       riskRows.push([
-        `Ownership concentration — ${fmtInt(f.portfolio.portfolio_building_count)} building(s) under the HPD-registered owner; ${fmtInt(f.portfolio.portfolio_open_hpd_violations)} open HPD violations portfolio-wide${f.portfolio.on_speculation_watch_list ? '; on NYC speculation watch list' : ''}`,
+        `Ownership concentration: ${fmtInt(f.portfolio.portfolio_building_count)} building(s) under the HPD-registered owner; ${fmtInt(f.portfolio.portfolio_open_hpd_violations)} open HPD violations portfolio-wide${f.portfolio.on_speculation_watch_list ? '; on NYC speculation watch list' : ''}`,
         f.portfolio.on_speculation_watch_list ? 'Speculation-watch status warrants a closer read of the seller and title.' : 'Confirm seller motivation and any cross-collateralization across the portfolio.',
       ]);
     } else {
       riskRows.push([
-        `Ownership — PLUTO recorded owner is ${f.zoning?.owner_name ?? 'not recorded'}. The building is not an HPD-registered multiple dwelling, so an HPD portfolio-concentration read does not apply here`,
+        `Ownership: PLUTO recorded owner is ${f.zoning?.owner_name ?? 'not recorded'}. The building is not an HPD-registered multiple dwelling, so an HPD portfolio-concentration read does not apply here`,
         'Concentration and related-party risk must come from title, ACRIS, and DOF records; HPD registration covers only 3+-unit residential buildings, which this is not.',
       ]);
     }
   }
   if (f.entitlement) {
     riskRows.push([
-      `Entitlement track record — CD ${f.entitlement.community_district ?? ''} approval ratio ${f.entitlement.cd_approval_ratio_pct != null ? f.entitlement.cd_approval_ratio_pct + '%' : '—'}, median timeline ${f.entitlement.cd_median_timeline_days != null ? f.entitlement.cd_median_timeline_days + ' days' : '—'}`,
+      `Entitlement track record: CD ${f.entitlement.community_district ?? ''} approval ratio ${f.entitlement.cd_approval_ratio_pct != null ? f.entitlement.cd_approval_ratio_pct + '%' : '—'}, median timeline ${f.entitlement.cd_median_timeline_days != null ? f.entitlement.cd_median_timeline_days + ' days' : '—'}`,
       'Track record is community-district level; a project-specific pre-application read is still required.',
     ]);
   }
@@ -448,7 +448,7 @@ export function buildIcMemoModel(args: {
       columns: ['Agent', 'Verdict', 'Confidence (weight)', 'Direction', 'Contribution'],
       rows: [
         ...b.agents.map((a) => [a.agent, a.verdict, fmtInt(a.confidence), String(a.direction), (a.contribution >= 0 ? '+' : '') + fmtInt(a.contribution)]),
-        ['— Weighted score —', '', fmtInt(b.total_weight), '', String(b.aggregate_score)],
+        ['Weighted score', '', fmtInt(b.total_weight), '', String(b.aggregate_score)],
       ],
       caption: `Weighted score ${b.aggregate_score} vs thresholds: buy ≥ ${b.thresholds.buy}, hold ≥ ${b.thresholds.hold}, wait ≥ ${b.thresholds.wait} → ${b.chosen_verdict.toUpperCase()} at confidence ${v.confidence}/100.`,
     },
