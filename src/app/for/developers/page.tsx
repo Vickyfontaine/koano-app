@@ -11,52 +11,42 @@ export const metadata: Metadata = {
 
 const FEATURES = [
   {
-    title: "KOANO composite score",
+    title: "Development Site Screening Memo",
     description:
-      "Sites ranked by risk-adjusted opportunity. The single number tells you where to look first.",
+      "A single-site verdict with the as-of-right envelope, entitlement risk, an assemblage and air-rights read, a due-diligence gap register, and the reasoning behind the call. Live for NYC.",
   },
   {
-    title: "Entitlement risk, from the facts",
+    title: "Entitlement Risk Memo",
     description:
-      "An entitlement risk score computed from live PLUTO facts: FAR headroom, special-district and mixed-use constraints, with the model adjusting the number rather than pinning it to the middle.",
+      "An entitlement risk read scored from live PLUTO facts, the community district's filing track record, and the subject lot's own filing history.",
   },
   {
-    title: "As-of-right envelope",
+    title: "Three-Site Comparison Brief",
     description:
-      "What the zoning actually allows on the lot, read from live MapPLUTO, so you see the buildable envelope before you commit.",
+      "Up to three sites run through all five agents and ranked by risk-adjusted composite score, with the reasoning that separates them.",
   },
   {
-    title: "Permit and violation history",
+    title: "As-of-right and incentive read",
     description:
-      "The site's full DOB permit and job-filing record and its HPD and ECB violation history, pulled live.",
+      "The buildable envelope from live MapPLUTO, plus Opportunity Zone and LIHTC eligibility from IRS and HUD, tied to the parcel's own geography.",
   },
   {
-    title: "Opportunity Zone and incentive status",
+    title: "Weekly monitoring",
     description:
-      "Live Opportunity Zone designation and LIHTC eligibility from IRS and HUD, tied to the parcel's own geography.",
-  },
-  {
-    title: "Multi-site comparison",
-    description:
-      "Compare up to three sites side by side, each run through all five agents, ranked by composite score with the reasoning attached.",
+      "Watch up to 50 sites. KOANO diffs each one's public record week over week and sends what changed.",
   },
 ];
 
-const PRO_FORMA_FEATURES = [
+const NOT_BUILT_YET = [
   {
-    title: "Land and construction benchmarks",
+    title: "Pro forma feasibility",
     description:
-      "Representative benchmarks for the market today, labeled as representative on every figure. A CoStar or HouseCanary license turns them live.",
+      "Land and construction benchmarks are representative today, labeled as such on every figure, and they feed a Pro Forma Summary that KOANO will not ship as live until the data is funded. A CoStar or HouseCanary license turns it live with a one-line change and no rework.",
   },
   {
-    title: "Pro forma inputs, sourced",
+    title: "Approval odds and community-board opposition",
     description:
-      "Every input the model uses carries its provenance, so a representative stand-in is never mistaken for a live number.",
-  },
-  {
-    title: "What funding unlocks",
-    description:
-      "The upgrade is a one-line change in the provider registry. No rework, no re-architecture, the moment the data is funded.",
+      "Forecasting a hearing outcome or an approval probability is a model KOANO has not built. It reports the district's actual filing and disposition record, not a prediction of your hearing.",
   },
 ];
 
@@ -74,10 +64,11 @@ export default function DevelopersPage() {
         headline="You already know the site. The question is what happens next to it."
         subhead="Five agents read the zoning, the permit history, and the development activity around a parcel. They converge on a single verdict, and the reasoning comes with it."
         users="CRE brokers, developers, and contractors"
+        featuresHeading="What you get today"
         features={FEATURES}
         secondaryFeatures={{
-          title: "Pro forma intelligence",
-          items: PRO_FORMA_FEATURES,
+          title: "What is not built yet",
+          items: NOT_BUILT_YET,
         }}
       />
       <Footer />

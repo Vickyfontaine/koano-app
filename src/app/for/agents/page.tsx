@@ -11,52 +11,42 @@ export const metadata: Metadata = {
 
 const FEATURES = [
   {
-    title: "Velocity heatmap",
+    title: "Comparative Market Analysis",
     description:
-      "See the fastest-changing neighborhoods at a glance, where recorded sale prices are moving first.",
+      "A full CMA built on live NYC recorded sales, ranked by true distance from the subject and time-adjusted to today. Delivered as a PDF and an editable Word file, so you can adjust it before it reaches a client.",
   },
   {
-    title: "Absorption analysis",
+    title: "Pricing Recommendation Sheet",
     description:
-      "Sales velocity by micro-market, drawn from live NYC recorded sales, so you know which neighborhoods are soaking up inventory.",
+      "A recommended price band with the comparable sales and the recorded price trend that produced it, laid out for a listing conversation.",
   },
   {
-    title: "Price trend detection",
+    title: "Client Neighborhood Report",
     description:
-      "Where recorded sale prices are climbing or softening across a submarket, read from live DOF sales.",
+      "A client-ready read on the neighborhood: prices, permits, demographics, and flood exposure, written as a narrative with every figure sourced.",
   },
   {
-    title: "Distance-ranked comps",
+    title: "Buyer and Seller Net Sheet",
     description:
-      "Recorded sales joined to their parcel centroids and ranked by true distance from the subject, then time-adjusted to today.",
+      "The closing math a client needs to decide, generated from the analysis with each figure labeled by where it came from.",
   },
   {
-    title: "CMA builder",
+    title: "Weekly monitoring",
     description:
-      "Comparative market analysis with KOANO's early-signal overlay, every comp sourced and dated.",
-  },
-  {
-    title: "Pricing recommendation",
-    description:
-      "A pricing recommendation with the comps, the price trend, and the reasoning shown alongside it.",
+      "Watch up to 20 properties. KOANO diffs each one's public record week over week and sends what changed, in the app and in a Monday digest.",
   },
 ];
 
-const CLIENT_TOOLS = [
+const NOT_BUILT_YET = [
   {
-    title: "Client neighborhood report",
+    title: "MLS-grade comp detail",
     description:
-      "A polished, client-ready report that turns the live record into a narrative you can hand over, with every figure sourced.",
+      "Beds, baths, condition, days-on-market, and active listings come from the MLS, which is licensed and gated. KOANO's comps are recorded sales, which are public and real. A CMA today carries price and distance. Beds, baths, and days-on-market arrive when the MLS feed is funded.",
   },
   {
-    title: "Pricing recommendation sheet",
+    title: "Likely-seller lead lists",
     description:
-      "The recommended price, the comps behind it, and the price trend, laid out for a listing conversation.",
-  },
-  {
-    title: "Buyer and seller net sheets",
-    description:
-      "The numbers a client needs to decide, generated from the analysis and labeled with where each figure came from.",
+      "Predicting who is about to sell from ownership tenure and permit patterns is a model KOANO has not built. It reads the record today and does not yet forecast the seller.",
   },
 ];
 
@@ -74,10 +64,11 @@ export default function AgentsPage() {
         headline="The MLS tells you what already happened."
         subhead="KOANO reads the signals that move first. Permit filings, price momentum, and lending activity, the things that show up in the public record before they show up in a comp."
         users="agents, brokers, and mortgage officers"
+        featuresHeading="What you get today"
         features={FEATURES}
         secondaryFeatures={{
-          title: "Client tools",
-          items: CLIENT_TOOLS,
+          title: "What is not built yet",
+          items: NOT_BUILT_YET,
         }}
       />
       <Footer />

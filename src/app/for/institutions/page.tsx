@@ -11,67 +11,47 @@ export const metadata: Metadata = {
 
 const FEATURES = [
   {
-    title: "NAV tracking",
+    title: "Investment Committee Memo",
     description:
-      "Net asset value tracking across your entire portfolio, every asset and every market, refreshed weekly.",
+      "A full IC memo with recommendation, market and risk analysis, comparable sales, and exhibits, as a PDF and an editable Word file for an analyst to complete the financial sections. Built on the stored verdict, so its math reproduces.",
   },
   {
-    title: "FFO & NOI monitoring",
+    title: "Monday Portfolio Briefing",
     description:
-      "Funds from operations and net operating income monitoring by asset, market, and asset class.",
+      "A weekly briefing on what moved across the assets you hold, what is at risk and why, grounded in the public record and traceable to a source.",
   },
   {
-    title: "Portfolio risk score",
+    title: "Portfolio Risk Report",
     description:
-      "A single portfolio risk score powered by all 5 KOANO agents, updated weekly.",
+      "Flood, contamination, seismic, disaster history, and crime exposure across the whole book, from live federal and city sources.",
   },
   {
-    title: "Hold / sell / reposition analysis",
+    title: "Asset One-Pager",
     description:
-      "Per-asset hold, sell, or reposition analysis with full reasoning chain and confidence scoring.",
+      "A per-holding one-pager with the verdict, the envelope, key market indicators, and top risks.",
   },
   {
-    title: "Monday morning briefing",
+    title: "Weekly monitoring",
     description:
-      "What changed this week. What is at risk and why. What opportunities are emerging. Every Monday.",
+      "Watch up to 500 assets. KOANO diffs each one's public record week over week and flags what changed.",
   },
-  {
-    title: "Regulatory change alerts",
-    description:
-      "Regulatory changes affecting held assets: zoning updates, policy shifts, opportunity zone expirations.",
-  },
-];
-
-const ENTERPRISE_FEATURES = [
   {
     title: "Immutable verdict record",
     description:
-      "Every verdict is recorded append-only. It cannot be edited or deleted after the fact, by anyone. The audit trail is a product promise, live today.",
+      "Every verdict is written append-only and cannot be edited or deleted after the fact, by anyone. Portfolio data is never used to train KOANO's models, and row-level security scopes every record to your account.",
+  },
+];
+
+const NOT_BUILT_YET = [
+  {
+    title: "NAV, FFO and NOI tracking",
+    description:
+      "These need rent rolls and operating statements, which are private. KOANO works from the public record and does not model private financials, so it will not report a value it cannot source.",
   },
   {
-    title: "Your data stays yours",
+    title: "Enterprise controls",
     description:
-      "Portfolio data is never used to train KOANO's models, and row-level security scopes every record to your account.",
-  },
-  {
-    title: "SOC 2 Type II: on the enterprise roadmap",
-    description:
-      "SOC 2 Type II certification lands with enterprise onboarding. The immutable audit trail that underpins it is already in production.",
-  },
-  {
-    title: "SSO & role-based access: on the enterprise roadmap",
-    description:
-      "Sign-in today is email and Google. Single sign-on and role-based access controls arrive with the enterprise tier.",
-  },
-  {
-    title: "Dedicated data isolation: on the enterprise roadmap",
-    description:
-      "Row-level security isolates your records today; dedicated per-tenant environments arrive with enterprise onboarding.",
-  },
-  {
-    title: "API access",
-    description:
-      "Direct API access for integration with your existing portfolio management and reporting systems.",
+      "SOC 2 Type II, single sign-on, role-based access, and dedicated per-tenant isolation arrive with enterprise onboarding. The immutable audit trail that underpins them is already in production.",
   },
 ];
 
@@ -89,10 +69,11 @@ export default function InstitutionsPage() {
         headline="A portfolio does not change on a reporting cycle."
         subhead="KOANO watches the assets and the markets you hold, and tells you what moved, what is at risk, and why. Every claim is traceable to a source."
         users="CEOs, CFOs, CIOs, REITs, and PE firms"
+        featuresHeading="What you get today"
         features={FEATURES}
         secondaryFeatures={{
-          title: "Enterprise security",
-          items: ENTERPRISE_FEATURES,
+          title: "What is not built yet",
+          items: NOT_BUILT_YET,
         }}
       />
       <Footer />
