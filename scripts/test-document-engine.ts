@@ -29,7 +29,7 @@ function canGenerate(plan: 'free' | Tier, homeTier: Tier): boolean {
   // -----------------------------------------------------------------------
   console.log('\n[1] Registry integrity');
   const entries = Object.entries(DOCUMENT_TYPES);
-  check('18 document types declared', entries.length === 18, `${entries.length}`);
+  check('16 document types declared', entries.length === 16, `${entries.length}`);
   for (const [id, doc] of entries) {
     check(`${id}: id matches key`, doc.id === id);
     check(`${id}: requiredBlocks all valid`, doc.requiredBlocks.every((b) => (VALID_BLOCKS as string[]).includes(b)));
@@ -40,10 +40,12 @@ function canGenerate(plan: 'free' | Tier, homeTier: Tier): boolean {
   // DOCX is added only for cma & ic_memo.
   const docxTypes = entries.filter(([, d]) => d.formats.includes('docx')).map(([id]) => id).sort();
   check('DOCX only on cma & ic_memo', JSON.stringify(docxTypes) === JSON.stringify(['cma', 'ic_memo']), docxTypes.join(', '));
-  // Exactly the two representative-dependent types are blocked.
+  // Exactly one representative-dependent type stays blocked: pro_forma_summary
+  // (on paid CoStar). portfolio_risk_report was built in Phase 3, and the two
+  // declared-but-unbuilt duplicates were deleted, so the count is 16, not 18.
   const blocked = entries.filter(([, d]) => d.status === 'blocked').map(([id]) => id).sort();
-  check('blocked = pro_forma_summary & portfolio_risk_report',
-    JSON.stringify(blocked) === JSON.stringify(['portfolio_risk_report', 'pro_forma_summary']), blocked.join(', '));
+  check('blocked = pro_forma_summary',
+    JSON.stringify(blocked) === JSON.stringify(['pro_forma_summary']), blocked.join(', '));
 
   // -----------------------------------------------------------------------
   console.log('\n[2] Monotonic tier gate');
