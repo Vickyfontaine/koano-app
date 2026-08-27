@@ -43,24 +43,24 @@ export function deterministicEntitlementRisk(
   const overMax = (overResidential && (maxCom == null || maxCom <= 0 || overCommercial)) || (overCommercial && (maxRes == null || maxRes <= 0));
   if (headroom != null && headroom <= 0) {
     score += 35;
-    factors.push('no as-of-right FAR headroom — any development needs a variance');
+    factors.push('no as-of-right FAR headroom: any development needs a variance');
   } else if (overMax) {
     score += 35;
-    factors.push('built FAR at or over the district maximum — needs a variance');
+    factors.push('built FAR at or over the district maximum: needs a variance');
   } else if (headroom != null && headroom < 15) {
     score += 12;
-    factors.push(`only ${headroom}% unused FAR — little by-right room`);
+    factors.push(`only ${headroom}% unused FAR: little by-right room`);
   } else if (headroom != null && headroom >= 50) {
     score -= 12;
-    factors.push(`${headroom}% unused FAR — ample as-of-right development room`);
+    factors.push(`${headroom}% unused FAR: ample as-of-right development room`);
   } else if (headroom != null) {
-    factors.push(`${headroom}% unused FAR — workable by-right room`);
+    factors.push(`${headroom}% unused FAR: workable by-right room`);
   }
 
   // 2. Special district — added discretionary review, design / affordability rules.
   if (zoning.special_district) {
     score += 22;
-    factors.push(`special district ${zoning.special_district} (per the zoning source) — added review / requirements`);
+    factors.push(`special district ${zoning.special_district} (per the zoning source): added review / requirements`);
   }
 
   // 3. Zoning family. Manufacturing without residential rights = residential needs
@@ -70,10 +70,10 @@ export function deterministicEntitlementRisk(
   const hasR = /(^|[^A-Z])R\d/.test(dist);
   if (hasM && !hasR && (maxRes == null || maxRes <= 0)) {
     score += 25;
-    factors.push('manufacturing zoning without residential rights — residential needs a rezoning');
+    factors.push('manufacturing zoning without residential rights: residential needs a rezoning');
   } else if (hasM && hasR) {
     score += 10;
-    factors.push('special mixed-use (M/R) district — development realized through the special-district framework');
+    factors.push('special mixed-use (M/R) district: development realized through the special-district framework');
   }
 
   // 4. Commercial overlay — minor added complexity on a residential base.

@@ -58,14 +58,14 @@ export function structuralDirection(f: StructuralFacts): StructuralDirection {
   // so it DOMINATES (and blocks the tract buy-lean below from cancelling it).
   if (zeroHeadroom || overMax) {
     nudge -= 0.7;
-    drivers.push('no as-of-right FAR headroom (built at/over the district max) — realizing value needs a variance → wait');
+    drivers.push('no as-of-right FAR headroom (built at/over the district max): realizing value needs a variance → wait');
   } else if (f.unusedFarPct != null && f.unusedFarPct >= 80) {
     // Very high as-of-right headroom — strong latent development upside.
     nudge += 1.0;
-    drivers.push(`${f.unusedFarPct}% unused FAR — large as-of-right development upside → buy`);
+    drivers.push(`${f.unusedFarPct}% unused FAR: large as-of-right development upside → buy`);
   } else if (f.unusedFarPct != null && f.unusedFarPct >= 50) {
     nudge += 0.6;
-    drivers.push(`${f.unusedFarPct}% unused FAR — meaningful as-of-right room → buy-lean`);
+    drivers.push(`${f.unusedFarPct}% unused FAR: meaningful as-of-right room → buy-lean`);
   }
   // NB: 15–49% headroom deliberately produces NO nudge — that is the ambiguous
   // middle the hold bias is meant to catch.
@@ -74,7 +74,7 @@ export function structuralDirection(f: StructuralFacts): StructuralDirection {
   // subject itself has room (not over-max), so it never offsets the variance wait.
   if (!zeroHeadroom && !overMax && f.newBuildingPermits != null && f.newBuildingPermits >= 3) {
     nudge += 0.3;
-    drivers.push(`${f.newBuildingPermits} new-building permits in the tract (24mo) — active ground-up development → buy-lean`);
+    drivers.push(`${f.newBuildingPermits} new-building permits in the tract (24mo): active ground-up development → buy-lean`);
   }
 
   // Clamp so the nudge complements agent consensus, never steamrolls it.
