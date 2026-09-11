@@ -4,6 +4,12 @@ import React, { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import SectionNumber from "@/components/ui/SectionNumber";
 import Button from "@/components/ui/Button";
+import {
+  HERO_CONTAINER_MAX,
+  HERO_HEADLINE_MAX,
+  HERO_SUBHEAD_MAX,
+  HERO_SECTION_PADDING,
+} from "@/components/marketing/heroLayout";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -73,13 +79,13 @@ export default function ClusterLanding({
         ref={heroRef}
         style={{
           background: "var(--white)",
-          padding: "160px 32px 120px",
+          padding: HERO_SECTION_PADDING,
           position: "relative",
         }}
       >
         {/* Render slot — cluster-N-render.webp will go here when delivered */}
 
-        <div style={{ maxWidth: "800px", margin: "0 auto", textAlign: "center" }}>
+        <div style={{ maxWidth: HERO_CONTAINER_MAX, margin: "0 auto", textAlign: "center" }}>
           <motion.div
             initial="hidden"
             animate={heroInView ? "visible" : "hidden"}
@@ -102,7 +108,7 @@ export default function ClusterLanding({
               lineHeight: 1.1,
               color: "var(--ink-primary)",
               margin: "24px auto 20px",
-              maxWidth: "760px",
+              maxWidth: HERO_HEADLINE_MAX,
             }}
           >
             {headline}
@@ -117,7 +123,7 @@ export default function ClusterLanding({
               fontWeight: 400,
               color: "var(--ink-secondary)",
               lineHeight: 1.6,
-              maxWidth: "640px",
+              maxWidth: HERO_SUBHEAD_MAX,
               margin: "0 auto 16px",
             }}
           >
@@ -155,7 +161,7 @@ export default function ClusterLanding({
               fontWeight: 400,
               color: "var(--ink-secondary)",
               lineHeight: 1.6,
-              maxWidth: "640px",
+              maxWidth: HERO_SUBHEAD_MAX,
               margin: "0 auto 40px",
             }}
           >

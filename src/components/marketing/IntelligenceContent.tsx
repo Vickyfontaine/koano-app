@@ -4,6 +4,12 @@ import React, { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import SectionNumber from "@/components/ui/SectionNumber";
 import Button from "@/components/ui/Button";
+import {
+  HERO_CONTAINER_MAX,
+  HERO_HEADLINE_MAX,
+  HERO_SUBHEAD_MAX,
+  HERO_SECTION_PADDING,
+} from "@/components/marketing/heroLayout";
 
 // The authoritative neural map is /public/neural-map.html (CLAUDE.md
 // Section 03) — embedded as a same-origin iframe, the same pattern the
@@ -147,11 +153,11 @@ export default function IntelligenceContent() {
         ref={heroRef}
         style={{
           background: "var(--white)",
-          padding: "160px 32px 120px",
+          padding: HERO_SECTION_PADDING,
           textAlign: "center",
         }}
       >
-        <div style={{ maxWidth: "800px", margin: "0 auto" }}>
+        <div style={{ maxWidth: HERO_CONTAINER_MAX, margin: "0 auto" }}>
           <motion.div
             initial="hidden"
             animate={heroInView ? "visible" : "hidden"}
@@ -173,8 +179,8 @@ export default function IntelligenceContent() {
               letterSpacing: "-0.02em",
               lineHeight: 1.1,
               color: "var(--ink-primary)",
-              margin: "24px auto 24px",
-              maxWidth: "760px",
+              margin: "24px auto 20px",
+              maxWidth: HERO_HEADLINE_MAX,
             }}
           >
             Five agents. One verdict. Every step on the record.
@@ -188,7 +194,7 @@ export default function IntelligenceContent() {
             className="text-body-lg"
             style={{
               color: "var(--ink-secondary)",
-              maxWidth: "640px",
+              maxWidth: HERO_SUBHEAD_MAX,
               margin: "0 auto 40px",
             }}
           >
