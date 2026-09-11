@@ -20,24 +20,28 @@ const fadeUp = {
   }),
 };
 
+// Ordered C1–C4 by KOANO's positioning priority (developers, professionals,
+// institutions, communities), matching the nav and homepage cluster order.
+// The C-badge is a display index for that order; it is intentionally
+// decoupled from the internal cluster_id (cluster_1/2/4/5).
 const TIERS = [
   {
     cluster: "C1",
-    name: "Property intelligence",
+    name: "Development intelligence",
     tagline:
-      "Know what's happening to your property's value before your neighbors do, and know what to do about it.",
-    price: "From $19",
-    priceRange: "$19–$49 / month",
-    users: "Homeowners · Renters · Neighbors",
+      "Find your best site. Model your deal. Understand your entitlement risk. Before anyone else does.",
+    price: "From $499",
+    priceRange: "$499–$1,499 / month",
+    users: "CRE brokers · Developers · Contractors",
     features: [
-      "Property Intelligence Report: valuation, permits, trajectory, verdict",
-      "Violation and Ownership Record",
-      "Permit History Report",
-      "Property Tax Appeal Evidence Packet",
-      "Weekly monitoring on up to 3 buildings",
+      "Development Site Screening Memo, with the verdict and reasoning",
+      "Entitlement Risk Memo from live PLUTO facts",
+      "Three-Site Comparison Brief, ranked by composite score",
+      "As-of-right envelope, Opportunity Zone and LIHTC status, live",
+      "Weekly monitoring on up to 50 sites",
     ],
-    addOn: "$49 adds the investment view, return math and rents, on representative benchmarks until licensed data is funded.",
-    href: "/for/community",
+    addOn: "Pro Forma Summary is representative until a CoStar or HouseCanary license is funded.",
+    href: "/for/developers",
   },
   {
     cluster: "C2",
@@ -58,25 +62,7 @@ const TIERS = [
     href: "/for/agents",
   },
   {
-    cluster: "C4",
-    name: "Development intelligence",
-    tagline:
-      "Find your best site. Model your deal. Understand your entitlement risk. Before anyone else does.",
-    price: "From $499",
-    priceRange: "$499–$1,499 / month",
-    users: "CRE brokers · Developers · Contractors",
-    features: [
-      "Development Site Screening Memo, with the verdict and reasoning",
-      "Entitlement Risk Memo from live PLUTO facts",
-      "Three-Site Comparison Brief, ranked by composite score",
-      "As-of-right envelope, Opportunity Zone and LIHTC status, live",
-      "Weekly monitoring on up to 50 sites",
-    ],
-    addOn: "Pro Forma Summary is representative until a CoStar or HouseCanary license is funded.",
-    href: "/for/developers",
-  },
-  {
-    cluster: "C5",
+    cluster: "C3",
     name: "Portfolio intelligence",
     tagline:
       "Monitor everything. Miss nothing. Make institutional decisions with intelligence infrastructure that was previously available only to the world's largest firms.",
@@ -94,6 +80,24 @@ const TIERS = [
     addOn: "Custom billing. SOC 2 Type II, SSO and dedicated isolation on the enterprise roadmap.",
     href: "/for/institutions",
     isEnterprise: true,
+  },
+  {
+    cluster: "C4",
+    name: "Property intelligence",
+    tagline:
+      "Know what's happening to your property's value before your neighbors do, and know what to do about it.",
+    price: "From $19",
+    priceRange: "$19–$49 / month",
+    users: "Homeowners · Renters · Neighbors",
+    features: [
+      "Property Intelligence Report: valuation, permits, trajectory, verdict",
+      "Violation and Ownership Record",
+      "Permit History Report",
+      "Property Tax Appeal Evidence Packet",
+      "Weekly monitoring on up to 3 buildings",
+    ],
+    addOn: "$49 adds the investment view, return math and rents, on representative benchmarks until licensed data is funded.",
+    href: "/for/community",
   },
 ];
 

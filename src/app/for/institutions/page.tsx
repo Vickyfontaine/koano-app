@@ -61,7 +61,7 @@ export default function InstitutionsPage() {
       <Nav />
       <div style={{ height: "64px" }} />
       <ClusterLanding
-        clusterNumber="C5"
+        clusterNumber="C3"
         clusterName="Portfolio intelligence"
         tagline="Monitor everything. Miss nothing. Make institutional decisions with intelligence infrastructure that was previously available only to the world's largest firms."
         price="From $1,499 / month"

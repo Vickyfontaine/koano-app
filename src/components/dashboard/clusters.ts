@@ -1,6 +1,13 @@
 // Cluster identity + approved verbatim copy (CLAUDE.md Sections 08 & 13).
 // This is the single client-side source of truth for cluster metadata.
-// There is no Cluster 0 and no Cluster 3.
+// There is no Cluster 0 and no cluster_3 ID: the internal cluster_id space is
+// cluster_1/2/4/5 (DB, pricing, onboarding all key off it).
+// NOTE: `badge` (C1–C4) is a DISPLAY index in KOANO's positioning order —
+// C1 developers, C2 professionals, C3 institutions, C4 communities — and is
+// intentionally DECOUPLED from the cluster_id. So cluster_4 (developers)
+// carries badge "C1", and the display "C3" is institutions, not a cluster_3.
+// `number` ("01".."05") still mirrors the cluster_id and is load-bearing for
+// DOM ids (e.g. c4-history) — do not repoint it to the badge.
 
 export type ClusterId = "cluster_1" | "cluster_2" | "cluster_4" | "cluster_5";
 
@@ -14,7 +21,7 @@ export const CLUSTER_IDS: ClusterId[] = [
 export interface ClusterMeta {
   id: ClusterId;
   number: string; // section-number eyebrow, e.g. "01"
-  badge: string; // short badge, e.g. "C1"
+  badge: string; // display index C1–C4 by positioning order (decoupled from id)
   label: string; // approved product name
   audience: string; // who it serves (Section 08)
   tagline: string; // approved verbatim card copy (Section 13)
@@ -25,7 +32,7 @@ export const CLUSTERS: Record<ClusterId, ClusterMeta> = {
   cluster_1: {
     id: "cluster_1",
     number: "01",
-    badge: "C1",
+    badge: "C4",
     label: "Property intelligence",
     audience: "Homeowners, renters, neighbors",
     tagline:
@@ -45,7 +52,7 @@ export const CLUSTERS: Record<ClusterId, ClusterMeta> = {
   cluster_4: {
     id: "cluster_4",
     number: "04",
-    badge: "C4",
+    badge: "C1",
     label: "Development intelligence",
     audience: "Developers, CRE brokers, contractors",
     tagline:
@@ -55,7 +62,7 @@ export const CLUSTERS: Record<ClusterId, ClusterMeta> = {
   cluster_5: {
     id: "cluster_5",
     number: "05",
-    badge: "C5",
+    badge: "C3",
     label: "Portfolio intelligence",
     audience: "Institutional investors, C-suite, REITs",
     tagline:

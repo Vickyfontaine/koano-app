@@ -60,7 +60,7 @@ export default function CommunityPage() {
       <Nav />
       <div style={{ height: "64px" }} />
       <ClusterLanding
-        clusterNumber="C1"
+        clusterNumber="C4"
         clusterName="Property intelligence"
         tagline="Know what's happening to your property's value before your neighbors do, and know what to do about it."
         price="From $19 / month"

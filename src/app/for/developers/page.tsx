@@ -56,7 +56,7 @@ export default function DevelopersPage() {
       <Nav />
       <div style={{ height: "64px" }} />
       <ClusterLanding
-        clusterNumber="C4"
+        clusterNumber="C1"
         clusterName="Development intelligence"
         tagline="Find your best site. Model your deal. Understand your entitlement risk. Before anyone else does."
         price="From $499 / month"
