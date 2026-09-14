@@ -7,6 +7,7 @@ import Button from "../ui/Button";
 // Cluster links ordered by positioning priority (CLAUDE.md Section 01):
 // professional and institutional first, homeowners last.
 const NAV_LINKS = [
+  { label: "About us", href: "/about" },
   { label: "How it works", href: "/intelligence" },
   { label: "For developers", href: "/for/developers" },
   { label: "For professionals", href: "/for/agents" },
@@ -64,15 +65,14 @@ export default function Nav() {
             href="/"
             id="nav-logo"
             className="flex items-center"
-            style={{
-              fontWeight: 500,
-              fontSize: "15px",
-              color: "var(--near-black)",
-              letterSpacing: "2px",
-              textDecoration: "none",
-            }}
+            style={{ textDecoration: "none" }}
+            aria-label="KOANO home"
           >
-            KOANO
+            <img
+              src="/logo.png"
+              alt="KOANO"
+              style={{ height: "50px", width: "auto", display: "block" }}
+            />
           </a>
 
           {/* Center links — desktop */}
