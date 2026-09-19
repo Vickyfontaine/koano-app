@@ -4,6 +4,13 @@ import React, { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import SectionNumber from "@/components/ui/SectionNumber";
 import Button from "@/components/ui/Button";
+import {
+  HERO_CONTAINER_MAX,
+  HERO_HEADLINE_MAX,
+  HERO_SUBHEAD_MAX,
+  HERO_SECTION_PADDING,
+} from "@/components/marketing/heroLayout";
+import CtaBackground from "@/components/marketing/CtaBackground";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -119,11 +126,46 @@ export default function PricingContent() {
         ref={heroRef}
         style={{
           background: "var(--white)",
-          padding: "160px 32px 120px",
-          textAlign: "center",
+          position: "relative",
+          overflow: "hidden",
+          // Group-A viewport fit (same as how-it-works): section = below-nav
+          // viewport height, image BOTTOM-anchored so the park foreground lands
+          // on the fold and only the empty top sky is cropped on wide-short
+          // windows — never the grass/people. Aspect preserved; no object-fit.
+          // +6px extends a hair past the fold so the image covers any sub-pixel
+          // seam at the viewport bottom (no hairline gap).
+          height: "calc(100svh - var(--nav-h) + 6px)",
         }}
       >
-        <div style={{ maxWidth: "800px", margin: "0 auto" }}>
+        {/* Hero render — full-bleed, BOTTOM-anchored so the park foreground sits
+            on the fold; excess top sky overflows above and is clipped. */}
+        <img
+          src="/renders/pricing.webp"
+          alt=""
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            width: "100%",
+            height: "auto",
+            display: "block",
+          }}
+        />
+
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "flex-start",
+            alignItems: "center",
+            textAlign: "center",
+            padding: HERO_SECTION_PADDING,
+          }}
+        >
+          <div style={{ maxWidth: HERO_CONTAINER_MAX, width: "100%" }}>
           <motion.div
             initial="hidden"
             animate={heroInView ? "visible" : "hidden"}
@@ -145,8 +187,8 @@ export default function PricingContent() {
               letterSpacing: "-0.02em",
               lineHeight: 1.1,
               color: "var(--ink-primary)",
-              margin: "24px auto 24px",
-              maxWidth: "760px",
+              margin: "24px auto 20px",
+              maxWidth: HERO_HEADLINE_MAX,
             }}
           >
             Start free. Upgrade when you hit the limit.
@@ -159,7 +201,7 @@ export default function PricingContent() {
             className="text-body-lg"
             style={{
               color: "var(--ink-secondary)",
-              maxWidth: "640px",
+              maxWidth: HERO_SUBHEAD_MAX,
               margin: "0 auto 20px",
             }}
           >
@@ -176,7 +218,7 @@ export default function PricingContent() {
             className="text-body-lg"
             style={{
               color: "var(--ink-secondary)",
-              maxWidth: "640px",
+              maxWidth: HERO_SUBHEAD_MAX,
               margin: "0 auto 24px",
             }}
           >
@@ -201,6 +243,7 @@ export default function PricingContent() {
             The same intelligence engine. Four altitudes. Choose the one that
             matches your role and the decisions you need to make.
           </motion.p>
+          </div>
         </div>
       </section>
 
@@ -497,8 +540,15 @@ export default function PricingContent() {
       {/* Enterprise CTA */}
       <section
         ref={ctaRef}
-        style={{ background: "var(--pale-wash)", padding: "120px 32px" }}
+        style={{
+          background: "var(--pale-wash)",
+          padding: "120px 32px",
+          position: "relative",
+          isolation: "isolate",
+          overflow: "hidden",
+        }}
       >
+        <CtaBackground />
         <div
           style={{
             maxWidth: "640px",

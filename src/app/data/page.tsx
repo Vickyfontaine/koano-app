@@ -13,7 +13,7 @@ export default function DataPage() {
   return (
     <>
       <Nav />
-      <div style={{ height: "64px" }} />
+      <div style={{ height: "var(--nav-h)" }} />
       <DataContent />
       <Footer />
     </>

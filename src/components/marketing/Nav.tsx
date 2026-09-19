@@ -46,9 +46,12 @@ export default function Nav() {
         id="main-nav"
         className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
         style={{
-          background: scrolled ? "rgba(255, 255, 255, 0.85)" : "var(--white)",
-          backdropFilter: scrolled ? "blur(12px)" : "none",
-          WebkitBackdropFilter: scrolled ? "blur(12px)" : "none",
+          // Liquid-glass, Apple "regular" band: blur ~24px, white fill 60–80%,
+          // saturate 1.4, hairline bottom border. Only when scrolled (over the
+          // rich image heroes it has real content to refract).
+          background: scrolled ? "rgba(255, 255, 255, 0.72)" : "var(--white)",
+          backdropFilter: scrolled ? "blur(24px) saturate(1.4)" : "none",
+          WebkitBackdropFilter: scrolled ? "blur(24px) saturate(1.4)" : "none",
           borderBottom: "1px solid var(--border-light)",
         }}
       >
@@ -57,7 +60,7 @@ export default function Nav() {
           style={{
             maxWidth: "1280px",
             padding: "0 32px",
-            height: "64px",
+            height: "var(--nav-h)",
           }}
         >
           {/* Logo */}

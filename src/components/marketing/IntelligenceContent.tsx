@@ -7,31 +7,9 @@ import Button from "@/components/ui/Button";
 import {
   HERO_CONTAINER_MAX,
   HERO_HEADLINE_MAX,
-  HERO_SUBHEAD_MAX,
   HERO_SECTION_PADDING,
 } from "@/components/marketing/heroLayout";
-
-// The authoritative neural map is /public/neural-map.html (CLAUDE.md
-// Section 03) — embedded as a same-origin iframe, the same pattern the
-// dashboard embeds use. The former react-three-fiber duplicate broke in
-// production (drei <Text> was fed a CSS URL as a font file) and diverged
-// from the Section 10 neural-map palette; it has been removed.
-function NeuralMapSection() {
-  return (
-    <iframe
-      src="/neural-map.html"
-      title="KOANO neural map: agent and data source topology"
-      style={{
-        width: "100%",
-        height: 600,
-        border: "1px solid var(--border)",
-        borderRadius: "20px",
-        background: "var(--white)",
-        display: "block",
-      }}
-    />
-  );
-}
+import CtaBackground from "@/components/marketing/CtaBackground";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -153,11 +131,52 @@ export default function IntelligenceContent() {
         ref={heroRef}
         style={{
           background: "var(--white)",
-          padding: HERO_SECTION_PADDING,
-          textAlign: "center",
+          position: "relative",
+          overflow: "hidden",
+          // Group-A viewport fit: the section is exactly the below-nav viewport
+          // height, and the full-bleed image is BOTTOM-anchored (below), so the
+          // buildings/park always land on the fold and only the empty TOP sky
+          // is cropped when the image is taller than the window — never the
+          // content. This is what fixes wide-short windows, where the image is
+          // simply too tall to ever shift into view. Image width is 100% and
+          // aspect is preserved; no object-fit. Text overlay stays in the sky.
+          // +6px extends the section a hair past the fold so the image content
+          // covers any sub-pixel seam at the viewport bottom (no hairline gap).
+          height: "calc(100svh - var(--nav-h) + 6px)",
         }}
       >
-        <div style={{ maxWidth: HERO_CONTAINER_MAX, margin: "0 auto" }}>
+        {/* Hero render — full-bleed, BOTTOM-anchored. Its base (skyline street /
+            park foreground) sits on the section bottom = the fold; if the image
+            is taller than the window its empty top sky overflows above and is
+            clipped (never the buildings). object-fit is deliberately NOT used —
+            aspect is preserved and nothing meaningful is cropped. */}
+        <img
+          src="/renders/how-it-works.webp"
+          alt=""
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            width: "100%",
+            height: "auto",
+            display: "block",
+          }}
+        />
+
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "flex-start",
+            alignItems: "center",
+            textAlign: "center",
+            padding: HERO_SECTION_PADDING,
+          }}
+        >
+          <div style={{ maxWidth: HERO_CONTAINER_MAX, width: "100%" }}>
           <motion.div
             initial="hidden"
             animate={heroInView ? "visible" : "hidden"}
@@ -186,32 +205,13 @@ export default function IntelligenceContent() {
             Five agents. One verdict. Every step on the record.
           </motion.h1>
 
-          <motion.p
-            initial="hidden"
-            animate={heroInView ? "visible" : "hidden"}
-            variants={fadeUp}
-            custom={2}
-            className="text-body-lg"
-            style={{
-              color: "var(--ink-secondary)",
-              maxWidth: HERO_SUBHEAD_MAX,
-              margin: "0 auto 40px",
-            }}
-          >
-            KOANO is not a dashboard. It is a reasoning system. Each agent owns
-            a domain, works from its own sources, and reaches its own
-            conclusion. A synthesis agent reads all five, resolves what they
-            disagree on, and issues one verdict. Nothing is hidden, including
-            the disagreements.
-          </motion.p>
-
           <motion.div
             initial="hidden"
             animate={heroInView ? "visible" : "hidden"}
             variants={fadeUp}
-            custom={3}
+            custom={2}
             className="flex flex-wrap items-center justify-center"
-            style={{ gap: "16px" }}
+            style={{ gap: "16px", marginTop: "20px" }}
           >
             <Button variant="primary" href="/signup" id="intelligence-hero-cta">
               Sign up
@@ -219,6 +219,71 @@ export default function IntelligenceContent() {
             <Button variant="ghost" href="/pricing" id="intelligence-hero-pricing">
               See pricing
             </Button>
+          </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Product demo video */}
+      <section style={{ background: "var(--white)", padding: "120px 32px" }}>
+        <div style={{ maxWidth: "1000px", margin: "0 auto", textAlign: "center" }}>
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={fadeUp}
+            custom={0}
+            style={{ marginBottom: "40px" }}
+          >
+            <SectionNumber number="02" label="Product demo" />
+            <h2 className="text-h2" style={{ color: "var(--ink-primary)", marginTop: "16px" }}>
+              Watch the demo.
+            </h2>
+          </motion.div>
+
+          {/* Demo video slot — 16:9. Drop the product demo in here, e.g.:
+              <video src="/renders/demo.mp4" controls playsInline poster="…"
+                     style={{ width: "100%", height: "100%", objectFit: "cover" }} /> */}
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.15 }}
+            variants={fadeUp}
+            custom={1}
+            style={{
+              position: "relative",
+              aspectRatio: "16 / 9",
+              borderRadius: "20px",
+              overflow: "hidden",
+              border: "1px solid var(--border)",
+              background: "var(--pale-wash)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <div
+              style={{
+                width: "72px",
+                height: "72px",
+                borderRadius: "50%",
+                background: "var(--brand-blue)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <div
+                style={{
+                  width: 0,
+                  height: 0,
+                  borderTop: "12px solid transparent",
+                  borderBottom: "12px solid transparent",
+                  borderLeft: "20px solid var(--near-black)",
+                  marginLeft: "5px",
+                }}
+              />
+            </div>
           </motion.div>
         </div>
       </section>
@@ -236,7 +301,7 @@ export default function IntelligenceContent() {
             custom={0}
             style={{ marginBottom: "80px", textAlign: "center" }}
           >
-            <SectionNumber number="02" label="The architecture" />
+            <SectionNumber number="03" label="The architecture" />
             <h2
               className="text-h2"
               style={{ color: "var(--ink-primary)", marginTop: "16px" }}
@@ -388,44 +453,6 @@ export default function IntelligenceContent() {
         </div>
       </section>
 
-      {/* Neural pathway visualization */}
-      <section
-        style={{
-          background: "var(--pale-wash)",
-          padding: "80px 32px 120px",
-        }}
-      >
-        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
-          <div style={{ textAlign: "center", marginBottom: "48px" }}>
-            <span
-              style={{
-                fontFamily: "'DM Mono', monospace",
-                fontSize: "11px",
-                fontWeight: 500,
-                color: "var(--brand-blue)",
-                letterSpacing: "1.5px",
-                textTransform: "uppercase",
-              }}
-            >
-              Live agent network
-            </span>
-            <p
-              style={{
-                fontSize: "15px",
-                color: "var(--ink-muted)",
-                marginTop: "12px",
-                maxWidth: "480px",
-                margin: "12px auto 0",
-              }}
-            >
-              Five specialist agents connected to their data sources, flowing
-              into a single synthesis verdict. Drag to rotate.
-            </p>
-          </div>
-          <NeuralMapSection />
-        </div>
-      </section>
-
       {/* The 5 agents */}
       <section
         ref={agentsRef}
@@ -465,7 +492,7 @@ export default function IntelligenceContent() {
             custom={0}
             style={{ marginBottom: "80px", textAlign: "center" }}
           >
-            <SectionNumber number="03" label="The agents" />
+            <SectionNumber number="04" label="The agents" />
             <h2
               className="text-h2"
               style={{ color: "var(--ink-primary)", marginTop: "16px" }}
@@ -602,7 +629,7 @@ export default function IntelligenceContent() {
             custom={0}
             style={{ marginBottom: "64px" }}
           >
-            <SectionNumber number="04" label="Synthesis" />
+            <SectionNumber number="05" label="Synthesis" />
             <h2
               className="text-h2"
               style={{
@@ -692,7 +719,7 @@ export default function IntelligenceContent() {
             custom={0}
             style={{ marginBottom: "64px", textAlign: "center" }}
           >
-            <SectionNumber number="05" label="The verdict" />
+            <SectionNumber number="06" label="The verdict" />
             <h2
               className="text-h2"
               style={{ color: "var(--ink-primary)", marginTop: "16px" }}
@@ -852,8 +879,15 @@ export default function IntelligenceContent() {
       {/* CTA */}
       <section
         ref={ctaRef}
-        style={{ background: "var(--pale-wash)", padding: "120px 32px" }}
+        style={{
+          background: "var(--pale-wash)",
+          padding: "120px 32px",
+          position: "relative",
+          isolation: "isolate",
+          overflow: "hidden",
+        }}
       >
+        <CtaBackground />
         <div
           style={{
             maxWidth: "640px",
@@ -867,7 +901,7 @@ export default function IntelligenceContent() {
             variants={fadeUp}
             custom={0}
           >
-            <SectionNumber number="06" />
+            <SectionNumber number="07" />
             <h2
               className="text-h2"
               style={{

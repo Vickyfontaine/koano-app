@@ -54,9 +54,10 @@ export default function DevelopersPage() {
   return (
     <>
       <Nav />
-      <div style={{ height: "64px" }} />
+      <div style={{ height: "var(--nav-h)" }} />
       <ClusterLanding
         clusterNumber="C1"
+        render="/renders/for-developers.webp"
         clusterName="Development intelligence"
         tagline="Find your best site. Model your deal. Understand your entitlement risk. Before anyone else does."
         price="From $499 / month"

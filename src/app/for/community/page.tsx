@@ -58,9 +58,10 @@ export default function CommunityPage() {
   return (
     <>
       <Nav />
-      <div style={{ height: "64px" }} />
+      <div style={{ height: "var(--nav-h)" }} />
       <ClusterLanding
         clusterNumber="C4"
+        render="/renders/for-community.webp"
         clusterName="Property intelligence"
         tagline="Know what's happening to your property's value before your neighbors do, and know what to do about it."
         price="From $19 / month"

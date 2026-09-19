@@ -4,6 +4,7 @@ import React, { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import SectionNumber from "../ui/SectionNumber";
 import Button from "../ui/Button";
+import CtaBackground from "./CtaBackground";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -31,8 +32,12 @@ export default function EarlyAccessSection() {
       style={{
         background: "var(--white)",
         padding: "120px 32px",
+        position: "relative",
+        isolation: "isolate",
+        overflow: "hidden",
       }}
     >
+      <CtaBackground />
       <div
         style={{
           maxWidth: "640px",

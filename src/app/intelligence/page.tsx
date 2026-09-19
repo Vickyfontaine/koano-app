@@ -13,7 +13,7 @@ export default function IntelligencePage() {
   return (
     <>
       <Nav />
-      <div style={{ height: "64px" }} />
+      <div style={{ height: "var(--nav-h)" }} />
       <IntelligenceContent />
       <Footer />
     </>

@@ -13,7 +13,7 @@ export default function PricingPage() {
   return (
     <>
       <Nav />
-      <div style={{ height: "64px" }} />
+      <div style={{ height: "var(--nav-h)" }} />
       <PricingContent />
       <Footer />
     </>

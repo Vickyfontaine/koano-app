@@ -7,6 +7,10 @@
    ============================================ */
 
 :root {
+  /* Layout — fixed nav height. Single source of truth: the nav bar, every
+     page's nav spacer, and the hero viewport-fit calcs all read this. */
+  --nav-h: 64px;
+
   /* Backgrounds */
   --white: #FFFFFF;
   --pale-wash: #F0F7FC;

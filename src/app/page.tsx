@@ -5,7 +5,6 @@ import ProvenanceSection from "@/components/marketing/ProvenanceSection";
 import ArchiveSection from "@/components/marketing/ArchiveSection";
 import MonitoringSection from "@/components/marketing/MonitoringSection";
 import ClustersSection from "@/components/marketing/ClustersSection";
-import PromiseSection from "@/components/marketing/PromiseSection";
 import DataTickerSection from "@/components/marketing/DataTickerSection";
 import EarlyAccessSection from "@/components/marketing/EarlyAccessSection";
 import Footer from "@/components/marketing/Footer";
@@ -33,9 +32,6 @@ export default function Home() {
 
       {/* 05 — CLUSTERS: four altitudes */}
       <ClustersSection />
-
-      {/* PROMISE */}
-      <PromiseSection />
 
       {/* DATA TICKER */}
       <DataTickerSection />

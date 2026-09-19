@@ -8,8 +8,9 @@ import {
   HERO_CONTAINER_MAX,
   HERO_HEADLINE_MAX,
   HERO_SUBHEAD_MAX,
-  HERO_SECTION_PADDING,
+  HERO_PADDING_TOP,
 } from "@/components/marketing/heroLayout";
+import CtaBackground from "@/components/marketing/CtaBackground";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -50,6 +51,8 @@ interface ClusterLandingProps {
     items: Feature[];
   };
   users: string;
+  /** Optional hero background render, placed full-bleed behind the text. */
+  render?: string;
 }
 
 export default function ClusterLanding({
@@ -64,6 +67,7 @@ export default function ClusterLanding({
   features,
   secondaryFeatures,
   users,
+  render,
 }: ClusterLandingProps) {
   const heroRef = useRef<HTMLElement>(null);
   const featuresRef = useRef<HTMLElement>(null);
@@ -79,13 +83,52 @@ export default function ClusterLanding({
         ref={heroRef}
         style={{
           background: "var(--white)",
-          padding: HERO_SECTION_PADDING,
+          // Group-B viewport fit: cap the section to the below-nav viewport.
+          // The text is TOP-anchored (HERO_PADDING_TOP below the nav) so its
+          // nav→number gap matches every other hero's; the cover image's clear
+          // vertical channel is full-height, so top-anchored text still sits in
+          // it. Horizontal padding 32; no bottom padding so the tallest
+          // (3-line) headlines get maximum room before the cap.
+          padding: `${HERO_PADDING_TOP}px 32px 0`,
           position: "relative",
+          overflow: "hidden",
+          minHeight: "calc(100svh - var(--nav-h))",
+          maxHeight: "calc(100svh - var(--nav-h))",
+          display: "flex",
+          alignItems: "flex-start",
         }}
       >
-        {/* Render slot — cluster-N-render.webp will go here when delivered */}
+        {/* Hero render — full-bleed behind the text block. The image was
+            composed against the hero's text width + padding, so the copy lands
+            in its blank strip. */}
+        {render && (
+          <img
+            src={render}
+            alt=""
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              objectPosition: "center",
+              zIndex: 0,
+              pointerEvents: "none",
+            }}
+          />
+        )}
 
-        <div style={{ maxWidth: HERO_CONTAINER_MAX, margin: "0 auto", textAlign: "center" }}>
+        <div
+          style={{
+            maxWidth: HERO_CONTAINER_MAX,
+            width: "100%",
+            margin: "0 auto",
+            textAlign: "center",
+            position: "relative",
+            zIndex: 1,
+          }}
+        >
           <motion.div
             initial="hidden"
             animate={heroInView ? "visible" : "hidden"}
@@ -358,8 +401,12 @@ export default function ClusterLanding({
         style={{
           background: secondaryFeatures ? "var(--pale-wash)" : "var(--white)",
           padding: "120px 32px",
+          position: "relative",
+          isolation: "isolate",
+          overflow: "hidden",
         }}
       >
+        <CtaBackground />
         <div
           style={{
             maxWidth: "640px",

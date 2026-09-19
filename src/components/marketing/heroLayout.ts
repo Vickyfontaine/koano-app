@@ -23,19 +23,19 @@ export const HERO_HEADLINE_MAX = `${HERO_HEADLINE_WIDTH}px`;
 export const HERO_SUBHEAD_MAX = `${HERO_SUBHEAD_WIDTH}px`;
 
 /**
- * Hero section padding, composed against the renders' blank strip.
+ * Hero text-block top offset.
  *
- * Top + bottom are asymmetric on purpose: they sum to the same 280px as the
- * original 160/120, so the section's total height is unchanged and nothing
- * below the hero shifts, while the text block sits 90px higher to land in the
- * blank strip. Do NOT rebalance top/bottom without re-checking the render
- * overlay — these values are composed against the images.
+ * HERO_PADDING_TOP is the top padding that anchors the text block. It gives the
+ * number a bit more breathing room from the nav than the number→headline gap
+ * (an exact 1:1 read too tight at the top). Every hero anchors its text to the
+ * top with this value, so the top rhythm is identical across all of them.
+ * (Add ~6px to this value for the rendered nav→number gap — the number's
+ * line-box adds ~7px of leading above the glyph, measured not guessed.)
  *
- * NOTE: these are fixed pixels (not responsive). The renders are fixed-aspect
- * and scale with viewport width; this offset is only verified at desktop
- * width. A mobile breakpoint may be needed — see the hero components.
+ * The images are bottom-anchored in their own components, so this only governs
+ * the text; the bottom value is legacy and unused by the top-anchored text.
  */
-export const HERO_PADDING_TOP = 70;
+export const HERO_PADDING_TOP = 34;
 export const HERO_PADDING_SIDE = 32;
 export const HERO_PADDING_BOTTOM = 210;
 export const HERO_SECTION_PADDING = `${HERO_PADDING_TOP}px ${HERO_PADDING_SIDE}px ${HERO_PADDING_BOTTOM}px`;

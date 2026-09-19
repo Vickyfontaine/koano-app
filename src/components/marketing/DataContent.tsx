@@ -4,6 +4,7 @@ import React, { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import SectionNumber from "@/components/ui/SectionNumber";
 import Button from "@/components/ui/Button";
+import CtaBackground from "@/components/marketing/CtaBackground";
 import {
   LIVE_SOURCE_GROUPS,
   REPRESENTATIVE_SOURCES,
@@ -726,8 +727,15 @@ export default function DataContent() {
       {/* CTA */}
       <section
         ref={ctaRef}
-        style={{ background: "var(--pale-wash)", padding: "120px 32px" }}
+        style={{
+          background: "var(--pale-wash)",
+          padding: "120px 32px",
+          position: "relative",
+          isolation: "isolate",
+          overflow: "hidden",
+        }}
       >
+        <CtaBackground />
         <div
           style={{
             maxWidth: "640px",

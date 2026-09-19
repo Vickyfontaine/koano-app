@@ -4,6 +4,8 @@ import React, { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import SectionNumber from "@/components/ui/SectionNumber";
 import Button from "@/components/ui/Button";
+import { HERO_PADDING_TOP } from "@/components/marketing/heroLayout";
+import CtaBackground from "@/components/marketing/CtaBackground";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -90,10 +92,20 @@ export default function AboutContent() {
         ref={heroRef}
         style={{
           background: "var(--white)",
-          padding: "160px 32px 120px",
+          // Top offset only; no bottom padding. The 210px bottom (legacy from
+          // the shared token) inflated the section past the viewport once the
+          // promise quote was added, dragging the bottom-anchored render below
+          // the fold.
+          padding: `${HERO_PADDING_TOP}px 32px 0`,
+          position: "relative",
+          overflow: "hidden",
+          // Fill the viewport below the nav so the next section never peeks
+          // under the hero. The render (below) is sized by this same height so
+          // it scales up with the hero instead of stranding whitespace.
+          minHeight: "calc(100svh - var(--nav-h))",
         }}
       >
-        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "1280px", margin: "0 auto", position: "relative", zIndex: 1 }}>
           <div
             className="about-hero-layout"
             style={{
@@ -172,19 +184,18 @@ export default function AboutContent() {
                   Our community mission
                 </Button>
               </motion.div>
-            </div>
 
-            <motion.div
-              initial="hidden"
-              animate={heroInView ? "visible" : "hidden"}
-              variants={fadeUp}
-              custom={3}
-            >
-              {/* Promise quote */}
-              <div
+              {/* Founding promise — restored under the CTAs */}
+              <motion.div
+                initial="hidden"
+                animate={heroInView ? "visible" : "hidden"}
+                variants={fadeUp}
+                custom={3}
                 style={{
-                  padding: "40px",
+                  marginTop: "48px",
+                  paddingLeft: "28px",
                   borderLeft: "2px solid var(--brand-blue)",
+                  maxWidth: "560px",
                 }}
               >
                 <p
@@ -193,7 +204,7 @@ export default function AboutContent() {
                     fontWeight: 500,
                     color: "var(--ink-primary)",
                     lineHeight: 1.5,
-                    marginBottom: "24px",
+                    marginBottom: "16px",
                     fontStyle: "italic",
                   }}
                 >
@@ -212,10 +223,34 @@ export default function AboutContent() {
                 >
                   KOANO founding promise
                 </span>
-              </div>
-            </motion.div>
+              </motion.div>
+            </div>
           </div>
         </div>
+
+        {/* About hero render — brownstone row on white, flush to the right
+            edge of the hero, sitting beside the left-aligned text. */}
+        <img
+          src="/renders/about.webp"
+          alt=""
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            right: 0,
+            bottom: 0,
+            // Size by the hero height so the render grows with the (now
+            // viewport-filling) hero, preserving the image-to-text proportion.
+            // Aspect is kept (width auto); its light/sidewalk left edge sits
+            // behind the text (zIndex 0) so no dark collision. Capped for very
+            // tall screens.
+            height: "calc(100svh - var(--nav-h))",
+            maxHeight: "940px",
+            width: "auto",
+            zIndex: 0,
+            pointerEvents: "none",
+            userSelect: "none",
+          }}
+        />
       </section>
 
       {/* Founding principles */}
@@ -510,8 +545,15 @@ export default function AboutContent() {
       {/* CTA */}
       <section
         ref={ctaRef}
-        style={{ background: "var(--white)", padding: "120px 32px" }}
+        style={{
+          background: "var(--white)",
+          padding: "120px 32px",
+          position: "relative",
+          isolation: "isolate",
+          overflow: "hidden",
+        }}
       >
+        <CtaBackground />
         <div
           style={{
             maxWidth: "640px",
