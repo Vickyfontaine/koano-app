@@ -138,7 +138,7 @@ export default function HeroSection() {
                 fontSize: "18px",
                 fontWeight: 400,
                 lineHeight: 1.6,
-                color: "var(--ink-primary)",
+                color: "#010d5c",
                 maxWidth: "520px",
                 marginTop: "24px",
                 marginBottom: "36px",
