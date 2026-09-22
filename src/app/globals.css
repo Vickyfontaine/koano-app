@@ -452,38 +452,105 @@ body {
 }
 
 /* ============================================
-   MOBILE-ONLY HERO FIXES (≤900px)
+   MOBILE-ONLY FIXES (≤900px)
    Everything below lives inside this media query and NEVER runs on
-   desktop (>900px). !important is used only to override components'
-   inline styles — the inline values themselves are left byte-identical,
-   so desktop is untouched. No DOM is reordered (visual order via flex
-   `order` only).
+   desktop (>900px). !important overrides components' inline styles; the
+   inline values themselves are left byte-identical, so desktop is
+   untouched. No DOM is reordered. Hero renders are temporarily hidden
+   here — to be reintroduced once the underlying layout is right.
    ============================================ */
 @media (max-width: 900px) {
-  /* --- Homepage hero (HeroSection) ---------------------------------
-     Fix: (1) auto height + top-aligned content with no vertical clip,
-     so the eyebrow/headline/subhead are fully visible; (2) the render
-     flows BELOW the copy (static, full width, uncropped) instead of
-     sitting behind it. Visual order is set with flex `order` so the DOM
-     is not reordered. */
+
+  /* STEP 1 — hide every hero render + the CTA background image. */
+  img[src*="menu-hero"],
+  img[src*="how-it-works"],
+  img[src*="pricing.webp"],
+  img[src*="about.webp"],
+  img[src*="/renders/for-"],
+  img[src*="cta.webp"] {
+    display: none !important;
+  }
+
+  /* --- Homepage hero: auto height, top-aligned, no vertical clip (the
+     eyebrow/headline/subhead are fully visible), and no horizontal
+     overflow (the dashboard card + CTA row fit / wrap). Homepage has NO
+     nav spacer, so its content needs top padding to clear the nav. --- */
   #hero-section {
     height: auto !important;
     min-height: 0 !important;
     overflow: visible !important;
-    display: flex !important;
-    flex-direction: column !important;
   }
   #hero-section > div {
-    order: 1 !important;
     height: auto !important;
-    padding-top: 96px !important;   /* clear the fixed 64px nav */
-    padding-bottom: 32px !important;
+    padding-top: 96px !important;
+    padding-bottom: 48px !important;
   }
-  #hero-section > img {
-    order: 2 !important;
+  .hero-dashboard-col {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+  .hero-dashboard-col > div {
+    max-width: 100% !important;
+  }
+
+  /* --- Cluster heroes (/for/*): drop the fixed viewport height so the
+     Sign up / See pricing CTAs are never clipped on short screens. --- */
+  section:has(> img[src*="/renders/for-"]) {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* --- /about hero: auto height so the (previously oversized) render is
+     gone and the copy + quote flow without overlap. --- */
+  section:has(> img[src*="about.webp"]) {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* --- /pricing + /intelligence heroes (Group-A): their content overlay
+     is position:absolute; make it flow so the copy has room (no render
+     behind it) and the section sizes to the copy. --- */
+  section:has(> img[src*="pricing.webp"]),
+  section:has(> img[src*="how-it-works"]) {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+  section:has(> img[src*="pricing.webp"]) > div,
+  section:has(> img[src*="how-it-works"]) > div {
     position: static !important;
-    display: block !important;
-    width: 100% !important;
-    height: auto !important;        /* natural aspect → full, uncropped */
+  }
+
+  /* --- /data hero: trim the oversized top-padding gap. (Only the data
+     hero is a first section with no image, so this targets it alone.) --- */
+  section:first-of-type:not(:has(> img)) {
+    padding-top: 40px !important;
+  }
+
+  /* --- /intelligence agent cards: let the nowrap data-chip wrap so its
+     intrinsic width can't push the grid column wider than the screen. --- */
+  .intelligence-agents-grid > * {
+    min-width: 0 !important;
+  }
+  .intelligence-agents-grid .data-chip {
+    white-space: normal !important;
+  }
+
+  /* --- Homepage AgentsSection: hide the center timeline spine + the
+     per-agent dots (absolutely placed at left:50% for the desktop
+     zigzag) so they don't run over the full-width stacked cards. --- */
+  #agents-section [style*="left:50%"] {
+    display: none !important;
+  }
+
+  /* --- ProvenanceLedger rows: the 4-column grid (label/value/badge/source)
+     sums past the screen and overflows the homepage. Restack to 2 columns
+     on mobile. Targeted by its unique inline grid template (no id/class). --- */
+  [style*="grid-template-columns:minmax(160px"] {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    gap: 4px 12px !important;
   }
 }
