@@ -450,3 +450,40 @@ body {
     text-wrap: balance;
   }
 }
+
+/* ============================================
+   MOBILE-ONLY HERO FIXES (≤900px)
+   Everything below lives inside this media query and NEVER runs on
+   desktop (>900px). !important is used only to override components'
+   inline styles — the inline values themselves are left byte-identical,
+   so desktop is untouched. No DOM is reordered (visual order via flex
+   `order` only).
+   ============================================ */
+@media (max-width: 900px) {
+  /* --- Homepage hero (HeroSection) ---------------------------------
+     Fix: (1) auto height + top-aligned content with no vertical clip,
+     so the eyebrow/headline/subhead are fully visible; (2) the render
+     flows BELOW the copy (static, full width, uncropped) instead of
+     sitting behind it. Visual order is set with flex `order` so the DOM
+     is not reordered. */
+  #hero-section {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  #hero-section > div {
+    order: 1 !important;
+    height: auto !important;
+    padding-top: 96px !important;   /* clear the fixed 64px nav */
+    padding-bottom: 32px !important;
+  }
+  #hero-section > img {
+    order: 2 !important;
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;        /* natural aspect → full, uncropped */
+  }
+}
