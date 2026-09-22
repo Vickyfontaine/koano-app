@@ -46,13 +46,16 @@ export default function Nav() {
         id="main-nav"
         className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
         style={{
-          // Liquid-glass, Apple "regular" band: blur ~24px, white fill 60–80%,
-          // saturate 1.4, hairline bottom border. Only when scrolled (over the
-          // rich image heroes it has real content to refract).
-          background: scrolled ? "rgba(255, 255, 255, 0.72)" : "var(--white)",
-          backdropFilter: scrolled ? "blur(24px) saturate(1.4)" : "none",
-          WebkitBackdropFilter: scrolled ? "blur(24px) saturate(1.4)" : "none",
+          // Solid nav. Glass was retired: our palette is too light and the
+          // heroes too sky-heavy for backdrop-filter to ever refract — it read
+          // as a plain white haze on every background except the flat dark
+          // homepage hero, which is translucency, not glass. Instead the bar is
+          // always solid white with the hairline border, and on scroll it lifts
+          // off the content with a quiet navy-tinted shadow. That "detach on
+          // scroll" cue reads honestly on light AND dark backgrounds.
+          background: "var(--white)",
           borderBottom: "1px solid var(--border-light)",
+          boxShadow: scrolled ? "var(--shadow-raised)" : "none",
         }}
       >
         <div

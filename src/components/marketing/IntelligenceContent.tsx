@@ -253,7 +253,7 @@ export default function IntelligenceContent() {
             style={{
               position: "relative",
               aspectRatio: "16 / 9",
-              borderRadius: "20px",
+              borderRadius: "var(--radius-card)",
               overflow: "hidden",
               border: "1px solid var(--border)",
               background: "var(--pale-wash)",
@@ -336,8 +336,9 @@ export default function IntelligenceContent() {
               style={{
                 background: "var(--white)",
                 border: "1px solid var(--border)",
-                borderRadius: "24px",
+                borderRadius: "var(--radius-deep)",
                 padding: "40px",
+                boxShadow: "var(--shadow-flat)",
               }}
             >
               <span
@@ -375,7 +376,7 @@ export default function IntelligenceContent() {
                 style={{
                   background: "var(--pale-wash)",
                   border: "1px solid var(--border)",
-                  borderRadius: "20px",
+                  borderRadius: "var(--radius-card)",
                   padding: "32px",
                 }}
               >
@@ -413,7 +414,7 @@ export default function IntelligenceContent() {
                   style={{
                     background: "var(--white)",
                     border: "1px solid var(--brand-blue)",
-                    borderRadius: "16px",
+                    borderRadius: "var(--radius-inner)",
                     padding: "24px",
                     textAlign: "center",
                   }}
@@ -751,8 +752,9 @@ export default function IntelligenceContent() {
               style={{
                 background: "var(--white)",
                 border: "1px solid var(--brand-blue)",
-                borderRadius: "20px",
+                borderRadius: "var(--radius-card)",
                 padding: "32px",
+                boxShadow: "var(--shadow-flat)",
               }}
             >
               <div

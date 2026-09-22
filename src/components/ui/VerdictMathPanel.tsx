@@ -166,7 +166,7 @@ export default function VerdictMathPanel({ verdict }: VerdictMathPanelProps) {
       style={{
         background: "var(--white)",
         border: "1px solid var(--border)",
-        borderRadius: "20px",
+        borderRadius: "var(--radius-card)",
         padding: "28px",
         display: "flex",
         flexDirection: "column",

@@ -32,7 +32,11 @@ export default function Button({
     return (
       <a href={href} className={`${baseClass} ${className}`} id={id}>
         {children}
-        {variant === "primary" && <span aria-hidden="true">↗</span>}
+        {variant === "primary" && (
+          <span aria-hidden="true" className="btn-arrow">
+            ↗
+          </span>
+        )}
       </a>
     );
   }

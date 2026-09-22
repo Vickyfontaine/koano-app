@@ -32,6 +32,20 @@
   --border: #D6EBF7;
   --border-light: #E8F3FA;
 
+  /* Radius scale — one step between nested levels, never three in a stack.
+     Pills (buttons, chips) stay 100px and are deliberately outside this scale. */
+  --radius-chip: 8px;    /* rectangular badges / micro-tags */
+  --radius-inner: 12px;  /* wells nested inside a card */
+  --radius-card: 16px;   /* top-level cards and panels */
+  --radius-deep: 20px;   /* deep/outer containers (e.g. nested-doll shell) */
+
+  /* Elevation — navy-tinted (never pure black), so shadows read as part of
+     the Coastal palette rather than a generic grey drop. */
+  --shadow-flat: 0 1px 2px rgba(13, 43, 62, 0.04), 0 2px 6px rgba(13, 43, 62, 0.04);
+  --shadow-raised: 0 1px 2px rgba(13, 43, 62, 0.05), 0 6px 20px rgba(13, 43, 62, 0.07);
+  --shadow-hover: 0 6px 14px rgba(13, 43, 62, 0.08), 0 22px 48px rgba(13, 43, 62, 0.13);
+  --shadow-accent: 0 24px 60px -24px rgba(26, 79, 110, 0.3);
+
   /* Functional signals */
   --signal-positive: #22C55E;
   --signal-warning: #F59E0B;
@@ -133,7 +147,11 @@ body {
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease;
+  box-shadow: var(--shadow-raised);
+  transition: background 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1);
   text-decoration: none;
   white-space: nowrap;
 }
@@ -141,6 +159,26 @@ body {
 .btn-primary:hover {
   background: var(--sky);
   border-color: var(--sky);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(26, 79, 110, 0.28);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  background: var(--brand-blue);
+  border-color: var(--brand-blue);
+  box-shadow: var(--shadow-flat);
+  transition-duration: 100ms;
+}
+
+/* The trailing ↗ on primary CTAs — nudges forward on hover. */
+.btn-arrow {
+  display: inline-block;
+  transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-primary:hover .btn-arrow {
+  transform: translateX(3px);
 }
 
 .btn-ghost {
@@ -156,7 +194,10 @@ body {
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition: background 200ms cubic-bezier(0.16, 1, 0.3, 1),
+    color 200ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 200ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
   text-decoration: none;
   white-space: nowrap;
 }
@@ -164,6 +205,13 @@ body {
 .btn-ghost:hover {
   background: var(--pale-wash);
   color: var(--ink-primary);
+  border-color: var(--brand-blue);
+  transform: translateY(-1px);
+}
+
+.btn-ghost:active {
+  transform: translateY(0);
+  transition-duration: 100ms;
 }
 
 /* Ghost variant for use on dark/video backgrounds (hero only) */
@@ -180,14 +228,17 @@ body {
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition: background 200ms cubic-bezier(0.16, 1, 0.3, 1),
+    color 200ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 200ms cubic-bezier(0.16, 1, 0.3, 1);
   text-decoration: none;
   white-space: nowrap;
 }
 
 .btn-ghost-light:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.12);
   color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.55);
 }
 
 /* ============================================
@@ -199,7 +250,7 @@ body {
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.65);
-  border-radius: 20px;
+  border-radius: var(--radius-card);
   box-shadow:
     0 0 0 0.5px rgba(255, 255, 255, 0.3) inset,
     0 8px 32px rgba(168, 196, 212, 0.15);
@@ -212,16 +263,38 @@ body {
 .card {
   background: var(--white);
   border: 1px solid var(--border);
-  border-radius: 20px;
+  border-radius: var(--radius-card);
   padding: 28px;
+  box-shadow: var(--shadow-flat);
 }
 
-.card-hover {
-  transition: background 0.2s ease;
+/* Interactive card — a clickable card (cluster cards, pricing tiers). Rests at
+   the same quiet shadow as any card; the lift does the work on hover. The lift
+   itself (transform) is driven by framer-motion `whileHover`/`whileTap` on these
+   components — CSS here owns only shadow + border-color so it never fights the
+   inline transform framer writes after the entrance animation. Pairs with
+   `.card`, or stands alone (it supplies its own border for the recolor). */
+.card-interactive {
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-flat);
+  transition: box-shadow 260ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 260ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.card-hover:hover {
-  background: var(--pale-wash);
+.card-interactive:hover {
+  box-shadow: var(--shadow-hover);
+  border-color: var(--brand-blue);
+}
+
+/* Featured interactive card (the enterprise pricing tier): keeps its deeper
+   accent shadow + brand border at rest, still rises to the hover shadow. */
+.card-interactive.card-featured {
+  border-color: var(--brand-blue);
+  box-shadow: var(--shadow-accent);
+}
+
+.card-interactive.card-featured:hover {
+  box-shadow: var(--shadow-hover);
 }
 
 /* ============================================
@@ -321,7 +394,7 @@ body {
   color: var(--ink-faint);
   background: var(--pale-wash);
   border: 1px dashed var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-inner);
   padding: 16px 20px;
 }
 

@@ -101,8 +101,9 @@ export default function MonitoringSection() {
                   background: "var(--white)",
                   border: "1px solid var(--border)",
                   borderLeft: "3px solid var(--brand-blue)",
-                  borderRadius: "0 14px 14px 0",
+                  borderRadius: "0 var(--radius-card) var(--radius-card) 0",
                   padding: "18px 20px",
+                  boxShadow: "var(--shadow-flat)",
                 }}
               >
                 <p

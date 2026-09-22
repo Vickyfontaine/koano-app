@@ -269,12 +269,12 @@ export default function PricingContent() {
                 initial="hidden"
                 animate={tiersInView ? "visible" : "hidden"}
                 variants={fadeUp}
+                whileHover={{ y: -3, transition: { duration: 0.26, ease: EASE } }}
+                whileTap={{ y: -1, transition: { duration: 0.12, ease: EASE } }}
+                className={`card-interactive${tier.isEnterprise ? " card-featured" : ""}`}
                 style={{
                   background: "var(--white)",
-                  border: tier.isEnterprise
-                    ? "1px solid var(--brand-blue)"
-                    : "1px solid var(--border)",
-                  borderRadius: "20px",
+                  borderRadius: "var(--radius-card)",
                   padding: "32px 28px",
                   display: "flex",
                   flexDirection: "column",
@@ -399,7 +399,7 @@ export default function PricingContent() {
                 <div
                   style={{
                     background: "var(--pale-wash)",
-                    borderRadius: "12px",
+                    borderRadius: "var(--radius-inner)",
                     padding: "12px 14px",
                     marginBottom: "24px",
                   }}

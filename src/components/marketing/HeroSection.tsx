@@ -36,28 +36,31 @@ export default function HeroSection() {
         height: "100vh",
         minHeight: "700px",
         overflow: "hidden",
-        background: "var(--near-black)",
+        // Sky colour sampled from the hero image, so the area above the
+        // contained (uncropped) image blends into its sky seamlessly.
+        background: "#adc1ca",
       }}
     >
-      {/* Video background — fallback to near-black until hero-render.mp4 is delivered */}
-      {/* When video is ready, uncomment:
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
+      {/* Hero background image — replaces the dark fill (near-black stays only as
+          a load fallback behind it). Full-bleed, behind the content overlay. */}
+      <img
+        src="/renders/menu-hero.jpg"
+        alt=""
+        aria-hidden="true"
         style={{
           position: "absolute",
           inset: 0,
           width: "100%",
           height: "100%",
-          objectFit: "cover",
+          // Contain (not cover) so the image keeps its native proportions and
+          // isn't zoomed/cropped; grounded at the bottom so the buildings sit on
+          // the fold and only sky extends above (into the matching section bg).
+          objectFit: "contain",
+          objectPosition: "center bottom",
           zIndex: 0,
+          pointerEvents: "none",
         }}
-      >
-        <source src="/renders/hero-render.mp4" type="video/mp4" />
-      </video>
-      */}
+      />
 
       {/* Content overlay */}
       <div
@@ -135,7 +138,7 @@ export default function HeroSection() {
                 fontSize: "18px",
                 fontWeight: 400,
                 lineHeight: 1.6,
-                color: "rgba(255, 255, 255, 0.85)",
+                color: "var(--ink-primary)",
                 maxWidth: "520px",
                 marginTop: "24px",
                 marginBottom: "36px",

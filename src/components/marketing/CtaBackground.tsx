@@ -20,9 +20,20 @@ export default function CtaBackground() {
       aria-hidden="true"
       style={{
         position: "absolute",
-        inset: 0,
+        // Box is anchored at the section top and made 16px TALLER than the
+        // section (the extra 16px hangs below and is clipped by the host's
+        // overflow:hidden). With objectPosition center-bottom this lands the
+        // buildings' base on the footer's blue separator, while the top stays
+        // flush with the section top — no strip of the section's own colour
+        // (pale-wash blue, or a faint seam on white) is uncovered above.
+        // NOTE: height must be explicit — an absolutely-positioned <img> with
+        // height:auto resolves to the image's intrinsic height, which breaks
+        // object-fit's box. So we size it, not top/bottom.
+        top: 0,
+        left: 0,
+        right: 0,
         width: "100%",
-        height: "100%",
+        height: "calc(100% + 16px)",
         objectFit: "cover",
         objectPosition: "center bottom",
         zIndex: -1,

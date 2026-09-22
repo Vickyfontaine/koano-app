@@ -116,7 +116,7 @@ function CoverageChip({ coverage }: { coverage: ProviderCatalogEntry["coverage"]
         letterSpacing: "0.08em",
         textTransform: "uppercase",
         border: "1px solid var(--border)",
-        borderRadius: "6px",
+        borderRadius: "var(--radius-chip)",
         padding: "1px 6px",
         flexShrink: 0,
       }}
@@ -214,7 +214,7 @@ export default function DataContent() {
                 style={{
                   background: "var(--pale-wash)",
                   border: "1px solid var(--border)",
-                  borderRadius: "16px",
+                  borderRadius: "var(--radius-card)",
                   padding: "16px 24px",
                   textAlign: "center",
                   minWidth: "160px",
@@ -334,7 +334,7 @@ export default function DataContent() {
                       style={{
                         background: "var(--white)",
                         border: "1px solid var(--border)",
-                        borderRadius: "12px",
+                        borderRadius: "var(--radius-inner)",
                         padding: "14px 16px",
                         display: "flex",
                         flexDirection: "column",
@@ -436,7 +436,6 @@ export default function DataContent() {
                 <div
                   key={source.source}
                   className="card"
-                  style={{ background: "var(--pale-wash)" }}
                 >
                   <div
                     style={{
@@ -455,7 +454,7 @@ export default function DataContent() {
                         letterSpacing: "0.08em",
                         textTransform: "uppercase",
                         border: "1px solid var(--signal-warning)",
-                        borderRadius: "6px",
+                        borderRadius: "var(--radius-chip)",
                         padding: "1px 6px",
                       }}
                     >
@@ -687,7 +686,7 @@ export default function DataContent() {
 
                   <div
                     className="card"
-                    style={{ background: "var(--pale-wash)", flex: 1 }}
+                    style={{ flex: 1 }}
                   >
                     <span
                       className="section-number"

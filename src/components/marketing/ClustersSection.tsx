@@ -101,7 +101,9 @@ export default function ClustersSection() {
               initial="hidden"
               animate={isInView ? "visible" : "hidden"}
               variants={fadeUp}
-              className="card card-hover"
+              whileHover={{ y: -3, transition: { duration: 0.26, ease: EASE } }}
+              whileTap={{ y: -1, transition: { duration: 0.12, ease: EASE } }}
+              className="card card-interactive"
               style={{
                 textDecoration: "none",
                 display: "flex",

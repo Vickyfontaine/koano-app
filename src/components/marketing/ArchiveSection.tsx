@@ -114,8 +114,9 @@ export default function ArchiveSection() {
           style={{
             background: "var(--pale-wash)",
             border: "1px solid var(--border)",
-            borderRadius: "20px",
+            borderRadius: "var(--radius-card)",
             padding: "28px",
+            boxShadow: "var(--shadow-flat)",
           }}
         >
           <div

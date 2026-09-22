@@ -60,7 +60,7 @@ export default function ProvenanceLedger({ dataPoints, locationConfidence, addre
   })).filter((g) => g.rows.length > 0);
 
   return (
-    <div style={{ border: "1px solid var(--border)", borderRadius: "20px", background: "var(--white)", padding: "24px" }} id={id}>
+    <div style={{ border: "1px solid var(--border)", borderRadius: "var(--radius-card)", background: "var(--white)", padding: "24px" }} id={id}>
       <button
         onClick={() => setOpen((v) => !v)}
         style={{
@@ -93,7 +93,7 @@ export default function ProvenanceLedger({ dataPoints, locationConfidence, addre
               style={{
                 border: "1px solid var(--border)",
                 borderLeft: "3px solid var(--signal-warning)",
-                borderRadius: "0 12px 12px 0",
+                borderRadius: "0 var(--radius-inner) var(--radius-inner) 0",
                 padding: "12px 16px",
               }}
             >
