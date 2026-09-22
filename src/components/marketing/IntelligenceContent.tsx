@@ -333,6 +333,7 @@ export default function IntelligenceContent() {
           >
             {/* Layer 1 — outer */}
             <div
+              className="arch-l1"
               style={{
                 background: "var(--white)",
                 border: "1px solid var(--border)",
@@ -373,6 +374,7 @@ export default function IntelligenceContent() {
 
               {/* Layer 2 — middle */}
               <div
+                className="arch-l2"
                 style={{
                   background: "var(--pale-wash)",
                   border: "1px solid var(--border)",
@@ -411,6 +413,7 @@ export default function IntelligenceContent() {
 
                 {/* Layer 3 — inner */}
                 <div
+                  className="arch-l3"
                   style={{
                     background: "var(--white)",
                     border: "1px solid var(--brand-blue)",
@@ -606,7 +609,7 @@ export default function IntelligenceContent() {
                   </div>
                   <span
                     className="data-chip"
-                    style={{ alignSelf: "flex-start", marginTop: "4px" }}
+                    style={{ alignSelf: "flex-start", marginTop: "4px", textAlign: "center", justifyContent: "center" }}
                   >
                     {agent.outputs}
                   </span>
@@ -839,9 +842,11 @@ export default function IntelligenceContent() {
                   {REASONING_DEMO.map((item) => (
                     <div
                       key={item.agent}
+                      className="reason-row"
                       style={{ display: "flex", gap: "12px", fontSize: "13px" }}
                     >
                       <span
+                        className="reason-agent"
                         style={{
                           fontFamily: "'DM Mono', monospace",
                           color: "var(--brand-blue)",

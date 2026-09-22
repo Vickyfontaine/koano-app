@@ -213,7 +213,8 @@ export default function AgentsSection() {
                       whiteSpace: "normal",
                       maxWidth: "100%",
                       lineHeight: 1.6,
-                      textAlign: "left",
+                      textAlign: "center",
+                      justifyContent: "center",
                     }}
                   >
                     {agent.output}

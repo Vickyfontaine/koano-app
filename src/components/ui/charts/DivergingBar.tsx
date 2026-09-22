@@ -126,6 +126,7 @@ export default function DivergingBar({
                   {/* A hollow node sitting on the zero line: consulted, returned nothing */}
                   <span
                     aria-hidden="true"
+                    className="divbar-node"
                     style={{
                       position: "absolute",
                       top: "50%",
@@ -139,6 +140,7 @@ export default function DivergingBar({
                     }}
                   />
                   <span
+                    className="divbar-neutral-note"
                     style={{
                       ...mono,
                       position: "absolute",

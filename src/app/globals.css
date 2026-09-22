@@ -579,8 +579,25 @@ body {
     grid-template-columns: 1fr !important;
     gap: 8px !important;
   }
-  [style*="left:calc(50% + 12px)"] {
-    font-size: 9px !important;
-    left: calc(50% + 6px) !important;
+  /* Neutral rows: left-align the "no directional signal" note (it read as
+     smooshed to the right of the track) and drop the center node, so it reads
+     as a plain left-aligned label under the agent name. */
+  .divbar-neutral-note {
+    left: 0 !important;
   }
+  .divbar-node {
+    display: none !important;
+  }
+
+  /* --- /intelligence architecture (nested "Russian doll"): the accumulated
+     nested padding crushed the inner layers to a ~2-words-per-line column.
+     Trim the padding at each level and left-align the innermost box. --- */
+  .arch-l1 { padding: 22px !important; }
+  .arch-l2 { padding: 18px !important; }
+  .arch-l3 { padding: 16px !important; text-align: left !important; }
+
+  /* --- /intelligence verdict reasoning chain: stack the agent name above its
+     explanation (was a cramped 130px label beside a squeezed column). --- */
+  .reason-row { flex-direction: column !important; gap: 3px !important; }
+  .reason-agent { width: auto !important; }
 }
