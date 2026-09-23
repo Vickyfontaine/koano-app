@@ -136,9 +136,9 @@ export default function HeroSection() {
               variants={fadeUp}
               style={{
                 fontSize: "18px",
-                fontWeight: 400,
+                fontWeight: 500,
                 lineHeight: 1.6,
-                color: "#010d5c",
+                color: "#FFFFFF",
                 maxWidth: "520px",
                 marginTop: "24px",
                 marginBottom: "36px",
