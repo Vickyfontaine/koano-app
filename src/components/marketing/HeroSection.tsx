@@ -123,9 +123,9 @@ export default function HeroSection() {
                 maxWidth: "560px",
               }}
             >
-              Real estate has always had data.
+              SMART DATA.
               <br />
-              It&apos;s never had a brain.
+              SMARTER REAL ESTATE DECISIONS.
             </motion.h1>
 
             {/* Subhead */}
