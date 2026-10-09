@@ -624,8 +624,8 @@ Homepage hero tag: `Real estate reasoning engine`
 
 Hero headline:
 ```
-Real estate has always had data.
-It's never had a brain.
+SMART DATA.
+SMARTER REAL ESTATE DECISIONS.
 ```
 
 Hero subhead:
