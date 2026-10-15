@@ -241,9 +241,7 @@ export default function IntelligenceContent() {
             </h2>
           </motion.div>
 
-          {/* Demo video slot — 16:9. Drop the product demo in here, e.g.:
-              <video src="/renders/demo.mp4" controls playsInline poster="…"
-                     style={{ width: "100%", height: "100%", objectFit: "cover" }} /> */}
+          {/* Demo video slot — 16:9. */}
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -257,33 +255,16 @@ export default function IntelligenceContent() {
               overflow: "hidden",
               border: "1px solid var(--border)",
               background: "var(--pale-wash)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
             }}
           >
-            <div
-              style={{
-                width: "72px",
-                height: "72px",
-                borderRadius: "50%",
-                background: "var(--brand-blue)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <div
-                style={{
-                  width: 0,
-                  height: 0,
-                  borderTop: "12px solid transparent",
-                  borderBottom: "12px solid transparent",
-                  borderLeft: "20px solid var(--near-black)",
-                  marginLeft: "5px",
-                }}
-              />
-            </div>
+            <video
+              src="/renders/koano-demo.mp4"
+              poster="/renders/koano-demo-poster.jpg"
+              controls
+              playsInline
+              preload="metadata"
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+            />
           </motion.div>
         </div>
       </section>
