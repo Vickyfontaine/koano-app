@@ -7,7 +7,7 @@ import {
   SPECIALIST_AGENTS,
   type Verdict,
 } from "@/components/ui/verdict";
-import { EXAMPLE_VERDICT, EXAMPLE_VERDICT_ADDRESS } from "./exampleVerdict";
+import { EXAMPLE_VERDICT, EXAMPLE_VERDICT_ADDRESS, EXAMPLE_VERDICT_LABEL } from "./exampleVerdict";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -23,7 +23,7 @@ const AGENT_TAG: Record<string, string> = {
 
 const VCHIP: Record<Verdict, { color: string; bg: string }> = {
   buy: { color: "var(--signal-positive)", bg: "rgba(34,197,94,0.12)" },
-  hold: { color: "var(--mid-blue)", bg: "rgba(90,155,190,0.14)" },
+  hold: { color: "var(--mid-blue-ink)", bg: "rgba(90,155,190,0.14)" },
   wait: { color: "var(--signal-warning)", bg: "rgba(245,158,11,0.14)" },
   sell: { color: "var(--signal-negative)", bg: "rgba(239,68,68,0.12)" },
   drop: { color: "var(--signal-negative)", bg: "rgba(239,68,68,0.12)" },
@@ -99,7 +99,7 @@ export default function HeroDashboard() {
               marginBottom: "4px",
             }}
           >
-            Subject property
+            Recorded example
           </div>
           <div style={{ fontSize: "15px", fontWeight: 500, color: "#FFFFFF", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
             {EXAMPLE_VERDICT_ADDRESS}
@@ -187,11 +187,8 @@ export default function HeroDashboard() {
           </div>
         </div>
         <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.75)", lineHeight: 1.5, marginTop: "12px" }}>{DRIVER}</div>
-        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "12px" }}>
-          <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "var(--signal-positive)" }} />
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", letterSpacing: "0.06em", color: "rgba(255,255,255,0.6)" }}>
-            Live · every figure sourced
-          </span>
+        <div style={{ fontFamily: "var(--font-mono)", fontSize: "11px", lineHeight: 1.5, letterSpacing: "0.04em", color: "rgba(255,255,255,0.65)", marginTop: "12px" }}>
+          {EXAMPLE_VERDICT_LABEL} Replayed at about 30x.
         </div>
       </motion.div>
     </div>

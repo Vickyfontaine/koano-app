@@ -82,7 +82,7 @@ export default function CoverageMap({ dataPoints, id, defaultOpen }: CoverageMap
           <span style={{ ...mono, textTransform: "uppercase", color: "var(--ink-muted)" }}>Coverage map</span>
           <span style={{ fontSize: "13px", color: "var(--ink-muted)", marginLeft: "10px" }}>{summaryParts.join(" · ")}</span>
         </span>
-        <span style={{ ...mono, color: "var(--mid-blue)" }}>{open ? "Hide" : "Show layers"}</span>
+        <span style={{ ...mono, color: "var(--mid-blue-ink)" }}>{open ? "Hide" : "Show layers"}</span>
       </button>
 
       {open && (

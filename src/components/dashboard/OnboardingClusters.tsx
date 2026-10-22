@@ -210,7 +210,7 @@ export default function OnboardingClusters() {
                     style={{
                       fontSize: "13px",
                       fontWeight: 500,
-                      color: "var(--mid-blue)",
+                      color: "var(--mid-blue-ink)",
                     }}
                   >
                     {isSelected && saving ? "Saving…" : "Select ↗"}

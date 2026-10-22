@@ -16,6 +16,9 @@ import type {
 
 export const EXAMPLE_VERDICT_ADDRESS = "175 3rd Street, Brooklyn";
 export const EXAMPLE_VERDICT_DATE = "August 26, 2026";
+// The one label every marketing appearance of this run carries (sprint rule).
+export const EXAMPLE_VERDICT_LABEL = "Recorded example run, August 2026. Illustrative of how the engine reasons.";
+export const EXAMPLE_VERDICT_LABEL_SHORT = "Recorded example run, August 2026";
 
 const breakdown: WeightingBreakdown = {
   method: "confidence-weighted v1",
@@ -24,7 +27,7 @@ const breakdown: WeightingBreakdown = {
   final_score: 1.23,
   structural_nudge: 1,
   structural_drivers: [
-    "97% unused FAR — large as-of-right development upside → buy",
+    "97% unused FAR: large as-of-right development upside, read as a buy lean",
   ],
   chosen_verdict: "buy",
   thresholds: { buy: 1, hold: -0.3, wait: -1.2 },

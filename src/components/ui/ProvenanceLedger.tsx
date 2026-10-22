@@ -22,6 +22,9 @@ interface ProvenanceLedgerProps {
   address?: string | null;
   id?: string;
   defaultOpen?: boolean;
+  /** A replay of a frozen run (the marketing example): badges read "Recorded"
+   *  and the live/non-live filter is hidden, so a recording never claims live. */
+  recorded?: boolean;
 }
 
 const mono: React.CSSProperties = {
@@ -39,7 +42,7 @@ const AGENT_ORDER: AgentName[] = [
   "synthesis",
 ];
 
-export default function ProvenanceLedger({ dataPoints, locationConfidence, address, id, defaultOpen }: ProvenanceLedgerProps) {
+export default function ProvenanceLedger({ dataPoints, locationConfidence, address, id, defaultOpen, recorded = false }: ProvenanceLedgerProps) {
   const [open, setOpen] = useState(!!defaultOpen);
   const [nonLiveOnly, setNonLiveOnly] = useState(false);
 
@@ -79,10 +82,12 @@ export default function ProvenanceLedger({ dataPoints, locationConfidence, addre
         <span>
           <span style={{ ...mono, textTransform: "uppercase", color: "var(--ink-muted)" }}>Provenance ledger</span>
           <span style={{ fontSize: "13px", color: "var(--ink-muted)", marginLeft: "10px" }}>
-            {points.length} figures · {liveCount} live{nonLiveCount > 0 ? ` · ${nonLiveCount} non-live` : ""}
+            {recorded
+              ? `${points.length} figures, each recorded with its source`
+              : `${points.length} figures · ${liveCount} live${nonLiveCount > 0 ? ` · ${nonLiveCount} non-live` : ""}`}
           </span>
         </span>
-        <span style={{ ...mono, color: "var(--mid-blue)" }}>{open ? "Hide" : "Show every source"}</span>
+        <span style={{ ...mono, color: "var(--mid-blue-ink)" }}>{open ? "Hide" : "Show every source"}</span>
       </button>
 
       {open && (
@@ -107,15 +112,17 @@ export default function ProvenanceLedger({ dataPoints, locationConfidence, addre
           ) : (
             address && (
               <p style={{ ...mono, color: "var(--ink-muted)", margin: 0 }}>
-                Location confirmed (two geocoders agreed) · every figure below is for {address}
+                {recorded ? "Recorded run" : "Location confirmed (two geocoders agreed)"} · every figure below is for {address}
               </p>
             )
           )}
 
-          <label style={{ display: "inline-flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
-            <input type="checkbox" checked={nonLiveOnly} onChange={(e) => setNonLiveOnly(e.target.checked)} />
-            <span style={{ fontSize: "13px", color: "var(--ink-secondary)" }}>Show only non-live figures</span>
-          </label>
+          {!recorded && (
+            <label style={{ display: "inline-flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
+              <input type="checkbox" checked={nonLiveOnly} onChange={(e) => setNonLiveOnly(e.target.checked)} />
+              <span style={{ fontSize: "13px", color: "var(--ink-secondary)" }}>Show only non-live figures</span>
+            </label>
+          )}
 
           {byAgent.length === 0 && (
             <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>Every figure is live.</p>
@@ -144,7 +151,7 @@ export default function ProvenanceLedger({ dataPoints, locationConfidence, addre
                       {String(d.value ?? "—")}
                     </span>
                     <span style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
-                      <ProvenanceBadge provenance={d.provenance} />
+                      <ProvenanceBadge provenance={d.provenance} labelOverride={recorded ? "Recorded" : undefined} />
                       {unconfirmed && (
                         <span
                           title="Location unverified. This figure may be for a nearby lot"

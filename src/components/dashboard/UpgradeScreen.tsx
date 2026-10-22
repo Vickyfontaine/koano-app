@@ -158,7 +158,7 @@ export default function UpgradeScreen({
                     fontFamily: "var(--font-mono)",
                     fontSize: "13px",
                     fontWeight: 500,
-                    color: "var(--mid-blue)",
+                    color: "var(--mid-blue-ink)",
                   }}
                 >
                   {busy ? "Starting checkout…" : c.price}

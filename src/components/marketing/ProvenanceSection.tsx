@@ -4,7 +4,7 @@ import React, { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import SectionNumber from "../ui/SectionNumber";
 import ProvenanceLedger from "../ui/ProvenanceLedger";
-import { EXAMPLE_LEDGER, EXAMPLE_VERDICT_ADDRESS } from "./exampleVerdict";
+import { EXAMPLE_LEDGER, EXAMPLE_VERDICT_ADDRESS, EXAMPLE_VERDICT_LABEL } from "./exampleVerdict";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -52,8 +52,17 @@ export default function ProvenanceSection() {
             The same verdict, opened up. Every number KOANO used carries its
             value, its provenance, and the exact public source it came from. This
             is the real ledger from the run above. On a New York address every
-            figure is live, and where a figure is ever not live, KOANO labels it
-            distinctly rather than quietly averaging it in.
+            figure is fetched live at run time, and where a figure is ever not
+            live, KOANO labels it distinctly rather than quietly averaging it in.
+          </p>
+          <p
+            style={{
+              fontSize: "13px",
+              color: "var(--ink-muted)",
+              marginTop: "12px",
+            }}
+          >
+            {EXAMPLE_VERDICT_LABEL}
           </p>
         </motion.div>
 
@@ -68,6 +77,7 @@ export default function ProvenanceSection() {
             locationConfidence="confirmed"
             address={EXAMPLE_VERDICT_ADDRESS}
             defaultOpen
+            recorded
           />
         </motion.div>
 
@@ -86,7 +96,7 @@ export default function ProvenanceSection() {
           <a
             href="/data"
             style={{
-              color: "var(--mid-blue)",
+              color: "var(--mid-blue-ink)",
               textDecoration: "none",
               fontWeight: 500,
             }}

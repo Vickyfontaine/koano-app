@@ -10,6 +10,13 @@ import {
   HERO_SECTION_PADDING,
 } from "@/components/marketing/heroLayout";
 import CtaBackground from "@/components/marketing/CtaBackground";
+import { VERDICT_COLORS } from "@/components/ui/verdict";
+import {
+  EXAMPLE_VERDICT,
+  EXAMPLE_VERDICT_ADDRESS,
+  EXAMPLE_VERDICT_LABEL,
+  EXAMPLE_VERDICT_LABEL_SHORT,
+} from "@/components/marketing/exampleVerdict";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -50,7 +57,7 @@ const AGENTS_DETAIL = [
     name: "Demand sentiment",
     file: "demand-sentiment.ts",
     inputs: "CFPB HMDA · BLS QCEW · IRS migration · Census ACS",
-    outputs: "Demand momentum · Gentrification stage (1–7)",
+    outputs: "Demand momentum · Credit access · Migration",
     description:
       "Reads mortgage lending, employment and wages, household migration, and demographic change to gauge where housing demand is strengthening or softening.",
   },
@@ -101,12 +108,14 @@ const ARBITRATION = [
   },
 ];
 
+// The recorded example run's per-agent reads, verbatim from the frozen run
+// (the same figures the homepage replay shows). Nothing invented.
 const REASONING_DEMO = [
-  { agent: "Market timing", verdict: "Recorded-sale prices rising, sales velocity steady" },
-  { agent: "Infrastructure", verdict: "Active DOB permits nearby, multi-year build pipeline" },
-  { agent: "Demand sentiment", verdict: "Mortgage lending and in-migration both rising" },
-  { agent: "Risk & volatility", verdict: "Risk score 22/100, low flood and crime exposure" },
-  { agent: "Regulatory", verdict: "Opportunity Zone tract, FAR headroom on the lot" },
+  { agent: "Market timing", verdict: "Hold at 80. Recorded $/sq ft and the FHFA index both rising, mortgage rate 6.65%" },
+  { agent: "Infrastructure", verdict: "Buy at 82. 675 DOB permits in the tract over 24 months, foundation work on the lot" },
+  { agent: "Demand sentiment", verdict: "Hold at 74. Mortgage denials 31.9%, net county out-migration" },
+  { agent: "Risk & volatility", verdict: "Hold at 80. Flood zone X, FEMA risk index very low, 16 EPA cleanup sites within 2 miles" },
+  { agent: "Regulatory", verdict: "Wait at 75. M1-4/R7-2 with special district G, 97% unused FAR" },
 ];
 
 export default function IntelligenceContent() {
@@ -240,6 +249,17 @@ export default function IntelligenceContent() {
               Watch the demo.
             </h2>
           </motion.div>
+
+          <p
+            style={{
+              fontSize: "14px",
+              color: "var(--ink-muted)",
+              margin: "0 auto 20px",
+              maxWidth: "560px",
+            }}
+          >
+            {EXAMPLE_VERDICT_LABEL}
+          </p>
 
           {/* Demo video slot — 16:9. */}
           <motion.div
@@ -759,19 +779,21 @@ export default function IntelligenceContent() {
                     textTransform: "uppercase",
                   }}
                 >
-                  Demo
+                  {EXAMPLE_VERDICT_LABEL_SHORT}
                 </span>
               </div>
 
               <h3
                 style={{
                   fontSize: "28px",
-                  fontWeight: 500,
-                  color: "var(--ink-primary)",
+                  fontWeight: 700,
+                  letterSpacing: "-0.02em",
+                  textTransform: "uppercase",
+                  color: VERDICT_COLORS[EXAMPLE_VERDICT.verdict],
                   marginBottom: "8px",
                 }}
               >
-                Buy
+                {EXAMPLE_VERDICT.verdict}
               </h3>
               <p
                 style={{
@@ -782,7 +804,7 @@ export default function IntelligenceContent() {
                   marginBottom: "4px",
                 }}
               >
-                Confidence: 87 / 100
+                Confidence: {EXAMPLE_VERDICT.confidence} / 100 · {EXAMPLE_VERDICT_ADDRESS}
               </p>
               <p
                 style={{
@@ -793,7 +815,7 @@ export default function IntelligenceContent() {
                   marginBottom: "24px",
                 }}
               >
-                Signal window: 6–12 months
+                Signal window: {EXAMPLE_VERDICT.signal_window_months} months
               </p>
 
               <div
@@ -849,15 +871,15 @@ export default function IntelligenceContent() {
               </div>
 
               <a
-                href="/signup"
+                href="/#agents-section"
                 style={{
                   fontSize: "14px",
                   fontWeight: 500,
-                  color: "var(--mid-blue)",
+                  color: "var(--mid-blue-ink)",
                   textDecoration: "none",
                 }}
               >
-                View full reasoning chain →
+                See this run&apos;s verdict math on the homepage
               </a>
             </div>
           </motion.div>

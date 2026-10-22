@@ -8,7 +8,7 @@ import { VERDICT_COLORS } from "../ui/verdict";
 import {
   EXAMPLE_VERDICT,
   EXAMPLE_VERDICT_ADDRESS,
-  EXAMPLE_VERDICT_DATE,
+  EXAMPLE_VERDICT_LABEL,
 } from "./exampleVerdict";
 
 const AGENTS = [
@@ -28,7 +28,7 @@ const AGENTS = [
     number: "03",
     name: "Demand sentiment",
     description: "Reads mortgage lending, employment and wages, and household migration for where housing demand is heading.",
-    output: "Demand momentum · Gentrification stage",
+    output: "Demand momentum · Credit access · Migration",
   },
   {
     number: "04",
@@ -296,7 +296,7 @@ export default function AgentsSection() {
                   letterSpacing: "0.08em",
                 }}
               >
-                {EXAMPLE_VERDICT_ADDRESS} · {EXAMPLE_VERDICT_DATE}
+                {EXAMPLE_VERDICT_ADDRESS}
               </span>
             </div>
 
@@ -323,7 +323,16 @@ export default function AgentsSection() {
                 }}
               >
                 Confidence {EXAMPLE_VERDICT.confidence} / 100 · Signal window{" "}
-                {EXAMPLE_VERDICT.signal_window_months} months · Provenance live
+                {EXAMPLE_VERDICT.signal_window_months} months
+              </p>
+              <p
+                style={{
+                  fontSize: "13px",
+                  color: "var(--ink-muted)",
+                  marginTop: "8px",
+                }}
+              >
+                {EXAMPLE_VERDICT_LABEL}
               </p>
             </div>
 
@@ -336,7 +345,7 @@ export default function AgentsSection() {
                 style={{
                   fontSize: "14px",
                   fontWeight: 500,
-                  color: "var(--mid-blue)",
+                  color: "var(--mid-blue-ink)",
                   textDecoration: "none",
                 }}
               >
