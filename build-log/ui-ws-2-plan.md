@@ -2,7 +2,7 @@
 
 Closes A1, A2 (code side; the final render drop-in is WS6 once the founder supplies the mobile set), A4, A18. Depends on the WS1 tokens.
 
-Baseline for this workstream: `build-log/ui-ws-2/before/` (equals the WS1 "after" set). After: `build-log/ui-ws-2/after/`.
+Baseline for this workstream is the WS1 "after" set (`build-log/ui-ws-1/after/`, not duplicated). After: `build-log/ui-ws-2/after/`.
 
 ## What the baseline shows (from the WS1 captures)
 

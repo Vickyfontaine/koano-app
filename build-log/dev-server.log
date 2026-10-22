@@ -1,0 +1,642 @@
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:3000
+  - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 1007ms
+ ✓ Compiled /src/middleware in 251ms (188 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 1654ms (2138 modules)
+ GET / 200 in 2002ms
+ ✓ Compiled in 313ms (967 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (197kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+ ✓ Compiled in 384ms (2312 modules)
+ GET / 200 in 133ms
+ GET / 200 in 24ms
+ GET / 200 in 32ms
+ ✓ Compiled /intelligence in 190ms (2133 modules)
+ GET /intelligence 200 in 227ms
+ GET /intelligence 200 in 18ms
+ GET /intelligence 200 in 25ms
+ ✓ Compiled /pricing in 173ms (2140 modules)
+ GET /pricing 200 in 206ms
+ GET /pricing 200 in 22ms
+ GET /pricing 200 in 15ms
+ ✓ Compiled /for/developers in 173ms (2147 modules)
+ GET /for/developers 200 in 206ms
+ GET /for/developers 200 in 18ms
+ GET /for/developers 200 in 18ms
+ ✓ Compiled /for/agents in 168ms (2149 modules)
+ GET /for/agents 200 in 198ms
+ GET /for/agents 200 in 18ms
+ GET /for/agents 200 in 20ms
+ ✓ Compiled /for/institutions in 171ms (2151 modules)
+ GET /for/institutions 200 in 203ms
+ GET /for/institutions 200 in 19ms
+ GET /for/institutions 200 in 23ms
+ ✓ Compiled /for/community in 176ms (1930 modules)
+ GET /for/community 200 in 209ms
+ GET /for/community 200 in 16ms
+ GET /for/community 200 in 22ms
+ ✓ Compiled /about in 180ms (1932 modules)
+ GET /about 200 in 216ms
+ GET /about 200 in 20ms
+ GET /about 200 in 19ms
+ ✓ Compiled /data in 349ms (1935 modules)
+ GET /data 200 in 404ms
+ GET /data 200 in 22ms
+ GET /data 200 in 20ms
+ ✓ Compiled /login/[[...rest]] in 359ms (1979 modules)
+ GET /login 200 in 581ms
+ GET /login/SignIn_clerk_catchall_check_1792690090559 200 in 18ms
+ GET /login 200 in 24ms
+ GET /login/SignIn_clerk_catchall_check_1792690149338 200 in 14ms
+ GET /login 200 in 20ms
+ GET /login/SignIn_clerk_catchall_check_1792690152052 200 in 28ms
+ GET /login 200 in 21ms
+ GET /login/SignIn_clerk_catchall_check_1792690211414 200 in 14ms
+ GET /login 200 in 18ms
+ GET /login/SignIn_clerk_catchall_check_1792690214648 200 in 19ms
+ GET /login 200 in 23ms
+ GET /login/SignIn_clerk_catchall_check_1792690273610 200 in 17ms
+ ✓ Compiled /signup/[[...rest]] in 218ms (1979 modules)
+ GET /signup 200 in 418ms
+ GET /signup/SignUp_clerk_catchall_check_1792690278384 200 in 14ms
+ GET /signup 200 in 23ms
+ GET /signup/SignUp_clerk_catchall_check_1792690335662 200 in 17ms
+ GET /signup 200 in 18ms
+ GET /signup/SignUp_clerk_catchall_check_1792690338684 200 in 16ms
+ GET /signup 200 in 18ms
+ GET /signup/SignUp_clerk_catchall_check_1792690397695 200 in 16ms
+ GET /signup 200 in 18ms
+ GET /signup/SignUp_clerk_catchall_check_1792690400468 200 in 16ms
+ GET /signup 200 in 19ms
+ GET /signup/SignUp_clerk_catchall_check_1792690459902 200 in 19ms
+ GET /login 200 in 19ms
+ GET /login/SignIn_clerk_catchall_check_1792690496812 200 in 15ms
+ GET /login 200 in 15ms
+ GET /login/SignIn_clerk_catchall_check_1792690530816 200 in 15ms
+ GET /login 200 in 20ms
+ GET /login/SignIn_clerk_catchall_check_1792690583167 200 in 18ms
+ GET /signup 200 in 13ms
+ GET /signup/SignUp_clerk_catchall_check_1792690589182 200 in 13ms
+ GET /login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fdashboard 200 in 14ms
+ GET /login/SignIn_clerk_catchall_check_1792690596060 200 in 14ms
+ GET /login 200 in 15ms
+ GET /login/SignIn_clerk_catchall_check_1792690606752 200 in 12ms
+ GET /signup 200 in 18ms
+ GET /signup/SignUp_clerk_catchall_check_1792690617249 200 in 18ms
+ GET /login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Fdashboard 200 in 14ms
+ GET /login/SignIn_clerk_catchall_check_1792690625177 200 in 16ms
+ GET /login?__clerk_ticket=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJlaXMiOjM2MDAsImV4cCI6MTc5MjY5NDI0NCwiaWlkIjoiaW5zXzNHQzNmWGRlNEtGbHVnNER2RDdyTVVtS2xURSIsInNpZCI6InNpdF8zTDNsVTNyOWk5RDFESzJ5WDVIV0Mxd3Y1WkwiLCJzdCI6InNpZ25faW5fdG9rZW4ifQ.PTaOyiq_Sfxq6xJbz05lwgilMX7Zvn-iCe85fcUI8D0tbFA3wKhCZKIokz3w60k02ay5n76V3J-bKptypcUxzr9T0BPXR1qIlbQrjo5_5WQ-o5oE9FJQ4cE4igMLLxCV1zDSBIs5dCKIsYJvLE0M6aR6EV7O10zvAuz_0HJdlQL0M18bVTPuOwokhwSg28TxCZ_5ihuTFY64e_iDoR9ljr23r63laN9MkjLMxzWsav-_oQe7PlpUm_cyKa_swm-V1gQkXnbznqKTyBnGPZNSRUyZAuKMlBU2eZQnupByig3Ld7WMOAEoj__2fWalLweqb_zTR-H8Bdu3qASOfXjELw 200 in 20ms
+ GET /login/SignIn_clerk_catchall_check_1792690657073 200 in 15ms
+ POST /login 200 in 21ms
+ ○ Compiling /dashboard ...
+ ✓ Compiled /dashboard in 1459ms (2452 modules)
+ GET /dashboard?_rsc=16jui 200 in 1440ms
+ ✓ Compiled /onboarding in 171ms (2445 modules)
+ GET /onboarding?_rsc=j4y0x 200 in 5ms
+ GET /dashboard 307 in 436ms
+ GET /onboarding 200 in 32ms
+ GET /onboarding 200 in 14ms
+ ✓ Compiled /api/profile in 122ms (1366 modules)
+ POST /api/profile 200 in 867ms
+ GET /dashboard?_rsc=16jui 200 in 233ms
+ ✓ Compiled /api/verdicts in 92ms (1368 modules)
+ ✓ Compiled (1371 modules)
+ GET /api/notifications?limit=40 200 in 702ms
+ GET /api/verdicts?limit=50 200 in 805ms
+ GET /api/notifications?limit=40 200 in 329ms
+ GET /api/verdicts?limit=50 200 in 548ms
+ GET /dashboard 200 in 632ms
+ GET /api/notifications?limit=40 200 in 1662ms
+ GET /api/verdicts?limit=50 200 in 2315ms
+ GET /api/notifications?limit=40 200 in 743ms
+ GET /api/verdicts?limit=50 200 in 791ms
+ GET /dashboard 200 in 241ms
+ GET /api/notifications?limit=40 200 in 1525ms
+ GET /api/notifications?limit=40 200 in 437ms
+ GET /api/verdicts?limit=50 200 in 2094ms
+ GET /api/verdicts?limit=50 200 in 485ms
+ GET /api/verdicts?limit=50 200 in 608ms
+ GET /api/verdicts?limit=50 200 in 533ms
+ ✓ Compiled /api/resolve-address in 210ms (1400 modules)
+ POST /api/resolve-address 200 in 1666ms
+ ✓ Compiled /api/site-detail in 286ms (1527 modules)
+ ✓ Compiled (1530 modules)
+ POST /api/site-detail 200 in 9937ms
+[grounding] risk-volatility: untraceable ["Kings County"] — re-prompting once
+[grounding] market-timing: untraceable ["Aug","Sep"] — re-prompting once
+[grounding] demand-sentiment: untraceable ["Fewer"] — re-prompting once
+ POST /api/agents/stream 200 in 77582ms
+ GET /api/notifications?bbl=3009890071&limit=20 200 in 275ms
+ GET /api/notifications?bbl=3009890071&limit=20 200 in 458ms
+ GET /dashboard 200 in 560ms
+ GET /api/notifications?limit=40 200 in 390ms
+ GET /api/verdicts?limit=50 200 in 498ms
+ GET /api/verdicts?limit=50 200 in 291ms
+ GET /api/notifications?limit=40 200 in 477ms
+ GET /api/verdicts?limit=50 200 in 715ms
+ GET /api/verdicts?limit=50 200 in 649ms
+ POST /api/resolve-address 200 in 450ms
+[grounding] market-timing: untraceable ["Aug","Sep"] — re-prompting once
+ ✓ Compiled / in 281ms (1551 modules)
+ GET / 200 in 379ms
+ GET / 200 in 26ms
+ GET / 200 in 24ms
+ ✓ Compiled /intelligence in 142ms (1552 modules)
+ GET /intelligence 200 in 196ms
+ GET /intelligence 200 in 20ms
+ GET /intelligence 200 in 20ms
+ ✓ Compiled /pricing in 135ms (1381 modules)
+ GET /pricing 200 in 226ms
+ GET /pricing 200 in 16ms
+ GET /pricing 200 in 24ms
+ ✓ Compiled /for/developers in 96ms (1376 modules)
+ GET /for/developers 200 in 171ms
+ GET /for/developers 200 in 17ms
+ GET /for/developers 200 in 19ms
+ ✓ Compiled /for/agents in 93ms (1373 modules)
+ GET /for/agents 200 in 135ms
+ GET /for/agents 200 in 19ms
+ GET /for/agents 200 in 21ms
+ ✓ Compiled /for/institutions in 133ms (1353 modules)
+ GET /for/institutions 200 in 168ms
+ GET /for/institutions 200 in 19ms
+ GET /for/institutions 200 in 19ms
+ ✓ Compiled /for/community in 104ms (1355 modules)
+ GET /for/community 200 in 142ms
+ POST /api/site-detail 200 in 136103ms
+[grounding] demand-sentiment: untraceable ["Critically"] — re-prompting once
+ GET /for/community 200 in 19ms
+ GET /for/community 200 in 21ms
+ ✓ Compiled /about in 99ms (1350 modules)
+ GET /about 200 in 134ms
+ GET /about 200 in 20ms
+ GET /about 200 in 19ms
+ ✓ Compiled /data in 130ms (1354 modules)
+ GET /data 200 in 167ms
+ POST /api/agents/stream 200 in 176231ms
+ GET /data 200 in 14ms
+ GET /data 200 in 20ms
+ GET /dashboard 200 in 313ms
+ ✓ Compiled /api/verdicts in 153ms (1356 modules)
+ ✓ Compiled (1359 modules)
+ GET /api/notifications?limit=40 200 in 598ms
+ GET /api/verdicts?limit=50 200 in 923ms
+ GET /api/notifications?limit=40 200 in 314ms
+ GET /api/verdicts?limit=50 200 in 311ms
+ ✓ Compiled /login/[[...rest]] in 99ms (1369 modules)
+ GET /login 200 in 177ms
+ GET /login/SignIn_clerk_catchall_check_1792691046870 200 in 13ms
+ ✓ Compiled /api/resolve-address in 149ms (1404 modules)
+ POST /api/resolve-address 200 in 1515ms
+ POST /api/resolve-address 200 in 1522ms
+ ✓ Compiled /api/agents/stream in 79ms (1407 modules)
+ ✓ Compiled (1534 modules)
+ POST /api/site-detail 200 in 5364ms
+ POST /api/site-detail 200 in 6798ms
+[grounding] infrastructure: untraceable ["Feb","Apr","Jun","Aug"] — re-prompting once
+[grounding] market-timing: untraceable ["2020","2022","Brooklyn Heights","DUMBO"] — re-prompting once
+[grounding] risk-volatility: untraceable ["Kings County"] — re-prompting once
+ GET /login 200 in 55ms
+ GET /login/SignIn_clerk_catchall_check_1792691105837 200 in 14ms
+ GET /login 200 in 18ms
+ GET /login/SignIn_clerk_catchall_check_1792691110846 200 in 16ms
+ GET /login 200 in 25ms
+ GET /login/SignIn_clerk_catchall_check_1792691168126 200 in 14ms
+ GET /login 200 in 15ms
+ GET /login/SignIn_clerk_catchall_check_1792691170757 200 in 19ms
+[grounding] demand-sentiment: untraceable ["Critically"] — re-prompting once
+[grounding] demand-sentiment: untraceable ["Critically"] — re-prompting once
+ GET /login 200 in 20ms
+ GET /login/SignIn_clerk_catchall_check_1792691230253 200 in 17ms
+ ✓ Compiled /signup/[[...rest]] in 155ms (1362 modules)
+ GET /signup 200 in 252ms
+ GET /signup/SignUp_clerk_catchall_check_1792691234510 200 in 17ms
+ POST /api/agents/stream 200 in 192549ms
+[grounding] synthesis: untraceable ["LIHTC"] — re-prompting once
+ POST /api/agents/stream 200 in 231178ms
+ GET /signup 200 in 18ms
+ GET /signup/SignUp_clerk_catchall_check_1792691292213 200 in 15ms
+ GET /signup 200 in 14ms
+ GET /signup/SignUp_clerk_catchall_check_1792691296408 200 in 15ms
+ GET /dashboard 200 in 330ms
+ ✓ Compiled /api/verdicts in 124ms (1361 modules)
+ ✓ Compiled (1364 modules)
+ GET /api/notifications?limit=40 200 in 736ms
+ GET /api/verdicts?limit=50 200 in 777ms
+ GET /api/notifications?limit=40 200 in 347ms
+ GET /api/verdicts?limit=50 200 in 587ms
+ ✓ Compiled /api/properties in 78ms (1366 modules)
+ ✓ Compiled (1403 modules)
+ GET /api/verdicts?limit=50 200 in 597ms
+ GET /api/notifications?limit=40 200 in 672ms
+ GET /api/properties 200 in 798ms
+ GET /api/notifications?limit=40 200 in 268ms
+ GET /api/properties 200 in 268ms
+ GET /api/verdicts?limit=50 200 in 840ms
+ GET /api/archive 200 in 2280ms
+ GET /api/archive 200 in 456ms
+ ✓ Compiled /api/resolve-address in 104ms (1405 modules)
+ POST /api/resolve-address 200 in 317ms
+ POST /api/properties 200 in 688ms
+ GET /api/properties 200 in 178ms
+ ✓ Compiled /api/site-detail in 88ms (1408 modules)
+ POST /api/resolve-address 200 in 354ms
+ POST /api/properties 200 in 603ms
+ GET /api/properties 200 in 707ms
+ POST /api/site-detail 200 in 5021ms
+ POST /api/site-detail 200 in 7017ms
+ POST /api/site-detail 200 in 23589ms
+ GET /signup 200 in 58ms
+ GET /signup/SignUp_clerk_catchall_check_1792691354393 200 in 16ms
+ GET /signup 200 in 13ms
+ GET /signup/SignUp_clerk_catchall_check_1792691357022 200 in 14ms
+ GET /signup 200 in 20ms
+ GET /signup/SignUp_clerk_catchall_check_1792691416522 200 in 18ms
+ ✓ Compiled in 575ms (2462 modules)
+ ✓ Compiled in 67ms (1092 modules)
+ ✓ Compiled in 183ms (2623 modules)
+ ✓ Compiled in 191ms (2623 modules)
+ ✓ Compiled in 917ms (2449 modules)
+ ✓ Compiled in 567ms (2449 modules)
+ ✓ Compiled in 263ms (2449 modules)
+ ✓ Compiled in 295ms (2637 modules)
+ ✓ Compiled in 149ms (2623 modules)
+ ✓ Compiled in 236ms (2449 modules)
+ ✓ Compiled in 343ms (2449 modules)
+ ✓ Compiled in 338ms (2637 modules)
+ ✓ Compiled in 189ms (2623 modules)
+ ✓ Compiled in 440ms (2435 modules)
+ ✓ Compiled in 328ms (2623 modules)
+ ✓ Compiled in 142ms (2623 modules)
+ ✓ Compiled in 585ms (2451 modules)
+ ✓ Compiled in 211ms (2639 modules)
+ ✓ Compiled in 194ms (2625 modules)
+ ✓ Compiled in 220ms (2451 modules)
+ ✓ Compiled in 67ms (1093 modules)
+ ✓ Compiled in 190ms (2639 modules)
+ ✓ Compiled in 188ms (2625 modules)
+ ✓ Compiled in 354ms (2625 modules)
+ ✓ Compiled in 150ms (2625 modules)
+ ✓ Compiled in 221ms (2625 modules)
+ ✓ Compiled in 137ms (2625 modules)
+ ✓ Compiled in 285ms (1093 modules)
+ ✓ Compiled in 266ms (2639 modules)
+ ✓ Compiled in 134ms (2625 modules)
+ GET /dashboard 200 in 1191ms
+ ✓ Compiled /api/verdicts in 245ms (1362 modules)
+ ✓ Compiled (1365 modules)
+ GET /api/notifications?limit=40 200 in 928ms
+ GET /dashboard?_rsc=syt8b 200 in 532ms
+ GET /api/verdicts?limit=50 200 in 1365ms
+ ✓ Compiled / in 206ms (1386 modules)
+ GET / 200 in 296ms
+ GET /dashboard?_rsc=syt8b 200 in 168ms
+ GET /api/verdicts?limit=50 200 in 1024ms
+ GET /api/notifications?limit=40 200 in 1637ms
+ GET /dashboard 200 in 304ms
+ GET /api/notifications?limit=40 200 in 415ms
+ GET /api/verdicts?limit=50 200 in 474ms
+ GET /api/notifications?limit=40 200 in 397ms
+ GET /api/verdicts?limit=50 200 in 834ms
+ GET /api/verdicts?limit=50 200 in 558ms
+ GET /api/verdicts?limit=50 200 in 756ms
+ GET / 200 in 29ms
+ ✓ Compiled /api/resolve-address in 194ms (1417 modules)
+ GET /dashboard?_rsc=syt8b 200 in 242ms
+ POST /api/resolve-address 200 in 507ms
+ ✓ Compiled /api/site-detail in 137ms (1544 modules)
+ ✓ Compiled in 0ms (1547 modules)
+ ✓ Compiled in 0ms (1547 modules)
+ ✓ Compiled in 0ms (1547 modules)
+ GET /dashboard?_rsc=syt8b 200 in 789ms
+ GET /dashboard?_rsc=syt8b 200 in 539ms
+ GET / 200 in 97ms
+ POST /api/site-detail 200 in 4152ms
+ ✓ Compiled /intelligence in 330ms (1553 modules)
+ GET /intelligence 200 in 392ms
+ GET /dashboard?_rsc=syt8b 200 in 760ms
+ GET /intelligence 200 in 20ms
+ GET /intelligence 200 in 21ms
+[grounding] demand-sentiment: untraceable ["Kings County"] — re-prompting once
+ ✓ Compiled /pricing in 149ms (1553 modules)
+ GET /pricing 200 in 186ms
+ GET /dashboard?_rsc=syt8b 200 in 343ms
+[grounding] market-timing: untraceable ["2020"] — re-prompting once
+ GET /pricing 200 in 22ms
+ GET /pricing 200 in 18ms
+[grounding] risk-volatility: untraceable ["Kings County"] — re-prompting once
+ ✓ Compiled /for/developers in 117ms (1556 modules)
+ GET /for/developers 200 in 155ms
+ GET /dashboard?_rsc=syt8b 200 in 746ms
+ GET /for/developers 200 in 18ms
+ GET /for/developers 200 in 18ms
+ ✓ Compiled /for/agents in 101ms (1544 modules)
+ GET /for/agents 200 in 161ms
+ GET /dashboard?_rsc=syt8b 200 in 410ms
+ GET /for/agents 200 in 24ms
+ GET /for/agents 200 in 19ms
+ ✓ Compiled /for/institutions in 127ms (1355 modules)
+ GET /for/institutions 200 in 216ms
+ GET /dashboard?_rsc=syt8b 200 in 380ms
+ GET /for/institutions 200 in 20ms
+ GET /for/institutions 200 in 13ms
+ POST /api/agents/stream 200 in 89198ms
+ ✓ Compiled /api/notifications in 122ms (1353 modules)
+ GET /api/notifications?bbl=3009890071&limit=20 200 in 522ms
+ GET /api/notifications?bbl=3009890071&limit=20 200 in 367ms
+ ✓ Compiled /for/community in 87ms (1355 modules)
+ GET /for/community 200 in 135ms
+ GET /dashboard?_rsc=syt8b 200 in 301ms
+ GET /for/community 200 in 16ms
+ GET /for/community 200 in 17ms
+ GET /dashboard 200 in 382ms
+ ✓ Compiled /api/verdicts in 133ms (1353 modules)
+ GET /api/notifications?limit=40 200 in 596ms
+ GET /api/verdicts?limit=50 200 in 746ms
+ ✓ Compiled /about in 140ms (1358 modules)
+ GET /api/notifications?limit=40 200 in 283ms
+ GET /about 200 in 250ms
+ GET /api/verdicts?limit=50 200 in 617ms
+ GET /api/verdicts?limit=50 200 in 747ms
+ GET /api/verdicts?limit=50 200 in 392ms
+ GET /about 200 in 22ms
+ ✓ Compiled /api/resolve-address in 157ms (1395 modules)
+ POST /api/resolve-address 200 in 458ms
+ ✓ Compiled /api/site-detail in 128ms (1522 modules)
+ ✓ Compiled (1525 modules)
+ GET /about 200 in 32ms
+ POST /api/site-detail 200 in 4873ms
+ ✓ Compiled /data in 98ms (1531 modules)
+ GET /data 200 in 149ms
+ GET /data 200 in 24ms
+ GET /data 200 in 24ms
+ ✓ Compiled /login/[[...rest]] in 133ms (1539 modules)
+ GET /login 200 in 220ms
+ GET /login/SignIn_clerk_catchall_check_1792692906775 200 in 14ms
+ POST /api/agents/stream 200 in 63568ms
+ GET /dashboard 200 in 517ms
+ GET /api/notifications?limit=40 200 in 256ms
+ GET /api/notifications?limit=40 200 in 353ms
+ GET /api/verdicts?limit=50 200 in 952ms
+ GET /api/verdicts?limit=50 200 in 446ms
+ GET /login 200 in 25ms
+ GET /login/SignIn_clerk_catchall_check_1792692965730 200 in 28ms
+ GET /login 200 in 16ms
+ GET /login/SignIn_clerk_catchall_check_1792692968620 200 in 15ms
+ POST /api/resolve-address 200 in 277ms
+ POST /api/resolve-address 200 in 281ms
+ POST /api/site-detail 200 in 1129ms
+ POST /api/site-detail 200 in 5069ms
+[grounding] demand-sentiment: untraceable ["Kings County"] — re-prompting once
+[grounding] demand-sentiment: untraceable ["Even"] — re-prompting once
+[grounding] regulatory-policy: untraceable ["Qualified Opportunity Fund"] — re-prompting once
+[grounding] market-timing: untraceable ["2020","2022","Brooklyn Heights","DUMBO"] — re-prompting once
+[grounding] infrastructure: untraceable ["Feb","Apr","Jun","Aug"] — re-prompting once
+[grounding] demand-sentiment: WITHHELD an observation that stayed untraceable after retry
+[grounding] risk-volatility: untraceable ["Kings County"] — re-prompting once
+[grounding] market-timing: WITHHELD an observation that stayed untraceable after retry
+ GET /login 200 in 19ms
+ GET /login/SignIn_clerk_catchall_check_1792693027811 200 in 13ms
+ GET /login 200 in 17ms
+ GET /login/SignIn_clerk_catchall_check_1792693030450 200 in 15ms
+ POST /api/agents/stream 200 in 70579ms
+[grounding] synthesis: untraceable ["Partially"] — re-prompting once
+ POST /api/agents/stream 200 in 103990ms
+ GET /login 200 in 17ms
+ GET /login/SignIn_clerk_catchall_check_1792693089931 200 in 18ms
+ ✓ Compiled /signup/[[...rest]] in 190ms (1363 modules)
+ GET /signup 200 in 315ms
+ GET /signup/SignUp_clerk_catchall_check_1792693093151 200 in 16ms
+ GET /dashboard 200 in 456ms
+ ✓ Compiled /api/verdicts in 80ms (1367 modules)
+ ✓ Compiled (1370 modules)
+ GET /api/notifications?limit=40 200 in 608ms
+ GET /api/notifications?limit=40 200 in 414ms
+ GET /api/verdicts?limit=50 200 in 1044ms
+ GET /api/verdicts?limit=50 200 in 398ms
+ ✓ Compiled /api/properties in 157ms (1372 modules)
+ GET /api/notifications?limit=40 200 in 190ms
+ ✓ Compiled in 1ms (1409 modules)
+ ✓ Compiled in 0ms (1409 modules)
+ ✓ Compiled in 0ms (1409 modules)
+ ✓ Compiled in 0ms (1409 modules)
+ GET /api/properties 200 in 867ms
+ GET /api/notifications?limit=40 200 in 675ms
+ GET /dashboard?_rsc=syt8b 200 in 606ms
+ GET /api/verdicts?limit=50 200 in 1062ms
+ GET /api/properties 200 in 199ms
+ ✓ Compiled /api/site-detail in 190ms (1412 modules)
+ GET /api/verdicts?limit=50 200 in 597ms
+ GET /api/archive 200 in 2366ms
+ GET /api/archive 200 in 593ms
+ POST /api/site-detail 200 in 1957ms
+ POST /api/site-detail 200 in 2080ms
+ POST /api/site-detail 200 in 2357ms
+ ✓ Compiled /api/resolve-address in 81ms (1409 modules)
+ POST /api/resolve-address 200 in 360ms
+ POST /api/properties 409 in 379ms
+ POST /api/site-detail 200 in 12012ms
+ POST /api/resolve-address 200 in 295ms
+ POST /api/properties 409 in 361ms
+ ✓ Compiled /api/agents/stream in 148ms (1536 modules)
+ GET /signup 200 in 67ms
+ GET /signup/SignUp_clerk_catchall_check_1792693152107 200 in 18ms
+ GET /signup 200 in 19ms
+ GET /signup/SignUp_clerk_catchall_check_1792693155026 200 in 17ms
+[grounding] demand-sentiment: untraceable ["Purchase","Nearly"] — re-prompting once
+[grounding] market-timing: untraceable ["2020"] — re-prompting once
+ POST /api/agents/stream 200 in 72081ms
+ GET /api/properties 200 in 208ms
+ POST /api/site-detail 200 in 1978ms
+ GET /signup 200 in 19ms
+ GET /signup/SignUp_clerk_catchall_check_1792693214257 200 in 17ms
+ GET /signup 200 in 14ms
+ GET /signup/SignUp_clerk_catchall_check_1792693217207 200 in 16ms
+ POST /api/site-detail 200 in 15237ms
+ GET /signup 200 in 21ms
+ GET /signup/SignUp_clerk_catchall_check_1792693276513 200 in 15ms
+ ✓ Compiled in 699ms (2451 modules)
+ ✓ Compiled in 188ms (2451 modules)
+ ✓ Compiled in 475ms (2451 modules)
+ ✓ Compiled / in 266ms (1379 modules)
+ GET / 200 in 391ms
+ ✓ Compiled in 652ms (2453 modules)
+ ✓ Compiled in 597ms (2453 modules)
+ ✓ Compiled in 567ms (2453 modules)
+ GET /dashboard 200 in 1308ms
+ ✓ Compiled / in 216ms (1363 modules)
+ ✓ Compiled (1387 modules)
+ GET / 200 in 597ms
+ GET /api/notifications?limit=40 200 in 1051ms
+ GET /dashboard?_rsc=syt8b 200 in 374ms
+ GET /api/notifications?limit=40 200 in 355ms
+ GET /api/verdicts?limit=50 200 in 1413ms
+ GET /api/verdicts?limit=50 200 in 369ms
+ GET /dashboard 200 in 158ms
+ ✓ Compiled in 350ms (2669 modules)
+ GET / 200 in 127ms
+ ✓ Compiled in 156ms (2649 modules)
+ GET / 200 in 45ms
+ ✓ Compiled /intelligence in 164ms (1387 modules)
+ GET /intelligence 200 in 201ms
+ GET /intelligence 200 in 24ms
+ GET /intelligence 200 in 17ms
+ ✓ Compiled /pricing in 104ms (1387 modules)
+ GET /pricing 200 in 139ms
+ GET /pricing 200 in 20ms
+ GET /pricing 200 in 25ms
+ ✓ Compiled /for/developers in 109ms (1392 modules)
+ GET /for/developers 200 in 139ms
+ GET /for/developers 200 in 13ms
+ GET /for/developers 200 in 16ms
+ ✓ Compiled /for/agents in 92ms (1392 modules)
+ GET /for/agents 200 in 120ms
+ GET /for/agents 200 in 14ms
+ GET /for/agents 200 in 16ms
+ ✓ Compiled /for/institutions in 143ms (1382 modules)
+ GET /for/institutions 200 in 203ms
+ GET /for/institutions 200 in 16ms
+ GET /for/institutions 200 in 15ms
+ ✓ Compiled /for/community in 96ms (1193 modules)
+ GET /for/community 200 in 183ms
+ GET /for/community 200 in 15ms
+ GET /for/community 200 in 17ms
+ ✓ Compiled /about in 135ms (980 modules)
+ GET /about 200 in 198ms
+ GET /about 200 in 16ms
+ GET /about 200 in 17ms
+ ✓ Compiled /data in 89ms (976 modules)
+ GET /data 200 in 124ms
+ GET /data 200 in 17ms
+ GET /data 200 in 26ms
+ ✓ Compiled /login/[[...rest]] in 129ms (997 modules)
+ GET /login 200 in 193ms
+ GET /login/SignIn_clerk_catchall_check_1792711776138 200 in 17ms
+ GET /login 200 in 18ms
+ GET /login/SignIn_clerk_catchall_check_1792711835673 200 in 17ms
+ GET /login 200 in 16ms
+ GET /login/SignIn_clerk_catchall_check_1792711838233 200 in 16ms
+ GET /login 200 in 19ms
+ GET /login/SignIn_clerk_catchall_check_1792711897904 200 in 14ms
+ GET /login 200 in 15ms
+ GET /login/SignIn_clerk_catchall_check_1792711901159 200 in 17ms
+ GET /login 200 in 17ms
+ GET /login/SignIn_clerk_catchall_check_1792711959924 200 in 18ms
+ ✓ Compiled /signup/[[...rest]] in 191ms (995 modules)
+ GET /signup 200 in 257ms
+ GET /signup/SignUp_clerk_catchall_check_1792711962922 200 in 15ms
+ GET /signup 200 in 19ms
+ GET /signup/SignUp_clerk_catchall_check_1792712022025 200 in 16ms
+ GET /signup 200 in 16ms
+ GET /signup/SignUp_clerk_catchall_check_1792712024457 200 in 15ms
+ GET /signup 200 in 21ms
+ GET /signup/SignUp_clerk_catchall_check_1792712084157 200 in 16ms
+ GET /signup 200 in 18ms
+ GET /signup/SignUp_clerk_catchall_check_1792712086517 200 in 13ms
+ GET /signup 200 in 21ms
+ GET /signup/SignUp_clerk_catchall_check_1792712146275 200 in 12ms
+ ✓ Compiled in 332ms (2261 modules)
+ ✓ Compiled in 129ms (2261 modules)
+ ○ Compiling /dashboard ...
+ ✓ Compiled /dashboard in 551ms (1364 modules)
+ GET /dashboard 200 in 1810ms
+ ✓ Compiled /api/notifications in 144ms (1369 modules)
+ ✓ Compiled (1371 modules)
+ GET /api/notifications?limit=40 200 in 573ms
+ GET /api/notifications?limit=40 200 in 194ms
+ GET /api/verdicts?limit=50 200 in 922ms
+ GET /api/verdicts?limit=50 200 in 936ms
+ GET /dashboard 200 in 196ms
+ GET /api/notifications?limit=40 200 in 262ms
+ GET /api/notifications?limit=40 200 in 130ms
+ GET /api/verdicts?limit=50 200 in 406ms
+ GET /api/verdicts?limit=50 200 in 379ms
+ GET /api/verdicts?limit=50 200 in 435ms
+ GET /api/verdicts?limit=50 200 in 425ms
+ ✓ Compiled /api/resolve-address in 165ms (1403 modules)
+ POST /api/resolve-address 200 in 378ms
+ GET /dashboard?_rsc=syt8b 200 in 310ms
+ ✓ Compiled /api/site-detail in 123ms (1530 modules)
+ ✓ Compiled in 0ms (1533 modules)
+ ✓ Compiled in 0ms (1533 modules)
+ ✓ Compiled in 0ms (1533 modules)
+ GET /dashboard?_rsc=syt8b 200 in 724ms
+ GET /dashboard?_rsc=syt8b 200 in 368ms
+ POST /api/site-detail 200 in 1645ms
+[grounding] demand-sentiment: untraceable ["Kings County"] — re-prompting once
+[grounding] risk-volatility: untraceable ["Kings County"] — re-prompting once
+[grounding] infrastructure: untraceable ["Alterations"] — re-prompting once
+ POST /api/agents/stream 200 in 102547ms
+ GET /api/notifications?bbl=3009890071&limit=20 200 in 192ms
+ GET /api/notifications?bbl=3009890071&limit=20 200 in 287ms
+ GET /dashboard 200 in 205ms
+ GET /api/notifications?limit=40 200 in 739ms
+ GET /api/notifications?limit=40 200 in 137ms
+ GET /api/verdicts?limit=50 200 in 936ms
+ GET /api/verdicts?limit=50 200 in 420ms
+ GET /api/verdicts?limit=50 200 in 536ms
+ GET /api/verdicts?limit=50 200 in 366ms
+ POST /api/resolve-address 200 in 217ms
+ POST /api/site-detail 200 in 2996ms
+[grounding] demand-sentiment: untraceable ["Kings County"] — re-prompting once
+[grounding] regulatory-policy: untraceable ["Regulatory"] — re-prompting once
+[grounding] risk-volatility: untraceable ["Kings County"] — re-prompting once
+ POST /api/agents/stream 200 in 91051ms
+ GET /dashboard 200 in 176ms
+ GET /api/notifications?limit=40 200 in 306ms
+ GET /api/verdicts?limit=50 200 in 580ms
+ GET /api/notifications?limit=40 200 in 285ms
+ GET /api/verdicts?limit=50 200 in 492ms
+ POST /api/resolve-address 200 in 227ms
+ POST /api/resolve-address 200 in 233ms
+ POST /api/site-detail 200 in 3322ms
+ POST /api/site-detail 200 in 3335ms
+[grounding] demand-sentiment: untraceable ["Kings County"] — re-prompting once
+[grounding] market-timing: untraceable ["Individual"] — re-prompting once
+[grounding] market-timing: untraceable ["Brooklyn Heights","DUMBO"] — re-prompting once
+[grounding] risk-volatility: untraceable ["HVAC"] — re-prompting once
+[grounding] risk-volatility: untraceable ["Kings County","HVAC"] — re-prompting once
+ POST /api/agents/stream 200 in 80987ms
+[grounding] synthesis: untraceable ["LIHTC"] — re-prompting once
+ POST /api/agents/stream 200 in 107819ms
+ GET /dashboard 200 in 185ms
+ GET /api/notifications?limit=40 200 in 155ms
+ GET /api/verdicts?limit=50 200 in 410ms
+ GET /api/notifications?limit=40 200 in 375ms
+ GET /api/verdicts?limit=50 200 in 405ms
+ ✓ Compiled /api/properties in 177ms (1368 modules)
+ GET /api/notifications?limit=40 200 in 242ms
+ ✓ Compiled in 1ms (1405 modules)
+ ✓ Compiled in 0ms (1405 modules)
+ ✓ Compiled in 0ms (1405 modules)
+ GET /api/verdicts?limit=50 200 in 597ms
+ ✓ Compiled in 1ms (1405 modules)
+ ✓ Compiled in 0ms (1405 modules)
+ GET /api/notifications?limit=40 200 in 497ms
+ GET /api/properties 200 in 789ms
+ GET /dashboard?_rsc=syt8b 200 in 555ms
+ ✓ Compiled /api/site-detail in 182ms (1408 modules)
+ GET /api/properties 200 in 322ms
+ GET /api/verdicts?limit=50 200 in 717ms
+ POST /api/site-detail 200 in 950ms
+ POST /api/site-detail 200 in 852ms
+ POST /api/site-detail 200 in 1016ms
+ GET /api/archive 200 in 2175ms
+ GET /api/archive 200 in 574ms
+ POST /api/site-detail 200 in 2992ms
+ ✓ Compiled /api/resolve-address in 85ms (1410 modules)
+ POST /api/resolve-address 200 in 317ms
+ POST /api/properties 409 in 392ms
+ POST /api/resolve-address 200 in 199ms
+ POST /api/properties 409 in 302ms
+ ✓ Compiled /api/agents/stream in 193ms (1537 modules)
+[grounding] demand-sentiment: untraceable ["Kings County"] — re-prompting once
+[grounding] market-timing: untraceable ["Sep","Aug"] — re-prompting once
+[grounding] risk-volatility: untraceable ["Kings County"] — re-prompting once
+ POST /api/agents/stream 200 in 79791ms
+ GET /api/properties 200 in 257ms
+ POST /api/site-detail 200 in 498ms
+ POST /api/site-detail 200 in 500ms

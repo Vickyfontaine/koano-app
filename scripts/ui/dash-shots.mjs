@@ -41,8 +41,8 @@ async function snap(page, name) {
     await page.waitForTimeout(500);
     await scrollThrough(page);
     await page.waitForTimeout(300);
-    await page.screenshot({ path: join(OUT, `${name}-${width}.png`), fullPage: true });
-    await page.screenshot({ path: join(OUT, `${name}-${width}-fold.png`), fullPage: false });
+    await page.screenshot({ path: join(OUT, `${name}-${width}.jpg`), fullPage: true, type: "jpeg", quality: 78 });
+    await page.screenshot({ path: join(OUT, `${name}-${width}-fold.jpg`), fullPage: false, type: "jpeg", quality: 78 });
     const a = await audit(page);
     report.push({ name, width, ...a, console: page._koanoConsole.splice(0) });
     console.log(`${name}@${width}${a.horizontalOverflow ? " OVERFLOW" : ""}`);

@@ -1,0 +1,47 @@
+cluster_1-empty@1440
+cluster_1-empty@768
+cluster_1-empty@390 OVERFLOW
+cluster_1-running@1440
+cluster_1-running@768
+cluster_1-running@390 OVERFLOW
+cluster_1-done@1440
+cluster_1-done@768
+cluster_1-done@390 OVERFLOW
+cluster_2-empty@1440
+cluster_2-empty@768
+cluster_2-empty@390 OVERFLOW
+cluster_2-running@1440
+cluster_2-running@768
+cluster_2-running@390 OVERFLOW
+cluster_2-done@1440
+cluster_2-done@768
+cluster_2-done@390 OVERFLOW
+cluster_4-empty@1440
+cluster_4-empty@768
+cluster_4-empty@390 OVERFLOW
+cluster_4-running@1440
+cluster_4-running@768
+cluster_4-running@390 OVERFLOW
+cluster_4-done@1440
+cluster_4-done@768
+cluster_4-done@390 OVERFLOW
+cluster_5-empty@1440
+cluster_5-empty@768
+cluster_5-empty@390 OVERFLOW
+cluster_5-tracked@1440
+cluster_5-tracked@768
+cluster_5-tracked@390 OVERFLOW
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+locator.click: Timeout 30000ms exceeded.
+Call log:
+[2m  - waiting for locator('button:has-text("Analyze")').first()[22m
+
+    at /Users/victor/Desktop/koano-app/scripts/ui/dash-shots.mjs:108:62 {
+  log: [ `  - waiting for locator('button:has-text("Analyze")').first()` ],
+  name: 'TimeoutError'
+}
+
+Node.js v24.14.1

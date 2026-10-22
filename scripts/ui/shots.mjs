@@ -100,11 +100,11 @@ export async function capture(browser, { name, path, width, state, out, base }) 
   await page.waitForTimeout(600);
   await scrollThrough(page);
   await page.waitForTimeout(400);
-  const file = join(out, `${name}-${width}.png`);
-  await page.screenshot({ path: file, fullPage: true });
+  const file = join(out, `${name}-${width}.jpg`);
+  await page.screenshot({ path: file, fullPage: true, type: "jpeg", quality: 78 });
   // A viewport-only "fold" capture too: the full-page image downsamples a long
   // page to the point where type is unreadable; the fold is what a visitor sees.
-  await page.screenshot({ path: join(out, `${name}-${width}-fold.png`), fullPage: false });
+  await page.screenshot({ path: join(out, `${name}-${width}-fold.jpg`), fullPage: false, type: "jpeg", quality: 78 });
   const a = await audit(page);
   await context.close();
   return { name, width, url, file, console: console_, ...a };

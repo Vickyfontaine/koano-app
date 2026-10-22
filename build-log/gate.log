@@ -1,0 +1,104 @@
+  ▲ Next.js 14.2.35
+  - Environments: .env.local
+
+   Creating an optimized production build ...
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (197kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+
+   We detected TypeScript in your project and reconfigured your tsconfig.json file for you. Strict-mode is set to false by default.
+   The following suggested values were added to your tsconfig.json. These values can be changed to fit your project's needs:
+
+   	- include was updated to add '.next-gate/types/**/*.ts'
+
+
+./src/app/layout.tsx
+61:11  Warning: Custom fonts not added in `pages/_document.js` will only load for a single page. This is discouraged. See: https://nextjs.org/docs/messages/no-page-custom-font  @next/next/no-page-custom-font
+
+./src/components/marketing/AboutContent.tsx
+233:9  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/marketing/ClusterLanding.tsx
+105:11  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/marketing/CtaBackground.tsx
+17:5  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/marketing/HeroSection.tsx
+46:7  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/marketing/IntelligenceContent.tsx
+162:9  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/marketing/Nav.tsx
+77:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/marketing/PricingContent.tsx
+142:9  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules
+   Collecting page data ...
+   Generating static pages (0/20) ...
+   Generating static pages (5/20) 
+   Generating static pages (10/20) 
+   Generating static pages (15/20) 
+ ✓ Generating static pages (20/20)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                              Size     First Load JS
+┌ ○ /                                    10.5 kB         164 kB
+├ ○ /_not-found                          872 B          88.3 kB
+├ ○ /about                               3.78 kB         138 kB
+├ ƒ /api/agents                          0 B                0 B
+├ ƒ /api/agents/stream                   0 B                0 B
+├ ƒ /api/archive                         0 B                0 B
+├ ƒ /api/archive/health                  0 B                0 B
+├ ƒ /api/briefing                        0 B                0 B
+├ ƒ /api/cron/archive                    0 B                0 B
+├ ƒ /api/documents                       0 B                0 B
+├ ƒ /api/monitoring                      0 B                0 B
+├ ƒ /api/narrative                       0 B                0 B
+├ ƒ /api/notifications                   0 B                0 B
+├ ƒ /api/profile                         0 B                0 B
+├ ƒ /api/profile/asset                   0 B                0 B
+├ ƒ /api/properties                      0 B                0 B
+├ ƒ /api/resolve-address                 0 B                0 B
+├ ƒ /api/site-detail                     0 B                0 B
+├ ƒ /api/stripe/checkout                 0 B                0 B
+├ ƒ /api/stripe/webhook                  0 B                0 B
+├ ƒ /api/verdicts                        0 B                0 B
+├ ○ /apple-icon.png                      0 B                0 B
+├ ƒ /dashboard                           39.9 kB         179 kB
+├ ƒ /dashboard/settings                  4.58 kB        94.7 kB
+├ ○ /data                                5.51 kB         140 kB
+├ ○ /for/agents                          143 B           137 kB
+├ ○ /for/community                       144 B           137 kB
+├ ○ /for/developers                      143 B           137 kB
+├ ○ /for/institutions                    143 B           137 kB
+├ ○ /icon.png                            0 B                0 B
+├ ○ /intelligence                        7.72 kB         142 kB
+├ ƒ /login/[[...rest]]                   212 B           134 kB
+├ ƒ /onboarding                          2.5 kB          130 kB
+├ ○ /opengraph-image.png                 0 B                0 B
+├ ○ /pricing                             4.86 kB         139 kB
+├ ƒ /signup/[[...rest]]                  212 B           134 kB
+└ ○ /twitter-image.png                   0 B                0 B
++ First Load JS shared by all            87.5 kB
+  ├ chunks/117-64a50022bbfc56ca.js       31.7 kB
+  ├ chunks/fd9d1056-63f8eb66952e04c9.js  53.6 kB
+  └ other shared chunks (total)          2.09 kB
+
+
+ƒ Middleware                             77.5 kB
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+[grounding] market-timing: untraceable ["Individual","Dec","Oct","LTV"] — re-prompting once
+
+Replay fixture — 175 3rd Street, Brooklyn, NY
+  recorded @ 4a29adf0d788 | 23 provider + 7 LLM records (offline)
+  expected: HOLD conf 68 risk 54 prov live | score 0.23 + nudge 0 = 0.23
+  ✓ decision surface BYTE-IDENTICAL on offline replay
+
