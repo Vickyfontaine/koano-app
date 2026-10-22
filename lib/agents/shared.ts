@@ -273,9 +273,9 @@ export async function callAgentLLM(args: {
     );
     console.warn(`[grounding] ${agent}: untraceable ${JSON.stringify(terms)} — re-prompting once`);
     const correction =
-      `Some claims in your response could not be traced to the provided data points: ${terms
+      `Some claims in your response could not be traced to the provided data points, or use language KOANO does not permit: ${terms
         .map((t) => `"${t}"`)
-        .join(', ')}. These read as general knowledge, not sourced facts. Rewrite your reasoning AND headline using ONLY what the data points state — for any coded field (a district letter, zoning code, class, flag), state the code and its value as given and do NOT expand it into names, places, years, programs, or obligations. Return the same JSON object.`;
+        .join(', ')}. Untraceable terms read as general knowledge, not sourced facts; resident-composition and gentrification language (who lives somewhere, their wealth, education, class or origin) is never permitted. Rewrite your reasoning AND headline using ONLY what the data points state — for any coded field (a district letter, zoning code, class, flag), state the code and its value as given and do NOT expand it into names, places, years, programs, or obligations. Describe market signals, never residents. Return the same JSON object.`;
     const second = await runModel([
       { role: 'user', content: userPayload },
       { role: 'assistant', content: first.text },

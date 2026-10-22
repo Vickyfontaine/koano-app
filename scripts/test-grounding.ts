@@ -5,7 +5,7 @@
 // structural citation test. Plus clean cases that must NOT false-positive.
 // Usage: npx tsx scripts/test-grounding.ts
 
-import { buildAllowedTokens, groundObservation, WITHHELD_OBSERVATION } from '../lib/agents/grounding';
+import { buildAllowedTokens, groundObservation, bannedLanguage, WITHHELD_OBSERVATION } from '../lib/agents/grounding';
 import type { DataPoint } from '../lib/providers/types';
 
 let failures = 0;
@@ -55,13 +55,26 @@ check('"outside the Special Flood Hazard Area" grounds', groundObservation('The 
 check('"class C violations are immediately hazardous" grounds', groundObservation('Open class C violations are immediately hazardous.', allowed).grounded);
 
 console.log('\n[5] NO false positive on ordinary sentence-initial vocabulary');
-for (const s of ['Liquidity is compressed in this submarket.', 'Massive alteration volume dominates the tract.', 'Their portfolio carries no open violations.', 'Gentrification is at an early stage here.', 'Treated as indicative only, the fallback value is modest.']) {
+for (const s of ['Liquidity is compressed in this submarket.', 'Massive alteration volume dominates the tract.', 'Their portfolio carries no open violations.', 'Momentum is at an early stage here.', 'Treated as indicative only, the fallback value is modest.']) {
   const r = groundObservation(s, allowed);
   check(`"${s.slice(0, 34)}…" grounds`, r.grounded, r.ungrounded.join(' | '));
 }
 
 console.log('\n[6] The withheld message is stable');
 check('WITHHELD_OBSERVATION is non-empty and self-describing', /withheld/i.test(WITHHELD_OBSERVATION) && /traced/i.test(WITHHELD_OBSERVATION));
+
+console.log('\n[banned] resident-composition / gentrification language is withheld (Phase 0 item 30-8)');
+const BANNED_SAMPLE = 'The tract reads as late-stage gentrification with a high-wealth, college-educated demographic profile supporting price appreciation.';
+const gb = groundObservation(BANNED_SAMPLE, allowed);
+check('flagged as ungrounded', !gb.grounded);
+check('catches "gentrification"', gb.ungrounded.some((t) => /gentrif/i.test(t)));
+check('catches "high-wealth"', gb.ungrounded.some((t) => /high-wealth/i.test(t)));
+check('catches "college-educated"', gb.ungrounded.some((t) => /college-educated/i.test(t)));
+check('catches "demographic profile"', gb.ungrounded.some((t) => /demographic profile/i.test(t)));
+const CLEAN_DEMAND = 'The mortgage originations rose year over year while the denial rate held near a third; employment is contracting, which caps demand.';
+check('clean demand prose passes', groundObservation(CLEAN_DEMAND, allowed).grounded);
+check('bannedLanguage is empty on clean prose', bannedLanguage(CLEAN_DEMAND).length === 0);
+check('"minority signals" (a KOANO term) is not banned', bannedLanguage('the minority signals cut against the call').length === 0);
 
 console.log(`\n${failures === 0 ? '✓ ALL GROUNDING CHECKS PASSED' : `✗ ${failures} CHECK(S) FAILED`}\n`);
 process.exit(failures === 0 ? 0 : 1);

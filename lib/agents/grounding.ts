@@ -123,9 +123,41 @@ function candidateClaims(observation: string): string[] {
   return out;
 }
 
+// BANNED LANGUAGE (UI sprint WS1 / Phase 0 item 30-8): resident-composition and
+// gentrification language may not appear in any stored observation or headline.
+// It is a legal-trust line, not a style preference: the reasoning is immutable,
+// is shown to renters and homeowners, and must never characterize who lives
+// somewhere. Matched case-insensitively; a hit is treated exactly like an
+// untraceable claim (re-prompt once, then withhold).
+const BANNED_LANGUAGE: RegExp[] = [
+  /\bgentrif\w*/i,
+  /\b(high|low)[- ]wealth\b/i,
+  /\baffluen\w*/i,
+  /\bwealthy\b/i,
+  /\bupscale\b/i,
+  /\b(college|well|highly)[- ]educated\b/i,
+  /\bbachelor'?s?\b/i,
+  /\beducation(al)? attainment\b/i,
+  /\bdemographic (profile|shift|change|transition|turnover|makeup|mix)\b/i,
+  /\b(white|blue)[- ]collar\b/i,
+  /\b(ethnic|racial)\w*/i,
+  /\bimmigrant\w*/i,
+  /\bworking[- ]class\b/i,
+  /\bupper[- ]middle[- ]class\b/i,
+];
+
+export function bannedLanguage(text: string): string[] {
+  const hits: string[] = [];
+  for (const re of BANNED_LANGUAGE) {
+    const m = text.match(re);
+    if (m) hits.push(m[0]);
+  }
+  return Array.from(new Set(hits));
+}
+
 export interface GroundingResult {
   grounded: boolean;
-  ungrounded: string[]; // the specific untraceable phrases
+  ungrounded: string[]; // the specific untraceable phrases (and banned terms)
 }
 
 // A candidate is grounded if EVERY component token is in the allowed universe.
@@ -138,6 +170,7 @@ export function groundObservation(observation: string, allowed: Set<string>): Gr
     const ok = tokensOf(cand).every((t) => allowed.has(t));
     if (!ok) ungrounded.push(cand);
   }
+  for (const b of bannedLanguage(observation)) ungrounded.push(b);
   const uniq = Array.from(new Set(ungrounded));
   return { grounded: uniq.length === 0, ungrounded: uniq };
 }
