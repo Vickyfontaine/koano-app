@@ -81,11 +81,11 @@ export default function MonitoringSection() {
         >
           <div
             style={{
-              fontFamily: "'DM Mono', monospace",
-              fontSize: "10px",
+              fontFamily: "var(--font-mono)",
+              fontSize: "11px",
               letterSpacing: "0.08em",
               textTransform: "uppercase",
-              color: "var(--ink-faint)",
+              color: "var(--ink-muted)",
               marginBottom: "16px",
               textAlign: "center",
             }}

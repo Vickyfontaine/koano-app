@@ -95,7 +95,7 @@ export default function HeroSection() {
               variants={fadeUp}
               style={{
                 display: "block",
-                fontFamily: "'DM Mono', monospace",
+                fontFamily: "var(--font-mono)",
                 fontSize: "11px",
                 fontWeight: 500,
                 color: "var(--brand-blue)",
@@ -192,7 +192,7 @@ export default function HeroSection() {
                   )}
                   <span
                     style={{
-                      fontFamily: "'DM Mono', monospace",
+                      fontFamily: "var(--font-mono)",
                       fontSize: "13px",
                       color: "rgba(255, 255, 255, 0.85)",
                       letterSpacing: "0.08em",

@@ -109,8 +109,8 @@ function CoverageChip({ coverage }: { coverage: ProviderCatalogEntry["coverage"]
   return (
     <span
       style={{
-        fontFamily: "'DM Mono', monospace",
-        fontSize: "10px",
+        fontFamily: "var(--font-mono)",
+        fontSize: "11px",
         fontWeight: 500,
         color: coverage === "nyc" ? "var(--mid-blue)" : "var(--ink-muted)",
         letterSpacing: "0.08em",
@@ -233,9 +233,9 @@ export default function DataContent() {
                 </p>
                 <p
                   style={{
-                    fontFamily: "'DM Mono', monospace",
+                    fontFamily: "var(--font-mono)",
                     fontSize: "11px",
-                    color: "var(--ink-faint)",
+                    color: "var(--ink-muted)",
                     letterSpacing: "0.08em",
                     textTransform: "uppercase",
                   }}
@@ -307,7 +307,7 @@ export default function DataContent() {
               >
                 <p
                   style={{
-                    fontFamily: "'DM Mono', monospace",
+                    fontFamily: "var(--font-mono)",
                     fontSize: "11px",
                     fontWeight: 500,
                     color: "var(--brand-blue)",
@@ -447,8 +447,8 @@ export default function DataContent() {
                   >
                     <span
                       style={{
-                        fontFamily: "'DM Mono', monospace",
-                        fontSize: "10px",
+                        fontFamily: "var(--font-mono)",
+                        fontSize: "11px",
                         fontWeight: 500,
                         color: "var(--signal-warning)",
                         letterSpacing: "0.08em",
@@ -462,9 +462,9 @@ export default function DataContent() {
                     </span>
                     <span
                       style={{
-                        fontFamily: "'DM Mono', monospace",
-                        fontSize: "10px",
-                        color: "var(--ink-faint)",
+                        fontFamily: "var(--font-mono)",
+                        fontSize: "11px",
+                        color: "var(--ink-muted)",
                         letterSpacing: "0.08em",
                         textTransform: "uppercase",
                       }}
@@ -496,7 +496,7 @@ export default function DataContent() {
                   {source.swapNote && (
                     <p
                       style={{
-                        fontFamily: "'DM Mono', monospace",
+                        fontFamily: "var(--font-mono)",
                         fontSize: "12px",
                         color: "var(--ink-muted)",
                         letterSpacing: "0.04em",
@@ -575,7 +575,7 @@ export default function DataContent() {
               >
                 <span
                   style={{
-                    fontFamily: "'DM Mono', monospace",
+                    fontFamily: "var(--font-mono)",
                     fontSize: "11px",
                     fontWeight: 500,
                     color: "var(--brand-blue)",

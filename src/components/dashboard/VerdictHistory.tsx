@@ -75,7 +75,7 @@ export default function VerdictHistory({ id }: { id?: string }) {
       <PanelHeader title="Verdict history: append-only audit trail" />
 
       {rows !== null && rows.length > 0 && (
-        <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
           <input
             type="text"
             value={filter}
@@ -85,15 +85,14 @@ export default function VerdictHistory({ id }: { id?: string }) {
             style={{
               flex: 1,
               minWidth: "200px",
-              padding: "8px 14px",
+              padding: "8px 16px",
               borderRadius: "100px",
               border: "1px solid var(--border)",
               background: "var(--white)",
               fontFamily: "inherit",
               fontSize: "13px",
               color: "var(--ink-primary)",
-              outline: "none",
-            }}
+                }}
           />
           {hiddenCount > 0 && (
             <button
@@ -102,8 +101,8 @@ export default function VerdictHistory({ id }: { id?: string }) {
                 border: "1px solid var(--border)",
                 background: showHidden ? "var(--pale-wash)" : "transparent",
                 borderRadius: "100px",
-                padding: "7px 14px",
-                fontFamily: "'DM Mono', monospace",
+                padding: "8px 16px",
+                fontFamily: "var(--font-mono)",
                 fontSize: "11px",
                 letterSpacing: "0.04em",
                 color: "var(--ink-muted)",
@@ -134,7 +133,7 @@ export default function VerdictHistory({ id }: { id?: string }) {
         </p>
       )}
       {rows !== null && visible.length > 0 && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
           {visible.map((r) => {
             const canExpand = Array.isArray(r.agent_summaries) && r.agent_summaries.length > 0;
             const expanded = expandedId === r.id;
@@ -151,7 +150,7 @@ export default function VerdictHistory({ id }: { id?: string }) {
                 <div style={{ display: "flex", alignItems: "baseline", gap: "12px", flexWrap: "wrap" }}>
                   <span
                     style={{
-                      fontFamily: "'DM Mono', monospace",
+                      fontFamily: "var(--font-mono)",
                       fontSize: "12px",
                       fontWeight: 500,
                       textTransform: "uppercase",
@@ -164,7 +163,7 @@ export default function VerdictHistory({ id }: { id?: string }) {
                   <span style={{ fontSize: "13px", color: "var(--ink-secondary)", flex: 1, minWidth: "200px" }}>
                     {r.address_normalized ?? r.address_input}
                   </span>
-                  <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "11px", color: "var(--ink-muted)" }}>
+                  <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--ink-muted)" }}>
                     conf {r.confidence} · risk {r.risk_score} · {r.signal_window_months} mo
                   </span>
                   <ProvenanceBadge provenance={r.overall_provenance} />
@@ -172,21 +171,21 @@ export default function VerdictHistory({ id }: { id?: string }) {
                     <span
                       title="Generated before the grounding gate (2026-08-19). Its narrative was not checked claim-by-claim against the data, so the headline may contain unsourced assertions. The verdict math (Show math) is unaffected. It is deterministic from the stored votes."
                       style={{
-                        fontFamily: "'DM Mono', monospace",
-                        fontSize: "10px",
+                        fontFamily: "var(--font-mono)",
+                        fontSize: "11px",
                         letterSpacing: "0.04em",
                         textTransform: "uppercase",
                         color: "var(--signal-warning)",
                         background: "var(--white)",
                         border: "1px solid var(--signal-warning)",
                         borderRadius: "100px",
-                        padding: "2px 9px",
+                        padding: "2px 8px",
                       }}
                     >
                       Pre-grounding-gate
                     </span>
                   )}
-                  <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "11px", color: "var(--ink-faint)" }}>
+                  <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--ink-muted)" }}>
                     {new Date(r.created_at).toLocaleDateString()}
                   </span>
                   {canExpand && (
@@ -196,9 +195,9 @@ export default function VerdictHistory({ id }: { id?: string }) {
                         border: "1px solid var(--border)",
                         background: "transparent",
                         borderRadius: "100px",
-                        padding: "3px 12px",
-                        fontFamily: "'DM Mono', monospace",
-                        fontSize: "10px",
+                        padding: "4px 12px",
+                        fontFamily: "var(--font-mono)",
+                        fontSize: "11px",
                         letterSpacing: "0.04em",
                         color: "var(--ink-muted)",
                         cursor: "pointer",
@@ -215,11 +214,11 @@ export default function VerdictHistory({ id }: { id?: string }) {
                       border: "1px solid var(--border)",
                       background: "transparent",
                       borderRadius: "100px",
-                      padding: "3px 12px",
-                      fontFamily: "'DM Mono', monospace",
-                      fontSize: "10px",
+                      padding: "4px 12px",
+                      fontFamily: "var(--font-mono)",
+                      fontSize: "11px",
                       letterSpacing: "0.04em",
-                      color: "var(--ink-faint)",
+                      color: "var(--ink-muted)",
                       cursor: busyId === r.id ? "wait" : "pointer",
                     }}
                   >

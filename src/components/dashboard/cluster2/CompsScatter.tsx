@@ -87,7 +87,7 @@ export default function CompsScatter({
         yTicks={yTicks}
         refLine={{ y: indicative, label: `indicative ${money(indicative)}/sf` }}
       />
-      <p style={{ fontSize: "12px", color: "var(--ink-faint)", margin: 0, lineHeight: 1.5 }}>
+      <p style={{ fontSize: "12px", color: "var(--ink-muted)", margin: 0, lineHeight: 1.5 }}>
         {data.sales_count > comps.length
           ? `The ${comps.length} nearest of ${data.sales_count.toLocaleString()} qualifying residential sales within ~1 mile`
           : `${comps.length} qualifying residential sales within ~1 mile`}

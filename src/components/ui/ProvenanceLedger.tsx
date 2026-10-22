@@ -25,7 +25,7 @@ interface ProvenanceLedgerProps {
 }
 
 const mono: React.CSSProperties = {
-  fontFamily: "'DM Mono', monospace",
+  fontFamily: "var(--font-mono)",
   fontSize: "11px",
   letterSpacing: "0.04em",
 };
@@ -77,7 +77,7 @@ export default function ProvenanceLedger({ dataPoints, locationConfidence, addre
         }}
       >
         <span>
-          <span style={{ ...mono, textTransform: "uppercase", color: "var(--ink-faint)" }}>Provenance ledger</span>
+          <span style={{ ...mono, textTransform: "uppercase", color: "var(--ink-muted)" }}>Provenance ledger</span>
           <span style={{ fontSize: "13px", color: "var(--ink-muted)", marginLeft: "10px" }}>
             {points.length} figures · {liveCount} live{nonLiveCount > 0 ? ` · ${nonLiveCount} non-live` : ""}
           </span>
@@ -106,7 +106,7 @@ export default function ProvenanceLedger({ dataPoints, locationConfidence, addre
             </div>
           ) : (
             address && (
-              <p style={{ ...mono, color: "var(--ink-faint)", margin: 0 }}>
+              <p style={{ ...mono, color: "var(--ink-muted)", margin: 0 }}>
                 Location confirmed (two geocoders agreed) · every figure below is for {address}
               </p>
             )
@@ -135,7 +135,7 @@ export default function ProvenanceLedger({ dataPoints, locationConfidence, addre
                       gridTemplateColumns: "minmax(160px, 1.4fr) minmax(80px, 1fr) auto minmax(120px, 1.2fr)",
                       gap: "12px",
                       alignItems: "baseline",
-                      padding: "7px 0",
+                      padding: "8px 0",
                       borderTop: "1px solid var(--border-light)",
                     }}
                   >
@@ -143,18 +143,18 @@ export default function ProvenanceLedger({ dataPoints, locationConfidence, addre
                     <span style={{ ...mono, fontSize: "12px", color: "var(--ink-primary)", wordBreak: "break-word" }}>
                       {String(d.value ?? "—")}
                     </span>
-                    <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
                       <ProvenanceBadge provenance={d.provenance} />
                       {unconfirmed && (
                         <span
                           title="Location unverified. This figure may be for a nearby lot"
-                          style={{ ...mono, fontSize: "9px", color: "var(--signal-warning)", border: "1px solid var(--signal-warning)", borderRadius: "100px", padding: "1px 6px", textTransform: "uppercase" }}
+                          style={{ ...mono, fontSize: "11px", color: "var(--signal-warning)", border: "1px solid var(--signal-warning)", borderRadius: "100px", padding: "2px 8px", textTransform: "uppercase" }}
                         >
                           loc?
                         </span>
                       )}
                     </span>
-                    <span style={{ ...mono, fontSize: "10px", color: "var(--ink-faint)", wordBreak: "break-word" }}>
+                    <span style={{ ...mono, fontSize: "11px", color: "var(--ink-muted)", wordBreak: "break-word" }}>
                       {d.source}
                     </span>
                   </div>

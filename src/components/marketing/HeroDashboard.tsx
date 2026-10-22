@@ -91,8 +91,8 @@ export default function HeroDashboard() {
         <div style={{ minWidth: 0 }}>
           <div
             style={{
-              fontFamily: "'DM Mono', monospace",
-              fontSize: "10px",
+              fontFamily: "var(--font-mono)",
+              fontSize: "11px",
               letterSpacing: "0.12em",
               textTransform: "uppercase",
               color: "rgba(255,255,255,0.55)",
@@ -111,7 +111,7 @@ export default function HeroDashboard() {
             transition={done ? { duration: 0.3 } : { duration: 1.1, repeat: Infinity, ease: "easeInOut" }}
             style={{ width: "7px", height: "7px", borderRadius: "50%", background: done ? "var(--signal-positive)" : "var(--mid-blue)" }}
           />
-          <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "10px", letterSpacing: "0.06em", color: "rgba(255,255,255,0.7)" }}>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", letterSpacing: "0.06em", color: "rgba(255,255,255,0.7)" }}>
             {status}
           </span>
         </div>
@@ -132,15 +132,15 @@ export default function HeroDashboard() {
               style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px", padding: "9px 0", borderBottom: "1px solid rgba(255,255,255,0.1)" }}
             >
               <div style={{ minWidth: 0 }}>
-                <div style={{ fontSize: "13.5px", fontWeight: 500, color: "rgba(255,255,255,0.92)", lineHeight: 1.25 }}>{a.name}</div>
-                <div style={{ fontFamily: "'DM Mono', monospace", fontSize: "11px", color: "rgba(255,255,255,0.55)", marginTop: "2px" }}>{a.tag}</div>
+                <div style={{ fontSize: "14px", fontWeight: 500, color: "rgba(255,255,255,0.92)", lineHeight: 1.25 }}>{a.name}</div>
+                <div style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "rgba(255,255,255,0.55)", marginTop: "2px" }}>{a.tag}</div>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
-                <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>{a.conf}%</span>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>{a.conf}%</span>
                 <span
                   style={{
-                    fontFamily: "'DM Mono', monospace",
-                    fontSize: "10px",
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "11px",
                     fontWeight: 600,
                     letterSpacing: "0.06em",
                     textTransform: "uppercase",
@@ -173,23 +173,23 @@ export default function HeroDashboard() {
       >
         <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: "12px" }}>
           <div>
-            <div style={{ fontFamily: "'DM Mono', monospace", fontSize: "10px", letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)", marginBottom: "3px" }}>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: "11px", letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)", marginBottom: "3px" }}>
               Synthesis · one verdict
             </div>
             <div style={{ fontSize: "34px", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1, color: "var(--signal-positive)" }}>
               {(EXAMPLE_VERDICT.verdict as string).toUpperCase()}
             </div>
           </div>
-          <div style={{ textAlign: "right", fontFamily: "'DM Mono', monospace", fontSize: "11px", color: "rgba(255,255,255,0.6)", lineHeight: 1.7 }}>
+          <div style={{ textAlign: "right", fontFamily: "var(--font-mono)", fontSize: "11px", color: "rgba(255,255,255,0.6)", lineHeight: 1.7 }}>
             <div><b style={{ color: "#FFFFFF" }}>{EXAMPLE_VERDICT.confidence}</b> confidence</div>
             <div><b style={{ color: "#FFFFFF" }}>{EXAMPLE_VERDICT.risk_score}</b> risk</div>
             <div><b style={{ color: "#FFFFFF" }}>{EXAMPLE_VERDICT.signal_window_months}mo</b> window</div>
           </div>
         </div>
-        <div style={{ fontSize: "12.5px", color: "rgba(255,255,255,0.75)", lineHeight: 1.5, marginTop: "12px" }}>{DRIVER}</div>
+        <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.75)", lineHeight: 1.5, marginTop: "12px" }}>{DRIVER}</div>
         <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "12px" }}>
           <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "var(--signal-positive)" }} />
-          <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "10px", letterSpacing: "0.06em", color: "rgba(255,255,255,0.6)" }}>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", letterSpacing: "0.06em", color: "rgba(255,255,255,0.6)" }}>
             Live · every figure sourced
           </span>
         </div>

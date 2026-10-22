@@ -32,7 +32,7 @@ export default function PermitHistoryPanel({ permits, error, id }: PermitHistory
       <div style={{ ...panelTitle, marginBottom: "2px" }}>This building: all-time</div>
       <Row label="Permits on record" value={fmtInt(allTime)} />
       <Row label="Most recent permit" value={mostRecent ?? "None on record"} />
-      <p style={{ fontSize: "11px", color: "var(--ink-faint)", margin: "0 0 4px" }}>
+      <p style={{ fontSize: "11px", color: "var(--ink-muted)", margin: "0 0 4px" }}>
         DOB NOW (2021+) merged with DOB&rsquo;s legacy permit dataset, which is frozen at June 2020.
         A short or empty history reflects permits filed, not all work done.
       </p>
@@ -55,14 +55,14 @@ export default function PermitHistoryPanel({ permits, error, id }: PermitHistory
       {d.recent_permits.length > 0 && (
         <div style={{ paddingTop: "8px" }}>
           <div style={{ ...panelTitle, marginBottom: "8px" }}>Recent: building &amp; nearby</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
             {d.recent_permits.slice(0, 5).map((p, i) => (
               <div
                 key={i}
                 style={{
                   display: "flex",
                   justifyContent: "space-between",
-                  gap: "10px",
+                  gap: "8px",
                   fontSize: "12px",
                   color: "var(--ink-secondary)",
                 }}
@@ -72,7 +72,7 @@ export default function PermitHistoryPanel({ permits, error, id }: PermitHistory
                   {p.work_type ? ` · ${p.work_type}` : ""}
                   {p.permit_status ? ` · ${p.permit_status}` : ""}
                 </span>
-                <span style={{ fontFamily: "'DM Mono', monospace", color: "var(--ink-faint)" }}>
+                <span style={{ fontFamily: "var(--font-mono)", color: "var(--ink-muted)" }}>
                   {p.issuance_date.slice(0, 10)}
                 </span>
               </div>
@@ -80,7 +80,7 @@ export default function PermitHistoryPanel({ permits, error, id }: PermitHistory
           </div>
         </div>
       )}
-      <p style={{ fontSize: "11px", color: "var(--ink-faint)", margin: 0 }}>{d.scope_note}</p>
+      <p style={{ fontSize: "11px", color: "var(--ink-muted)", margin: 0 }}>{d.scope_note}</p>
     </div>
   );
 }

@@ -20,9 +20,9 @@ export default function LocationConfidenceNote({
       style={{
         border: "1px solid var(--border)",
         borderLeft: "3px solid var(--signal-warning)",
-        borderRadius: "0 12px 12px 0",
+        borderRadius: "0 var(--radius-inner) var(--radius-inner) 0",
         background: "rgba(245, 158, 11, 0.06)",
-        padding: "14px 18px",
+        padding: "16px 24px",
       }}
     >
       <p style={{ fontSize: "13px", fontWeight: 500, color: "var(--ink-primary)", margin: 0 }}>

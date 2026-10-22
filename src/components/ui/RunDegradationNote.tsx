@@ -22,8 +22,8 @@ export default function RunDegradationNote({ degradation }: { degradation?: RunD
       style={{
         border: "1px solid var(--border)",
         borderLeft: "3px solid var(--signal-warning)",
-        borderRadius: "0 12px 12px 0",
-        padding: "14px 18px",
+        borderRadius: "0 var(--radius-inner) var(--radius-inner) 0",
+        padding: "16px 24px",
         maxWidth: "680px",
       }}
     >

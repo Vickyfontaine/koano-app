@@ -17,7 +17,7 @@ export default function VerdictWorkbench() {
   const { status, result } = stream;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
       <AddressInput onSubmit={stream.run} busy={status === "running"} />
 
       {status === "idle" && (
@@ -47,15 +47,15 @@ export default function VerdictWorkbench() {
           style={{
             border: "1px solid var(--border)",
             borderLeft: "3px solid var(--signal-negative)",
-            borderRadius: "0 12px 12px 0",
-            padding: "16px 20px",
+            borderRadius: "0 var(--radius-inner) var(--radius-inner) 0",
+            padding: "16px 24px",
             maxWidth: "620px",
           }}
         >
           <p style={{ fontSize: "14px", color: "var(--ink-secondary)", margin: 0 }}>
             Analysis failed: {stream.error}
           </p>
-          <p style={{ fontSize: "12px", color: "var(--ink-faint)", margin: "6px 0 0" }}>
+          <p style={{ fontSize: "12px", color: "var(--ink-muted)", margin: "6px 0 0" }}>
             Live NYC data is deepest. Try a New York City street address.
           </p>
         </div>
@@ -71,9 +71,9 @@ export default function VerdictWorkbench() {
           />
           <p
             style={{
-              fontFamily: "'DM Mono', monospace",
+              fontFamily: "var(--font-mono)",
               fontSize: "11px",
-              color: "var(--ink-faint)",
+              color: "var(--ink-muted)",
               margin: 0,
             }}
           >

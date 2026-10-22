@@ -44,7 +44,7 @@ export default function CmaBuilder({ detail, detailError, id }: CmaBuilderProps)
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-              gap: "6px 24px",
+              gap: "8px 24px",
             }}
           >
             <Row label="Building area" value={`${fmtInt(zoning.data.building_area_sqft)} sq ft`} />
@@ -57,13 +57,13 @@ export default function CmaBuilder({ detail, detailError, id }: CmaBuilderProps)
 
       {/* Comparable sales — LIVE NYC recorded sales (DOF Rolling Sales) */}
       {comps?.data && comps.data.comps.length > 0 ? (
-        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
           <div
             style={{
               borderLeft: "3px solid var(--mid-blue)",
               background: "var(--pale-wash)",
-              borderRadius: "0 12px 12px 0",
-              padding: "10px 14px",
+              borderRadius: "0 var(--radius-inner) var(--radius-inner) 0",
+              padding: "8px 16px",
               fontSize: "12px",
               color: "var(--ink-secondary)",
             }}
@@ -92,19 +92,19 @@ export default function CmaBuilder({ detail, detailError, id }: CmaBuilderProps)
               <tbody>
                 {comps.data.comps.map((comp, i) => (
                   <tr key={i}>
-                    <td style={{ padding: "10px 12px", fontSize: "13px", color: "var(--ink-secondary)", borderBottom: "1px solid var(--border-light)" }}>
+                    <td style={{ padding: "8px 12px", fontSize: "13px", color: "var(--ink-secondary)", borderBottom: "1px solid var(--border-light)" }}>
                       {comp.address}
                     </td>
-                    <td style={{ padding: "10px 12px", fontFamily: "'DM Mono', monospace", fontSize: "13px", color: "var(--ink-primary)", borderBottom: "1px solid var(--border-light)" }}>
+                    <td style={{ padding: "8px 12px", fontFamily: "var(--font-mono)", fontSize: "13px", color: "var(--ink-primary)", borderBottom: "1px solid var(--border-light)" }}>
                       {fmtMoney(comp.sale_price)}
                     </td>
-                    <td style={{ padding: "10px 12px", fontFamily: "'DM Mono', monospace", fontSize: "12px", color: "var(--ink-muted)", borderBottom: "1px solid var(--border-light)" }}>
+                    <td style={{ padding: "8px 12px", fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--ink-muted)", borderBottom: "1px solid var(--border-light)" }}>
                       {comp.sale_date}
                     </td>
-                    <td style={{ padding: "10px 12px", fontFamily: "'DM Mono', monospace", fontSize: "13px", color: "var(--ink-primary)", borderBottom: "1px solid var(--border-light)" }}>
+                    <td style={{ padding: "8px 12px", fontFamily: "var(--font-mono)", fontSize: "13px", color: "var(--ink-primary)", borderBottom: "1px solid var(--border-light)" }}>
                       {fmtInt(comp.gross_square_feet)}
                     </td>
-                    <td style={{ padding: "10px 12px", fontFamily: "'DM Mono', monospace", fontSize: "13px", color: "var(--ink-primary)", borderBottom: "1px solid var(--border-light)" }}>
+                    <td style={{ padding: "8px 12px", fontFamily: "var(--font-mono)", fontSize: "13px", color: "var(--ink-primary)", borderBottom: "1px solid var(--border-light)" }}>
                       {fmtMoney(comp.price_per_sqft)}
                     </td>
                   </tr>
@@ -126,7 +126,7 @@ export default function CmaBuilder({ detail, detailError, id }: CmaBuilderProps)
       )}
 
       {/* Early-signal overlay — live indicators that lead the MLS */}
-      <div style={{ borderTop: "1px solid var(--border-light)", paddingTop: "14px", display: "flex", flexDirection: "column", gap: "10px" }}>
+      <div style={{ borderTop: "1px solid var(--border-light)", paddingTop: "14px", display: "flex", flexDirection: "column", gap: "8px" }}>
         <span style={panelTitle}>Early-signal overlay: live indicators that lead the MLS</span>
         {earlySignals.length === 0 ? (
           <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
@@ -134,7 +134,7 @@ export default function CmaBuilder({ detail, detailError, id }: CmaBuilderProps)
           </p>
         ) : (
           earlySignals.map((s, i) => (
-            <div key={i} style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
+            <div key={i} style={{ display: "flex", gap: "8px", alignItems: "flex-start" }}>
               <span
                 aria-hidden="true"
                 style={{
@@ -153,11 +153,11 @@ export default function CmaBuilder({ detail, detailError, id }: CmaBuilderProps)
                           : "var(--mid-blue)",
                 }}
               />
-              <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                 <span style={{ fontSize: "13px", lineHeight: 1.5, color: "var(--ink-secondary)" }}>
                   {s.text}
                 </span>
-                <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "10px", color: "var(--ink-faint)" }}>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--ink-muted)" }}>
                   {s.source}
                 </span>
               </div>

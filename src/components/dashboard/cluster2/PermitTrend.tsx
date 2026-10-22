@@ -60,7 +60,7 @@ export default function PermitTrend({
         borderColor={DOMAIN_DEVELOPMENT_EDGE}
         ariaLabel="Monthly permit counts, last 24 months"
       />
-      <p style={{ fontSize: "12px", color: "var(--ink-faint)", margin: 0, lineHeight: 1.5 }}>
+      <p style={{ fontSize: "12px", color: "var(--ink-muted)", margin: 0, lineHeight: 1.5 }}>
         {data.total_permits_24mo.toLocaleString()} permits issued in the last 24 months:
         {" "}
         {data.new_building_permits.toLocaleString()} new-building, {data.demolition_permits.toLocaleString()} demolition,{" "}

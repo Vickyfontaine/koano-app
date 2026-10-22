@@ -40,10 +40,10 @@ export default function ValuationPanel({ detail, detailError, id }: ValuationPan
 
       {/* Indicative value — live recorded-sale $/sq ft × live PLUTO area */}
       <div>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
           <span
             style={{
-              fontFamily: "'DM Mono', monospace",
+              fontFamily: "var(--font-mono)",
               fontSize: "32px",
               fontWeight: 500,
               color: "var(--ink-primary)",
@@ -62,7 +62,7 @@ export default function ValuationPanel({ detail, detailError, id }: ValuationPan
         </p>
       </div>
 
-      <div style={{ borderTop: "1px solid var(--border-light)", paddingTop: "14px", display: "flex", flexDirection: "column", gap: "10px" }}>
+      <div style={{ borderTop: "1px solid var(--border-light)", paddingTop: "14px", display: "flex", flexDirection: "column", gap: "8px" }}>
         {comps?.data && comps.data.sales_count > 0 && (
           <Row
             label="Recorded residential sales (ZIP, 12mo)"
@@ -101,7 +101,7 @@ export default function ValuationPanel({ detail, detailError, id }: ValuationPan
         )}
       </div>
 
-      <p style={{ fontSize: "11px", color: "var(--ink-faint)", margin: 0 }}>
+      <p style={{ fontSize: "11px", color: "var(--ink-muted)", margin: 0 }}>
         Assembled from the sources above, each badged with its provenance, not a live appraisal.
       </p>
     </div>

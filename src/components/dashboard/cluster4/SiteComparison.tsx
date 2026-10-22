@@ -50,11 +50,11 @@ interface DetailState {
 const idleDetail: DetailState = { loading: false, data: null, error: null };
 
 const monoLabel: React.CSSProperties = {
-  fontFamily: "'DM Mono', monospace",
-  fontSize: "10px",
+  fontFamily: "var(--font-mono)",
+  fontSize: "11px",
   letterSpacing: "0.08em",
   textTransform: "uppercase",
-  color: "var(--ink-faint)",
+  color: "var(--ink-muted)",
 };
 
 export default function SiteComparison() {
@@ -209,7 +209,7 @@ export default function SiteComparison() {
           }}
         >
           {SLOT_LABELS.map((label, i) => (
-            <div key={label} style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            <div key={label} style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
               <label htmlFor={`site-${i}`} style={monoLabel}>
                 {label}
               </label>
@@ -230,8 +230,7 @@ export default function SiteComparison() {
                   fontFamily: "inherit",
                   fontSize: "14px",
                   color: "var(--ink-primary)",
-                  outline: "none",
-                }}
+                  }}
               />
             </div>
           ))}
@@ -249,7 +248,7 @@ export default function SiteComparison() {
             {running ? "Comparing sites…" : "Run comparison"}
             {!running && <span aria-hidden="true">↗</span>}
           </button>
-          <span style={{ fontSize: "12px", color: "var(--ink-faint)" }}>
+          <span style={{ fontSize: "12px", color: "var(--ink-muted)" }}>
             Up to three sites · all five agents run on each · ~1–3 min
           </span>
         </div>
@@ -282,7 +281,7 @@ export default function SiteComparison() {
               style={{
                 border: "1px solid var(--border)",
                 borderLeft: "3px solid var(--signal-negative)",
-                borderRadius: "0 12px 12px 0",
+                borderRadius: "0 var(--radius-inner) var(--radius-inner) 0",
                 padding: "12px 16px",
                 maxWidth: "620px",
               }}
@@ -381,7 +380,7 @@ export default function SiteComparison() {
                         style={{
                           ...monoLabel,
                           textAlign: "left",
-                          padding: "10px 14px",
+                          padding: "8px 16px",
                           borderBottom: "1px solid var(--border)",
                         }}
                       >
@@ -398,28 +397,28 @@ export default function SiteComparison() {
                   const reg = v.agent_summaries.find((s) => s.agent === "regulatory-policy");
                   return (
                     <tr key={slot}>
-                      <td style={{ padding: "12px 14px", fontFamily: "'DM Mono', monospace", fontSize: "14px", color: "var(--ink-primary)", borderBottom: "1px solid var(--border-light)" }}>
+                      <td style={{ padding: "12px 16px", fontFamily: "var(--font-mono)", fontSize: "14px", color: "var(--ink-primary)", borderBottom: "1px solid var(--border-light)" }}>
                         #{rank + 1}
                       </td>
-                      <td style={{ padding: "12px 14px", fontSize: "13px", color: "var(--ink-secondary)", borderBottom: "1px solid var(--border-light)" }}>
+                      <td style={{ padding: "12px 16px", fontSize: "13px", color: "var(--ink-secondary)", borderBottom: "1px solid var(--border-light)" }}>
                         {r.resolved_address.normalized}
                       </td>
-                      <td style={{ padding: "12px 14px", fontFamily: "'DM Mono', monospace", fontSize: "13px", textTransform: "uppercase", fontWeight: 500, color: VERDICT_COLORS[v.verdict], borderBottom: "1px solid var(--border-light)" }}>
+                      <td style={{ padding: "12px 16px", fontFamily: "var(--font-mono)", fontSize: "13px", textTransform: "uppercase", fontWeight: 500, color: VERDICT_COLORS[v.verdict], borderBottom: "1px solid var(--border-light)" }}>
                         {v.verdict}
                       </td>
-                      <td style={{ padding: "12px 14px", fontFamily: "'DM Mono', monospace", fontSize: "13px", color: "var(--ink-primary)", borderBottom: "1px solid var(--border-light)" }}>
+                      <td style={{ padding: "12px 16px", fontFamily: "var(--font-mono)", fontSize: "13px", color: "var(--ink-primary)", borderBottom: "1px solid var(--border-light)" }}>
                         {v.confidence}
                       </td>
-                      <td style={{ padding: "12px 14px", fontFamily: "'DM Mono', monospace", fontSize: "13px", color: "var(--ink-primary)", borderBottom: "1px solid var(--border-light)" }}>
+                      <td style={{ padding: "12px 16px", fontFamily: "var(--font-mono)", fontSize: "13px", color: "var(--ink-primary)", borderBottom: "1px solid var(--border-light)" }}>
                         {v.risk_score}
                       </td>
-                      <td style={{ padding: "12px 14px", fontFamily: "'DM Mono', monospace", fontSize: "13px", color: "var(--ink-primary)", borderBottom: "1px solid var(--border-light)" }}>
+                      <td style={{ padding: "12px 16px", fontFamily: "var(--font-mono)", fontSize: "13px", color: "var(--ink-primary)", borderBottom: "1px solid var(--border-light)" }}>
                         {reg ? `${reg.risk_score}/100` : "—"}
                       </td>
-                      <td style={{ padding: "12px 14px", fontFamily: "'DM Mono', monospace", fontSize: "13px", color: "var(--ink-primary)", borderBottom: "1px solid var(--border-light)" }}>
+                      <td style={{ padding: "12px 16px", fontFamily: "var(--font-mono)", fontSize: "13px", color: "var(--ink-primary)", borderBottom: "1px solid var(--border-light)" }}>
                         {v.signal_window_months} mo
                       </td>
-                      <td style={{ padding: "12px 14px", borderBottom: "1px solid var(--border-light)" }}>
+                      <td style={{ padding: "12px 16px", borderBottom: "1px solid var(--border-light)" }}>
                         <ProvenanceBadge provenance={v.overall_provenance} />
                       </td>
                     </tr>
@@ -440,7 +439,7 @@ export default function SiteComparison() {
                 <div style={{ display: "flex", alignItems: "baseline", gap: "12px", marginTop: "8px" }}>
                   <span
                     style={{
-                      fontFamily: "'DM Mono', monospace",
+                      fontFamily: "var(--font-mono)",
                       fontSize: "13px",
                       fontWeight: 500,
                       color: "var(--brand-blue)",
@@ -460,7 +459,7 @@ export default function SiteComparison() {
                     {r.resolved_address.normalized}
                   </h3>
                   {r.resolved_address.bbl && (
-                    <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "11px", color: "var(--ink-faint)" }}>
+                    <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--ink-muted)" }}>
                       BBL {r.resolved_address.bbl}
                     </span>
                   )}
@@ -529,8 +528,8 @@ export default function SiteComparison() {
           style={{
             border: "1px solid var(--border)",
             borderLeft: "3px solid var(--signal-negative)",
-            borderRadius: "0 12px 12px 0",
-            padding: "16px 20px",
+            borderRadius: "0 var(--radius-inner) var(--radius-inner) 0",
+            padding: "16px 24px",
             maxWidth: "620px",
           }}
         >
@@ -539,7 +538,7 @@ export default function SiteComparison() {
               {SLOT_LABELS[i]} ({addresses[i]}): {streams[i].error}
             </p>
           ))}
-          <p style={{ fontSize: "12px", color: "var(--ink-faint)", margin: "6px 0 0" }}>
+          <p style={{ fontSize: "12px", color: "var(--ink-muted)", margin: "6px 0 0" }}>
             Live NYC data is deepest. Try New York City street addresses.
           </p>
         </div>

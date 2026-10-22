@@ -43,7 +43,6 @@ export default function AddressInput({ onSubmit, busy = false }: AddressInputPro
           fontFamily: "inherit",
           fontSize: "15px",
           color: "var(--ink-primary)",
-          outline: "none",
         }}
       />
       <button

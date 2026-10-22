@@ -14,7 +14,7 @@ export default function SectionNumber({
   className = "",
 }: SectionNumberProps) {
   return (
-    <span className={`section-number ${className}`}>
+    <span className={`section-number ${className}`} aria-hidden="true">
       {number}
       {label && <> · {label}</>}
     </span>

@@ -52,7 +52,7 @@ export default function Footer() {
           <span
             style={{
               fontSize: "13px",
-              color: "var(--ink-faint)",
+              color: "var(--ink-muted)",
               fontWeight: 400,
             }}
           >

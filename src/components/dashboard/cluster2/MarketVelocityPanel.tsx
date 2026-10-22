@@ -24,27 +24,27 @@ function StatTile({ tile }: { tile: Tile }) {
     <div
       style={{
         border: "1px solid var(--border-light)",
-        borderRadius: "12px",
+        borderRadius: "var(--radius-inner)",
         padding: "16px",
         display: "flex",
         flexDirection: "column",
-        gap: "6px",
+        gap: "8px",
       }}
     >
       <span
         style={{
-          fontFamily: "'DM Mono', monospace",
-          fontSize: "10px",
+          fontFamily: "var(--font-mono)",
+          fontSize: "11px",
           letterSpacing: "0.08em",
           textTransform: "uppercase",
-          color: "var(--ink-faint)",
+          color: "var(--ink-muted)",
         }}
       >
         {tile.label}
       </span>
       <span
         style={{
-          fontFamily: "'DM Mono', monospace",
+          fontFamily: "var(--font-mono)",
           fontSize: "22px",
           fontWeight: 500,
           color: "var(--ink-primary)",

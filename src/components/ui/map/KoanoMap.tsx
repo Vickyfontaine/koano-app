@@ -172,7 +172,7 @@ function markerSvg(kind: MarkerKind, provenance: Provenance, accent?: string, un
 }
 
 function provDotColor(p: Provenance): string {
-  return PROVENANCE_META[p].color;
+  return PROVENANCE_META[p].fill;
 }
 
 function legendGlyph(
@@ -469,7 +469,7 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
         style={{
           height,
           border: "1px solid var(--border)",
-          borderRadius: "20px",
+          borderRadius: "var(--radius-card)",
           background: "var(--pale-wash)",
           display: "flex",
           alignItems: "center",
@@ -482,8 +482,8 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
           {failed ? "Map failed to load." : "Map needs a Mapbox token."}{" "}
           {!TOKEN && (
             <>
-              Set <code style={{ fontFamily: "'DM Mono', monospace" }}>NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN</code> in{" "}
-              <code style={{ fontFamily: "'DM Mono', monospace" }}>.env.local</code>.
+              Set <code style={{ fontFamily: "var(--font-mono)" }}>NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN</code> in{" "}
+              <code style={{ fontFamily: "var(--font-mono)" }}>.env.local</code>.
             </>
           )}
         </p>
@@ -492,7 +492,7 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
   }
 
   return (
-    <div style={{ position: "relative", borderRadius: "20px", overflow: "hidden", border: "1px solid var(--border)" }}>
+    <div style={{ position: "relative", borderRadius: "var(--radius-card)", overflow: "hidden", border: "1px solid var(--border)" }}>
       <div ref={containerRef} style={{ height, width: "100%" }} />
       {/* In-map legend — provenance lives ON the canvas, not in a caption elsewhere. */}
       <div
@@ -502,8 +502,8 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
           left: "14px",
           background: "rgba(255,255,255,0.94)",
           border: "1px solid var(--border)",
-          borderRadius: "12px",
-          padding: "12px 14px",
+          borderRadius: "var(--radius-inner)",
+          padding: "12px 16px",
           maxWidth: "260px",
           backdropFilter: "blur(4px)",
         }}
@@ -517,17 +517,17 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            gap: "10px",
+            gap: "8px",
             width: "100%",
             border: "none",
             background: "transparent",
             padding: 0,
             cursor: "pointer",
-            fontFamily: "'DM Mono', monospace",
-            fontSize: "9px",
+            fontFamily: "var(--font-mono)",
+            fontSize: "11px",
             letterSpacing: "0.08em",
             textTransform: "uppercase",
-            color: "var(--ink-faint)",
+            color: "var(--ink-muted)",
             marginBottom: collapsed ? 0 : "10px",
           }}
         >
@@ -537,7 +537,7 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
 
         {!collapsed && (
           <>
-            <div style={{ display: "flex", flexDirection: "column", gap: "9px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
               {legend.map((item) => {
                 const provDot = item.hideProvenanceDot ? null : (
                   <span
@@ -554,13 +554,13 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
                 const labelText = (
                   <span style={{ fontSize: "12px", color: "var(--ink-secondary)", flex: 1 }}>
                     {item.label}
-                    {typeof item.count === "number" && <span style={{ color: "var(--ink-faint)" }}> · {item.count}</span>}
+                    {typeof item.count === "number" && <span style={{ color: "var(--ink-muted)" }}> · {item.count}</span>}
                   </span>
                 );
                 if (item.gradient) {
                   // A diverging scale decoded on the map: the bar + its value anchors.
                   return (
-                    <div key={item.label} style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                    <div key={item.label} style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                         {labelText}
                         {provDot}
@@ -577,9 +577,9 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
                         style={{
                           display: "flex",
                           justifyContent: "space-between",
-                          fontFamily: "'DM Mono', monospace",
-                          fontSize: "9px",
-                          color: "var(--ink-faint)",
+                          fontFamily: "var(--font-mono)",
+                          fontSize: "11px",
+                          color: "var(--ink-muted)",
                         }}
                       >
                         <span>{item.gradient.lowLabel}</span>
@@ -590,7 +590,7 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
                   );
                 }
                 return (
-                  <div key={item.label} style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                  <div key={item.label} style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                       <span style={{ display: "inline-flex", width: "16px", justifyContent: "center" }}>
                         {legendGlyph(item.kind, item.provenance, item.accent, item.uncertain)}
@@ -602,9 +602,9 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
                       <span
                         style={{
                           paddingLeft: "24px",
-                          fontFamily: "'DM Mono', monospace",
-                          fontSize: "9px",
-                          color: "var(--ink-faint)",
+                          fontFamily: "var(--font-mono)",
+                          fontSize: "11px",
+                          color: "var(--ink-muted)",
                         }}
                       >
                         {detailText}
@@ -615,7 +615,7 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
               })}
             </div>
             {note && (
-              <p style={{ fontSize: "10px", lineHeight: 1.45, color: "var(--ink-faint)", margin: "9px 0 0" }}>{note}</p>
+              <p style={{ fontSize: "11px", lineHeight: 1.45, color: "var(--ink-muted)", margin: "9px 0 0" }}>{note}</p>
             )}
           </>
         )}

@@ -20,7 +20,7 @@ const NOTIF_COLOR: Record<string, string> = {
 
 const panelStyle: React.CSSProperties = {
   border: "1px solid var(--border)",
-  borderRadius: "20px",
+  borderRadius: "var(--radius-card)",
   background: "var(--white)",
   padding: "24px",
   display: "flex",
@@ -65,13 +65,13 @@ export default function MonitoringFeed({ id }: { id?: string }) {
         {feed && feed.length > 0 && unread > 0 && (
           <span
             style={{
-              fontFamily: "'DM Mono', monospace",
+              fontFamily: "var(--font-mono)",
               fontSize: "11px",
               letterSpacing: "0.06em",
               color: "var(--ink-secondary)",
               border: "1px solid var(--border)",
               borderRadius: "100px",
-              padding: "4px 10px",
+              padding: "4px 12px",
               whiteSpace: "nowrap",
             }}
           >
@@ -83,14 +83,14 @@ export default function MonitoringFeed({ id }: { id?: string }) {
       {error ? (
         <p style={{ fontSize: "13px", color: "var(--ink-secondary)", margin: 0 }}>{error}</p>
       ) : !feed ? (
-        <p style={{ fontSize: "13px", color: "var(--ink-faint)", margin: 0 }}>Loading changes…</p>
+        <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>Loading changes…</p>
       ) : feed.length === 0 ? (
         <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0, lineHeight: 1.55 }}>
           No changes detected across the portfolio yet. Each watched property establishes a silent
           baseline the first week it is seen; changes appear here from the next weekly diff onward.
         </p>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
           {feed.map((n) => {
             const w = n.data as { window_from?: string; window_to?: string };
             return (
@@ -106,11 +106,11 @@ export default function MonitoringFeed({ id }: { id?: string }) {
                     flexShrink: 0,
                   }}
                 />
-                <div style={{ display: "flex", flexDirection: "column", gap: "3px", flex: 1 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px", flex: 1 }}>
                   <span style={{ fontSize: "14px", fontWeight: 500, color: "var(--ink-primary)" }}>{n.title}</span>
                   <span style={{ fontSize: "13px", lineHeight: 1.5, color: "var(--ink-secondary)" }}>{n.body}</span>
                   {w.window_from && w.window_to && (
-                    <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "10px", color: "var(--ink-faint)" }}>
+                    <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--ink-muted)" }}>
                       compared {w.window_from} → {w.window_to}
                     </span>
                   )}
@@ -121,7 +121,7 @@ export default function MonitoringFeed({ id }: { id?: string }) {
         </div>
       )}
 
-      <p style={{ fontSize: "11px", color: "var(--ink-faint)", margin: 0 }}>
+      <p style={{ fontSize: "11px", color: "var(--ink-muted)", margin: 0 }}>
         Changes are stated as before/after values read directly from two archived snapshots, never
         inferred. A Monday email digest carries the same feed.
       </p>

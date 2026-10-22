@@ -42,11 +42,11 @@ export default function Cluster4Dashboard({ navTarget }: { navTarget?: NavTarget
         </h1>
         <p
           style={{
-            fontFamily: "'DM Mono', monospace",
+            fontFamily: "var(--font-mono)",
             fontSize: "11px",
             letterSpacing: "0.08em",
             textTransform: "uppercase",
-            color: "var(--ink-faint)",
+            color: "var(--ink-muted)",
             margin: 0,
           }}
         >

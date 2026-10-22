@@ -105,14 +105,14 @@ function ConfirmingUpgrade() {
         style={{
           background: "var(--white)",
           border: "1px solid var(--border)",
-          borderRadius: "20px",
+          borderRadius: "var(--radius-card)",
           padding: "32px",
           maxWidth: "420px",
           width: "100%",
           textAlign: "center",
           display: "flex",
           flexDirection: "column",
-          gap: "14px",
+          gap: "16px",
         }}
       >
         {phase === "confirming" && (

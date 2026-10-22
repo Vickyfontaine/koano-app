@@ -31,10 +31,10 @@ interface BarChartProps {
 }
 
 const axisLabel: React.CSSProperties = {
-  fontFamily: "'DM Mono', monospace",
-  fontSize: "9px",
+  fontFamily: "var(--font-mono)",
+  fontSize: "11px",
   letterSpacing: "0.04em",
-  color: "var(--ink-faint)",
+  color: "var(--ink-muted)",
   whiteSpace: "nowrap",
 };
 
@@ -80,7 +80,7 @@ export default function BarChart({
           <div
             role="img"
             aria-label={ariaLabel}
-            style={{ position: "absolute", inset: 0, display: "flex", alignItems: "flex-end", gap: "2px" }}
+            style={{ position: "absolute", inset: 0, display: "flex", alignItems: "flex-end", gap: "4px" }}
           >
             {data.map((d) => (
               <div

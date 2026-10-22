@@ -91,7 +91,7 @@ export default function PortfolioOverview({
       <PanelHeader title="Portfolio overview" />
 
       {/* Add property */}
-      <form onSubmit={handleAdd} style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+      <form onSubmit={handleAdd} style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
         <input
           type="text"
           value={address}
@@ -109,8 +109,7 @@ export default function PortfolioOverview({
             fontFamily: "inherit",
             fontSize: "14px",
             color: "var(--ink-primary)",
-            outline: "none",
-          }}
+            }}
         />
         <button
           type="submit"
@@ -165,17 +164,17 @@ export default function PortfolioOverview({
                 const busy = analyzingId === p.id;
                 return (
                   <tr key={p.id}>
-                    <td style={{ padding: "10px 12px", fontSize: "13px", color: "var(--ink-secondary)", borderBottom: "1px solid var(--border-light)" }}>
+                    <td style={{ padding: "8px 12px", fontSize: "13px", color: "var(--ink-secondary)", borderBottom: "1px solid var(--border-light)" }}>
                       {p.address_normalized ?? p.address_input}
                     </td>
-                    <td style={{ padding: "10px 12px", fontFamily: "'DM Mono', monospace", fontSize: "12px", color: "var(--ink-muted)", borderBottom: "1px solid var(--border-light)" }}>
+                    <td style={{ padding: "8px 12px", fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--ink-muted)", borderBottom: "1px solid var(--border-light)" }}>
                       {p.bbl ?? "—"}
                     </td>
-                    <td style={{ padding: "10px 12px", borderBottom: "1px solid var(--border-light)" }}>
+                    <td style={{ padding: "8px 12px", borderBottom: "1px solid var(--border-light)" }}>
                       {v ? (
                         <span
                           style={{
-                            fontFamily: "'DM Mono', monospace",
+                            fontFamily: "var(--font-mono)",
                             fontSize: "12px",
                             fontWeight: 500,
                             textTransform: "uppercase",
@@ -185,19 +184,19 @@ export default function PortfolioOverview({
                           {v.verdict} · {v.confidence}
                         </span>
                       ) : (
-                        <span style={{ fontSize: "12px", color: "var(--ink-faint)" }}>not analyzed</span>
+                        <span style={{ fontSize: "12px", color: "var(--ink-muted)" }}>not analyzed</span>
                       )}
                     </td>
-                    <td style={{ padding: "10px 12px", fontFamily: "'DM Mono', monospace", fontSize: "12px", color: "var(--ink-primary)", borderBottom: "1px solid var(--border-light)" }}>
+                    <td style={{ padding: "8px 12px", fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--ink-primary)", borderBottom: "1px solid var(--border-light)" }}>
                       {v ? `${v.risk_score}/100` : "—"}
                     </td>
-                    <td style={{ padding: "10px 12px", borderBottom: "1px solid var(--border-light)" }}>
+                    <td style={{ padding: "8px 12px", borderBottom: "1px solid var(--border-light)" }}>
                       {v ? <ProvenanceBadge provenance={v.overall_provenance} /> : "—"}
                     </td>
-                    <td style={{ padding: "10px 12px", fontFamily: "'DM Mono', monospace", fontSize: "11px", color: "var(--ink-faint)", borderBottom: "1px solid var(--border-light)" }}>
+                    <td style={{ padding: "8px 12px", fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--ink-muted)", borderBottom: "1px solid var(--border-light)" }}>
                       {v ? new Date(v.created_at).toLocaleDateString() : "—"}
                     </td>
-                    <td style={{ padding: "10px 12px", borderBottom: "1px solid var(--border-light)", whiteSpace: "nowrap" }}>
+                    <td style={{ padding: "8px 12px", borderBottom: "1px solid var(--border-light)", whiteSpace: "nowrap" }}>
                       <button
                         onClick={() => onAnalyze(p)}
                         disabled={analyzingId !== null}
@@ -205,7 +204,7 @@ export default function PortfolioOverview({
                           border: "1px solid var(--border)",
                           background: "transparent",
                           borderRadius: "100px",
-                          padding: "6px 14px",
+                          padding: "8px 16px",
                           fontFamily: "inherit",
                           fontSize: "12px",
                           fontWeight: 500,
@@ -225,7 +224,7 @@ export default function PortfolioOverview({
                           background: "transparent",
                           fontFamily: "inherit",
                           fontSize: "12px",
-                          color: "var(--ink-faint)",
+                          color: "var(--ink-muted)",
                           cursor: "pointer",
                         }}
                       >
@@ -240,7 +239,7 @@ export default function PortfolioOverview({
         </div>
       ) : null}
 
-      <p style={{ fontSize: "11px", color: "var(--ink-faint)", margin: 0 }}>
+      <p style={{ fontSize: "11px", color: "var(--ink-muted)", margin: 0 }}>
         Verdicts come from the append-only audit trail; removing a property never removes its
         verdict records.
       </p>

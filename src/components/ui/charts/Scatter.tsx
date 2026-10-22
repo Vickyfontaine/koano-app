@@ -35,10 +35,10 @@ interface ScatterProps {
 }
 
 const axisLabel: React.CSSProperties = {
-  fontFamily: "'DM Mono', monospace",
-  fontSize: "9px",
+  fontFamily: "var(--font-mono)",
+  fontSize: "11px",
   letterSpacing: "0.04em",
-  color: "var(--ink-faint)",
+  color: "var(--ink-muted)",
   whiteSpace: "nowrap",
 };
 
@@ -100,7 +100,7 @@ export default function Scatter({
                 color: "var(--ink-muted)",
                 background: "rgba(255,255,255,0.92)",
                 borderRadius: "3px",
-                padding: "1px 4px",
+                padding: "2px 4px",
               }}
             >
               {refLine.label}

@@ -108,11 +108,11 @@ export default function DocumentButton({
       id={id}
       style={{
         border: "1px solid var(--border)",
-        borderRadius: "16px",
-        padding: "20px",
+        borderRadius: "var(--radius-card)",
+        padding: "24px",
         display: "flex",
         flexDirection: "column",
-        gap: "14px",
+        gap: "16px",
         background: "var(--white)",
       }}
     >
@@ -145,7 +145,7 @@ export default function DocumentButton({
             <br />
             Reuses the analysis you just ran. No new generation used.
             {!hasRecentVerdict && (
-              <span style={{ color: "var(--ink-faint)" }}> Run an analysis first to enable.</span>
+              <span style={{ color: "var(--ink-muted)" }}> Run an analysis first to enable.</span>
             )}
           </span>
         </label>
@@ -171,11 +171,11 @@ export default function DocumentButton({
         <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
           <span
             style={{
-              fontFamily: "'DM Mono', monospace",
-              fontSize: "10px",
+              fontFamily: "var(--font-mono)",
+              fontSize: "11px",
               letterSpacing: "0.08em",
               textTransform: "uppercase",
-              color: "var(--ink-faint)",
+              color: "var(--ink-muted)",
             }}
           >
             Format

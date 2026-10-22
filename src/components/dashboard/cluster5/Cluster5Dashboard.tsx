@@ -106,11 +106,11 @@ export default function Cluster5Dashboard() {
           </h1>
           <p
             style={{
-              fontFamily: "'DM Mono', monospace",
+              fontFamily: "var(--font-mono)",
               fontSize: "11px",
               letterSpacing: "0.08em",
               textTransform: "uppercase",
-              color: "var(--ink-faint)",
+              color: "var(--ink-muted)",
               margin: 0,
             }}
           >
@@ -145,8 +145,8 @@ export default function Cluster5Dashboard() {
           style={{
             border: "1px solid var(--border)",
             borderLeft: "3px solid var(--signal-negative)",
-            borderRadius: "0 12px 12px 0",
-            padding: "16px 20px",
+            borderRadius: "0 var(--radius-inner) var(--radius-inner) 0",
+            padding: "16px 24px",
             maxWidth: "620px",
           }}
         >
@@ -219,10 +219,10 @@ export default function Cluster5Dashboard() {
             <div
               style={{
                 border: "1px dashed var(--border)",
-                borderRadius: "16px",
-                padding: "20px",
+                borderRadius: "var(--radius-card)",
+                padding: "24px",
                 fontSize: "13px",
-                color: "var(--ink-faint)",
+                color: "var(--ink-muted)",
               }}
             >
               Add properties to your portfolio to generate the Monday Briefing PDF.
@@ -241,10 +241,10 @@ export default function Cluster5Dashboard() {
             <div
               style={{
                 border: "1px dashed var(--border)",
-                borderRadius: "16px",
-                padding: "20px",
+                borderRadius: "var(--radius-card)",
+                padding: "24px",
                 fontSize: "13px",
-                color: "var(--ink-faint)",
+                color: "var(--ink-muted)",
               }}
             >
               Analyze a property above to enable its one-pager.

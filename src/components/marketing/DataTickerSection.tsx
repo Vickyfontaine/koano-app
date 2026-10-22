@@ -40,9 +40,9 @@ export default function DataTickerSection() {
             <span
               key={`${source}-${i}`}
               style={{
-                fontFamily: "'DM Mono', monospace",
+                fontFamily: "var(--font-mono)",
                 fontSize: "12px",
-                color: "var(--ink-faint)",
+                color: "var(--ink-muted)",
                 letterSpacing: "0.08em",
                 whiteSpace: "nowrap",
                 padding: "0 16px",

@@ -12,7 +12,8 @@ export interface ScoreBand {
   from: number;
   to: number;
   label: string;
-  color: string; // the band's verdict color (used as a translucent tint)
+  color: string; // the band's verdict FILL hue (used as a translucent tint)
+  ink?: string; // the band label's text color (AA ink); defaults to color
 }
 
 interface ScoreBandsProps {
@@ -28,7 +29,7 @@ interface ScoreBandsProps {
 }
 
 const mono: React.CSSProperties = {
-  fontFamily: "'DM Mono', monospace",
+  fontFamily: "var(--font-mono)",
   letterSpacing: "0.06em",
 };
 
@@ -60,7 +61,7 @@ export default function ScoreBands({
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: "2px",
+            gap: "4px",
             whiteSpace: "nowrap",
           }}
         >
@@ -75,7 +76,7 @@ export default function ScoreBands({
           >
             {verdictLabel}
           </span>
-          <span style={{ ...mono, fontSize: "10px", color: "var(--ink-muted)" }}>
+          <span style={{ ...mono, fontSize: "11px", color: "var(--ink-muted)" }}>
             score {fmt(score)}
           </span>
         </div>
@@ -118,11 +119,11 @@ export default function ScoreBands({
                 top: "50%",
                 left: `${mid}%`,
                 transform: "translate(-50%, -50%)",
-                fontSize: "9px",
+                fontSize: "11px",
                 fontWeight: chosen ? 700 : 500,
                 textTransform: "uppercase",
-                color: b.color,
-                opacity: chosen ? 1 : 0.7,
+                color: b.ink ?? b.color,
+                opacity: chosen ? 1 : 0.8,
               }}
             >
               {b.label}
@@ -156,8 +157,8 @@ export default function ScoreBands({
                 position: "absolute",
                 left: `${left}%`,
                 transform: "translateX(-50%)",
-                fontSize: "9px",
-                color: "var(--ink-faint)",
+                fontSize: "11px",
+                color: "var(--ink-muted)",
               }}
             >
               {fmt(t)}

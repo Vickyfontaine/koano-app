@@ -180,7 +180,7 @@ export default function ClusterLanding({
               variants={fadeUp}
               custom={2}
               style={{
-                fontFamily: "'DM Mono', monospace",
+                fontFamily: "var(--font-mono)",
                 fontSize: "12px",
                 fontWeight: 500,
                 letterSpacing: "0.08em",
@@ -218,10 +218,10 @@ export default function ClusterLanding({
             variants={fadeUp}
             custom={3}
             style={{
-              fontFamily: "'DM Mono', monospace",
+              fontFamily: "var(--font-mono)",
               fontSize: "12px",
               fontWeight: 500,
-              color: "var(--ink-faint)",
+              color: "var(--ink-muted)",
               letterSpacing: "0.08em",
               textTransform: "uppercase",
               marginBottom: "32px",

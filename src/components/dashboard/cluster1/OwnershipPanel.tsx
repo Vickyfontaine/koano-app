@@ -64,9 +64,9 @@ export default function OwnershipPanel({ portfolio, error, id }: OwnershipPanelP
           <div style={{ ...panelTitle, marginBottom: "8px" }}>Same-entity buildings</div>
           <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
             {p.buildings.slice(0, 6).map((b) => (
-              <div key={b.bbl} style={{ display: "flex", justifyContent: "space-between", gap: "10px", fontSize: "12px", color: "var(--ink-secondary)" }}>
+              <div key={b.bbl} style={{ display: "flex", justifyContent: "space-between", gap: "8px", fontSize: "12px", color: "var(--ink-secondary)" }}>
                 <span>{b.address}{b.zip ? `, ${b.zip}` : ""}</span>
-                <span style={{ fontFamily: "'DM Mono', monospace", color: "var(--ink-faint)" }}>
+                <span style={{ fontFamily: "var(--font-mono)", color: "var(--ink-muted)" }}>
                   {b.open_hpd_violations} open
                 </span>
               </div>
@@ -75,7 +75,7 @@ export default function OwnershipPanel({ portfolio, error, id }: OwnershipPanelP
         </div>
       )}
 
-      <p style={{ fontSize: "11px", color: "var(--ink-faint)", margin: 0 }}>{p.match_caveat}</p>
+      <p style={{ fontSize: "11px", color: "var(--ink-muted)", margin: 0 }}>{p.match_caveat}</p>
     </div>
   );
 }

@@ -13,7 +13,7 @@ export default function AuthShell({ children }: { children: React.ReactNode }) {
         flexDirection: "column",
       }}
     >
-      <header style={{ padding: "28px 40px" }}>
+      <header style={{ padding: "24px 32px" }}>
         <Link
           href="/"
           style={{
@@ -36,12 +36,12 @@ export default function AuthShell({ children }: { children: React.ReactNode }) {
           alignItems: "center",
           justifyContent: "center",
           padding: "24px",
-          gap: "28px",
+          gap: "24px",
         }}
       >
         <p
           style={{
-            fontFamily: "'DM Mono', monospace",
+            fontFamily: "var(--font-mono)",
             fontSize: "11px",
             letterSpacing: "1.5px",
             textTransform: "uppercase",
@@ -54,8 +54,8 @@ export default function AuthShell({ children }: { children: React.ReactNode }) {
         <div style={{ width: "100%", maxWidth: "420px" }}>{children}</div>
       </main>
 
-      <footer style={{ padding: "24px 40px", textAlign: "center" }}>
-        <span style={{ fontSize: "12px", color: "var(--ink-faint)" }}>
+      <footer style={{ padding: "24px 32px", textAlign: "center" }}>
+        <span style={{ fontSize: "12px", color: "var(--ink-muted)" }}>
           © 2026 KOANO Inc. All rights reserved.
         </span>
       </footer>

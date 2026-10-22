@@ -254,7 +254,7 @@ export default function AgentsSection() {
             />
             <span
               style={{
-                fontFamily: "'DM Mono', monospace",
+                fontFamily: "var(--font-mono)",
                 fontSize: "12px",
                 fontWeight: 500,
                 color: "var(--brand-blue)",
@@ -290,9 +290,9 @@ export default function AgentsSection() {
               </span>
               <span
                 style={{
-                  fontFamily: "'DM Mono', monospace",
+                  fontFamily: "var(--font-mono)",
                   fontSize: "11px",
-                  color: "var(--ink-faint)",
+                  color: "var(--ink-muted)",
                   letterSpacing: "0.08em",
                 }}
               >
@@ -316,7 +316,7 @@ export default function AgentsSection() {
               </h3>
               <p
                 style={{
-                  fontFamily: "'DM Mono', monospace",
+                  fontFamily: "var(--font-mono)",
                   fontSize: "13px",
                   color: "var(--ink-muted)",
                   letterSpacing: "0.06em",

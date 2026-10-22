@@ -27,11 +27,11 @@ function money(n: number): string {
 }
 
 const panelTitle: React.CSSProperties = {
-  fontFamily: "'DM Mono', monospace",
-  fontSize: "10px",
+  fontFamily: "var(--font-mono)",
+  fontSize: "11px",
   letterSpacing: "0.08em",
   textTransform: "uppercase",
-  color: "var(--ink-faint)",
+  color: "var(--ink-muted)",
 };
 
 export default function PropertyMap({
@@ -57,7 +57,7 @@ export default function PropertyMap({
           style={{
             height: 440,
             border: "1px solid var(--border)",
-            borderRadius: "20px",
+            borderRadius: "var(--radius-card)",
             background: "var(--pale-wash)",
             display: "flex",
             alignItems: "center",

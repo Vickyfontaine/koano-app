@@ -71,7 +71,7 @@ export default function RiskMonitor({ properties, id }: RiskMonitorProps) {
 
   return (
     <div style={panelStyle} id={id}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "10px" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "8px" }}>
         <PanelHeader title="Risk monitor" />
         <button
           onClick={() => void load()}
@@ -79,7 +79,7 @@ export default function RiskMonitor({ properties, id }: RiskMonitorProps) {
             border: "1px solid var(--border)",
             background: "transparent",
             borderRadius: "100px",
-            padding: "6px 14px",
+            padding: "8px 16px",
             fontFamily: "inherit",
             fontSize: "12px",
             fontWeight: 500,
@@ -128,41 +128,41 @@ export default function RiskMonitor({ properties, id }: RiskMonitorProps) {
                 const disaster = r.detail?.disaster_history;
                 return (
                   <tr key={r.property.id}>
-                    <td style={{ padding: "10px 12px", fontSize: "13px", color: "var(--ink-secondary)", borderBottom: "1px solid var(--border-light)" }}>
+                    <td style={{ padding: "8px 12px", fontSize: "13px", color: "var(--ink-secondary)", borderBottom: "1px solid var(--border-light)" }}>
                       {r.property.address_normalized ?? r.property.address_input}
                     </td>
-                    <td style={{ padding: "10px 12px", fontFamily: "'DM Mono', monospace", fontSize: "13px", fontWeight: 500, color: v ? riskColor(v.risk_score) : "var(--ink-faint)", borderBottom: "1px solid var(--border-light)" }}>
+                    <td style={{ padding: "8px 12px", fontFamily: "var(--font-mono)", fontSize: "13px", fontWeight: 500, color: v ? riskColor(v.risk_score) : "var(--ink-faint)", borderBottom: "1px solid var(--border-light)" }}>
                       {v ? `${v.risk_score}/100` : "not analyzed"}
                     </td>
-                    <td style={{ padding: "10px 12px", fontSize: "12px", borderBottom: "1px solid var(--border-light)" }}>
+                    <td style={{ padding: "8px 12px", fontSize: "12px", borderBottom: "1px solid var(--border-light)" }}>
                       {r.loading ? (
-                        <span style={{ color: "var(--ink-faint)" }}>fetching…</span>
+                        <span style={{ color: "var(--ink-muted)" }}>fetching…</span>
                       ) : flood?.data ? (
-                        <span style={{ display: "inline-flex", alignItems: "center", gap: "6px", color: "var(--ink-secondary)" }}>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: "8px", color: "var(--ink-secondary)" }}>
                           zone {flood.data.flood_zone ?? "—"}
                           {flood.data.in_special_flood_hazard_area ? " · SFHA" : ""}
                           <ProvenanceBadge provenance={flood.provenance} />
                         </span>
                       ) : (
-                        <span style={{ color: "var(--ink-faint)" }}>{r.error ?? "—"}</span>
+                        <span style={{ color: "var(--ink-muted)" }}>{r.error ?? "—"}</span>
                       )}
                     </td>
-                    <td style={{ padding: "10px 12px", fontSize: "12px", borderBottom: "1px solid var(--border-light)" }}>
+                    <td style={{ padding: "8px 12px", fontSize: "12px", borderBottom: "1px solid var(--border-light)" }}>
                       {contamination?.data ? (
-                        <span style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: "'DM Mono', monospace", color: "var(--ink-primary)" }}>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: "8px", fontFamily: "var(--font-mono)", color: "var(--ink-primary)" }}>
                           {contamination.data.superfund_sites_within_radius}
                           <ProvenanceBadge provenance={contamination.provenance} />
                         </span>
                       ) : (
-                        r.loading ? <span style={{ color: "var(--ink-faint)" }}>fetching…</span> : "—"
+                        r.loading ? <span style={{ color: "var(--ink-muted)" }}>fetching…</span> : "—"
                       )}
                     </td>
-                    <td style={{ padding: "10px 12px", fontFamily: "'DM Mono', monospace", fontSize: "12px", color: "var(--ink-primary)", borderBottom: "1px solid var(--border-light)" }}>
+                    <td style={{ padding: "8px 12px", fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--ink-primary)", borderBottom: "1px solid var(--border-light)" }}>
                       {seismic?.data && seismic.data.pga_g != null ? `${seismic.data.pga_g}g` : "—"}
                     </td>
-                    <td style={{ padding: "10px 12px", fontSize: "12px", borderBottom: "1px solid var(--border-light)" }}>
+                    <td style={{ padding: "8px 12px", fontSize: "12px", borderBottom: "1px solid var(--border-light)" }}>
                       {disaster?.data ? (
-                        <span style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: "'DM Mono', monospace", color: "var(--ink-primary)" }}>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: "8px", fontFamily: "var(--font-mono)", color: "var(--ink-primary)" }}>
                           {disaster.data.declarations_last_10yr}
                           <ProvenanceBadge provenance={disaster.provenance} />
                         </span>
@@ -178,7 +178,7 @@ export default function RiskMonitor({ properties, id }: RiskMonitorProps) {
         </div>
       )}
 
-      <p style={{ fontSize: "11px", color: "var(--ink-faint)", margin: 0 }}>
+      <p style={{ fontSize: "11px", color: "var(--ink-muted)", margin: 0 }}>
         Hazard signals are live federal data: EPA Superfund/brownfield proximity (2-mile radius),
         USGS seismic, and FEMA disaster declarations. These are point-in-time fetches; separately,
         your portfolio is continuously monitored. Material changes are diffed weekly against the

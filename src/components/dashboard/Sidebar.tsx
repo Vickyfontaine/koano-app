@@ -64,11 +64,11 @@ export default function Sidebar({
           htmlFor="cluster-switcher"
           style={{
             display: "block",
-            fontFamily: "'DM Mono', monospace",
-            fontSize: "10px",
+            fontFamily: "var(--font-mono)",
+            fontSize: "11px",
             letterSpacing: "0.1em",
             textTransform: "uppercase",
-            color: "var(--ink-faint)",
+            color: "var(--ink-muted)",
             padding: "0 4px 6px",
           }}
         >
@@ -80,8 +80,8 @@ export default function Sidebar({
           onChange={(e) => onClusterChange(e.target.value as ClusterId)}
           style={{
             width: "100%",
-            padding: "10px 12px",
-            borderRadius: "12px",
+            padding: "8px 12px",
+            borderRadius: "var(--radius-inner)",
             border: "1px solid var(--border)",
             background: "var(--white)",
             fontFamily: "inherit",
@@ -107,7 +107,7 @@ export default function Sidebar({
             padding: "0 20px 8px",
             margin: 0,
             fontSize: "11px",
-            color: "var(--ink-faint)",
+            color: "var(--ink-muted)",
             lineHeight: 1.5,
           }}
         >
@@ -130,8 +130,8 @@ export default function Sidebar({
                 display: "block",
                 width: "100%",
                 textAlign: "left",
-                padding: "10px 12px",
-                borderRadius: "8px",
+                padding: "8px 12px",
+                borderRadius: "var(--radius-chip)",
                 border: "none",
                 background: active ? "var(--white)" : "transparent",
                 color: active ? "var(--ink-primary)" : "var(--ink-muted)",
@@ -155,8 +155,8 @@ export default function Sidebar({
         href="/dashboard/settings"
         style={{
           margin: "0 12px 4px",
-          padding: "10px 12px",
-          borderRadius: "8px",
+          padding: "8px 12px",
+          borderRadius: "var(--radius-chip)",
           color: "var(--ink-muted)",
           fontSize: "14px",
           textDecoration: "none",
@@ -180,9 +180,9 @@ export default function Sidebar({
         <UserButton />
         <span
           style={{
-            fontFamily: "'DM Mono', monospace",
-            fontSize: "10px",
-            color: "var(--ink-faint)",
+            fontFamily: "var(--font-mono)",
+            fontSize: "11px",
+            color: "var(--ink-muted)",
             letterSpacing: "0.1em",
             textTransform: "uppercase",
           }}

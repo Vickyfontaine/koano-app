@@ -53,12 +53,12 @@ function fieldError(key: FieldKey, v: string): string | null {
 
 const cardStyle: React.CSSProperties = {
   border: "1px solid var(--border)",
-  borderRadius: "16px",
+  borderRadius: "var(--radius-card)",
   padding: "24px",
   background: "var(--white)",
   display: "flex",
   flexDirection: "column",
-  gap: "18px",
+  gap: "16px",
 };
 
 function AssetUpload({
@@ -120,7 +120,7 @@ function AssetUpload({
         style={{
           width: "72px",
           height: "72px",
-          borderRadius: "12px",
+          borderRadius: "var(--radius-inner)",
           border: "1px solid var(--border)",
           background: "var(--pale-wash)",
           display: "flex",
@@ -134,10 +134,10 @@ function AssetUpload({
           // eslint-disable-next-line @next/next/no-img-element
           <img src={url} alt={label} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
         ) : (
-          <span style={{ fontSize: "10px", color: "var(--ink-faint)" }}>None</span>
+          <span style={{ fontSize: "11px", color: "var(--ink-muted)" }}>None</span>
         )}
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
         <span style={{ fontSize: "13px", fontWeight: 500, color: "var(--ink-primary)" }}>{label}</span>
         <span style={{ fontSize: "11px", color: "var(--ink-muted)" }}>PNG, JPEG, or WebP · up to 2 MB</span>
         <div style={{ display: "flex", gap: "8px", marginTop: "2px" }}>
@@ -245,7 +245,7 @@ export default function ProfileSettingsForm() {
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "20px", maxWidth: "640px" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "24px", maxWidth: "640px" }}>
       <div style={cardStyle}>
         <div>
           <h2 style={{ fontSize: "18px", fontWeight: 500, color: "var(--ink-primary)", margin: "0 0 4px" }}>
@@ -266,8 +266,8 @@ export default function ProfileSettingsForm() {
               maxLength={MAX_LEN[key] + 20}
               onChange={(e) => setFields((f) => ({ ...f, [key]: e.target.value }))}
               style={{
-                padding: "10px 12px",
-                borderRadius: "10px",
+                padding: "8px 12px",
+                borderRadius: "var(--radius-inner)",
                 border: `1px solid ${errors[key] ? "var(--signal-negative)" : "var(--border)"}`,
                 fontSize: "14px",
                 fontFamily: "inherit",
@@ -295,7 +295,7 @@ export default function ProfileSettingsForm() {
         <AssetUpload kind="headshot" label="Headshot" url={headshotUrl} onChange={setHeadshotUrl} />
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
         <button
           type="button"
           onClick={() => void save()}

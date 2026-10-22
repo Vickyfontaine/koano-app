@@ -117,11 +117,11 @@ export default function Cluster2Dashboard() {
         </h1>
         <p
           style={{
-            fontFamily: "'DM Mono', monospace",
+            fontFamily: "var(--font-mono)",
             fontSize: "11px",
             letterSpacing: "0.08em",
             textTransform: "uppercase",
-            color: "var(--ink-faint)",
+            color: "var(--ink-muted)",
             margin: 0,
           }}
         >
@@ -145,15 +145,15 @@ export default function Cluster2Dashboard() {
           style={{
             border: "1px solid var(--border)",
             borderLeft: "3px solid var(--signal-negative)",
-            borderRadius: "0 12px 12px 0",
-            padding: "16px 20px",
+            borderRadius: "0 var(--radius-inner) var(--radius-inner) 0",
+            padding: "16px 24px",
             maxWidth: "620px",
           }}
         >
           <p style={{ fontSize: "14px", color: "var(--ink-secondary)", margin: 0 }}>
             {resolver.state.error}
           </p>
-          <p style={{ fontSize: "12px", color: "var(--ink-faint)", margin: "6px 0 0" }}>
+          <p style={{ fontSize: "12px", color: "var(--ink-muted)", margin: "6px 0 0" }}>
             Live NYC data is deepest. Try a New York City street address.
           </p>
         </div>
@@ -245,17 +245,17 @@ export default function Cluster2Dashboard() {
                 <div
                   style={{
                     border: "1px dashed var(--border)",
-                    borderRadius: "16px",
-                    padding: "20px",
+                    borderRadius: "var(--radius-card)",
+                    padding: "24px",
                     display: "flex",
                     flexDirection: "column",
-                    gap: "6px",
+                    gap: "8px",
                   }}
                 >
                   <h3 style={{ fontSize: "16px", fontWeight: 500, color: "var(--ink-muted)", margin: 0 }}>
                     Comparative Market Analysis
                   </h3>
-                  <p style={{ fontSize: "12px", color: "var(--ink-faint)", margin: 0 }}>
+                  <p style={{ fontSize: "12px", color: "var(--ink-muted)", margin: 0 }}>
                     Not yet available. The CMA needs listing photos and geocoded comps, which KOANO
                     does not source today.
                   </p>
@@ -278,15 +278,15 @@ export default function Cluster2Dashboard() {
               style={{
                 border: "1px solid var(--border)",
                 borderLeft: "3px solid var(--signal-negative)",
-                borderRadius: "0 12px 12px 0",
-                padding: "16px 20px",
+                borderRadius: "0 var(--radius-inner) var(--radius-inner) 0",
+                padding: "16px 24px",
                 maxWidth: "620px",
               }}
             >
               <p style={{ fontSize: "14px", color: "var(--ink-secondary)", margin: 0 }}>
                 Verdict pipeline failed: {stream.error}
               </p>
-              <p style={{ fontSize: "12px", color: "var(--ink-faint)", margin: "6px 0 0" }}>
+              <p style={{ fontSize: "12px", color: "var(--ink-muted)", margin: "6px 0 0" }}>
                 Live NYC data is deepest. Try a New York City street address.
               </p>
             </div>
@@ -310,9 +310,9 @@ export default function Cluster2Dashboard() {
               />
               <p
                 style={{
-                  fontFamily: "'DM Mono', monospace",
+                  fontFamily: "var(--font-mono)",
                   fontSize: "11px",
-                  color: "var(--ink-faint)",
+                  color: "var(--ink-muted)",
                   margin: 0,
                 }}
               >

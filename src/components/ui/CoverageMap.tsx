@@ -24,7 +24,7 @@ interface CoverageMapProps {
 }
 
 const mono: React.CSSProperties = {
-  fontFamily: "'DM Mono', monospace",
+  fontFamily: "var(--font-mono)",
   fontSize: "11px",
   letterSpacing: "0.04em",
 };
@@ -46,7 +46,7 @@ const SECTIONS: Array<{
 
 function LayerRow({ l, showUnlock, color }: { l: CoverageLayer; showUnlock: boolean; color: string }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "2px", padding: "6px 0", borderTop: "1px solid var(--border-light)" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "4px", padding: "8px 0", borderTop: "1px solid var(--border-light)" }}>
       <span style={{ fontSize: "13px", color: "var(--ink-secondary)" }}>{l.layer}</span>
       {showUnlock && l.unlock && (
         <span style={{ ...mono, fontSize: "11px", color }}>→ fills with {l.unlock}</span>
@@ -73,20 +73,20 @@ export default function CoverageMap({ dataPoints, id, defaultOpen }: CoverageMap
   if (map.partner.length) summaryParts.push(`${map.partner.length} partner`);
 
   return (
-    <div style={{ border: "1px solid var(--border)", borderRadius: "20px", background: "var(--white)", padding: "24px" }} id={id}>
+    <div style={{ border: "1px solid var(--border)", borderRadius: "var(--radius-card)", background: "var(--white)", padding: "24px" }} id={id}>
       <button
         onClick={() => setOpen((v) => !v)}
         style={{ width: "100%", border: "none", background: "transparent", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: "12px", padding: 0 }}
       >
         <span>
-          <span style={{ ...mono, textTransform: "uppercase", color: "var(--ink-faint)" }}>Coverage map</span>
+          <span style={{ ...mono, textTransform: "uppercase", color: "var(--ink-muted)" }}>Coverage map</span>
           <span style={{ fontSize: "13px", color: "var(--ink-muted)", marginLeft: "10px" }}>{summaryParts.join(" · ")}</span>
         </span>
         <span style={{ ...mono, color: "var(--mid-blue)" }}>{open ? "Hide" : "Show layers"}</span>
       </button>
 
       {open && (
-        <div style={{ marginTop: "18px", display: "flex", flexDirection: "column", gap: "14px" }}>
+        <div style={{ marginTop: "18px", display: "flex", flexDirection: "column", gap: "16px" }}>
           {SECTIONS.map(({ state, heading, blurb, showUnlock }) => {
             const layers = map[state];
             if (layers.length === 0) return null;
@@ -94,11 +94,11 @@ export default function CoverageMap({ dataPoints, id, defaultOpen }: CoverageMap
             return (
               <div
                 key={state}
-                style={{ border: "1px solid var(--border)", borderLeft: `3px solid ${color}`, borderRadius: "0 12px 12px 0", padding: "12px 16px" }}
+                style={{ border: "1px solid var(--border)", borderLeft: `3px solid ${color}`, borderRadius: "0 var(--radius-inner) var(--radius-inner) 0", padding: "12px 16px" }}
               >
-                <div style={{ display: "flex", alignItems: "baseline", gap: "10px", marginBottom: "4px" }}>
+                <div style={{ display: "flex", alignItems: "baseline", gap: "8px", marginBottom: "4px" }}>
                   <span style={{ ...mono, textTransform: "uppercase", color, fontWeight: 500 }}>{heading}</span>
-                  <span style={{ fontSize: "12px", color: "var(--ink-faint)" }}>{layers.length} layer{layers.length === 1 ? "" : "s"}</span>
+                  <span style={{ fontSize: "12px", color: "var(--ink-muted)" }}>{layers.length} layer{layers.length === 1 ? "" : "s"}</span>
                 </div>
                 <p style={{ fontSize: "12px", lineHeight: 1.5, color: "var(--ink-muted)", margin: "0 0 6px" }}>{blurb}</p>
                 <div style={{ display: "flex", flexDirection: "column" }}>

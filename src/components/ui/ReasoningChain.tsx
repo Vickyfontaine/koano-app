@@ -25,11 +25,11 @@ interface ReasoningChainProps {
 }
 
 const monoLabel: React.CSSProperties = {
-  fontFamily: "'DM Mono', monospace",
-  fontSize: "10px",
+  fontFamily: "var(--font-mono)",
+  fontSize: "11px",
   letterSpacing: "0.08em",
   textTransform: "uppercase",
-  color: "var(--ink-faint)",
+  color: "var(--ink-muted)",
 };
 
 function agentLabel(agent: string): string {
@@ -56,11 +56,11 @@ export default function ReasoningChain({
       style={{
         background: "var(--white)",
         border: "1px solid var(--border)",
-        borderRadius: "20px",
-        padding: "28px",
+        borderRadius: "var(--radius-card)",
+        padding: "24px",
         display: "flex",
         flexDirection: "column",
-        gap: "20px",
+        gap: "24px",
       }}
     >
       {/* Agent conclusions — always visible */}
@@ -79,11 +79,11 @@ export default function ReasoningChain({
                 key={s.agent}
                 style={{
                   border: "1px solid var(--border-light)",
-                  borderRadius: "12px",
-                  padding: "14px",
+                  borderRadius: "var(--radius-inner)",
+                  padding: "16px",
                   display: "flex",
                   flexDirection: "column",
-                  gap: "6px",
+                  gap: "8px",
                 }}
               >
                 <span style={{ fontSize: "13px", fontWeight: 500, color: "var(--ink-secondary)" }}>
@@ -91,7 +91,7 @@ export default function ReasoningChain({
                 </span>
                 <span
                   style={{
-                    fontFamily: "'DM Mono', monospace",
+                    fontFamily: "var(--font-mono)",
                     fontSize: "15px",
                     fontWeight: 500,
                     textTransform: "uppercase",
@@ -115,11 +115,11 @@ export default function ReasoningChain({
           style={{
             borderLeft: "3px solid var(--signal-warning)",
             background: "rgba(245, 158, 11, 0.05)",
-            borderRadius: "0 12px 12px 0",
-            padding: "16px 20px",
+            borderRadius: "0 var(--radius-inner) var(--radius-inner) 0",
+            padding: "16px 24px",
             display: "flex",
             flexDirection: "column",
-            gap: "10px",
+            gap: "8px",
           }}
         >
           <span style={monoLabel}>
@@ -148,7 +148,7 @@ export default function ReasoningChain({
           border: "1px solid var(--border)",
           background: "transparent",
           borderRadius: "100px",
-          padding: "9px 20px",
+          padding: "8px 24px",
           fontFamily: "inherit",
           fontSize: "13px",
           fontWeight: 500,
@@ -169,7 +169,7 @@ export default function ReasoningChain({
               <div style={{ ...monoLabel, marginBottom: "10px", color: "var(--brand-blue)" }}>
                 {agentLabel(g.agent)}
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                 {g.steps.map((step) => {
                   const swap =
                     step.provenance === "representative"
@@ -178,20 +178,20 @@ export default function ReasoningChain({
                   return (
                     <div
                       key={step.step}
-                      style={{ display: "flex", gap: "14px", alignItems: "flex-start" }}
+                      style={{ display: "flex", gap: "16px", alignItems: "flex-start" }}
                     >
                       <span
                         style={{
-                          fontFamily: "'DM Mono', monospace",
+                          fontFamily: "var(--font-mono)",
                           fontSize: "11px",
-                          color: "var(--ink-faint)",
+                          color: "var(--ink-muted)",
                           minWidth: "24px",
                           paddingTop: "3px",
                         }}
                       >
                         {String(step.step).padStart(2, "0")}
                       </span>
-                      <div style={{ display: "flex", flexDirection: "column", gap: "6px", flex: 1 }}>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "8px", flex: 1 }}>
                         <p
                           style={{
                             fontSize: "14px",
@@ -206,7 +206,7 @@ export default function ReasoningChain({
                           style={{
                             display: "flex",
                             alignItems: "center",
-                            gap: "6px",
+                            gap: "8px",
                             flexWrap: "wrap",
                           }}
                         >
@@ -214,14 +214,14 @@ export default function ReasoningChain({
                             <span
                               key={si}
                               style={{
-                                fontFamily: "'DM Mono', monospace",
-                                fontSize: "10px",
+                                fontFamily: "var(--font-mono)",
+                                fontSize: "11px",
                                 letterSpacing: "0.04em",
                                 color: "var(--ink-muted)",
                                 background: "var(--pale-wash)",
                                 border: "1px solid var(--border-light)",
                                 borderRadius: "100px",
-                                padding: "2px 9px",
+                                padding: "2px 8px",
                               }}
                             >
                               {s}

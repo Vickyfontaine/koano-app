@@ -214,9 +214,9 @@ export default function AboutContent() {
                 </p>
                 <span
                   style={{
-                    fontFamily: "'DM Mono', monospace",
+                    fontFamily: "var(--font-mono)",
                     fontSize: "12px",
-                    color: "var(--ink-faint)",
+                    color: "var(--ink-muted)",
                     letterSpacing: "0.08em",
                     textTransform: "uppercase",
                   }}
@@ -528,10 +528,10 @@ export default function AboutContent() {
               </p>
               <p
                 style={{
-                  fontFamily: "'DM Mono', monospace",
+                  fontFamily: "var(--font-mono)",
                   fontSize: "12px",
                   letterSpacing: "0.08em",
-                  color: "var(--ink-faint)",
+                  color: "var(--ink-muted)",
                   margin: "4px 0 0",
                 }}
               >

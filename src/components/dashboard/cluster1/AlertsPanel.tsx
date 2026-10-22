@@ -203,11 +203,11 @@ export default function AlertsPanel({ detail, detailError, id }: AlertsPanelProp
             return (
               <div key={n.id} style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
                 <span aria-hidden="true" style={{ width: "8px", height: "8px", borderRadius: "50%", background: NOTIF_COLOR[n.severity] ?? "var(--mid-blue)", marginTop: "6px", flexShrink: 0 }} />
-                <div style={{ display: "flex", flexDirection: "column", gap: "3px", flex: 1 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px", flex: 1 }}>
                   <span style={{ fontSize: "14px", fontWeight: 500, color: "var(--ink-primary)" }}>{n.title}</span>
                   <span style={{ fontSize: "13px", lineHeight: 1.5, color: "var(--ink-secondary)" }}>{n.body}</span>
                   {w.window_from && w.window_to && (
-                    <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "10px", color: "var(--ink-faint)" }}>
+                    <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--ink-muted)" }}>
                       compared {w.window_from} → {w.window_to}
                     </span>
                   )}
@@ -216,7 +216,7 @@ export default function AlertsPanel({ detail, detailError, id }: AlertsPanelProp
             );
           })}
         </div>
-        <p style={{ fontSize: "11px", color: "var(--ink-faint)", margin: 0 }}>
+        <p style={{ fontSize: "11px", color: "var(--ink-muted)", margin: 0 }}>
           Changes detected weekly against the archived record. Point-in-time signals appear until the first change.
         </p>
       </div>
@@ -257,9 +257,9 @@ export default function AlertsPanel({ detail, detailError, id }: AlertsPanelProp
                     display: "inline-flex",
                     alignItems: "center",
                     gap: "8px",
-                    fontFamily: "'DM Mono', monospace",
-                    fontSize: "10px",
-                    color: "var(--ink-faint)",
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "11px",
+                    color: "var(--ink-muted)",
                   }}
                 >
                   {a.source}
@@ -270,7 +270,7 @@ export default function AlertsPanel({ detail, detailError, id }: AlertsPanelProp
           ))}
         </div>
       )}
-      <p style={{ fontSize: "11px", color: "var(--ink-faint)", margin: 0 }}>
+      <p style={{ fontSize: "11px", color: "var(--ink-muted)", margin: 0 }}>
         Point-in-time signals computed from the data fetched for this analysis.
       </p>
     </div>

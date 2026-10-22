@@ -19,7 +19,7 @@ export default function ClusterPlaceholderView({
   const c = CLUSTERS[cluster];
 
   return (
-    <div style={{ maxWidth: "860px", display: "flex", flexDirection: "column", gap: "20px" }}>
+    <div style={{ maxWidth: "860px", display: "flex", flexDirection: "column", gap: "24px" }}>
       <div>
         <span className="section-number">{c.number}</span>
         <h1
@@ -35,11 +35,11 @@ export default function ClusterPlaceholderView({
         </h1>
         <p
           style={{
-            fontFamily: "'DM Mono', monospace",
+            fontFamily: "var(--font-mono)",
             fontSize: "11px",
             letterSpacing: "0.08em",
             textTransform: "uppercase",
-            color: "var(--ink-faint)",
+            color: "var(--ink-muted)",
             margin: 0,
           }}
         >

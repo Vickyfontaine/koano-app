@@ -121,11 +121,11 @@ export default function ArchiveSection() {
         >
           <div
             style={{
-              fontFamily: "'DM Mono', monospace",
-              fontSize: "10px",
+              fontFamily: "var(--font-mono)",
+              fontSize: "11px",
               letterSpacing: "0.08em",
               textTransform: "uppercase",
-              color: "var(--ink-faint)",
+              color: "var(--ink-muted)",
               marginBottom: "20px",
             }}
           >
@@ -166,7 +166,7 @@ export default function ArchiveSection() {
               marginTop: "24px",
               paddingTop: "16px",
               borderTop: "1px solid var(--border)",
-              fontFamily: "'DM Mono', monospace",
+              fontFamily: "var(--font-mono)",
               fontSize: "11px",
               color: "var(--ink-muted)",
               letterSpacing: "0.04em",

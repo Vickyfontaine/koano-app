@@ -74,11 +74,11 @@ export default function LoadingState({
       style={{
         background: "var(--white)",
         border: "1px solid var(--border)",
-        borderRadius: "20px",
-        padding: "28px",
+        borderRadius: "var(--radius-card)",
+        padding: "24px",
         display: "flex",
         flexDirection: "column",
-        gap: "18px",
+        gap: "16px",
         maxWidth: "640px",
       }}
     >
@@ -92,9 +92,9 @@ export default function LoadingState({
         </span>
         <span
           style={{
-            fontFamily: "'DM Mono', monospace",
+            fontFamily: "var(--font-mono)",
             fontSize: "11px",
-            color: "var(--ink-faint)",
+            color: "var(--ink-muted)",
           }}
         >
           {elapsed}s · typically ~60s
@@ -104,7 +104,7 @@ export default function LoadingState({
       {normalizedAddress && (
         <p
           style={{
-            fontFamily: "'DM Mono', monospace",
+            fontFamily: "var(--font-mono)",
             fontSize: "12px",
             color: "var(--ink-muted)",
             margin: 0,
@@ -135,7 +135,7 @@ export default function LoadingState({
                 <span style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
                   <span
                     style={{
-                      fontFamily: "'DM Mono', monospace",
+                      fontFamily: "var(--font-mono)",
                       fontSize: "12px",
                       textTransform: "uppercase",
                       color: "var(--ink-primary)",
@@ -148,9 +148,9 @@ export default function LoadingState({
               ) : (
                 <span
                   style={{
-                    fontFamily: "'DM Mono', monospace",
+                    fontFamily: "var(--font-mono)",
                     fontSize: "11px",
-                    color: "var(--ink-faint)",
+                    color: "var(--ink-muted)",
                   }}
                 >
                   {state === "pending" ? "waiting" : "analyzing…"}
@@ -182,9 +182,9 @@ export default function LoadingState({
           </span>
           <span
             style={{
-              fontFamily: "'DM Mono', monospace",
+              fontFamily: "var(--font-mono)",
               fontSize: "11px",
-              color: "var(--ink-faint)",
+              color: "var(--ink-muted)",
             }}
           >
             {phase === "synthesis" ? "arbitrating…" : "waiting for all five agents"}

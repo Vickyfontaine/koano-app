@@ -103,11 +103,11 @@ export default function Cluster1Dashboard() {
         </h1>
         <p
           style={{
-            fontFamily: "'DM Mono', monospace",
+            fontFamily: "var(--font-mono)",
             fontSize: "11px",
             letterSpacing: "0.08em",
             textTransform: "uppercase",
-            color: "var(--ink-faint)",
+            color: "var(--ink-muted)",
             margin: 0,
           }}
         >
@@ -131,15 +131,15 @@ export default function Cluster1Dashboard() {
           style={{
             border: "1px solid var(--border)",
             borderLeft: "3px solid var(--signal-negative)",
-            borderRadius: "0 12px 12px 0",
-            padding: "16px 20px",
+            borderRadius: "0 var(--radius-inner) var(--radius-inner) 0",
+            padding: "16px 24px",
             maxWidth: "620px",
           }}
         >
           <p style={{ fontSize: "14px", color: "var(--ink-secondary)", margin: 0 }}>
             {resolver.state.error}
           </p>
-          <p style={{ fontSize: "12px", color: "var(--ink-faint)", margin: "6px 0 0" }}>
+          <p style={{ fontSize: "12px", color: "var(--ink-muted)", margin: "6px 0 0" }}>
             Live NYC data is deepest. Try a New York City street address.
           </p>
         </div>
@@ -181,15 +181,15 @@ export default function Cluster1Dashboard() {
           style={{
             border: "1px solid var(--border)",
             borderLeft: "3px solid var(--signal-negative)",
-            borderRadius: "0 12px 12px 0",
-            padding: "16px 20px",
+            borderRadius: "0 var(--radius-inner) var(--radius-inner) 0",
+            padding: "16px 24px",
             maxWidth: "620px",
           }}
         >
           <p style={{ fontSize: "14px", color: "var(--ink-secondary)", margin: 0 }}>
             Analysis failed: {stream.error}
           </p>
-          <p style={{ fontSize: "12px", color: "var(--ink-faint)", margin: "6px 0 0" }}>
+          <p style={{ fontSize: "12px", color: "var(--ink-muted)", margin: "6px 0 0" }}>
             Live NYC data is deepest. Try a New York City street address.
           </p>
         </div>
@@ -306,9 +306,9 @@ export default function Cluster1Dashboard() {
 
           <p
             style={{
-              fontFamily: "'DM Mono', monospace",
+              fontFamily: "var(--font-mono)",
               fontSize: "11px",
-              color: "var(--ink-faint)",
+              color: "var(--ink-muted)",
               margin: 0,
             }}
           >

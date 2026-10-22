@@ -526,9 +526,9 @@ export default function IntelligenceContent() {
                   <span className="section-number">{agent.number}</span>
                   <span
                     style={{
-                      fontFamily: "'DM Mono', monospace",
+                      fontFamily: "var(--font-mono)",
                       fontSize: "11px",
-                      color: "var(--ink-faint)",
+                      color: "var(--ink-muted)",
                       letterSpacing: "0.08em",
                     }}
                   >
@@ -566,10 +566,10 @@ export default function IntelligenceContent() {
                   <div>
                     <span
                       style={{
-                        fontFamily: "'DM Mono', monospace",
-                        fontSize: "10px",
+                        fontFamily: "var(--font-mono)",
+                        fontSize: "11px",
                         fontWeight: 500,
-                        color: "var(--ink-faint)",
+                        color: "var(--ink-muted)",
                         letterSpacing: "0.12em",
                         textTransform: "uppercase",
                       }}
@@ -578,7 +578,7 @@ export default function IntelligenceContent() {
                     </span>
                     <p
                       style={{
-                        fontFamily: "'DM Mono', monospace",
+                        fontFamily: "var(--font-mono)",
                         fontSize: "12px",
                         color: "var(--ink-muted)",
                         letterSpacing: "0.06em",
@@ -752,9 +752,9 @@ export default function IntelligenceContent() {
                 <span className="data-chip">Verdict</span>
                 <span
                   style={{
-                    fontFamily: "'DM Mono', monospace",
+                    fontFamily: "var(--font-mono)",
                     fontSize: "11px",
-                    color: "var(--ink-faint)",
+                    color: "var(--ink-muted)",
                     letterSpacing: "0.08em",
                     textTransform: "uppercase",
                   }}
@@ -775,7 +775,7 @@ export default function IntelligenceContent() {
               </h3>
               <p
                 style={{
-                  fontFamily: "'DM Mono', monospace",
+                  fontFamily: "var(--font-mono)",
                   fontSize: "13px",
                   color: "var(--ink-muted)",
                   letterSpacing: "0.06em",
@@ -786,7 +786,7 @@ export default function IntelligenceContent() {
               </p>
               <p
                 style={{
-                  fontFamily: "'DM Mono', monospace",
+                  fontFamily: "var(--font-mono)",
                   fontSize: "13px",
                   color: "var(--ink-muted)",
                   letterSpacing: "0.06em",
@@ -829,7 +829,7 @@ export default function IntelligenceContent() {
                       <span
                         className="reason-agent"
                         style={{
-                          fontFamily: "'DM Mono', monospace",
+                          fontFamily: "var(--font-mono)",
                           color: "var(--brand-blue)",
                           flexShrink: 0,
                           fontSize: "11px",

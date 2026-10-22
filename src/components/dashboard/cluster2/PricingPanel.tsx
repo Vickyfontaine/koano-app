@@ -69,10 +69,10 @@ export default function PricingPanel({ detail, detailError, verdict, id }: Prici
 
       {base != null ? (
         <>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
             <span
               style={{
-                fontFamily: "'DM Mono', monospace",
+                fontFamily: "var(--font-mono)",
                 fontSize: "26px",
                 fontWeight: 500,
                 color: "var(--ink-primary)",
@@ -96,7 +96,7 @@ export default function PricingPanel({ detail, detailError, verdict, id }: Prici
         </p>
       )}
 
-      <div style={{ borderTop: "1px solid var(--border-light)", paddingTop: "14px", display: "flex", flexDirection: "column", gap: "10px" }}>
+      <div style={{ borderTop: "1px solid var(--border-light)", paddingTop: "14px", display: "flex", flexDirection: "column", gap: "8px" }}>
         {verdict ? (
           <>
             <Row
@@ -120,7 +120,7 @@ export default function PricingPanel({ detail, detailError, verdict, id }: Prici
             <p style={{ fontSize: "13px", lineHeight: 1.6, color: "var(--ink-secondary)", margin: 0 }}>
               {verdict.headline}
             </p>
-            <p style={{ fontSize: "11px", color: "var(--ink-faint)", margin: 0 }}>
+            <p style={{ fontSize: "11px", color: "var(--ink-muted)", margin: 0 }}>
               Full agent reasoning below. Decision support, not financial advice.
             </p>
           </>

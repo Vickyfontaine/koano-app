@@ -52,7 +52,7 @@ export default function MonitoringSettings({ id }: { id?: string }) {
       <PanelHeader title="Monitoring" />
 
       {isFree ? (
-        <div style={{ background: "var(--pale-wash)", border: "1px solid var(--border)", borderRadius: 12, padding: 20 }}>
+        <div style={{ background: "var(--pale-wash)", border: "1px solid var(--border)", borderRadius: "var(--radius-inner)", padding: 20 }}>
           <p style={{ fontSize: 15, fontWeight: 500, color: "var(--ink-primary)", margin: "0 0 6px" }}>
             Monitoring watches your properties and tells you when something material changes.
           </p>
@@ -104,7 +104,7 @@ export default function MonitoringSettings({ id }: { id?: string }) {
       {/* Watched properties */}
       {s.properties.length > 0 && (
         <div style={{ marginTop: 20 }}>
-          <span style={{ fontSize: 11, color: "var(--ink-faint)", letterSpacing: "0.08em", textTransform: "uppercase" }}>Watched properties</span>
+          <span style={{ fontSize: 11, color: "var(--ink-muted)", letterSpacing: "0.08em", textTransform: "uppercase" }}>Watched properties</span>
           <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 8 }}>
             {s.properties.map((pr) => {
               const paused = pr.monitoring_enabled && !pr.active;
@@ -116,7 +116,7 @@ export default function MonitoringSettings({ id }: { id?: string }) {
                     {paused && <span style={badge("var(--signal-warning)")}>Paused: over {s.plan} limit</span>}
                     {!pr.monitoring_enabled && <span style={badge("var(--ink-faint)")}>Not watched</span>}
                     {!isFree && (
-                      <button type="button" onClick={() => void toggleWatch(pr.id, !pr.monitoring_enabled)} style={{ border: "1px solid var(--border)", background: "transparent", borderRadius: 100, padding: "3px 12px", fontSize: 12, color: "var(--ink-muted)", cursor: "pointer" }}>
+                      <button type="button" onClick={() => void toggleWatch(pr.id, !pr.monitoring_enabled)} style={{ border: "1px solid var(--border)", background: "transparent", borderRadius: 100, padding: "4px 12px", fontSize: 12, color: "var(--ink-muted)", cursor: "pointer" }}>
                         {pr.monitoring_enabled ? "Unwatch" : "Watch"}
                       </button>
                     )}
@@ -126,7 +126,7 @@ export default function MonitoringSettings({ id }: { id?: string }) {
             })}
           </div>
           {s.watched_count > s.cap && !isFree && (
-            <p style={{ fontSize: 11, color: "var(--ink-faint)", marginTop: 10 }}>
+            <p style={{ fontSize: 11, color: "var(--ink-muted)", marginTop: 10 }}>
               You watch more than your plan monitors. The oldest {s.cap} stay active; unwatch one to activate another, or upgrade to monitor all.
             </p>
           )}
@@ -137,7 +137,7 @@ export default function MonitoringSettings({ id }: { id?: string }) {
 }
 
 const rowStyle: React.CSSProperties = { display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, color: "var(--ink-secondary)" };
-const selectStyle: React.CSSProperties = { border: "1px solid var(--border)", borderRadius: 8, padding: "4px 8px", fontSize: 13, fontFamily: "inherit" };
+const selectStyle: React.CSSProperties = { border: "1px solid var(--border)", borderRadius: "var(--radius-chip)", padding: "4px 8px", fontSize: 13, fontFamily: "inherit" };
 function badge(color: string): React.CSSProperties {
-  return { fontSize: 10, fontWeight: 500, color, border: `1px solid ${color}`, borderRadius: 100, padding: "2px 8px", whiteSpace: "nowrap" };
+  return { fontSize: 11, fontWeight: 500, color, border: `1px solid ${color}`, borderRadius: 100, padding: "2px 8px", whiteSpace: "nowrap" };
 }

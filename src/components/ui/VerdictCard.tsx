@@ -43,15 +43,15 @@ function Meter({ value, color }: { value: number; color: string }) {
 }
 
 const metricLabel: React.CSSProperties = {
-  fontFamily: "'DM Mono', monospace",
-  fontSize: "10px",
+  fontFamily: "var(--font-mono)",
+  fontSize: "11px",
   letterSpacing: "0.08em",
   textTransform: "uppercase",
-  color: "var(--ink-faint)",
+  color: "var(--ink-muted)",
 };
 
 const metricValue: React.CSSProperties = {
-  fontFamily: "'DM Mono', monospace",
+  fontFamily: "var(--font-mono)",
   fontSize: "20px",
   fontWeight: 500,
   color: "var(--ink-primary)",
@@ -69,11 +69,11 @@ export default function VerdictCard({ verdict, address }: VerdictCardProps) {
       style={{
         background: "var(--white)",
         border: "1px solid var(--border)",
-        borderRadius: "20px",
-        padding: "28px",
+        borderRadius: "var(--radius-card)",
+        padding: "24px",
         display: "flex",
         flexDirection: "column",
-        gap: "20px",
+        gap: "24px",
       }}
     >
       {/* Verdict word + overall provenance */}
@@ -86,7 +86,7 @@ export default function VerdictCard({ verdict, address }: VerdictCardProps) {
           flexWrap: "wrap",
         }}
       >
-        <div style={{ display: "flex", alignItems: "baseline", gap: "14px", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: "16px", flexWrap: "wrap" }}>
           <span
             style={{
               fontSize: "40px",
@@ -124,7 +124,7 @@ export default function VerdictCard({ verdict, address }: VerdictCardProps) {
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
-          gap: "20px",
+          gap: "24px",
           borderTop: "1px solid var(--border-light)",
           paddingTop: "20px",
         }}
@@ -169,7 +169,7 @@ export default function VerdictCard({ verdict, address }: VerdictCardProps) {
             becomesLiveWith={overallSwap}
             showNote
           />
-          <p style={{ fontSize: "12px", color: "var(--ink-faint)", margin: "8px 0 0" }}>
+          <p style={{ fontSize: "12px", color: "var(--ink-muted)", margin: "8px 0 0" }}>
             A verdict&apos;s provenance equals its weakest input. Some inputs to this verdict
             are representative stand-ins; the reasoning chain marks each one.
           </p>
@@ -178,9 +178,9 @@ export default function VerdictCard({ verdict, address }: VerdictCardProps) {
 
       <p
         style={{
-          fontFamily: "'DM Mono', monospace",
+          fontFamily: "var(--font-mono)",
           fontSize: "11px",
-          color: "var(--ink-faint)",
+          color: "var(--ink-muted)",
           margin: 0,
         }}
       >

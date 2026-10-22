@@ -77,7 +77,7 @@ export default function UpgradeScreen({
         style={{
           background: "var(--white)",
           border: "1px solid var(--border)",
-          borderRadius: "20px",
+          borderRadius: "var(--radius-card)",
           padding: "32px",
           maxWidth: "860px",
           width: "100%",
@@ -85,13 +85,13 @@ export default function UpgradeScreen({
           overflowY: "auto",
           display: "flex",
           flexDirection: "column",
-          gap: "20px",
+          gap: "24px",
         }}
       >
         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
           <span
             style={{
-              fontFamily: "'DM Mono', monospace",
+              fontFamily: "var(--font-mono)",
               fontSize: "11px",
               letterSpacing: "1.5px",
               textTransform: "uppercase",
@@ -121,7 +121,7 @@ export default function UpgradeScreen({
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-            gap: "14px",
+            gap: "16px",
           }}
         >
           {TIER_ORDER.map(({ tier, clusterId }) => {
@@ -136,13 +136,13 @@ export default function UpgradeScreen({
                   textAlign: "left",
                   background: "var(--white)",
                   border: "1px solid var(--border)",
-                  borderRadius: "16px",
-                  padding: "20px",
+                  borderRadius: "var(--radius-card)",
+                  padding: "24px",
                   cursor: busyTier ? "wait" : "pointer",
                   fontFamily: "inherit",
                   display: "flex",
                   flexDirection: "column",
-                  gap: "10px",
+                  gap: "8px",
                   opacity: busyTier !== null && !busy ? 0.55 : 1,
                 }}
               >
@@ -155,7 +155,7 @@ export default function UpgradeScreen({
                 </span>
                 <span
                   style={{
-                    fontFamily: "'DM Mono', monospace",
+                    fontFamily: "var(--font-mono)",
                     fontSize: "13px",
                     fontWeight: 500,
                     color: "var(--mid-blue)",
@@ -180,7 +180,7 @@ export default function UpgradeScreen({
               border: "1px solid var(--border)",
               background: "transparent",
               borderRadius: "100px",
-              padding: "9px 20px",
+              padding: "8px 24px",
               fontFamily: "inherit",
               fontSize: "13px",
               fontWeight: 500,
@@ -190,7 +190,7 @@ export default function UpgradeScreen({
           >
             Maybe later
           </button>
-          <span style={{ fontSize: "12px", color: "var(--ink-faint)" }}>
+          <span style={{ fontSize: "12px", color: "var(--ink-muted)" }}>
             Secure checkout by Stripe · test mode
           </span>
         </div>

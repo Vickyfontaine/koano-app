@@ -28,41 +28,57 @@ import type { Provenance } from "../../../lib/providers/types";
 // source of truth so every badge/label renders the SAME distinct treatment —
 // `live` and `partner` are trusted (green / blue), `representative` and
 // `fetch_failed` are amber caveats, `coverage_absent` is a muted structural gap.
+export type ProvenanceGlyph = "solid" | "diamond" | "hatched" | "dashed" | "cut";
 export interface ProvenanceMeta {
   label: string;
+  /** TEXT color for the label: an AA ink token (5:1+ on white). */
   color: string;
+  /** FILL hue for the dot / glyph (the saturated signal color). */
+  fill: string;
   background: string;
+  /** Non-color cue so a state never depends on hue alone (A16). */
+  glyph: ProvenanceGlyph;
   note: string; // the explanatory line when a badge shows its note
 }
 export const PROVENANCE_META: Record<Provenance, ProvenanceMeta> = {
   live: {
     label: "Live",
-    color: "var(--signal-positive)",
-    background: "rgba(34, 197, 94, 0.08)",
+    color: "var(--signal-positive-ink)",
+    fill: "var(--signal-positive)",
+    background: "var(--signal-positive-tint)",
+    glyph: "solid",
     note: "Fetched live from the source.",
   },
   partner: {
     label: "Partner",
-    color: "var(--mid-blue)",
-    background: "rgba(90, 155, 190, 0.10)",
+    color: "var(--mid-blue-ink)",
+    fill: "var(--mid-blue)",
+    background: "rgba(90, 155, 190, 0.12)",
+    glyph: "diamond",
     note: "Supplied by a data partner. Attributed to the named source, not verified by KOANO.",
   },
   representative: {
     label: "Representative",
-    color: "var(--signal-warning)",
-    background: "rgba(245, 158, 11, 0.10)",
+    color: "var(--signal-warning-ink)",
+    fill: "var(--signal-warning)",
+    background: "var(--signal-warning-tint)",
+    glyph: "hatched",
     note: "Representative stand-in. Not fetched live from the source.",
   },
   fetch_failed: {
     label: "Fetch failed",
-    color: "var(--signal-warning)",
-    background: "rgba(245, 158, 11, 0.10)",
+    color: "var(--signal-warning-ink)",
+    fill: "var(--signal-warning)",
+    background: "var(--signal-warning-tint)",
+    glyph: "dashed",
     note: "The live call failed. Usually transient; retry to refresh.",
   },
   coverage_absent: {
     label: "Not covered",
-    color: "var(--ink-faint)",
-    background: "rgba(138, 171, 184, 0.12)",
+    color: "var(--ink-muted)",
+    fill: "var(--ink-faint)",
+    background: "rgba(110, 142, 157, 0.12)",
+    glyph: "cut",
     note: "Outside KOANO's coverage for this market. No data was queried.",
   },
 };
@@ -91,8 +107,17 @@ export const SPECIALIST_AGENTS: AgentName[] = [
   "regulatory-policy",
 ];
 
-// Signal colors (Section 10) mapped to verdict words.
+// Verdict colors (Section 10). VERDICT_COLORS is the TEXT ink (AA on white) for
+// the verdict word, table cells and chips; VERDICT_FILLS is the saturated hue
+// for bars, bands and dots. Never set a fill hue as a text color (A16).
 export const VERDICT_COLORS: Record<Verdict, string> = {
+  buy: "var(--signal-positive-ink)",
+  sell: "var(--signal-negative-ink)",
+  drop: "var(--signal-negative-ink)",
+  hold: "var(--mid-blue-ink)",
+  wait: "var(--signal-warning-ink)",
+};
+export const VERDICT_FILLS: Record<Verdict, string> = {
   buy: "var(--signal-positive)",
   sell: "var(--signal-negative)",
   drop: "var(--signal-negative)",

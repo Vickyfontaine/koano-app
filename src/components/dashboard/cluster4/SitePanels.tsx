@@ -56,10 +56,10 @@ export default function SitePanels({ detail, detailError, verdict }: SitePanelsP
         />
         {regPolicy ? (
           <>
-            <div style={{ display: "flex", alignItems: "baseline", gap: "10px" }}>
+            <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
               <span
                 style={{
-                  fontFamily: "'DM Mono', monospace",
+                  fontFamily: "var(--font-mono)",
                   fontSize: "28px",
                   fontWeight: 500,
                   color: riskColor(regPolicy.risk_score),
@@ -76,21 +76,21 @@ export default function SitePanels({ detail, detailError, verdict }: SitePanelsP
               {regPolicy.headline}
             </p>
             {entFactors && entFactors.length > 0 && (
-              <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                 <span
                   style={{
-                    fontFamily: "'DM Mono', monospace",
-                    fontSize: "10px",
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "11px",
                     letterSpacing: "0.06em",
                     textTransform: "uppercase",
-                    color: "var(--ink-faint)",
+                    color: "var(--ink-muted)",
                   }}
                 >
                   What drives this score (from the zoning facts)
                 </span>
                 {entFactors.map((f, i) => (
                   <div key={i} style={{ display: "flex", gap: "8px", alignItems: "flex-start" }}>
-                    <span aria-hidden="true" style={{ color: "var(--ink-faint)", lineHeight: 1.6 }}>
+                    <span aria-hidden="true" style={{ color: "var(--ink-muted)", lineHeight: 1.6 }}>
                       ·
                     </span>
                     <span style={{ fontSize: "12px", lineHeight: 1.55, color: "var(--ink-secondary)" }}>{f}</span>

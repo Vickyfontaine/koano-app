@@ -36,7 +36,7 @@ function fmt(n: number): string {
 }
 
 const mono: React.CSSProperties = {
-  fontFamily: "'DM Mono', monospace",
+  fontFamily: "var(--font-mono)",
   fontSize: "11px",
   letterSpacing: "0.04em",
 };
@@ -68,7 +68,7 @@ export default function ArchiveTrend({ id, previewData }: { id?: string; preview
       </p>
 
       {error && <p style={{ fontSize: "13px", color: "var(--signal-negative)", margin: 0 }}>{error}</p>}
-      {!error && !data && <p style={{ fontSize: "13px", color: "var(--ink-faint)", margin: 0 }}>Loading…</p>}
+      {!error && !data && <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>Loading…</p>}
 
       {data && data.observation.week_count === 0 && (
         <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
@@ -93,9 +93,9 @@ export default function ArchiveTrend({ id, previewData }: { id?: string; preview
             <table style={{ borderCollapse: "collapse", minWidth: "420px" }}>
               <thead>
                 <tr>
-                  <th style={{ ...mono, textAlign: "left", padding: "8px 12px", color: "var(--ink-faint)" }}>Dataset</th>
+                  <th style={{ ...mono, textAlign: "left", padding: "8px 12px", color: "var(--ink-muted)" }}>Dataset</th>
                   {data.observation.weeks.map((w) => (
-                    <th key={w} style={{ ...mono, textAlign: "right", padding: "8px 12px", color: "var(--ink-faint)" }}>
+                    <th key={w} style={{ ...mono, textAlign: "right", padding: "8px 12px", color: "var(--ink-muted)" }}>
                       {weekLabel(w)}
                     </th>
                   ))}
@@ -129,7 +129,7 @@ export default function ArchiveTrend({ id, previewData }: { id?: string; preview
             </table>
           </div>
 
-          <p style={{ fontSize: "12px", lineHeight: 1.55, color: "var(--ink-faint)", margin: 0, maxWidth: "680px" }}>
+          <p style={{ fontSize: "12px", lineHeight: 1.55, color: "var(--ink-muted)", margin: 0, maxWidth: "680px" }}>
             An amber <span style={{ color: "var(--signal-warning)" }}>gap</span> is a week a dataset
             was not captured (a cron outage, not zero real-world activity). It is left as a hole, never
             filled with a guessed value. The record only ever contains real captures.

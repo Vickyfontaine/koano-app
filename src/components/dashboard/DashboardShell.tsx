@@ -58,7 +58,7 @@ export default function DashboardShell({
           style={{
             marginLeft: "240px",
             flex: 1,
-            padding: "32px 40px",
+            padding: "32px",
             maxWidth: "calc(100vw - 240px)",
           }}
         >

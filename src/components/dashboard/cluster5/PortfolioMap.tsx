@@ -32,13 +32,13 @@ function hasCoords(p: PortfolioProperty): boolean {
 function shellStyle(): React.CSSProperties {
   return {
     border: "1px solid var(--border)",
-    borderRadius: "20px",
+    borderRadius: "var(--radius-card)",
     background: "var(--white)",
     minHeight: "360px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    padding: "40px",
+    padding: "32px",
     textAlign: "center",
   };
 }
@@ -62,7 +62,7 @@ export default function PortfolioMap({
   if (!properties) {
     return (
       <div style={shellStyle()}>
-        <p style={{ fontSize: "13px", color: "var(--ink-faint)", margin: 0 }}>Loading portfolio map…</p>
+        <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>Loading portfolio map…</p>
       </div>
     );
   }
@@ -141,14 +141,14 @@ export default function PortfolioMap({
     (anyUncertain ? " Dashed pins have an unverified location." : "");
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
       <KoanoMap center={center} markers={markers} legend={legend} height={520} note={note} />
       {unpinnable.length > 0 && (
         <div
           style={{
             border: "1px solid var(--border)",
             borderLeft: "3px solid var(--signal-warning)",
-            borderRadius: "0 12px 12px 0",
+            borderRadius: "0 var(--radius-inner) var(--radius-inner) 0",
             padding: "12px 16px",
           }}
         >
@@ -158,7 +158,7 @@ export default function PortfolioMap({
           <p style={{ fontSize: "12px", color: "var(--ink-muted)", margin: 0, lineHeight: 1.5 }}>
             {unpinnable.map((p) => p.address_normalized ?? p.address_input).join(" · ")}
           </p>
-          <p style={{ fontSize: "11px", color: "var(--ink-faint)", margin: "6px 0 0" }}>
+          <p style={{ fontSize: "11px", color: "var(--ink-muted)", margin: "6px 0 0" }}>
             KOANO will not guess a pin location. Re-add the property to capture its coordinates.
           </p>
         </div>

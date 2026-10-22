@@ -21,19 +21,19 @@ export function fmtPct(n: number | null | undefined): string {
 export const panelStyle: React.CSSProperties = {
   background: "var(--white)",
   border: "1px solid var(--border)",
-  borderRadius: "20px",
-  padding: "22px",
+  borderRadius: "var(--radius-card)",
+  padding: "24px",
   display: "flex",
   flexDirection: "column",
-  gap: "14px",
+  gap: "16px",
 };
 
 export const panelTitle: React.CSSProperties = {
-  fontFamily: "'DM Mono', monospace",
-  fontSize: "10px",
+  fontFamily: "var(--font-mono)",
+  fontSize: "11px",
   letterSpacing: "0.08em",
   textTransform: "uppercase",
-  color: "var(--ink-faint)",
+  color: "var(--ink-muted)",
 };
 
 export const monoLabel = panelTitle;
@@ -60,7 +60,7 @@ export function Row({ label, value }: { label: string; value: React.ReactNode })
       <span style={{ color: "var(--ink-muted)" }}>{label}</span>
       <span
         style={{
-          fontFamily: "'DM Mono', monospace",
+          fontFamily: "var(--font-mono)",
           fontSize: "13px",
           color: "var(--ink-primary)",
           textAlign: "right",
@@ -87,7 +87,7 @@ export function PanelHeader({
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        gap: "10px",
+        gap: "8px",
       }}
     >
       <span style={panelTitle}>{title}</span>

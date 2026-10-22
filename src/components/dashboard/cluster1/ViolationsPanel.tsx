@@ -33,10 +33,10 @@ export default function ViolationsPanel({ violations, error, id }: ViolationsPan
         <span style={panelTitle}>HPD housing maintenance</span>
         {v.hpd_registered ? (
           <>
-            <div style={{ display: "flex", alignItems: "baseline", gap: "10px" }}>
+            <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
               <span
                 style={{
-                  fontFamily: "'DM Mono', monospace",
+                  fontFamily: "var(--font-mono)",
                   fontSize: "26px",
                   fontWeight: 500,
                   color: openTotal > 0 ? riskColor(Math.min(100, openTotal * 2)) : "var(--signal-positive)",
@@ -91,13 +91,13 @@ export default function ViolationsPanel({ violations, error, id }: ViolationsPan
       {v.recent_items.length > 0 && (
         <div style={{ borderTop: "1px solid var(--border-light)", paddingTop: "12px" }}>
           <div style={{ ...panelTitle, marginBottom: "8px" }}>Recent</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
             {v.recent_items.slice(0, 5).map((r, i) => (
-              <div key={i} style={{ display: "flex", justifyContent: "space-between", gap: "10px", fontSize: "12px", color: "var(--ink-secondary)" }}>
+              <div key={i} style={{ display: "flex", justifyContent: "space-between", gap: "8px", fontSize: "12px", color: "var(--ink-secondary)" }}>
                 <span style={{ flex: 1 }}>
                   [{r.source}] {r.label}
                 </span>
-                <span style={{ fontFamily: "'DM Mono', monospace", color: "var(--ink-faint)", whiteSpace: "nowrap" }}>
+                <span style={{ fontFamily: "var(--font-mono)", color: "var(--ink-muted)", whiteSpace: "nowrap" }}>
                   {r.status} · {r.date}
                 </span>
               </div>
@@ -106,7 +106,7 @@ export default function ViolationsPanel({ violations, error, id }: ViolationsPan
         </div>
       )}
 
-      <p style={{ fontSize: "11px", color: "var(--ink-faint)", margin: 0 }}>
+      <p style={{ fontSize: "11px", color: "var(--ink-muted)", margin: 0 }}>
         HPD covers registered multiple dwellings (3+ units) only. {v.scope_note}
       </p>
     </div>

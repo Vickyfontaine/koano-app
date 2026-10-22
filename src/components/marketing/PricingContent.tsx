@@ -322,9 +322,9 @@ export default function PricingContent() {
                     </span>
                     <span
                       style={{
-                        fontFamily: "'DM Mono', monospace",
+                        fontFamily: "var(--font-mono)",
                         fontSize: "12px",
-                        color: "var(--ink-faint)",
+                        color: "var(--ink-muted)",
                         display: "block",
                         marginTop: "4px",
                         letterSpacing: "0.06em",
@@ -345,9 +345,9 @@ export default function PricingContent() {
                 >
                   <span
                     style={{
-                      fontFamily: "'DM Mono', monospace",
+                      fontFamily: "var(--font-mono)",
                       fontSize: "11px",
-                      color: "var(--ink-faint)",
+                      color: "var(--ink-muted)",
                       letterSpacing: "0.08em",
                       textTransform: "uppercase",
                     }}
@@ -406,7 +406,7 @@ export default function PricingContent() {
                 >
                   <p
                     style={{
-                      fontFamily: "'DM Mono', monospace",
+                      fontFamily: "var(--font-mono)",
                       fontSize: "11px",
                       color: "var(--ink-muted)",
                       letterSpacing: "0.06em",

@@ -10,6 +10,7 @@ import React from "react";
 import DivergingBar, { type DivergingDatum } from "@/components/ui/charts/DivergingBar";
 import {
   VERDICT_COLORS,
+  VERDICT_FILLS,
   breakdownFromSummaries,
   type SynthesisResult,
   type Verdict,
@@ -47,7 +48,7 @@ function rowsFor(v: SynthesisResult): { rows: DivergingDatum[]; score: number } 
       key: a.agent,
       label: SHORT[a.agent] ?? a.agent,
       value: a.contribution / tw,
-      color: VERDICT_COLORS[a.verdict] ?? "var(--ink-muted)",
+      color: VERDICT_FILLS[a.verdict] ?? "var(--ink-muted)",
       neutral: a.direction === 0,
       valueLabel: a.direction === 0 ? undefined : fmtSigned(a.contribution / tw),
     }))
@@ -56,11 +57,11 @@ function rowsFor(v: SynthesisResult): { rows: DivergingDatum[]; score: number } 
 }
 
 const mono: React.CSSProperties = {
-  fontFamily: "'DM Mono', monospace",
-  fontSize: "10px",
+  fontFamily: "var(--font-mono)",
+  fontSize: "11px",
   letterSpacing: "0.06em",
   textTransform: "uppercase",
-  color: "var(--ink-faint)",
+  color: "var(--ink-muted)",
 };
 
 export default function SiteMathStrip({ sites }: { sites: StripSite[] }) {
@@ -72,7 +73,7 @@ export default function SiteMathStrip({ sites }: { sites: StripSite[] }) {
         style={{
           display: "grid",
           gridTemplateColumns: `repeat(${Math.min(sites.length, 3)}, minmax(0, 1fr))`,
-          gap: "18px",
+          gap: "16px",
         }}
       >
         {sites.map((s) => {
@@ -83,7 +84,7 @@ export default function SiteMathStrip({ sites }: { sites: StripSite[] }) {
               key={s.label}
               style={{
                 border: "1px solid var(--border)",
-                borderRadius: "16px",
+                borderRadius: "var(--radius-card)",
                 padding: "16px",
                 display: "flex",
                 flexDirection: "column",
@@ -97,7 +98,7 @@ export default function SiteMathStrip({ sites }: { sites: StripSite[] }) {
                 <span
                   style={{
                     marginLeft: "auto",
-                    fontFamily: "'DM Mono', monospace",
+                    fontFamily: "var(--font-mono)",
                     fontSize: "12px",
                     fontWeight: 500,
                     textTransform: "uppercase",

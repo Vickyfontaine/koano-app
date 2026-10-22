@@ -16,6 +16,7 @@ import DivergingBar, { type DivergingDatum } from "./charts/DivergingBar";
 import {
   AGENT_LABELS,
   VERDICT_COLORS,
+  VERDICT_FILLS,
   PROVENANCE_META,
   isTrustedProvenance,
   breakdownFromSummaries,
@@ -37,11 +38,11 @@ interface VerdictMathPanelProps {
 const DOMAIN: [number, number] = [-2, 2];
 
 const monoLabel: React.CSSProperties = {
-  fontFamily: "'DM Mono', monospace",
-  fontSize: "10px",
+  fontFamily: "var(--font-mono)",
+  fontSize: "11px",
   letterSpacing: "0.08em",
   textTransform: "uppercase",
-  color: "var(--ink-faint)",
+  color: "var(--ink-muted)",
 };
 
 function agentLabel(agent: string): string {
@@ -65,7 +66,7 @@ function fmtNum(n: number, dp = 1): string {
 // A compact provenance dot for dense chart rows (the full pill stays where
 // there is room — the card and the reasoning chain).
 function ProvDot({ provenance }: { provenance: Provenance }) {
-  const color = PROVENANCE_META[provenance].color;
+  const color = PROVENANCE_META[provenance].fill;
   const title = PROVENANCE_META[provenance].label;
   return (
     <span
@@ -125,7 +126,7 @@ export default function VerdictMathPanel({ verdict }: VerdictMathPanelProps) {
     label: agentLabel(a.agent),
     sublabel: `${a.verdict} · conf ${a.confidence}`,
     value: a.normalized,
-    color: VERDICT_COLORS[a.verdict] ?? "var(--ink-muted)",
+    color: VERDICT_FILLS[a.verdict] ?? "var(--ink-muted)",
     muted: !isTrustedProvenance(a.prov),
     neutral: a.isNeutral,
     valueLabel: a.isNeutral ? undefined : fmtSigned(a.normalized),
@@ -155,10 +156,10 @@ export default function VerdictMathPanel({ verdict }: VerdictMathPanelProps) {
   const sumContrib = wb.agents.reduce((s, a) => s + a.contribution, 0);
 
   const bands: ScoreBand[] = [
-    { from: DOMAIN[0], to: wb.thresholds.wait, label: "sell", color: VERDICT_COLORS.sell },
-    { from: wb.thresholds.wait, to: wb.thresholds.hold, label: "wait", color: VERDICT_COLORS.wait },
-    { from: wb.thresholds.hold, to: wb.thresholds.buy, label: "hold", color: VERDICT_COLORS.hold },
-    { from: wb.thresholds.buy, to: DOMAIN[1], label: "buy", color: VERDICT_COLORS.buy },
+    { from: DOMAIN[0], to: wb.thresholds.wait, label: "sell", color: VERDICT_FILLS.sell, ink: VERDICT_COLORS.sell },
+    { from: wb.thresholds.wait, to: wb.thresholds.hold, label: "wait", color: VERDICT_FILLS.wait, ink: VERDICT_COLORS.wait },
+    { from: wb.thresholds.hold, to: wb.thresholds.buy, label: "hold", color: VERDICT_FILLS.hold, ink: VERDICT_COLORS.hold },
+    { from: wb.thresholds.buy, to: DOMAIN[1], label: "buy", color: VERDICT_FILLS.buy, ink: VERDICT_COLORS.buy },
   ];
 
   return (
@@ -167,7 +168,7 @@ export default function VerdictMathPanel({ verdict }: VerdictMathPanelProps) {
         background: "var(--white)",
         border: "1px solid var(--border)",
         borderRadius: "var(--radius-card)",
-        padding: "28px",
+        padding: "24px",
         display: "flex",
         flexDirection: "column",
         gap: "24px",
@@ -175,20 +176,20 @@ export default function VerdictMathPanel({ verdict }: VerdictMathPanelProps) {
     >
       {/* Header */}
       <div>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
           <div style={monoLabel}>How this verdict was computed</div>
           {wb.reconstructed && (
             <span
               style={{
-                fontFamily: "'DM Mono', monospace",
-                fontSize: "10px",
+                fontFamily: "var(--font-mono)",
+                fontSize: "11px",
                 letterSpacing: "0.06em",
                 textTransform: "uppercase",
                 color: "var(--ink-muted)",
                 background: "var(--pale-wash)",
                 border: "1px solid var(--border)",
                 borderRadius: "100px",
-                padding: "2px 9px",
+                padding: "2px 8px",
               }}
               title="This verdict's breakdown was not stored; it is re-derived now from the same stored agent votes. Identical arithmetic, but a re-derivation, not the original live computation."
             >
@@ -249,10 +250,10 @@ export default function VerdictMathPanel({ verdict }: VerdictMathPanelProps) {
             The specialists lean neutral on weak signal by design; a clear structural fact adds this
             directional nudge, which the drivers below explain.
           </p>
-          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
             {wb.structural_drivers!.map((d, i) => (
               <div key={i} style={{ display: "flex", gap: "8px", alignItems: "flex-start" }}>
-                <span aria-hidden="true" style={{ color: "var(--ink-faint)", lineHeight: 1.55 }}>·</span>
+                <span aria-hidden="true" style={{ color: "var(--ink-muted)", lineHeight: 1.55 }}>·</span>
                 <span style={{ fontSize: "13px", lineHeight: 1.55, color: "var(--ink-secondary)" }}>{d}</span>
               </div>
             ))}
@@ -265,7 +266,7 @@ export default function VerdictMathPanel({ verdict }: VerdictMathPanelProps) {
         style={{
           borderTop: "1px solid var(--border-light)",
           paddingTop: "16px",
-          fontFamily: "'DM Mono', monospace",
+          fontFamily: "var(--font-mono)",
           fontSize: "12px",
           lineHeight: 1.7,
           color: "var(--ink-secondary)",
@@ -296,7 +297,7 @@ export default function VerdictMathPanel({ verdict }: VerdictMathPanelProps) {
             {verdict.verdict}
           </span>
         </div>
-        <div style={{ color: "var(--ink-faint)", marginTop: "4px" }}>
+        <div style={{ color: "var(--ink-muted)", marginTop: "4px" }}>
           thresholds: buy ≥ {fmtNum(wb.thresholds.buy)} · hold ≥ {fmtNum(wb.thresholds.hold)} · wait ≥{" "}
           {fmtNum(wb.thresholds.wait)} · else sell · method {wb.method}
         </div>

@@ -14,7 +14,7 @@ export const koanoClerkAppearance = {
     colorDanger: "#EF4444",
     colorSuccess: "#22C55E",
     colorWarning: "#F59E0B",
-    borderRadius: "12px",
+    borderRadius: "var(--radius-inner)",
     fontFamily: "'Neue Montreal', 'DM Sans', system-ui, sans-serif",
     fontSize: "15px",
   },
@@ -23,7 +23,7 @@ export const koanoClerkAppearance = {
     cardBox: {
       boxShadow: "0 2px 16px rgba(13, 43, 62, 0.06)",
       border: "1px solid #D6EBF7",
-      borderRadius: "20px",
+      borderRadius: "var(--radius-card)",
       width: "100%",
     },
     card: { boxShadow: "none" },
@@ -44,7 +44,7 @@ export const koanoClerkAppearance = {
       "&:hover": { backgroundColor: "#F0F7FC" },
     },
     formFieldInput: {
-      borderRadius: "12px",
+      borderRadius: "var(--radius-inner)",
       border: "1px solid #D6EBF7",
       "&:focus": { borderColor: "#5A9BBE", boxShadow: "0 0 0 3px rgba(90, 155, 190, 0.12)" },
     },

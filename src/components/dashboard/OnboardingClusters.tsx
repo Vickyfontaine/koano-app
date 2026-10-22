@@ -51,7 +51,7 @@ export default function OnboardingClusters() {
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--white)" }}>
-      <header style={{ padding: "28px 40px" }}>
+      <header style={{ padding: "24px 32px" }}>
         <a
           href="/"
           style={{
@@ -66,7 +66,7 @@ export default function OnboardingClusters() {
         </a>
       </header>
 
-      <main style={{ maxWidth: "1080px", margin: "0 auto", padding: "24px 40px 80px" }}>
+      <main style={{ maxWidth: "1080px", margin: "0 auto", padding: "24px 32px 64px" }}>
         {/* Welcome — approved copy (KOANO_COPY.md) */}
         <motion.h1
           initial="hidden"
@@ -111,7 +111,7 @@ export default function OnboardingClusters() {
           custom={1}
           style={{
             textAlign: "center",
-            fontFamily: "'DM Mono', monospace",
+            fontFamily: "var(--font-mono)",
             fontSize: "11px",
             letterSpacing: "1.5px",
             textTransform: "uppercase",
@@ -126,7 +126,7 @@ export default function OnboardingClusters() {
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-            gap: "20px",
+            gap: "24px",
           }}
         >
           {CLUSTER_IDS.map((id, i) => {
@@ -147,8 +147,8 @@ export default function OnboardingClusters() {
                   border: isSelected
                     ? "1px solid var(--mid-blue)"
                     : "1px solid var(--border)",
-                  borderRadius: "20px",
-                  padding: "28px",
+                  borderRadius: "var(--radius-card)",
+                  padding: "24px",
                   cursor: saving ? "wait" : "pointer",
                   fontFamily: "inherit",
                   display: "flex",
@@ -170,11 +170,11 @@ export default function OnboardingClusters() {
                 </span>
                 <span
                   style={{
-                    fontFamily: "'DM Mono', monospace",
+                    fontFamily: "var(--font-mono)",
                     fontSize: "11px",
                     letterSpacing: "0.08em",
                     textTransform: "uppercase",
-                    color: "var(--ink-faint)",
+                    color: "var(--ink-muted)",
                   }}
                 >
                   {c.audience}
@@ -199,7 +199,7 @@ export default function OnboardingClusters() {
                 >
                   <span
                     style={{
-                      fontFamily: "'DM Mono', monospace",
+                      fontFamily: "var(--font-mono)",
                       fontSize: "12px",
                       color: "var(--ink-muted)",
                     }}

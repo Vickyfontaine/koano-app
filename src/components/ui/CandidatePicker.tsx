@@ -23,12 +23,12 @@ export default function CandidatePicker({ candidates, onChoose, busy = false }: 
       style={{
         border: "1px solid var(--border)",
         borderLeft: "3px solid var(--signal-warning)",
-        borderRadius: "0 16px 16px 0",
-        padding: "20px 22px",
+        borderRadius: "0 var(--radius-card) var(--radius-card) 0",
+        padding: "24px",
         maxWidth: "680px",
         display: "flex",
         flexDirection: "column",
-        gap: "14px",
+        gap: "16px",
       }}
     >
       <div>
@@ -41,7 +41,7 @@ export default function CandidatePicker({ candidates, onChoose, busy = false }: 
         </p>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
         {candidates.map((c, i) => {
           const best = i === 0 && c.match_reason === "Exact street match";
           return (
@@ -53,30 +53,30 @@ export default function CandidatePicker({ candidates, onChoose, busy = false }: 
                 textAlign: "left",
                 border: `1px solid ${best ? "var(--mid-blue)" : "var(--border)"}`,
                 background: best ? "var(--pale-wash)" : "var(--white)",
-                borderRadius: "12px",
+                borderRadius: "var(--radius-inner)",
                 padding: "14px 16px",
                 cursor: busy ? "wait" : "pointer",
                 display: "flex",
                 flexDirection: "column",
-                gap: "6px",
+                gap: "8px",
                 opacity: busy ? 0.6 : 1,
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
                 <span style={{ fontSize: "15px", fontWeight: 500, color: "var(--ink-primary)" }}>
                   {c.label}
                 </span>
                 {best && (
                   <span
                     style={{
-                      fontFamily: "'DM Mono', monospace",
-                      fontSize: "10px",
+                      fontFamily: "var(--font-mono)",
+                      fontSize: "11px",
                       letterSpacing: "0.06em",
                       textTransform: "uppercase",
                       color: "var(--near-black)",
                       background: "var(--brand-blue)",
                       borderRadius: "100px",
-                      padding: "2px 9px",
+                      padding: "2px 8px",
                     }}
                   >
                     Best match
@@ -86,9 +86,9 @@ export default function CandidatePicker({ candidates, onChoose, busy = false }: 
               <div
                 style={{
                   display: "flex",
-                  gap: "14px",
+                  gap: "16px",
                   flexWrap: "wrap",
-                  fontFamily: "'DM Mono', monospace",
+                  fontFamily: "var(--font-mono)",
                   fontSize: "11px",
                   letterSpacing: "0.04em",
                   color: "var(--ink-muted)",

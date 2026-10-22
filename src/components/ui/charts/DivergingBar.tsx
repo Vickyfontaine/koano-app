@@ -47,7 +47,7 @@ interface DivergingBarProps {
 }
 
 const mono: React.CSSProperties = {
-  fontFamily: "'DM Mono', monospace",
+  fontFamily: "var(--font-mono)",
   fontSize: "11px",
   letterSpacing: "0.04em",
 };
@@ -63,7 +63,7 @@ export default function DivergingBar({
   const zeroPct = scale(0);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
       {data.map((d) => {
         const vPct = scale(d.value);
         const left = Math.min(zeroPct, vPct);
@@ -80,7 +80,7 @@ export default function DivergingBar({
             }}
           >
             {/* Label column */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "3px", minWidth: 0 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "4px", minWidth: 0 }}>
               <span
                 style={{
                   fontSize: "13px",
@@ -91,9 +91,9 @@ export default function DivergingBar({
               >
                 {d.label}
               </span>
-              <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                 {d.sublabel && (
-                  <span style={{ ...mono, fontSize: "10px", color: "var(--ink-faint)" }}>{d.sublabel}</span>
+                  <span style={{ ...mono, fontSize: "11px", color: "var(--ink-muted)" }}>{d.sublabel}</span>
                 )}
                 {d.badge}
               </div>
@@ -147,8 +147,8 @@ export default function DivergingBar({
                       top: "50%",
                       left: `calc(${zeroPct}% + 12px)`,
                       transform: "translateY(-50%)",
-                      fontSize: "10px",
-                      color: "var(--ink-faint)",
+                      fontSize: "11px",
+                      color: "var(--ink-muted)",
                       whiteSpace: "nowrap",
                     }}
                   >
