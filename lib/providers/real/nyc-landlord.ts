@@ -88,21 +88,6 @@ function soqlEscape(s: string): string {
   return s.replace(/'/g, "''");
 }
 
-const REPRESENTATIVE_FALLBACK: LandlordPortfolioSummary = {
-  subject_bbl: null,
-  hpd_registered: true,
-  registered_owner: 'REPRESENTATIVE: live ownership lookup failed',
-  registered_owner_address: null,
-  owner_type: null,
-  management_company: null,
-  portfolio_building_count: 8,
-  portfolio_truncated: false,
-  portfolio_open_hpd_violations: 60,
-  portfolio_total_hpd_violations: 220,
-  on_speculation_watch_list: false,
-  match_caveat: MATCH_CAVEAT,
-  buildings: [],
-};
 
 export const nycLandlord: LandlordPortfolioProvider = {
   name: 'NYC landlord portfolios (HPD registrations/contacts + Speculation Watch List)',
@@ -301,9 +286,9 @@ export const nycLandlord: LandlordPortfolioProvider = {
     } catch (e) {
       return {
         ok: true,
-        data: REPRESENTATIVE_FALLBACK,
+        data: null,
         provenance: 'fetch_failed',
-        source: 'NYC landlord portfolio [FALLBACK]',
+        source: 'NYC landlord portfolio [live call failed]',
         fetched_at,
         error: `Live call failed: ${errMsg(e)}`,
       };

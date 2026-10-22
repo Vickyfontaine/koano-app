@@ -1,6 +1,7 @@
 // NYC DOB NOW: Build — Approved Permits — NYC Open Data SODA API (rbx6-tga4).
 // Live queries: subject property by BBL + neighborhood activity by census tract.
-// Falls back to a labeled representative response on failure.
+// On a failed live call it returns data:null tagged fetch_failed (omission over
+// fabrication): never a NYC-flavored stand-in that could be reasoned over.
 
 import type {
   PermitsProvider,
@@ -111,20 +112,6 @@ function monthlySeries(rows: DobNowPermit[]): PermitMonth[] {
   return Array.from(buckets.entries()).map(([month, count]) => ({ month, count }));
 }
 
-const REPRESENTATIVE_FALLBACK: PermitsSummary = {
-  bin: null,
-  scope_note:
-    'REPRESENTATIVE: live NYC Open Data call failed. Typical 24-month permit profile for an active-development Brooklyn tract.',
-  total_permits_24mo: 350,
-  new_building_permits: 12,
-  demolition_permits: 6,
-  alteration_permits: 240,
-  monthly_permits: [],
-  recent_permits: [],
-  all_permits: [],
-  all_permits_note:
-    'REPRESENTATIVE: live NYC Open Data call failed; no subject permit history retrieved.',
-};
 
 // DOB NOW: Build began rolling out in 2021 and does not contain most permits
 // filed before it. A short or empty subject list is a coverage fact, not proof
@@ -138,10 +125,9 @@ export const nycPermits: PermitsProvider = {
 
   async getPermits(addr: ResolvedAddress): Promise<ProviderResult<PermitsSummary>> {
     const fetched_at = new Date().toISOString();
-    // Out of market: no NYC BBL → nothing to query. Coverage-absent, never the
-    // NYC-flavored REPRESENTATIVE_FALLBACK (which is a real Brooklyn profile and
-    // would be fabrication for a non-NYC address). The fallback stays for a live
-    // call that FAILS on a real NYC BBL.
+    // Out of market: no NYC BBL → nothing to query. Coverage-absent. A live call
+    // that FAILS on a real NYC BBL returns data:null tagged fetch_failed below;
+    // there is no stand-in profile in either case.
     if (!addr.bbl) {
       return outOfMarketMunicipal<PermitsSummary>({
         layer: 'DOB permits',
@@ -242,9 +228,9 @@ export const nycPermits: PermitsProvider = {
     } catch (e) {
       return {
         ok: true,
-        data: REPRESENTATIVE_FALLBACK,
+        data: null,
         provenance: 'fetch_failed',
-        source: 'NYC Open Data: DOB NOW Approved Permits [FALLBACK]',
+        source: 'NYC Open Data: DOB NOW Approved Permits [live call failed]',
         endpoint: subjectUrl,
         fetched_at,
         error: `Live call failed: ${errMsg(e)}`,

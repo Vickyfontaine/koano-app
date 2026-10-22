@@ -97,14 +97,6 @@ function monthsAgoIso(n: number): string {
   return d.toISOString().slice(0, 19);
 }
 
-const REPRESENTATIVE_FALLBACK: MlsCompsSummary = {
-  comps: [],
-  median_price_per_sqft: 900,
-  sales_count: 0,
-  price_trend: 'flat',
-  scope_note:
-    'REPRESENTATIVE: live NYC recorded-sales call failed. Typical brownstone-Brooklyn $/sq ft profile.',
-};
 
 export const nycSalesComps: MlsCompsProvider = {
   name: 'NYC recorded sales comps (DOF Rolling Sales via NYC Open Data)',
@@ -309,9 +301,9 @@ export const nycSalesComps: MlsCompsProvider = {
     } catch (e) {
       return {
         ok: true,
-        data: REPRESENTATIVE_FALLBACK,
+        data: null,
         provenance: 'fetch_failed',
-        source: 'NYC recorded sales comps [FALLBACK]',
+        source: 'NYC recorded sales comps [live call failed]',
         fetched_at,
         error: `Live call failed: ${errMsg(e)}`,
       };

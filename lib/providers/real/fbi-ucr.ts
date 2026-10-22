@@ -11,8 +11,24 @@ const NYPD_CURRENT = 'https://data.cityofnewyork.us/resource/5uac-w243.json'; //
 const NYPD_HISTORIC = 'https://data.cityofnewyork.us/resource/qgea-i56i.json'; // complaints, historic
 
 interface NypdGroupRow {
-  law_cat_cd?: string;
+  ofns_desc?: string;
   count?: string;
+}
+
+// Offense classification (UI sprint WS1 / Phase 0 item 30-14, kill-list #18).
+// NYPD's law_cat_cd (FELONY / MISDEMEANOR / VIOLATION) is a SEVERITY tier, not a
+// violent/property split: a grand larceny is a felony and is not violent. Counts
+// are therefore classified by offense description against the FBI UCR Part I
+// definitions: violent = murder, rape, robbery, felony (aggravated) assault;
+// property = burglary, larceny, motor-vehicle theft, arson (plus criminal
+// mischief, the NYPD property-damage category).
+const VIOLENT_OFFENSE = /MURDER|MANSLAUGHTER|RAPE|ROBBERY|FELONY ASSAULT/i;
+const PROPERTY_OFFENSE = /BURGLARY|LARCENY|MOTOR VEHICLE|ARSON|CRIMINAL MISCHIEF|THEFT/i;
+
+interface NypdCounts {
+  violent: number;
+  property: number;
+  total: number;
 }
 
 async function nypdCountsWithinMile(
@@ -20,15 +36,31 @@ async function nypdCountsWithinMile(
   lat: number,
   lon: number,
   extraWhere?: string
-): Promise<Record<string, number>> {
+): Promise<NypdCounts> {
   const where = `within_circle(lat_lon, ${lat}, ${lon}, 1609)` + (extraWhere ? ` AND ${extraWhere}` : '');
   const url =
-    `${dataset}?$select=law_cat_cd,count(*)%20as%20count` +
-    `&$where=${encodeURIComponent(where)}&$group=law_cat_cd`;
+    `${dataset}?$select=ofns_desc,count(*)%20as%20count` +
+    `&$where=${encodeURIComponent(where)}&$group=ofns_desc&$limit=500`;
   const rows = await fetchJson<NypdGroupRow[]>(url, { timeoutMs: 45000 });
-  const out: Record<string, number> = {};
-  for (const r of rows) out[(r.law_cat_cd ?? 'UNKNOWN').toUpperCase()] = Number(r.count ?? 0);
+  const out: NypdCounts = { violent: 0, property: 0, total: 0 };
+  for (const r of rows) {
+    const n = Number(r.count ?? 0);
+    const d = (r.ofns_desc ?? '').toUpperCase();
+    out.total += n;
+    if (VIOLENT_OFFENSE.test(d)) out.violent += n;
+    else if (PROPERTY_OFFENSE.test(d)) out.property += n;
+  }
   return out;
+}
+
+// The same year-to-date window one year earlier (Jan 1 → today's month/day of the
+// prior year), so the trend compares like with like instead of a partial year
+// against a hard-coded full one.
+function priorYtdWindow(now: Date): { from: string; to: string; label: string } {
+  const y = now.getUTCFullYear() - 1;
+  const mm = String(now.getUTCMonth() + 1).padStart(2, '0');
+  const dd = String(now.getUTCDate()).padStart(2, '0');
+  return { from: `${y}-01-01T00:00:00.000`, to: `${y}-${mm}-${dd}T23:59:59.000`, label: `Jan 1 to ${mm}/${dd}, ${y}` };
 }
 
 // FBI Crime Data Explorer — summarized state response (current shape, verified
@@ -96,26 +128,25 @@ export const fbiUcr: CrimeProvider = {
     const nypdEndpoint = `${NYPD_CURRENT} (+ ${NYPD_HISTORIC} for prior-year trend)`;
     let nypdError: string | null = null;
     try {
+      const now = new Date();
       const current = await nypdCountsWithinMile(NYPD_CURRENT, addr.latitude, addr.longitude);
-      const violent = current['FELONY'] ?? 0;
-      const misd = current['MISDEMEANOR'] ?? 0;
-      const viol = current['VIOLATION'] ?? 0;
-      const total = violent + misd + viol;
+      const total = current.total;
 
       if (total > 0) {
-        // Prior-year same-scope count for a trend signal (best-effort)
+        // Trend: this year-to-date vs the SAME year-to-date window last year.
         let trend: CrimeStats['trend'] = 'unknown';
+        const win = priorYtdWindow(now);
+        let trendNote = 'Trend unavailable (prior-year window could not be read).';
         try {
           const prior = await nypdCountsWithinMile(
             NYPD_HISTORIC,
             addr.latitude,
             addr.longitude,
-            `cmplnt_fr_dt > '2023-01-01T00:00:00.000' AND cmplnt_fr_dt < '2024-01-01T00:00:00.000'`
+            `cmplnt_fr_dt >= '${win.from}' AND cmplnt_fr_dt <= '${win.to}'`
           );
-          const priorTotal = Object.values(prior).reduce((a, b) => a + b, 0);
-          if (priorTotal > 0) {
-            const annualized = total; // YTD vs full prior year — direction only
-            trend = annualized > priorTotal ? 'rising' : annualized < priorTotal * 0.5 ? 'falling' : 'flat';
+          if (prior.total > 0) {
+            trend = total > prior.total * 1.03 ? 'rising' : total < prior.total * 0.97 ? 'falling' : 'flat';
+            trendNote = `Trend compares this year to date (${total} complaints) with the same window last year (${win.label}: ${prior.total}).`;
           }
         } catch {
           trend = 'unknown';
@@ -125,12 +156,13 @@ export const fbiUcr: CrimeProvider = {
           ok: true,
           data: {
             jurisdiction: `1-mile radius of ${addr.normalized}`,
-            period: 'current year to date',
-            violent_incidents: violent,
-            property_incidents: misd,
+            period: `${now.getUTCFullYear()} year to date`,
+            violent_incidents: current.violent,
+            property_incidents: current.property,
             total_incidents: total,
             rate_note:
-              'NYPD complaint counts by law category (FELONY/MISDEMEANOR/VIOLATION) within 1609m of the property. FBI CDE unavailable without API key; this is a live local substitute.',
+              'NYPD complaints within 1,609 m of the property, classified by offense: violent = murder, rape, robbery and felony assault; property = burglary, larceny, motor-vehicle theft, criminal mischief and arson; total = all complaint categories. ' +
+              trendNote,
             trend,
           },
           provenance: 'live',

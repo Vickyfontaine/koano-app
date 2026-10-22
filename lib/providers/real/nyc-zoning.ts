@@ -35,28 +35,6 @@ function num(v: string | undefined): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
-const REPRESENTATIVE_FALLBACK: ZoningInfo = {
-  bbl: 'unknown',
-  zoning_district: 'R6B (REPRESENTATIVE: live PLUTO call failed)',
-  commercial_overlay: null,
-  special_district: null,
-  land_use_code: '02',
-  building_class: 'C0',
-  lot_area_sqft: 2000,
-  building_area_sqft: 3600,
-  built_far: 1.8,
-  max_residential_far: 2.0,
-  max_commercial_far: null,
-  unused_far_pct: 10,
-  year_built: 1931,
-  residential_units: 3,
-  assessed_total_usd: 90000,
-  assessed_land_usd: 24000,
-  max_affordable_residential_far: 2.4,
-  max_facility_far: 2.0,
-  owner_name: null,
-  community_district: null,
-};
 
 export const nycZoning: ZoningProvider = {
   name: 'NYC MapPLUTO (NYC Open Data)',
@@ -125,9 +103,9 @@ export const nycZoning: ZoningProvider = {
     } catch (e) {
       return {
         ok: true,
-        data: { ...REPRESENTATIVE_FALLBACK, bbl },
+        data: null,
         provenance: 'fetch_failed',
-        source: 'NYC Open Data: MapPLUTO (64uk-42ks) [FALLBACK]',
+        source: 'NYC Open Data: MapPLUTO (64uk-42ks) [live call failed]',
         endpoint: url,
         fetched_at,
         error: `Live call failed: ${errMsg(e)}`,

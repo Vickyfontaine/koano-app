@@ -55,17 +55,6 @@ function unusedFloorArea(lot: PlutoLot): number | null {
   return Math.max(0, Math.round(far * lotArea - bldg));
 }
 
-const REPRESENTATIVE_FALLBACK: AssemblageSummary = {
-  subject_bbl: null,
-  subject_owner_name: 'REPRESENTATIVE: live PLUTO block lookup failed',
-  block_lot_count: 0,
-  same_owner_lot_count: 0,
-  same_owner_bbls: [],
-  block_unused_far_floor_area_sqft: 0,
-  same_owner_unused_far_floor_area_sqft: 0,
-  block_note: BLOCK_NOTE,
-  neighbors: [],
-};
 
 export const nycAssemblage: AssemblageProvider = {
   name: 'NYC assemblage / air rights (MapPLUTO block-level)',
@@ -153,9 +142,9 @@ export const nycAssemblage: AssemblageProvider = {
     } catch (e) {
       return {
         ok: true,
-        data: REPRESENTATIVE_FALLBACK,
+        data: null,
         provenance: 'fetch_failed',
-        source: 'NYC Open Data: MapPLUTO (64uk-42ks) [FALLBACK]',
+        source: 'NYC Open Data: MapPLUTO (64uk-42ks) [live call failed]',
         fetched_at,
         error: `Live call failed: ${errMsg(e)}`,
       };

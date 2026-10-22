@@ -75,21 +75,6 @@ function median(nums: number[]): number | null {
 const SCOPE_NOTE =
   'Community-district filing outcomes from DOB Job Application Filings (legacy BIS, ic3t-wcy2): a track record of historical dispositions, not a prediction. Approval ratio = approved ÷ (approved + disapproved).';
 
-const REPRESENTATIVE_FALLBACK: EntitlementSummary = {
-  subject_bbl: null,
-  community_district: null,
-  subject_filing_count: 0,
-  cd_total_filings: 0,
-  cd_approved: 0,
-  cd_disapproved: 0,
-  cd_withdrawn: 0,
-  cd_suspended: 0,
-  cd_in_process: 0,
-  cd_approval_ratio_pct: null,
-  cd_median_timeline_days: null,
-  scope_note: 'REPRESENTATIVE: live DOB filings lookup failed. ' + SCOPE_NOTE,
-  subject_recent_items: [],
-};
 
 export const nycDobFilings: EntitlementProvider = {
   name: 'NYC entitlement track record (DOB Job Application Filings ic3t-wcy2)',
@@ -207,9 +192,9 @@ export const nycDobFilings: EntitlementProvider = {
     } catch (e) {
       return {
         ok: true,
-        data: REPRESENTATIVE_FALLBACK,
+        data: null,
         provenance: 'fetch_failed',
-        source: 'NYC Open Data: DOB Job Application Filings (ic3t-wcy2) [FALLBACK]',
+        source: 'NYC Open Data: DOB Job Application Filings (ic3t-wcy2) [live call failed]',
         fetched_at,
         error: `Live call failed: ${errMsg(e)}`,
       };

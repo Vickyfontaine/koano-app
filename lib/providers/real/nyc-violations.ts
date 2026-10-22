@@ -5,7 +5,8 @@
 //   HPD Multiple Dwelling Registrations (tesw-yqqr) — registration check only,
 //     so a zero-violation result can honestly say whether the building is even
 //     in HPD's universe (registered multiple dwellings, 3+ residential units).
-// Falls back to a labeled representative response on failure.
+// On a failed live call it returns data:null tagged fetch_failed (omission over
+// fabrication): never a NYC-flavored stand-in that could be reasoned over.
 //
 // Query keys: HPD datasets key on boroid/block/lot (bbl is null on old rows);
 // ECB + DOB complaints key on BIN. ECB dates are YYYYMMDD text (lexicographic
@@ -82,25 +83,6 @@ function isoCutoff(monthsAgo: number): string {
   return c.toISOString().slice(0, 10);
 }
 
-const REPRESENTATIVE_FALLBACK: BuildingViolationsSummary = {
-  bbl: null,
-  bin: null,
-  scope_note:
-    'REPRESENTATIVE: live NYC Open Data call failed. Typical profile for a mid-size registered multiple dwelling.',
-  hpd_registered: true,
-  hpd: {
-    total: 45,
-    open: 8,
-    open_by_class: { A: 2, B: 5, C: 1, I: 0 },
-    last_24mo: 12,
-    prior_24mo: 18,
-    most_recent_inspection: null,
-  },
-  ecb: { total: 6, active: 1, active_by_severity: { 'CLASS - 2': 1 }, most_recent_issue: null },
-  dob_complaints: { total: 10, active: 1, last_24mo: 3, most_recent: null, top_categories: [] },
-  recent_items: [],
-  all_items: [],
-};
 
 export const nycViolations: BuildingViolationsProvider = {
   name: 'NYC building violations (HPD + ECB + DOB via NYC Open Data)',
@@ -111,7 +93,7 @@ export const nycViolations: BuildingViolationsProvider = {
     const bin = realBin(addr.bin);
 
     // Out of market: no NYC lot key (BBL) or BIN → nothing to query. Coverage-
-    // absent, never the NYC-flavored REPRESENTATIVE_FALLBACK (a real "mid-size
+    // absent, never the NYC-flavored stand-in (none: a failed call omits) (a real "mid-size
     // registered multiple dwelling" profile — fabrication for a non-NYC address).
     if (!parts && !bin) {
       return outOfMarketMunicipal<BuildingViolationsSummary>({
@@ -309,9 +291,9 @@ export const nycViolations: BuildingViolationsProvider = {
     } catch (e) {
       return {
         ok: true,
-        data: REPRESENTATIVE_FALLBACK,
+        data: null,
         provenance: 'fetch_failed',
-        source: 'NYC building violations [FALLBACK]',
+        source: 'NYC building violations [live call failed]',
         fetched_at,
         error: `Live call failed: ${errMsg(e)}`,
       };
