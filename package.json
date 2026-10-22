@@ -15,7 +15,10 @@
     "test:geocode": "tsx scripts/test-geocode-guard.ts",
     "test:monitor": "tsx scripts/test-monitor-detect.ts",
     "test:shards": "tsx scripts/test-shard-logic.ts",
-    "test:docs": "tsx scripts/test-document-engine.ts && tsx scripts/test-render.ts && tsx scripts/test-tax-appeal.ts && tsx scripts/test-disclaimer-regression.ts"
+    "test:docs": "tsx scripts/test-document-engine.ts && tsx scripts/test-render.ts && tsx scripts/test-tax-appeal.ts && tsx scripts/test-disclaimer-regression.ts",
+    "video": "remotion studio video/src/index.ts --config=video/remotion.config.ts --public-dir=video/public",
+    "video:still": "remotion still video/src/index.ts EndCard video/out/endcard.png --config=video/remotion.config.ts --public-dir=video/public",
+    "video:render": "remotion render video/src/index.ts --config=video/remotion.config.ts --public-dir=video/public"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.110.0",
@@ -24,6 +27,10 @@
     "@react-three/drei": "^9.122.0",
     "@react-three/fiber": "^8.18.0",
     "@react-three/postprocessing": "^2.19.1",
+    "@remotion/cli": "4.0.527",
+    "@remotion/fonts": "4.0.527",
+    "@remotion/tailwind": "4.0.527",
+    "@remotion/transitions": "4.0.527",
     "@stripe/stripe-js": "^9.1.0",
     "@supabase/supabase-js": "^2.103.0",
     "@types/mapbox-gl": "^3.4.1",
@@ -36,6 +43,7 @@
     "next": "14.2.35",
     "react": "^18",
     "react-dom": "^18",
+    "remotion": "4.0.527",
     "stripe": "^22.0.1",
     "three": "^0.170.0"
   },
@@ -43,6 +51,8 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "ajv": "^8.20.0",
+    "ajv-keywords": "^5.1.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.35",
     "pdfjs-dist": "^6.2.108",
