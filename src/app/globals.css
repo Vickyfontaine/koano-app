@@ -10,34 +10,83 @@
   /* Layout — fixed nav height. Single source of truth: the nav bar, every
      page's nav spacer, and the hero viewport-fit calcs all read this. */
   --nav-h: 64px;
+  /* Content width shared by every dashboard lens (UI sprint, A5). */
+  --content-max: 1200px;
 
   /* Backgrounds */
   --white: #FFFFFF;
   --pale-wash: #F0F7FC;
   --sky: #D6EBF7;
 
-  /* Brand Blue — KOANO's signature color */
+  /* Brand Blue — KOANO's signature color. The logo is excluded from every
+     token change and always renders in its original blue. */
   --brand-blue: #A8C4D4;
   --mid-blue: #5A9BBE;
   --deep-navy: #1A4F6E;
   --near-black: #0D2B3E;
 
-  /* Ink (text) */
+  /* Ink (text). The two secondary inks were re-tuned for WCAG AA in the UI
+     sprint (A16): --ink-muted is the SMALLEST permitted text color (5.25:1 on
+     white, 4.86:1 on pale-wash); --ink-faint is DECORATIVE ONLY (rules, borders,
+     the marker on a neutral chart row) and must never be set as a text color. */
   --ink-primary: #0D2B3E;
   --ink-secondary: #3D5A6E;
-  --ink-muted: #5A7A8C;
-  --ink-faint: #8AABB8;
+  --ink-muted: #527082;
+  --ink-faint: #6E8E9D;
+  /* Link / accent-word ink: --mid-blue is a fill hue (3.06:1); text uses this. */
+  --mid-blue-ink: #2F6F94;
 
   /* Borders */
   --border: #D6EBF7;
   --border-light: #E8F3FA;
+  /* An input boundary must read against white (1.4.11 non-text, 3:1). */
+  --border-input: #8AABB8;
+
+  /* Spacing scale — 4px base. Every padding, gap and margin in the app is one
+     of these; no one-off values (UI sprint, A12). */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+
+  /* Dashboard type scale (families unchanged: Neue Montreal + DM Mono). 11px is
+     the floor; nothing in the product renders smaller (A10, A12). */
+  --font-mono: 'DM Mono', monospace;
+  --text-micro: 11px;   /* eyebrows, axis and legend labels, chips */
+  --text-caption: 12px; /* explanatory captions */
+  --text-data: 13px;    /* mono data in tables and rows */
+  --text-body: 14px;    /* dashboard body */
+  --text-ui: 15px;      /* panel titles, inputs */
+  --text-lead: 16px;    /* section leads */
+  --text-h3: 18px;
+  --text-h2: 22px;
+  --text-data-l: 28px;  /* KPI values (never wrap) */
+  --text-h1: 32px;
+  --text-verdict: 56px; /* the verdict word */
 
   /* Radius scale — one step between nested levels, never three in a stack.
-     Pills (buttons, chips) stay 100px and are deliberately outside this scale. */
+     Pills (buttons, chips) stay 100px and are deliberately outside this scale.
+     16px is the ONE top-level card radius everywhere (the 20px/16px split that
+     put two radii on adjacent cards is gone). */
   --radius-chip: 8px;    /* rectangular badges / micro-tags */
   --radius-inner: 12px;  /* wells nested inside a card */
   --radius-card: 16px;   /* top-level cards and panels */
   --radius-deep: 20px;   /* deep/outer containers (e.g. nested-doll shell) */
+  --radius-pill: 100px;
+
+  /* Motion tokens. Every animation uses one of these; reduced motion zeroes
+     transforms globally (below). */
+  --dur-1: 120ms;  /* opacity micro, reduced-motion floor */
+  --dur-2: 200ms;  /* hover, focus ring, badge */
+  --dur-3: 300ms;  /* content entrance (house rule 0.3s UI) */
+  --dur-4: 500ms;  /* content entrance (house rule 0.5s), needle sweep */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --stagger: 40ms;
 
   /* Elevation — navy-tinted (never pure black), so shadows read as part of
      the Coastal palette rather than a generic grey drop. */
@@ -46,15 +95,51 @@
   --shadow-hover: 0 6px 14px rgba(13, 43, 62, 0.08), 0 22px 48px rgba(13, 43, 62, 0.13);
   --shadow-accent: 0 24px 60px -24px rgba(26, 79, 110, 0.3);
 
-  /* Functional signals */
+  /* Functional signals: the hue is the FILL (dots, bars, bands, tints); the
+     -ink variant is for TEXT (verdict words, badge labels), tuned to 5:1+ on
+     white so a verdict word is never the least legible thing on the page. */
   --signal-positive: #22C55E;
   --signal-warning: #F59E0B;
   --signal-negative: #EF4444;
+  --signal-positive-ink: #15803D;
+  --signal-warning-ink: #B45309;
+  --signal-negative-ink: #B91C1C;
+  --signal-positive-tint: rgba(34, 197, 94, 0.10);
+  --signal-warning-tint: rgba(245, 158, 11, 0.12);
+  --signal-negative-tint: rgba(239, 68, 68, 0.10);
 
   /* Glass cards on light — hero only */
   --glass-light-bg: rgba(255, 255, 255, 0.45);
   --glass-light-border: rgba(255, 255, 255, 0.65);
   --glass-light-blur: blur(24px) saturate(180%);
+}
+
+/* ============================================
+   Focus, motion and interaction states (UI sprint, A16)
+   ============================================ */
+
+/* One visible focus ring for every interactive element, keyboard only. */
+:focus-visible {
+  outline: 2px solid var(--deep-navy);
+  outline-offset: 2px;
+  border-radius: inherit;
+}
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline-offset: 0;
+}
+
+/* Reduced motion: no transforms, opacity only, at the 120ms floor. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: var(--dur-1) !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: var(--dur-1) !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* ============================================
@@ -116,14 +201,14 @@ body {
 }
 
 .text-mono {
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 13px;
   font-weight: 400;
   letter-spacing: 0.08em;
 }
 
 .text-micro {
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.12em;
@@ -170,6 +255,22 @@ body {
   border-color: var(--brand-blue);
   box-shadow: var(--shadow-flat);
   transition-duration: 100ms;
+}
+
+/* A disabled control is flat and quiet: no glow, no lift, no pointer. It is
+   still readable (the label keeps AA contrast) so the state reads as "not yet",
+   never as broken. */
+.btn-primary:disabled,
+.btn-primary[aria-disabled="true"] {
+  background: var(--sky);
+  border-color: var(--sky);
+  color: var(--ink-muted);
+  box-shadow: none;
+  transform: none;
+  cursor: not-allowed;
+}
+.btn-primary:disabled .btn-arrow {
+  transform: none;
 }
 
 /* The trailing ↗ on primary CTAs — nudges forward on hover. */
@@ -305,7 +406,7 @@ body {
    ============================================ */
 
 .section-number {
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 500;
   color: var(--brand-blue);
@@ -321,8 +422,8 @@ body {
   display: inline-flex;
   align-items: center;
   background: var(--sky);
-  color: var(--brand-blue);
-  font-family: 'DM Mono', monospace;
+  color: var(--deep-navy);
+  font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.08em;
@@ -340,8 +441,8 @@ body {
   display: inline-flex;
   align-items: center;
   background: var(--sky);
-  color: var(--brand-blue);
-  font-family: 'DM Mono', monospace;
+  color: var(--deep-navy);
+  font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.08em;
@@ -374,18 +475,18 @@ body {
    ============================================ */
 
 .signal-positive {
-  color: var(--signal-positive);
-  background: rgba(34, 197, 94, 0.08);
+  color: var(--signal-positive-ink);
+  background: var(--signal-positive-tint);
 }
 
 .signal-warning {
-  color: var(--signal-warning);
-  background: rgba(245, 158, 11, 0.08);
+  color: var(--signal-warning-ink);
+  background: var(--signal-warning-tint);
 }
 
 .signal-negative {
-  color: var(--signal-negative);
-  background: rgba(239, 68, 68, 0.08);
+  color: var(--signal-negative-ink);
+  background: var(--signal-negative-tint);
 }
 
 /* ============================================
@@ -394,7 +495,7 @@ body {
 
 .copy-placeholder {
   font-style: italic;
-  color: var(--ink-faint);
+  color: var(--ink-muted);
   background: var(--pale-wash);
   border: 1px dashed var(--border);
   border-radius: var(--radius-inner);
