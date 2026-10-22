@@ -11,6 +11,7 @@
 
 import React from "react";
 import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
+import { valuationGuard } from "../../../../lib/documents/valuation-guard";
 import { BlockError, PanelHeader, Row, fmtInt, fmtMoney, panelStyle } from "../panels";
 import type { SiteDetailResponse } from "@/app/api/site-detail/route";
 
@@ -32,7 +33,10 @@ export default function ValuationPanel({ detail, detailError, id }: ValuationPan
 
   const psf = comps?.data?.median_price_per_sqft ?? null;
   const sqft = zoning?.data?.building_area_sqft ?? null;
-  const indicative = psf != null && sqft != null && sqft > 0 ? Math.round(psf * sqft) : null;
+  // No building-area valuation for a co-op, condo or 7+ unit subject (the
+  // 1-3 family $/sq ft does not price those); the reason prints instead.
+  const guard = valuationGuard(zoning?.data);
+  const indicative = guard.allowed && psf != null && sqft != null && sqft > 0 ? Math.round(psf * sqft) : null;
 
   return (
     <div style={panelStyle} id={id}>
@@ -44,20 +48,31 @@ export default function ValuationPanel({ detail, detailError, id }: ValuationPan
           <span
             style={{
               fontFamily: "var(--font-mono)",
-              fontSize: "32px",
+              fontSize: guard.allowed ? "32px" : "18px",
               fontWeight: 500,
               color: "var(--ink-primary)",
+              lineHeight: 1.2,
             }}
           >
-            {indicative != null ? fmtMoney(indicative) : "—"}
+            {!guard.allowed
+              ? "No unit-comparable valuation"
+              : indicative != null
+                ? fmtMoney(indicative)
+                : "Not computable"}
           </span>
           {comps && <ProvenanceBadge provenance={comps.provenance} />}
         </div>
-        <p style={{ fontSize: "12px", color: "var(--ink-muted)", margin: "6px 0 0" }}>
-          Indicative value: median recorded-sale {psf != null ? fmtMoney(psf) : "—"}/sq ft ×{" "}
-          {sqft != null ? fmtInt(sqft) : "—"} sq ft building area (live PLUTO).
-          {comps?.provenance !== "live" && (
-            <> Representative fallback. Live NYC recorded sales were unavailable for this request.</>
+        <p style={{ fontSize: "12px", color: "var(--ink-muted)", margin: "6px 0 0", lineHeight: 1.5 }}>
+          {!guard.allowed ? (
+            guard.reason
+          ) : (
+            <>
+              Indicative value: median recorded-sale {psf != null ? fmtMoney(psf) : "—"}/sq ft ×{" "}
+              {sqft != null ? fmtInt(sqft) : "—"} sq ft building area (live PLUTO).
+              {comps && comps.provenance !== "live" && (
+                <> Not fetched live this run; the recorded-sales call did not succeed.</>
+              )}
+            </>
           )}
         </p>
       </div>

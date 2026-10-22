@@ -10,6 +10,7 @@
 import type { ZoningInfo, MlsCompsSummary } from '../../providers/types';
 import type { DocumentData, Letterhead } from '../types';
 import type { RenderModel, RenderSection } from '../render/model';
+import { valuationGuard, excludeSubject } from '../valuation-guard';
 
 const MAX_COMPS_SHOWN = 12;
 
@@ -49,6 +50,10 @@ export interface PricingFacts {
   lowValue: number | null;
   midValue: number | null;
   highValue: number | null;
+  // Non-null when the building-area valuation is withheld (co-op, condo, 7+
+  // units): the reason is printed IN PLACE of the dollar figures.
+  valuationBlockedReason: string | null;
+  subjectExcluded: boolean; // the subject's own recorded sale was removed from its comp pool
 }
 
 export function extractPricingFacts(
@@ -60,16 +65,23 @@ export function extractPricingFacts(
   if (!comps || comps.sales_count <= 0 || comps.comps.length === 0) {
     return { ok: false, error: 'No recorded comparable sales available for this area. Cannot build a price band.' };
   }
-  const psf = comps.comps.map((c) => c.price_per_sqft).filter((n) => Number.isFinite(n) && n > 0).sort((a, b) => a - b);
+  // ONE comp pool for the band edges, the midpoint and (in the CMA) the HPI
+  // adjustment: the distance-ranked comparables, with the subject's own recorded
+  // sale excluded so a property never prices itself. The midpoint is the TRIMMED
+  // median of that same pool (the pricing sheet, CMA and net sheet all share
+  // this function, so two KOANO documents on one property never disagree).
+  const pool = excludeSubject(comps.comps, data.resolved_address.normalized);
+  const subjectExcluded = pool.length !== comps.comps.length;
+  const psf = pool.map((c) => c.price_per_sqft).filter((n) => Number.isFinite(n) && n > 0).sort((a, b) => a - b);
+  if (psf.length === 0) {
+    return { ok: false, error: 'No comparable recorded sales with a $/sq ft remain after excluding the subject. Cannot build a price band.' };
+  }
   const p25 = percentile(psf, 25);
   const p75 = percentile(psf, 75);
-  // Midpoint = the provider's TRIMMED median (the same central figure the net
-  // sheet, one-pager, and tax-appeal packet use) so two KOANO documents on one
-  // property never disagree on the central value; only the band EDGES are raw
-  // percentiles of the comparable distribution.
-  const median = comps.median_price_per_sqft;
+  const median = trimmedMedianPsf(psf);
+  const guard = valuationGuard(zoning);
   const area = zoning.building_area_sqft;
-  const scale = area && area > 0 ? area : null;
+  const scale = guard.allowed && area && area > 0 ? area : null;
   return {
     ok: true,
     facts: {
@@ -80,15 +92,27 @@ export function extractPricingFacts(
       salesCount: comps.sales_count,
       priceTrend: comps.price_trend,
       scopeNote: comps.scope_note,
-      comps: comps.comps,
+      comps: pool,
       p25Psf: p25,
       medianPsf: median,
       p75Psf: p75,
       lowValue: scale ? p25 * scale : null,
       midValue: scale ? median * scale : null,
       highValue: scale ? p75 * scale : null,
+      valuationBlockedReason: guard.allowed ? null : guard.reason,
+      subjectExcluded,
     },
   };
+}
+
+// Trimmed median of a sorted ascending $/sq ft pool (drops 10% off each end
+// when there are at least 5 sales), so an outlier never sets the midpoint.
+export function trimmedMedianPsf(sorted: number[]): number {
+  if (sorted.length === 0) return 0;
+  const cut = sorted.length >= 5 ? Math.floor(sorted.length * 0.1) : 0;
+  const s = sorted.slice(cut, sorted.length - cut);
+  const m = Math.floor(s.length / 2);
+  return Math.round(s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2);
 }
 
 export function buildPricingModel(args: {
@@ -100,22 +124,34 @@ export function buildPricingModel(args: {
   const { facts: f, letterhead, appendix, generatedAt } = args;
   const sections: RenderSection[] = [];
 
-  // 1 — The recommended band (headline figures) + how it was computed.
+  // 1 — The recommended band (headline figures) + how it was computed. When the
+  // building-area valuation is withheld (co-op, condo, 7+ units) the per-sq-ft
+  // band still prints, the dollar figures do not, and the reason is stated.
+  const blocked = f.valuationBlockedReason;
   sections.push({
     heading: 'Recommended Price Band',
     provenanceNote: {
       provenance: 'live',
-      text: 'The band is the interquartile spread (25th–75th percentile) of comparable recorded $/sq ft, applied to the subject building area. It is an indicative range from recorded sales, not an appraisal or a list price.',
+      text: blocked
+        ? 'The band below is per square foot of comparable recorded sales. No whole-building dollar value is printed for this subject; the reason is stated under the figures.'
+        : 'The band is the interquartile spread (25th to 75th percentile) of comparable recorded $/sq ft, applied to the subject building area. It is an indicative range from recorded sales, not an appraisal or a list price.',
     },
     highlight: {
-      figures: [
-        { label: 'Low (25th percentile)', value: fmtMoney(f.lowValue), sub: `${fmtMoney(f.p25Psf)}/sq ft` },
-        { label: 'Midpoint (trimmed median)', value: fmtMoney(f.midValue), sub: `${fmtMoney(f.medianPsf)}/sq ft`, emphasis: true },
-        { label: 'High (75th percentile)', value: fmtMoney(f.highValue), sub: `${fmtMoney(f.p75Psf)}/sq ft` },
-      ],
+      figures: blocked
+        ? [
+            { label: 'Low (25th percentile)', value: `${fmtMoney(f.p25Psf)}/sq ft` },
+            { label: 'Midpoint (trimmed median)', value: `${fmtMoney(f.medianPsf)}/sq ft`, emphasis: true },
+            { label: 'High (75th percentile)', value: `${fmtMoney(f.p75Psf)}/sq ft` },
+          ]
+        : [
+            { label: 'Low (25th percentile)', value: fmtMoney(f.lowValue), sub: `${fmtMoney(f.p25Psf)}/sq ft` },
+            { label: 'Midpoint (trimmed median)', value: fmtMoney(f.midValue), sub: `${fmtMoney(f.medianPsf)}/sq ft`, emphasis: true },
+            { label: 'High (75th percentile)', value: fmtMoney(f.highValue), sub: `${fmtMoney(f.p75Psf)}/sq ft` },
+          ],
     },
     paragraphs: [
-      `Derivation: the ${fmtInt(f.salesCount)} qualifying recorded sales were reduced to their price-per-square-foot. The 25th and 75th percentiles of that distribution (${fmtMoney(f.p25Psf)} and ${fmtMoney(f.p75Psf)} per sq ft) set the low and high edges: the interquartile spread, the middle 50% of comparable sales, which deliberately excludes the cheapest and most expensive outliers on both ends. KOANO's trimmed median (${fmtMoney(f.medianPsf)} per sq ft) sets the midpoint. All three were applied to the subject's ${fmtInt(f.buildingAreaSqft)} sq ft of building area.`,
+      ...(blocked ? [blocked] : []),
+      `Derivation: the ${fmtInt(f.comps.length)} comparable recorded sales${f.subjectExcluded ? ' (the subject\'s own recorded sale excluded)' : ''} were reduced to their price per square foot. The 25th and 75th percentiles of that distribution (${fmtMoney(f.p25Psf)} and ${fmtMoney(f.p75Psf)} per sq ft) set the low and high edges: the interquartile spread, the middle 50% of comparable sales, which deliberately excludes the cheapest and most expensive outliers on both ends. The trimmed median of the same pool (${fmtMoney(f.medianPsf)} per sq ft) sets the midpoint.${blocked ? '' : ` All three were applied to the subject's ${fmtInt(f.buildingAreaSqft)} sq ft of building area.`}`,
       `Local recorded-sale prices are ${f.priceTrend}, which the reviewer should weigh alongside the band.`,
     ],
   });
@@ -147,7 +183,7 @@ export function buildPricingModel(args: {
         fmtInt(c.gross_square_feet),
         c.building_class,
       ]),
-      caption: `${fmtInt(f.salesCount)} qualifying recorded sales in scope. Recorded sales have no days-on-market.`,
+      caption: `${fmtInt(f.salesCount)} qualifying recorded sales in scope; ${fmtInt(f.comps.length)} in the comparable pool. Recorded sales have no days-on-market.`,
     },
   };
   if (f.comps.length > shown.length) {

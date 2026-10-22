@@ -14,6 +14,7 @@
 
 import type { ZoningInfo, MlsCompsSummary } from '../../providers/types';
 import type { DocumentData, Letterhead } from '../types';
+import { valuationGuard } from '../valuation-guard';
 import type { RenderModel, RenderSection } from '../render/model';
 import { getAnthropicClient, KOANO_RUNTIME_MODEL } from '../../agents/shared';
 
@@ -42,6 +43,7 @@ export interface TaxAppealFacts {
   scopeNote: string;
   comps: MlsCompsSummary['comps'];
   indicativeValue: number | null; // median psf × building area (modeled from live inputs)
+  valuationBlockedReason: string | null; // set when the building-area valuation is withheld
 }
 
 // Pull the tax-appeal facts out of assembled data. Returns an error string if a
@@ -57,8 +59,9 @@ export function extractTaxAppealFacts(
     return { ok: false, error: 'No recorded comparable sales available for this area. Cannot build a comps-based packet.' };
   }
   const buildingAreaSqft = zoning.building_area_sqft;
+  const guard = valuationGuard(zoning);
   const indicativeValue =
-    buildingAreaSqft && buildingAreaSqft > 0 ? comps.median_price_per_sqft * buildingAreaSqft : null;
+    guard.allowed && buildingAreaSqft && buildingAreaSqft > 0 ? comps.median_price_per_sqft * buildingAreaSqft : null;
 
   return {
     ok: true,
@@ -76,6 +79,7 @@ export function extractTaxAppealFacts(
       scopeNote: comps.scope_note,
       comps: comps.comps,
       indicativeValue,
+      valuationBlockedReason: guard.allowed ? null : guard.reason,
     },
   };
 }
@@ -85,7 +89,9 @@ export function deterministicArgument(f: TaxAppealFacts): string[] {
   const paras: string[] = [];
   paras.push(
     `The subject property at ${f.addressLabel}${f.bbl ? ` (BBL ${f.bbl})` : ''} carries a current DOF total assessed value of ${fmtMoney(f.assessedTotal)}. ` +
-      `Recorded sales of comparable properties indicate a market value of approximately ${fmtMoney(f.indicativeValue)}, based on a median of ${fmtMoney(f.medianPsf)} per square foot across ${fmtInt(f.salesCount)} recorded sales applied to the property's ${fmtInt(f.buildingAreaSqft)} square feet of building area.`,
+      (f.indicativeValue != null
+        ? `Recorded sales of comparable properties indicate a market value of approximately ${fmtMoney(f.indicativeValue)}, based on a median of ${fmtMoney(f.medianPsf)} per square foot across ${fmtInt(f.salesCount)} recorded sales applied to the property's ${fmtInt(f.buildingAreaSqft)} square feet of building area.`
+        : `Recorded sales of comparable properties run ${fmtMoney(f.medianPsf)} per square foot across ${fmtInt(f.salesCount)} recorded sales. ${f.valuationBlockedReason ?? 'No whole-building value is printed for this subject.'}`),
   );
   paras.push(
     `Local recorded-sale prices are ${f.priceTrend}. To evaluate an appeal, compare the market value shown on your DOF Notice of Property Value against the indicative market value above. A material gap between the two is the basis for a Request for Review or a Tax Commission appeal. The comparable sales supporting this figure are listed above; ${f.scopeNote}`,
@@ -199,8 +205,10 @@ export function buildTaxAppealModel(args: {
   sections.push({
     heading: 'Indicative Value vs. Assessment',
     paragraphs: [
-      `Indicative market value from recorded comparable sales: ${fmtMoney(f.indicativeValue)} ` +
-        `(${fmtMoney(f.medianPsf)}/sq ft median × ${fmtInt(f.buildingAreaSqft)} sq ft building area).`,
+      f.indicativeValue != null
+        ? `Indicative market value from recorded comparable sales: ${fmtMoney(f.indicativeValue)} ` +
+          `(${fmtMoney(f.medianPsf)}/sq ft median × ${fmtInt(f.buildingAreaSqft)} sq ft building area).`
+        : `Indicative market value: not available for this subject. ${f.valuationBlockedReason ?? ''} Comparable recorded sales run ${fmtMoney(f.medianPsf)}/sq ft.`,
       `DOF total assessed value: ${fmtMoney(f.assessedTotal)}. Note: the assessed value is a class-dependent fraction of the DOF market value, so it is not directly comparable to the indicative market value above. Compare the indicative value to the MARKET VALUE printed on your DOF Notice of Property Value.`,
     ],
   });

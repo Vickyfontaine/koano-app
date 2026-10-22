@@ -11,6 +11,8 @@
 import type { ZoningInfo, MlsCompsSummary } from '../../providers/types';
 import type { DocumentData, Letterhead } from '../types';
 import type { RenderModel, RenderSection } from '../render/model';
+import { valuationGuard, excludeSubject } from '../valuation-guard';
+import { trimmedMedianPsf } from './pricing-sheet';
 
 function fmtMoney(n: number | null | undefined): string {
   if (n == null || !Number.isFinite(n)) return '—';
@@ -29,6 +31,7 @@ export interface NetSheetFacts {
   salesCount: number;
   scopeNote: string;
   indicativeValue: number | null;
+  valuationBlockedReason: string | null;
 }
 
 export function extractNetSheetFacts(
@@ -41,16 +44,22 @@ export function extractNetSheetFacts(
     return { ok: false, error: 'No recorded comparable sales available for this area. Cannot derive an indicative price.' };
   }
   const area = zoning.building_area_sqft;
+  const guard = valuationGuard(zoning);
+  // The same pool + midpoint as the pricing sheet and CMA (subject excluded).
+  const pool = excludeSubject(comps.comps, data.resolved_address.normalized);
+  const psf = pool.map((c) => c.price_per_sqft).filter((n) => Number.isFinite(n) && n > 0).sort((a, b) => a - b);
+  const medianPsf = psf.length ? trimmedMedianPsf(psf) : comps.median_price_per_sqft;
   return {
     ok: true,
     facts: {
       addressLabel: data.resolved_address.normalized || data.resolved_address.input,
       bbl: data.resolved_address.bbl,
       buildingAreaSqft: area,
-      medianPsf: comps.median_price_per_sqft,
+      medianPsf,
       salesCount: comps.sales_count,
       scopeNote: comps.scope_note,
-      indicativeValue: area && area > 0 ? comps.median_price_per_sqft * area : null,
+      indicativeValue: guard.allowed && area && area > 0 ? medianPsf * area : null,
+      valuationBlockedReason: guard.allowed ? null : guard.reason,
     },
   };
 }
@@ -73,15 +82,23 @@ export function buildNetSheetModel(args: {
     },
     highlight: {
       figures: [
-        {
-          label: 'KOANO indicative value (recorded sales)',
-          value: fmtMoney(f.indicativeValue),
-          sub: `${fmtMoney(f.medianPsf)}/sq ft median × ${fmtInt(f.buildingAreaSqft)} sq ft · ${fmtInt(f.salesCount)} recorded sales`,
-          emphasis: true,
-        },
+        f.valuationBlockedReason
+          ? {
+              label: 'Indicative value (recorded sales)',
+              value: 'Not available for this subject',
+              sub: `${fmtMoney(f.medianPsf)}/sq ft median across ${fmtInt(f.salesCount)} recorded sales; enter your contract or list price`,
+              emphasis: true,
+            }
+          : {
+              label: 'KOANO indicative value (recorded sales)',
+              value: fmtMoney(f.indicativeValue),
+              sub: `${fmtMoney(f.medianPsf)}/sq ft median × ${fmtInt(f.buildingAreaSqft)} sq ft · ${fmtInt(f.salesCount)} recorded sales`,
+              emphasis: true,
+            },
       ],
     },
     paragraphs: [
+      ...(f.valuationBlockedReason ? [f.valuationBlockedReason] : []),
       'Every line below is estimated FROM this figure. If you have a contract price, a list price, or an appraised value, use that instead. This indicative value is only a placeholder so the sheet is usable before those exist.',
     ],
   });
@@ -112,7 +129,9 @@ export function buildNetSheetModel(args: {
     paragraphs: [
       'Seller net proceeds  =  sale price  −  (transfer taxes  +  title  +  commission  +  mortgage payoff  +  attorney/misc.)',
       'Buyer cash to close  =  down payment  +  (transfer taxes  +  title  +  attorney/misc.)  −  credits',
-      `Using the assumed sale price of ${fmtMoney(f.indicativeValue)}, the net is that figure minus the totals you enter above. KOANO does not compute a net total, because the inputs are yours to supply. A number here would be false precision.`,
+      f.indicativeValue != null
+        ? `Using the assumed sale price of ${fmtMoney(f.indicativeValue)}, the net is that figure minus the totals you enter above. KOANO does not compute a net total, because the inputs are yours to supply. A number here would be false precision.`
+        : 'Enter your contract or list price as the sale price; the net is that figure minus the totals you enter above. KOANO does not compute a net total, because the inputs are yours to supply. A number here would be false precision.',
     ],
   });
 

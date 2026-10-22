@@ -8,6 +8,7 @@
 
 import React from "react";
 import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
+import { valuationGuard } from "../../../../lib/documents/valuation-guard";
 import { VERDICT_COLORS, weakestProvenance, type SynthesisResult } from "@/components/ui/verdict";
 import { BlockError, PanelHeader, Row, fmtInt, fmtMoney, panelStyle } from "../panels";
 import type { SiteDetailResponse } from "@/app/api/site-detail/route";
@@ -32,7 +33,8 @@ export default function PricingPanel({ detail, detailError, verdict, id }: Prici
   // A band needs a REAL $/sqft and a REAL area. psf === 0 is the "no comps"
   // signal (e.g. an out-of-coverage address) — it must NOT produce a "$0 – $0"
   // band a user could act on; fall through to the unavailable message instead.
-  const base = psf != null && psf > 0 && sqft != null && sqft > 0 ? psf * sqft : null;
+  const guard = valuationGuard(zoning?.data);
+  const base = guard.allowed && psf != null && psf > 0 && sqft != null && sqft > 0 ? psf * sqft : null;
 
   // The band leans on BOTH the comp benchmark and the PLUTO area, so its
   // provenance is the weaker of the two — never just the comps'.
@@ -88,6 +90,16 @@ export default function PricingPanel({ detail, detailError, verdict, id }: Prici
             {pricingProvenance !== "live" && (
               <> Not fully live. A fully live band needs live recorded sales and live PLUTO area.</>
             )}
+          </p>
+        </>
+      ) : !guard.allowed ? (
+        <>
+          <p style={{ fontSize: "16px", fontWeight: 500, color: "var(--ink-primary)", margin: 0 }}>
+            No unit-comparable valuation available
+          </p>
+          <p style={{ fontSize: "13px", lineHeight: 1.55, color: "var(--ink-secondary)", margin: 0 }}>
+            {guard.reason}
+            {psf != null && psf > 0 ? ` Nearby recorded sales run ${fmtMoney(psf)}/sq ft (${trend ?? "trend unknown"}).` : ""}
           </p>
         </>
       ) : (

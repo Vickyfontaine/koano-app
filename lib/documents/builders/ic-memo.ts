@@ -436,7 +436,7 @@ export function buildIcMemoModel(args: {
   }
   sections.push(exhibitA);
 
-  // Exhibit B — Verdict Math (the reconstructed weighting breakdown).
+  // Exhibit B — Verdict Math (the stored weighting breakdown, or the re-derivation).
   const b = v.breakdown;
   sections.push({
     number: 'B',
@@ -448,9 +448,19 @@ export function buildIcMemoModel(args: {
       columns: ['Agent', 'Verdict', 'Confidence (weight)', 'Direction', 'Contribution'],
       rows: [
         ...b.agents.map((a) => [a.agent, a.verdict, fmtInt(a.confidence), String(a.direction), (a.contribution >= 0 ? '+' : '') + fmtInt(a.contribution)]),
-        ['Weighted score', '', fmtInt(b.total_weight), '', String(b.aggregate_score)],
+        ['Sum', '', fmtInt(b.total_weight), '', (sumContribution(b) >= 0 ? '+' : '') + fmtInt(sumContribution(b))],
+        ['Agent-weighted score (sum of contributions ÷ sum of weights)', '', '', '', String(b.aggregate_score)],
+        ...(b.structural_nudge
+          ? [
+              ['Structural nudge from the facts', '', '', '', (b.structural_nudge >= 0 ? '+' : '') + String(b.structural_nudge)],
+              ['Final score', '', '', '', String(b.final_score ?? b.aggregate_score)],
+            ]
+          : []),
       ],
-      caption: `Weighted score ${b.aggregate_score} vs thresholds: buy ≥ ${b.thresholds.buy}, hold ≥ ${b.thresholds.hold}, wait ≥ ${b.thresholds.wait} → ${b.chosen_verdict.toUpperCase()} at confidence ${v.confidence}/100.`,
+      caption:
+        `Final score ${b.final_score ?? b.aggregate_score} vs thresholds: buy ≥ ${b.thresholds.buy}, hold ≥ ${b.thresholds.hold}, wait ≥ ${b.thresholds.wait} → ${b.chosen_verdict.toUpperCase()} at confidence ${v.confidence}/100.` +
+        (b.structural_drivers && b.structural_drivers.length > 0 ? ` Structural drivers: ${b.structural_drivers.join('; ')}.` : '') +
+        (b.reconstructed ? ' The agent-vote math is re-derived from the stored votes; the structural nudge was not stored with this verdict.' : ''),
     },
   });
 
@@ -468,4 +478,8 @@ export function buildIcMemoModel(args: {
     appendix,
     generatedAt,
   };
+}
+
+function sumContribution(b: { agents: { contribution: number }[] }): number {
+  return b.agents.reduce((s, a) => s + a.contribution, 0);
 }

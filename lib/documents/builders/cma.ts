@@ -77,7 +77,8 @@ export function extractCmaFacts(
   const adjComps: AdjComp[] = pricing.facts.comps.map((c) => ({ ...c, adjustedPsf: hpiAdjust(c.price_per_sqft, c.sale_date, yoy) }));
   const adjPsf = adjComps.map((c) => c.adjustedPsf).filter((n) => Number.isFinite(n) && n > 0);
   const timeAdjustedMedianPsf = adjPsf.length ? trimmedMedian(adjPsf) : pricing.facts.medianPsf;
-  const area = pricing.facts.buildingAreaSqft;
+  // Same pool, same guard as the pricing sheet: no whole-building value when withheld.
+  const area = pricing.facts.valuationBlockedReason ? null : pricing.facts.buildingAreaSqft;
 
   return {
     ok: true,
@@ -135,7 +136,7 @@ export function cmaFactsForModel(f: CmaFacts): Record<string, unknown> {
 }
 
 export function deterministicCmaNarrative(f: CmaFacts): string[] {
-  const band = `The comparable recorded sales place value in a band of ${fmtMoney(f.p25Psf)} to ${fmtMoney(f.p75Psf)} per square foot, with a central figure of ${fmtMoney(f.medianPsf)} (${fmtMoney(f.timeAdjustedMedianPsf)} adjusted to today's market via the ${f.hpiRegion ?? 'regional'} House Price Index). Local recorded-sale prices are ${f.priceTrend}.`;
+  const band = `The comparable recorded sales place value in a band of ${fmtMoney(f.p25Psf)} to ${fmtMoney(f.p75Psf)} per square foot, with a central figure of ${fmtMoney(f.medianPsf)} (${fmtMoney(f.timeAdjustedMedianPsf)} adjusted to today's market via the ${f.hpiRegion ?? 'regional'} House Price Index). Local recorded-sale prices are ${f.priceTrend}.${f.valuationBlockedReason ? ` ${f.valuationBlockedReason}` : ''}`;
   const macro = f.hpiYoy != null
     ? `The ${f.hpiRegion ?? 'regional'} House Price Index moved ${fmtPct(f.hpiYoy)} year over year (${f.hpiPeriod ?? 'latest period'})${f.hpi5yr != null ? ` and ${fmtPct(f.hpi5yr)} over five years` : ''}, the macro backdrop against which these comparables should be read.`
     : 'House Price Index context was unavailable for this call.';
@@ -156,19 +157,34 @@ export function buildCmaModel(args: {
   const { facts: f, letterhead, narrative, appendix, generatedAt } = args;
   const sections: RenderSection[] = [];
 
-  // 1 — Pricing recommendation (band + HPI time adjustment).
+  // 1 — Pricing recommendation (band + HPI time adjustment). Band edges, the
+  // midpoint and the HPI adjustment all come from ONE comp pool (the subject
+  // excluded). A withheld building-area valuation prints per sq ft + the reason.
+  const blocked = f.valuationBlockedReason;
   sections.push({
     heading: 'Pricing Recommendation',
-    provenanceNote: { provenance: 'live', text: 'An indicative range from distance-ranked recorded sales, not an appraisal or a list price. The midpoint is also shown adjusted to today via the regional House Price Index.' },
+    provenanceNote: {
+      provenance: 'live',
+      text: blocked
+        ? 'A per-square-foot range from distance-ranked recorded sales. No whole-building dollar value is printed for this subject; the reason is stated under the figures.'
+        : 'An indicative range from distance-ranked recorded sales, not an appraisal or a list price. The midpoint is also shown adjusted to today via the regional House Price Index.',
+    },
     highlight: {
-      figures: [
-        { label: 'Low (25th percentile)', value: fmtMoney(f.lowValue), sub: `${fmtMoney(f.p25Psf)}/sq ft` },
-        { label: 'Midpoint (trimmed median)', value: fmtMoney(f.midValue), sub: `${fmtMoney(f.medianPsf)}/sq ft`, emphasis: true },
-        { label: 'HPI-adjusted midpoint', value: fmtMoney(f.timeAdjustedMidValue), sub: `${fmtMoney(f.timeAdjustedMedianPsf)}/sq ft` },
-      ],
+      figures: blocked
+        ? [
+            { label: 'Low (25th percentile)', value: `${fmtMoney(f.p25Psf)}/sq ft` },
+            { label: 'Midpoint (trimmed median)', value: `${fmtMoney(f.medianPsf)}/sq ft`, emphasis: true },
+            { label: 'HPI-adjusted midpoint', value: `${fmtMoney(f.timeAdjustedMedianPsf)}/sq ft` },
+          ]
+        : [
+            { label: 'Low (25th percentile)', value: fmtMoney(f.lowValue), sub: `${fmtMoney(f.p25Psf)}/sq ft` },
+            { label: 'Midpoint (trimmed median)', value: fmtMoney(f.midValue), sub: `${fmtMoney(f.medianPsf)}/sq ft`, emphasis: true },
+            { label: 'HPI-adjusted midpoint', value: fmtMoney(f.timeAdjustedMidValue), sub: `${fmtMoney(f.timeAdjustedMedianPsf)}/sq ft` },
+          ],
     },
     paragraphs: [
-      `The band is the interquartile spread (25th–75th percentile) of ${fmtInt(f.salesCount)} comparable recorded $/sq ft (the middle 50% of nearby sales, excluding outliers on both ends) applied to the subject's ${fmtInt(f.buildingAreaSqft)} sq ft. Comparables are ranked by true distance from the subject (recorded sale → PLUTO centroid).`,
+      ...(blocked ? [blocked] : []),
+      `The band is the interquartile spread (25th to 75th percentile) of ${fmtInt(f.comps.length)} comparable recorded $/sq ft (the middle 50% of nearby sales, excluding outliers on both ends${f.subjectExcluded ? ', and excluding the subject\'s own recorded sale' : ''})${blocked ? '' : ` applied to the subject's ${fmtInt(f.buildingAreaSqft)} sq ft`}. Band, midpoint and the HPI adjustment are all computed on that one pool. Comparables are ranked by true distance from the subject (recorded sale to PLUTO centroid).`,
       `The HPI-adjusted midpoint moves each comparable's price to today using the ${f.hpiRegion ?? 'regional'} House Price Index (${fmtPct(f.hpiYoy)} YoY${f.hpiPeriod ? `, ${f.hpiPeriod}` : ''}), so older sales are not read at stale prices. Local recorded-sale prices are ${f.priceTrend}.`,
     ],
   });
@@ -189,7 +205,7 @@ export function buildCmaModel(args: {
         fmtInt(c.gross_square_feet),
         c.building_class,
       ]),
-      caption: `${fmtInt(f.salesCount)} qualifying recorded sales, distance-ranked. Recorded sales carry no beds/baths, condition, or days-on-market (those require MLS). ${f.scopeNote}`,
+      caption: `${fmtInt(f.comps.length)} comparable recorded sales, distance-ranked${f.subjectExcluded ? ', subject excluded' : ''}. Recorded sales carry no beds/baths, condition, or days-on-market (those require MLS). ${f.scopeNote}`,
     },
   });
 

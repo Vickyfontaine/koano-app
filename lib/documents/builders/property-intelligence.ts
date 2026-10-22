@@ -32,6 +32,7 @@ import type {
 } from '../../providers/types';
 import type { SiteDetailBlock } from '../../providers/blocks';
 import type { DocumentData, Letterhead } from '../types';
+import { valuationGuard } from '../valuation-guard';
 import type { RenderModel, RenderSection } from '../render/model';
 import { appendixWithVerdict, type ProvenanceAppendix } from '../disclaimer';
 import { getAnthropicClient, KOANO_RUNTIME_MODEL } from '../../agents/shared';
@@ -64,6 +65,7 @@ export interface PropertyIntelligenceFacts {
   buildingAreaSqft: number | null;
   // Value
   indicativeValue: number | null;
+  valuationBlockedReason: string | null;
   medianPsf: number | null;
   salesCount: number;
   priceTrend: 'rising' | 'falling' | 'flat' | null;
@@ -110,8 +112,9 @@ export function extractPropertyIntelligenceFacts(
   const demo = demoLive ? (data.blocks.demographics?.data as AcsDemographics) : null;
 
   const area = zoning.building_area_sqft;
+  const guard = valuationGuard(zoning);
   const indicativeValue =
-    comps && comps.sales_count > 0 && area && area > 0 ? comps.median_price_per_sqft * area : null;
+    guard.allowed && comps && comps.sales_count > 0 && area && area > 0 ? comps.median_price_per_sqft * area : null;
 
   return {
     ok: true,
@@ -125,6 +128,7 @@ export function extractPropertyIntelligenceFacts(
       zoningDistrict: zoning.zoning_district,
       buildingAreaSqft: area,
       indicativeValue,
+      valuationBlockedReason: guard.allowed ? null : guard.reason,
       medianPsf: comps && comps.sales_count > 0 ? comps.median_price_per_sqft : null,
       salesCount: comps?.sales_count ?? 0,
       priceTrend: comps && comps.sales_count > 0 ? comps.price_trend : null,
@@ -206,6 +210,10 @@ export function deterministicTrajectory(f: PropertyIntelligenceFacts): string[] 
     valueBits.push(
       `Recorded comparable sales place an indicative value near ${fmtMoney(f.indicativeValue)} (${fmtMoney(f.medianPsf)}/sq ft across ${fmtInt(f.salesCount)} sales)`,
     );
+  } else if (f.valuationBlockedReason && f.medianPsf != null) {
+    valueBits.push(
+      `Nearby recorded sales run ${fmtMoney(f.medianPsf)}/sq ft across ${fmtInt(f.salesCount)} sales, but no whole-building value is printed for this subject (${f.valuationBlockedReason.split(':')[0].toLowerCase()})`,
+    );
   }
   if (f.priceTrend) valueBits.push(`local recorded-sale prices are ${f.priceTrend}`);
   if (f.hpiYoY != null) valueBits.push(`the ${f.hpiRegion ?? 'regional'} House Price Index is ${fmtPct(f.hpiYoY)} year over year`);
@@ -285,12 +293,14 @@ export function buildPropertyIntelligenceModel(args: {
     heading: 'What It Is Worth (Indicative)',
     provenanceNote: {
       provenance: 'live',
-      text: 'Indicative value = median recorded $/sq ft (NYC DOF Rolling Sales) × PLUTO building area. Indicative, not an appraisal.',
+      text: f.valuationBlockedReason
+        ? f.valuationBlockedReason
+        : 'Indicative value = median recorded $/sq ft (NYC DOF Rolling Sales) × PLUTO building area. Indicative, not an appraisal.',
     },
     table: {
       columns: ['Field', 'Value'],
       rows: [
-        ['Indicative market value', fmtMoney(f.indicativeValue)],
+        ['Indicative market value', f.valuationBlockedReason ? 'Not available for this subject' : fmtMoney(f.indicativeValue)],
         ['Median recorded sale $/sq ft', fmtMoney(f.medianPsf)],
         ['Building area', f.buildingAreaSqft != null ? `${fmtInt(f.buildingAreaSqft)} sq ft` : '—'],
         ['Recorded sales in scope', fmtInt(f.salesCount)],
