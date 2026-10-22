@@ -14,7 +14,7 @@
 
 import type { ZoningInfo, MlsCompsSummary } from '../../providers/types';
 import type { DocumentData, Letterhead } from '../types';
-import { valuationGuard } from '../valuation-guard';
+import { valuationGuard, compPool } from '../valuation-guard';
 import type { RenderModel, RenderSection } from '../render/model';
 import { getAnthropicClient, KOANO_RUNTIME_MODEL } from '../../agents/shared';
 
@@ -60,8 +60,10 @@ export function extractTaxAppealFacts(
   }
   const buildingAreaSqft = zoning.building_area_sqft;
   const guard = valuationGuard(zoning);
+  const pool = compPool(comps, data.resolved_address.normalized);
+  const medianPsf = pool.medianPsf ?? comps.median_price_per_sqft;
   const indicativeValue =
-    guard.allowed && buildingAreaSqft && buildingAreaSqft > 0 ? comps.median_price_per_sqft * buildingAreaSqft : null;
+    guard.allowed && buildingAreaSqft && buildingAreaSqft > 0 ? medianPsf * buildingAreaSqft : null;
 
   return {
     ok: true,
@@ -73,11 +75,11 @@ export function extractTaxAppealFacts(
       buildingAreaSqft,
       assessedTotal: zoning.assessed_total_usd,
       assessedLand: zoning.assessed_land_usd,
-      medianPsf: comps.median_price_per_sqft,
-      salesCount: comps.sales_count,
+      medianPsf,
+      salesCount: pool.comps.length || comps.sales_count,
       priceTrend: comps.price_trend,
       scopeNote: comps.scope_note,
-      comps: comps.comps,
+      comps: pool.comps,
       indicativeValue,
       valuationBlockedReason: guard.allowed ? null : guard.reason,
     },
@@ -94,7 +96,9 @@ export function deterministicArgument(f: TaxAppealFacts): string[] {
         : `Recorded sales of comparable properties run ${fmtMoney(f.medianPsf)} per square foot across ${fmtInt(f.salesCount)} recorded sales. ${f.valuationBlockedReason ?? 'No whole-building value is printed for this subject.'}`),
   );
   paras.push(
-    `Local recorded-sale prices are ${f.priceTrend}. To evaluate an appeal, compare the market value shown on your DOF Notice of Property Value against the indicative market value above. A material gap between the two is the basis for a Request for Review or a Tax Commission appeal. The comparable sales supporting this figure are listed above; ${f.scopeNote}`,
+    f.indicativeValue != null
+      ? `Local recorded-sale prices are ${f.priceTrend}. To evaluate an appeal, compare the market value shown on your DOF Notice of Property Value against the indicative market value above. A material gap between the two is the basis for a Request for Review or a Tax Commission appeal. The comparable sales supporting this figure are listed above; ${f.scopeNote}`
+      : `Local recorded-sale prices are ${f.priceTrend}. Because no whole-building indicative value can be computed for this subject, compare the market value on your DOF Notice of Property Value against unit-level sales you obtain separately; the recorded $/sq ft above is context only. ${f.scopeNote}`,
   );
   return paras;
 }

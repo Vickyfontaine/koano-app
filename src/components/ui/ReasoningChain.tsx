@@ -166,7 +166,7 @@ export default function ReasoningChain({
         <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
           {groups.map((g, gi) => (
             <div key={gi}>
-              <div style={{ ...monoLabel, marginBottom: "10px", color: "var(--brand-blue)" }}>
+              <div style={{ ...monoLabel, marginBottom: "10px", color: "var(--mid-blue-ink)" }}>
                 {agentLabel(g.agent)}
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>

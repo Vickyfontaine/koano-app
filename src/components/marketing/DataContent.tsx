@@ -450,7 +450,7 @@ export default function DataContent() {
                         fontFamily: "var(--font-mono)",
                         fontSize: "11px",
                         fontWeight: 500,
-                        color: "var(--signal-warning)",
+                        color: "var(--signal-warning-ink)",
                         letterSpacing: "0.08em",
                         textTransform: "uppercase",
                         border: "1px solid var(--signal-warning)",

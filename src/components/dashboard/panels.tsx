@@ -38,12 +38,22 @@ export const panelTitle: React.CSSProperties = {
 
 export const monoLabel = panelTitle;
 
+// Fill hue for meters, bars and dots.
 export function riskColor(score: number): string {
   return score >= 67
     ? "var(--signal-negative)"
     : score >= 34
       ? "var(--signal-warning)"
       : "var(--signal-positive)";
+}
+
+// AA ink for a risk figure rendered as TEXT (never the fill hue).
+export function riskInk(score: number): string {
+  return score >= 67
+    ? "var(--signal-negative-ink)"
+    : score >= 34
+      ? "var(--signal-warning-ink)"
+      : "var(--signal-positive-ink)";
 }
 
 export function Row({ label, value }: { label: string; value: React.ReactNode }) {

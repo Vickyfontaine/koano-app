@@ -33,6 +33,8 @@ interface VerdictMathPanelProps {
   verdict: Pick<SynthesisResult, "verdict" | "overall_provenance" | "agent_summaries"> & {
     weighting_breakdown?: SynthesisResult["weighting_breakdown"] | null;
   };
+  /** A replay of a frozen run: provenance dots read "Recorded", never "Live". */
+  recorded?: boolean;
 }
 
 const DOMAIN: [number, number] = [-2, 2];
@@ -65,9 +67,9 @@ function fmtNum(n: number, dp = 1): string {
 
 // A compact provenance dot for dense chart rows (the full pill stays where
 // there is room — the card and the reasoning chain).
-function ProvDot({ provenance }: { provenance: Provenance }) {
+function ProvDot({ provenance, recorded = false }: { provenance: Provenance; recorded?: boolean }) {
   const color = PROVENANCE_META[provenance].fill;
-  const title = PROVENANCE_META[provenance].label;
+  const title = recorded ? "Recorded" : PROVENANCE_META[provenance].label;
   return (
     <span
       title={title}
@@ -90,7 +92,7 @@ function joinNames(names: string[]): string {
   return `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]}`;
 }
 
-export default function VerdictMathPanel({ verdict }: VerdictMathPanelProps) {
+export default function VerdictMathPanel({ verdict, recorded = false }: VerdictMathPanelProps) {
   // Fresh pipeline verdicts carry the live-computed breakdown. Persisted-history
   // verdicts don't (it isn't stored) — but it's a PURE function of the stored
   // agent_summaries, so we RE-DERIVE it (breakdownFromSummaries marks it
@@ -130,7 +132,7 @@ export default function VerdictMathPanel({ verdict }: VerdictMathPanelProps) {
     muted: !isTrustedProvenance(a.prov),
     neutral: a.isNeutral,
     valueLabel: a.isNeutral ? undefined : fmtSigned(a.normalized),
-    badge: <ProvDot provenance={a.prov} />,
+    badge: <ProvDot provenance={a.prov} recorded={recorded} />,
   }));
 
   // The one-line finding: how many agents actually moved this verdict.

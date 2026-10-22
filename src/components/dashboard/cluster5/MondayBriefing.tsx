@@ -67,7 +67,7 @@ export default function MondayBriefing({ hasProperties, id }: MondayBriefingProp
             className="btn-primary"
             onClick={generate}
             disabled={busy}
-            style={{ opacity: busy ? 0.55 : 1, cursor: busy ? "wait" : "pointer" }}
+            style={{ cursor: busy ? "wait" : undefined }}
           >
             {busy ? "Compiling…" : "Generate briefing"}
             {!busy && <span aria-hidden="true">↗</span>}
@@ -79,7 +79,7 @@ export default function MondayBriefing({ hasProperties, id }: MondayBriefingProp
       )}
 
       {error && (
-        <p style={{ fontSize: "13px", color: "var(--signal-negative)", margin: 0 }}>{error}</p>
+        <p style={{ fontSize: "13px", color: "var(--signal-negative-ink)", margin: 0 }}>{error}</p>
       )}
 
       {result && (

@@ -227,7 +227,7 @@ export default function OnboardingClusters() {
               textAlign: "center",
               marginTop: "24px",
               fontSize: "14px",
-              color: "var(--signal-negative)",
+              color: "var(--signal-negative-ink)",
             }}
           >
             {error}

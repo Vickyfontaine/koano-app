@@ -240,10 +240,7 @@ export default function SiteComparison() {
             type="submit"
             className="btn-primary"
             disabled={running || addresses.every((a) => !a.trim())}
-            style={{
-              opacity: running || addresses.every((a) => !a.trim()) ? 0.55 : 1,
-              cursor: running ? "wait" : "pointer",
-            }}
+            style={{ cursor: running ? "wait" : undefined }}
           >
             {running ? "Comparing sites…" : "Run comparison"}
             {!running && <span aria-hidden="true">↗</span>}
@@ -329,11 +326,11 @@ export default function SiteComparison() {
                   normalizedAddress={streams[i].normalized}
                 />
               ) : streams[i].status === "error" ? (
-                <p style={{ fontSize: "13px", color: "var(--signal-negative)", margin: 0 }}>
+                <p style={{ fontSize: "13px", color: "var(--signal-negative-ink)", margin: 0 }}>
                   Failed: {streams[i].error}
                 </p>
               ) : (
-                <p style={{ fontSize: "13px", color: "var(--signal-positive)", margin: 0 }}>
+                <p style={{ fontSize: "13px", color: "var(--signal-positive-ink)", margin: 0 }}>
                   Complete. Waiting for the other sites
                 </p>
               )}
@@ -369,7 +366,7 @@ export default function SiteComparison() {
           <MultiSiteMap sites={rankedSites} />
 
           {/* Summary table */}
-          <div style={{ overflowX: "auto" }}>
+          <div className="scroll-x" style={{ overflowX: "auto", padding: "2px" }}>
             <table style={{ borderCollapse: "collapse", width: "100%", minWidth: "560px" }}>
               <thead>
                 <tr>
@@ -442,7 +439,7 @@ export default function SiteComparison() {
                       fontFamily: "var(--font-mono)",
                       fontSize: "13px",
                       fontWeight: 500,
-                      color: "var(--brand-blue)",
+                      color: "var(--mid-blue-ink)",
                       letterSpacing: "1.5px",
                     }}
                   >

@@ -6,7 +6,7 @@
 // read as broken or as a clean bill of health.
 
 import React from "react";
-import { BlockError, PanelHeader, Row, fmtInt, panelStyle, panelTitle, riskColor } from "../panels";
+import { BlockError, PanelHeader, Row, fmtInt, panelStyle, panelTitle, riskInk } from "../panels";
 import type { SiteDetailBlock } from "@/app/api/site-detail/route";
 import type { BuildingViolationsSummary } from "../../../../lib/providers/types";
 
@@ -39,7 +39,7 @@ export default function ViolationsPanel({ violations, error, id }: ViolationsPan
                   fontFamily: "var(--font-mono)",
                   fontSize: "26px",
                   fontWeight: 500,
-                  color: openTotal > 0 ? riskColor(Math.min(100, openTotal * 2)) : "var(--signal-positive)",
+                  color: openTotal > 0 ? riskInk(Math.min(100, openTotal * 2)) : "var(--signal-positive-ink)",
                 }}
               >
                 {fmtInt(openTotal)} open

@@ -207,22 +207,18 @@ export default function DocumentButton({
           type="button"
           onClick={generate}
           disabled={busy || (!singleAction && source === "verdict" && !hasRecentVerdict)}
-          style={{
-            border: "none",
-            borderRadius: "100px",
-            padding: "10px 20px",
-            fontSize: "14px",
-            fontWeight: 500,
-            cursor: busy ? "default" : "pointer",
-            background: busy ? "var(--sky)" : "var(--brand-blue)",
-            color: "var(--near-black)",
-            opacity: !singleAction && source === "verdict" && !hasRecentVerdict ? 0.5 : 1,
-          }}
+          className="btn-primary"
+          style={{ padding: "10px 24px", cursor: busy ? "wait" : undefined }}
         >
-          {busy ? "Generating…" : `Generate ${format.toUpperCase()}  ↗`}
+          {busy ? "Generating…" : `Generate ${format.toUpperCase()}`}
+          {!busy && (
+            <span aria-hidden="true" className="btn-arrow">
+              ↗
+            </span>
+          )}
         </button>
         {done && !error && (
-          <span style={{ fontSize: "13px", color: "var(--signal-positive)" }}>Downloaded.</span>
+          <span style={{ fontSize: "13px", color: "var(--signal-positive-ink)" }}>Downloaded.</span>
         )}
       </div>
 
@@ -230,7 +226,7 @@ export default function DocumentButton({
         <p
           style={{
             fontSize: "13px",
-            color: "var(--signal-negative)",
+            color: "var(--signal-negative-ink)",
             margin: 0,
             borderLeft: "3px solid var(--signal-negative)",
             paddingLeft: "10px",

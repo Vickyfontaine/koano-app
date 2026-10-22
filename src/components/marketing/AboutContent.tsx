@@ -395,7 +395,7 @@ export default function AboutContent() {
                   <span
                     style={{
                       fontSize: "18px",
-                      color: "var(--signal-negative)",
+                      color: "var(--signal-negative-ink)",
                       fontWeight: 700,
                       lineHeight: 1,
                     }}

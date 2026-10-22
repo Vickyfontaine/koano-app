@@ -13,7 +13,8 @@
 // (any R-class building class), or has 7 or more residential units. The caller
 // prints the reason instead of a number. Pure and client-safe.
 
-import type { ZoningInfo } from '../providers/types';
+import type { ZoningInfo, MlsComp, MlsCompsSummary } from '../providers/types';
+import { COOP_CLASSES, streetKey } from '../agents/direction';
 
 export interface ValuationGuard {
   allowed: boolean;
@@ -23,7 +24,6 @@ export interface ValuationGuard {
   kind: 'coop' | 'condo' | 'multifamily' | null;
 }
 
-const COOP_CLASSES = new Set(['D4', 'C6', 'C8']);
 export const MULTIFAMILY_UNIT_THRESHOLD = 7;
 
 export function valuationGuard(zoning: Pick<ZoningInfo, 'building_class' | 'residential_units'> | null | undefined): ValuationGuard {
@@ -63,15 +63,55 @@ export function excludeSubject<T extends { address: string }>(comps: T[], subjec
   return comps.filter((c) => streetKey(c.address) !== key);
 }
 
-function streetKey(address: string): string {
-  // "175 3 STREET, Brooklyn, NY, USA" → "175 3 street"; "175 3RD ST" → "175 3 st"
-  const first = address.split(',')[0] ?? '';
-  return first
-    .toLowerCase()
-    .replace(/\b(\d+)(st|nd|rd|th)\b/g, '$1')
-    .replace(/\bstreet\b/g, 'st')
-    .replace(/\bavenue\b/g, 'ave')
-    .replace(/[^a-z0-9 ]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
+// ONE comparable pool for every valuation figure KOANO prints or shows for a
+// property: the provider's distance-ranked comparables with the subject's own
+// recorded sale excluded, and the central $/sq ft = the trimmed median of that
+// pool. The pricing sheet, CMA, net sheet, property intelligence report, tax
+// appeal packet, IC memo, one-pager and the dashboard panels all read this, so
+// two KOANO surfaces on one property never disagree on the central value. The
+// provider's `median_price_per_sqft` (the ZIP/1-mile market median over ALL
+// qualifying sales) remains a MARKET statistic and is labeled as such.
+export interface CompPool {
+  comps: MlsComp[];
+  psfSorted: number[]; // ascending $/sq ft of the pool
+  medianPsf: number | null; // trimmed median of psfSorted
+  p25Psf: number | null;
+  p75Psf: number | null;
+  subjectExcluded: boolean;
+}
+
+export function compPool(summary: Pick<MlsCompsSummary, 'comps'> | null | undefined, subjectNormalized: string | null | undefined): CompPool {
+  const all = summary?.comps ?? [];
+  const comps = excludeSubject(all, subjectNormalized);
+  const psfSorted = comps.map((c) => c.price_per_sqft).filter((n) => Number.isFinite(n) && n > 0).sort((a, b) => a - b);
+  return {
+    comps,
+    psfSorted,
+    medianPsf: psfSorted.length ? trimmedMedianPsf(psfSorted) : null,
+    p25Psf: psfSorted.length ? percentile(psfSorted, 25) : null,
+    p75Psf: psfSorted.length ? percentile(psfSorted, 75) : null,
+    subjectExcluded: comps.length !== all.length,
+  };
+}
+
+// Trimmed median of a sorted ascending $/sq ft pool: 10% off each end once
+// there are at least 10 sales (so an outlier never sets the midpoint); below
+// that, the plain median.
+export function trimmedMedianPsf(sorted: number[]): number {
+  if (sorted.length === 0) return 0;
+  const cut = sorted.length >= 10 ? Math.floor(sorted.length * 0.1) : 0;
+  const s = sorted.slice(cut, sorted.length - cut);
+  const m = Math.floor(s.length / 2);
+  return Math.round(s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2);
+}
+
+// Linear-interpolated percentile of a sorted ascending array.
+export function percentile(sorted: number[], p: number): number {
+  if (sorted.length === 0) return NaN;
+  if (sorted.length === 1) return sorted[0];
+  const idx = (p / 100) * (sorted.length - 1);
+  const lo = Math.floor(idx);
+  const hi = Math.ceil(idx);
+  if (lo === hi) return sorted[lo];
+  return sorted[lo] + (sorted[hi] - sorted[lo]) * (idx - lo);
 }

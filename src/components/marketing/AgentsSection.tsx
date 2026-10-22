@@ -337,7 +337,7 @@ export default function AgentsSection() {
             </div>
 
             {/* The exact panel the product shows, rendered from the frozen run */}
-            <VerdictMathPanel verdict={EXAMPLE_VERDICT} />
+            <VerdictMathPanel verdict={EXAMPLE_VERDICT} recorded />
 
             <div style={{ textAlign: "center", marginTop: "4px" }}>
               <a

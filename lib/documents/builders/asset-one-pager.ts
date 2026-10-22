@@ -127,7 +127,7 @@ export function buildOnePagerModel(args: {
       columns: ['Indicator', 'Reading'],
       rows: [
         ['House Price Index (YoY / 5-yr)', `${fmtPct(f.hpi?.yoy_change_pct)} / ${fmtPct(f.hpi?.five_yr_change_pct)}${f.hpi?.region ? ` — ${f.hpi.region}` : ''}`],
-        ['Recorded sale $/sq ft (median)', fmtMoney(f.comps?.median_price_per_sqft)],
+        ['Area recorded sale $/sq ft (market median)', fmtMoney(f.comps?.median_price_per_sqft)],
         ['Recorded sales in scope / trend', f.comps && f.comps.sales_count > 0 ? `${fmtInt(f.comps.sales_count)} / ${f.comps.price_trend}` : '—'],
       ],
       caption: 'Recorded residential sales (NYC DOF), not institutional CRE transactions.',

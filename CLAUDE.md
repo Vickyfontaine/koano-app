@@ -100,6 +100,8 @@ This inventory is kept current. As of this writing the backend spine, all four d
   - **Slice 5 — the coverage map** (`CoverageMap.tsx`/`coverage.ts`): per-verdict, per-LAYER, states rendered DISTINCTLY (a market gap ≠ a transient failure ≠ a stand-in), each non-live layer naming the feed that fills it. The artifact for a data-partner conversation.
   - **National-provider audit (§14/§16) — the hardcoded-NYC class + omission-over-fabrication.** The coverage map surfaced it: a NATIONAL provider with a hardcoded region is invisible because NY is correct for every NYC test. Crime hardcoded `state/NY` and FHFA HPI hardcoded the NY MSA while ignoring the address — every non-NYC verdict silently got New York's data (HPI even tagged `live`). Both now derive geography from the resolved address (`us-states.ts`). And the ~10 national providers that fabricated a region-flavored stand-in on failure were converted to honest omission (`data:null`). FBI crime endpoint drift fixed + a real key wired (§14/§18). Migrations 021–022.
 
+- **UI-first sprint (branch `ui-sprint`, `KOANO_UI_SPRINT.md`; plans and reports in `/build-log/`).** Workstream 1 (correctness and tokens) is built: the design-token layer and AA ink tokens (§10), the construction/occupancy guard on the FAR nudge (§07), the valuation guardrail (§16), resident composition removed from the verdict with a banned-language gate (§07), crime classified by offense, the seven NYC providers omitting instead of fabricating on a failed call, the verdict math persisted with each verdict (migration-023, see §06), white-label documents and the PDF typography pass (§16), and the recorded 175 3rd St example labeled everywhere it appears on the marketing site (§13). Workstreams 2 to 6 (marketing mobile, app shell, cluster dashboards, product feel, the `/vision` concept page) follow in order; each has its own `/build-log/ui-ws-N-report.md`.
+
 **Not built / deferred:**
 - Paid-source integrations still mocked: pro-forma benchmarks (CoStar-tier) and commercial deals — the only representative providers remaining. Comps are live for NYC (DOF recorded sales); MLS-grade comps outside NYC remain the paid gap.
 - Stripe billing UI (backend wired), PostHog, SOC 2, enterprise SSO.
@@ -228,6 +230,8 @@ There is intentionally **no `modeled`** (the old third level, never implemented 
 
 **Rollup ordering** (`weakestProvenance`): overall = the weakest (loudest-caveat) input, severity `live(0) < partner(1) < representative(2) < fetch_failed(3) < coverage_absent(4)`. Absence (no data to evaluate) is a louder caveat than a stand-in (wrong but inspectable); structural absence (coverage_absent) outranks transient (fetch_failed). `partner` sits just below `live`, so a mostly-live run with one partner figure rolls up `partner` (attributed), NEVER collapsing to `representative` — a mixed run is handled sensibly. An all-live run rolls up `live` (so a pure-live NYC verdict is unaffected by the taxonomy — verified byte-identical). `isTrustedProvenance` = live|partner (present real data); use it, never `=== 'representative'`, for "is this figure reliable?" checks, or out-of-market / fetch-failed cases get silently missed.
 
+**Schema (migration-023, written in the UI sprint; apply it in the Supabase SQL editor).** The `verdicts` and `documents` CHECK constraints were written for the two-state era (`live | representative`) and rejected every `coverage_absent` / `fetch_failed` / `partner` row; migration-023 widens both to the five states, adds `verdicts.weighting_breakdown` (the scored math incl. the structural nudge and guard, so a rebuilt history verdict reproduces the nudge), and enables RLS on `contamination_cache` and `bps_cache`. Until it is applied, `persistVerdict` retries without the new column and the history/IC-memo queries fall back to the base columns (deploy-safe), and a non-NYC verdict still fails to persist.
+
 ### Rules
 
 1. Every data point in every verdict carries a provenance tag.
@@ -279,6 +283,10 @@ A cost-effective Sonnet-class model, asked for a score, regresses to the safe mi
 - **Entitlement risk** — `lib/agents/entitlement.ts`. `deterministicEntitlementRisk(zoning, provenance)` scores from real PLUTO facts (over-max or zero FAR headroom +35, ≥50% headroom −12, special district +22, M/R mixed-use +10, …); `blendEntitlementRisk` combines at `ENTITLEMENT_FACT_WEIGHT = 0.7`. Applied in `regulatory-policy.ts` after the LLM call. Returns null (no blend) when zoning is not live. Fixed a flat 50 → 55/64/40 across three real sites.
 - **Confidence** — `lib/agents/confidence.ts`. `deterministicConfidence(dataPoints, minoritySignalCount)` from evidence STRENGTH (any NON-TRUSTED input — a stand-in, a failed fetch, or an uncovered market; i.e. `!isTrustedProvenance` — caps confidence at 74), RICHNESS (trusted-datapoint count / 20), and AGREEMENT (fewer minority signals → higher); `blendConfidence` at weight 0.65. Applied in `assembleAgentVerdict` (`shared.ts`). Broke the pinned-72 → a real 68–85 spread. (A fully-live run has caveatFrac 0, so this is unchanged for an all-live NYC verdict; Slice 4.)
 - **Verdict direction** — `lib/agents/direction.ts` + `synthesis.ts` `aggregate()`. `extractStructuralFacts(agents)` scans the collected data points by label regex (use `Array.from(byLabel)`, never Map iteration — TS target); `structuralDirection(f)` produces a nudge (over-max / zero headroom −0.7; ≥80% unused FAR +1.0; ≥50% +0.6; the 15–49% middle gets NO nudge so an ambiguous site stays `hold`; new-building tract signal +0.3; clamp ±1.5). `aggregate()` adds `dir.nudge` to the agent-consensus score; the breakdown carries `structural_nudge` / `structural_drivers` / `final_score` (and `aggregate_score` stays agent-only). The narrator and system prompt are fed `agentScore + nudge [drivers] = final` so the prose can never say "hold" while the computed verdict is "buy". Verified: 175 3rd St → BUY, 74 Grand Ave → WAIT, 176 Johnson St → HOLD (unchanged).
+
+**Guards on the direction nudge (UI sprint WS1 / Phase 0 30-1, kill-list #24).** The FAR-headroom buy-lean is SUPPRESSED and the site FLAGGED (the driver string names the guard; `WeightingBreakdown.structural_guard`) when the subject lot has an ACTIVE ground-up permit (new building, demolition, foundation, excavation, matched to the subject address among the infrastructure agent's `recent_permit_*` points), is a CO-OP or CONDO (DOF classes D4/C6/C8 or any R-class), or is LIKELY RENT-STABILIZED (6+ units, built before 1974). The tract new-building lean also stays off under a guard. `aggregate(agents, subjectAddress)` takes the normalized address for the match. This is exactly why the 175 3rd St demo (an active Foundation permit on the lot) now replays HOLD in the fixture while the marketing site keeps the August recording labeled as a recorded example. Landmark status is not fetched yet (Phase 0 data task). The guard reads only data points the agents already receive, so it changes no LLM input.
+
+**Resident composition is not a verdict input (UI sprint WS1 / Phase 0 30-8, kill-list #3).** Demand Sentiment no longer receives education attainment or household income and no longer estimates a "gentrification stage"; it reads housing-cost context (median rent, median home value, tract population) as the price level demand acts against. `lib/agents/grounding.ts` carries a BANNED_LANGUAGE list (gentrif*, high-wealth, affluent, wealthy, upscale, college-educated, bachelor's, education attainment, demographic profile/shift, white/blue collar, ethnic/racial, immigrant, working/upper-middle class); a hit in any observation or headline is treated like an untraceable claim (re-prompt once, then withhold), so no stored reasoning characterizes who lives somewhere.
 
 ### Geographic scope
 
@@ -481,6 +489,20 @@ fontFamily: {
 
 Headlines: letter-spacing -0.02em. Mono/data labels: letter-spacing 0.08em.
 
+### Design tokens (UI sprint WS1 — authoritative; `src/app/globals.css` `:root`, mirrored in `tailwind.config.ts`)
+
+These are the only permitted values for new and rebuilt surfaces. WS1 closed the sub-11px type, the 12.5/13.5px off-scale sizes, the 20/16px card-radius split, the hand-typed `'DM Mono', monospace` family and the `outline:none` inputs across `src/`, and snapped the dashboard paddings and gaps to the 4px scale; the remaining inline `style={{}}` values (a few 17/20/26/34/40px sizes and one-off gaps in components not yet rebuilt) migrate to these tokens component by component as WS2 to WS4 rebuild each surface. Do not add new one-off values.
+
+- **Spacing** (4px base): `--space-1` 4, `-2` 8, `-3` 12, `-4` 16, `-5` 24, `-6` 32, `-7` 48, `-8` 64, `-9` 96. Card padding 24; card-to-card gap 16; section-to-section 48; page gutter 32 desktop / 16 mobile. `--content-max: 1200px` is the one dashboard content width.
+- **Type scale** (families unchanged): `--text-micro` 11 (the FLOOR: nothing in the product renders smaller, incl. chart axes and legends), `--text-caption` 12, `--text-data` 13 (mono data), `--text-body` 14, `--text-ui` 15 (panel titles, inputs), `--text-lead` 16, `--text-h3` 18, `--text-h2` 22, `--text-data-l` 28 (KPI values, never wrap), `--text-h1` 32, `--text-verdict` 56.
+- **Radius**: `--radius-chip` 8, `--radius-inner` 12, `--radius-card` 16 (the ONE top-level card radius; tailwind `rounded-card` reads the same var), `--radius-deep` 20, `--radius-pill` 100. One step between nesting levels, never three in a stack.
+- **Motion**: `--dur-1` 120ms, `--dur-2` 200ms, `--dur-3` 300ms, `--dur-4` 500ms, `--ease-out` `cubic-bezier(0.16,1,0.3,1)`, `--stagger` 40ms (marketing keeps 80ms). A global `prefers-reduced-motion` block zeroes transforms and clamps every animation/transition to `--dur-1`.
+- **Focus**: a global `:focus-visible` ring (2px `--deep-navy`, 2px offset). Never set `outline: none` on an input.
+- **Ink (WCAG AA)**: `--ink-muted #527082` is the SMALLEST permitted text color (5.25:1 on white, 4.86:1 on pale-wash); `--ink-faint #6E8E9D` is DECORATIVE ONLY (rules, borders, the marker on a neutral chart row), never a text color; `--mid-blue-ink #2F6F94` for link and accent text (`--mid-blue` is a fill hue); `--signal-{positive,warning,negative}-ink` (#15803D / #B45309 / #B91C1C) for verdict words and badge labels, with `--signal-*` kept as the FILL hue (dots, bars, bands, tints `--signal-*-tint`). `VERDICT_COLORS` is the verdict TEXT ink; `VERDICT_FILLS` the hue for marks. `--border-input #8AABB8` is the input boundary (3:1 non-text).
+- **Disabled primary buttons** are flat (no glow, no lift, `--sky` fill, `--ink-muted` label).
+- **Chips** (`.data-chip`, `.price-chip`): `--sky` fill with `--deep-navy` text (a deliberate deviation from the earlier `--brand-blue` text, which measured 1.48:1 on sky). Section-number eyebrows keep `--brand-blue` and are `aria-hidden`.
+- **Provenance badge** (`ProvenanceBadge`, `PROVENANCE_META`): label in the state's ink token, mark in the state's hue AND a non-color cue per state (live solid dot, partner diamond, representative hatched square, fetch_failed dashed ring, coverage_absent cut ring), 11px, full note in `aria-label`. `labelOverride="Recorded"` on a replay of a frozen run.
+
 ### Color palette — Coastal Intelligence
 
 ```css
@@ -496,15 +518,19 @@ Headlines: letter-spacing -0.02em. Mono/data labels: letter-spacing 0.08em.
 
   --ink-primary: #0D2B3E;
   --ink-secondary: #3D5A6E;
-  --ink-muted: #5A7A8C;
-  --ink-faint: #8AABB8;
+  --ink-muted: #527082;   /* smallest text color (AA) */
+  --ink-faint: #6E8E9D;   /* decorative only, never text */
+  --mid-blue-ink: #2F6F94;
 
   --border: #D6EBF7;
   --border-light: #E8F3FA;
 
-  --signal-positive: #22C55E;
+  --signal-positive: #22C55E;      /* fills */
   --signal-warning: #F59E0B;
   --signal-negative: #EF4444;
+  --signal-positive-ink: #15803D;  /* text */
+  --signal-warning-ink: #B45309;
+  --signal-negative-ink: #B91C1C;
 }
 ```
 
@@ -543,6 +569,7 @@ The marketing heroes and CTA sections run on delivered image renders positioned 
 - **Render slots — WebP (upscaled ~4K, q90) in `public/renders/`.** `how-it-works.webp` → /intelligence hero; `pricing.webp` → /pricing hero; `for-developers` / `for-professionals` / `for-institutions` / `for-community.webp` → the four /for/* cluster heroes via ClusterLanding's `render` prop; `about.webp` → /about hero; `cta.webp` → every CTA-section background (`CtaBackground.tsx`, absolute `z-index:-1`, opaque white bg so it shows over pale-wash sections without changing the section's own colour, and never affects layout). **Aspect ratios are load-bearing** and must be preserved exactly on any re-upscale: Group-A skyline/park `1401:768`, Group-B clusters `1376:768`, about `1042:1008`, cta `~2.91:1`.
 - **Hero fit mechanics (do not regress).** Group-A heroes (how-it-works, pricing) are a fixed-height section (`calc(100svh - var(--nav-h) + 6px)`) with the full-bleed image **bottom-anchored**, so the buildings/park always land on the fold and only the empty top sky crops on wide-short windows — `object-fit: cover` is deliberately NOT used (it would slice the content). Group-B cluster heroes cap to the below-nav viewport and top-anchor the copy. `--nav-h` (globals.css `:root`, `64px`) is the single nav-height source; the nav, the page spacers, and the hero calcs all read it — never hardcode 64px.
 - **Homepage hero** stays dark / left-aligned, now two-column with `HeroDashboard.tsx` on the right: a looping animated panel replaying the REAL recorded 175 3rd St verdict (five agents → BUY, every figure sourced), driven by `exampleVerdict.ts`, on a **solid white card** (NOT glass — the dark hero background is flat).
+- **The recorded example is labeled, everywhere (UI sprint rule).** Every marketing appearance of the 175 3rd St run (the hero replay, the homepage verdict-math and ledger sections, the /intelligence demo video and verdict card) carries `EXAMPLE_VERDICT_LABEL`: "Recorded example run, August 2026. Illustrative of how the engine reasons." The replay carries no LIVE badge or "live" wording (the homepage ledger renders in `ProvenanceLedger recorded` mode with "Recorded" badges). The demo is NOT swapped (founder decision); live runs on real addresses get the construction and valuation guards, so the live product never repeats the demo's error. No em dashes in user-facing copy.
 - **/intelligence (how-it-works) order:** hero → **product-demo video slot** (16:9 placeholder, ready for a `<video>`) → architecture → agents → synthesis → verdict → CTA. The old neural-map "live agent network" section was removed. **Homepage:** the founding-promise ("$50M acquisition / Crown Heights") section was removed.
 
 ### Cluster display badges (C1–C4) are decoupled from cluster_id
@@ -649,7 +676,7 @@ Agents section header: `Five agents. One verdict. Every step auditable.`
 
 Footer copyright: `© 2026 KOANO Inc. All rights reserved.`
 
-Copy placeholders (render as italic `--ink-faint` inside a `--pale-wash` dashed-border container; never invent copy to fill them): cluster landing H1s, /intelligence headline, /pricing framing, /about founding story, onboarding welcome copy, dashboard empty states, /early-access headline and subhead.
+Copy placeholders (render as italic `--ink-muted` inside a `--pale-wash` dashed-border container; never invent copy to fill them): cluster landing H1s, /intelligence headline, /pricing framing, /about founding story, onboarding welcome copy, dashboard empty states, /early-access headline and subhead.
 
 ---
 
@@ -721,6 +748,9 @@ Each step verified before the next (Principle 3).
 - OMISSION OVER FABRICATION (Phase 5, applied across ALL national providers). On a live-call FAILURE or a missing input, a provider returns `data:null` — NEVER a region-flavored fabricated stand-in. Classify: a missing input it can't even attempt (no county/tract resolved, an unset optional token) omits as `live` (the omission rule); an attempted-and-failed call omits as `fetch_failed`. A plausible fabricated value is worse than a null, because a null is visibly missing while a fabrication (and these were NYC/Northeast-flavored) gets reasoned over. No `REPRESENTATIVE_FALLBACK` constants remain in the real providers.
 - A NATIONAL provider must key its query on the RESOLVED ADDRESS (state_fips → USPS via `us-states.ts`, tract GEOID, county FIPS, lat/lon) — NEVER a hardcoded region. The hardcoded-NYC class is invisible because NY is correct for every NYC test: crime hardcoded `state/NY` and FHFA HPI hardcoded the NY MSA while ignoring the address, so every non-NYC verdict silently served New York's data (HPI even as `live`). When a national source has a better NYC-local read (NYPD 1-mile for crime), prefer the LOCAL source for NYC and use the national one as the FALLBACK — do NOT put the national source first, or a newly-added key silently downgrades NYC. The coverage map (§06 Slice 5) is what surfaces this class; audit any provider with a hardcoded constant, an ignored `_addr`, or an NYC-only fallback path.
 - The keyless Census ACS call must send a project-specific `User-Agent` header (Census Reporter 403s generic UAs). Losing this silently drags every verdict representative.
+- **The seven NYC providers (permits, zoning, DOB filings, violations, landlord, recorded sales, assemblage) return `data:null` tagged `fetch_failed` on a failed live call.** The Brooklyn-flavored `REPRESENTATIVE_FALLBACK` profiles were deleted in the UI sprint; a transient NYC Open Data outage never puts a "typical 350-permit tract" in front of an agent or a document. Every consumer handles a null block (the coverage-absent path).
+- **Valuation guardrail (`lib/documents/valuation-guard.ts`).** No building-area valuation (median 1-3 family $/sq ft × PLUTO building area) for a co-op (D4/C6/C8), a condo (any R-class) or a 7+ unit subject; the reason prints in place of the figure (pricing sheet, CMA, net sheet, property intelligence, tax appeal, the Valuation and Pricing panels). The pricing sheet, CMA and net sheet compute band edges, midpoint (trimmed median) and the HPI adjustment on ONE comp pool with the subject's own recorded sale excluded.
+- **Crime is classified by offense** (NYPD `ofns_desc` against the UCR Part I split: violent = murder, rape, robbery, felony assault; property = burglary, larceny, motor-vehicle theft, criminal mischief, arson), never by the FELONY/MISDEMEANOR severity tier, and the trend compares this year to date with the same year-to-date window of the prior year.
 
 ### Architecture
 - Swapping a mock provider to real is a one-line registry change. If a change requires touching agent or UI code, the abstraction is wrong; fix the abstraction.
@@ -734,8 +764,13 @@ Each step verified before the next (Principle 3).
 - This is enforced, not remembered: a git pre-push hook (`.githooks/pre-push` → `npm run prepush` → `scripts/prepush.sh`) runs the full build AND replays the verdict-reproducibility fixture offline (§07C), blocking the push on either failure. The build goes to an isolated dir so it never corrupts a running `next dev` server. One-time per clone: `git config core.hooksPath .githooks`. A red fixture is NOT cleared by re-recording unless the decision diff is reviewed and intended — see §07C.
 - Never bypass the gate (`--no-verify`) to push a red build. Fix the build first.
 
+### Documents
+- **White-label is real (locked decision).** The CMA, client neighborhood report, pricing sheet and net sheet (`WHITE_LABEL_DOC_TYPES` in the documents route → `RenderModel.whiteLabel`) carry no KOANO mark, no KOANO paragraph in DOCX and the preparer as PDF author / DOCX creator. An empty letterhead is suppressed entirely on every type (never a placeholder firm line). The disclaimer and the provenance appendix stay on every document.
+- PDF typography: hyphenation is registered OFF; numeric columns right-align; callouts, provenance labels and verdict words print in the AA ink colors; the smallest print ink is `--ink-muted`. The screening memo's 0-100 figure is the "Site score" (one vocabulary per lens).
+
 ### Visual
 - No dark section backgrounds anywhere. All sections white or pale-wash.
+- **WCAG AA or it does not ship.** Text uses the ink tokens (§10); fill hues and `--ink-faint` are never text colors; every interactive element has the visible focus ring; 11px is the type floor; no state is color-only (badges carry a glyph).
 - `--near-black` is a text color, never a section background.
 - No grey placeholder boxes, no stock photography, no Unsplash.
 - Neue Montreal only. No Inter, Roboto, or system fonts as primary.
@@ -810,6 +845,7 @@ NEXT_PUBLIC_MARKETING_URL=
 
 ---
 
-*KOANO CLAUDE.md v5.3 | Confidential & Proprietary | 2026*
+*KOANO CLAUDE.md v5.4 | Confidential & Proprietary | 2026*
+*v5.4 records the UI-first sprint, workstream 1 (branch `ui-sprint`): the design-token layer and AA ink tokens (§10), the construction/occupancy guard on the FAR nudge and the removal of resident composition from the verdict with a banned-language gate (§07), the valuation guardrail, crime-by-offense and omission-over-fabrication in the NYC providers (§14/§16), the persisted verdict math and five-state constraints (migration-023, §06), white-label documents and the PDF typography pass (§16), and the "Recorded example run" label on every marketing appearance of the 175 3rd St run (§10/§13). The fixture was re-recorded surgically twice with reviewed diffs (BUY → HOLD under the guard; demand confidence 74 → 73 after its inputs changed).*
 *v5.3 records the built reality through Phase 5 (national expansion & extensibility): the verdict-reproducibility fixture wired into the pre-push gate (§07C, asserts the NYC verdict bit-identical on every push), out-of-market coverage-absent instead of NYC-flavored fabrication (Slice 1), the federal trio FEMA NRI / HUD QCT-DDA / Census BPS (Slice 3, re-recorded through the fixture after reviewed diffs), the five-state provenance taxonomy live | partner | representative | fetch_failed | coverage_absent (§06, Slice 4), the per-layer coverage map for a data-partner conversation (Slice 5), and the national-provider audit — the hardcoded-NYC failure class (crime + FHFA HPI silently served New York's data everywhere; both now key on the resolved address), omission-over-fabrication across the national providers, and the FBI CDE endpoint-drift fix. Prior phases (v5.2) stand: backend spine, four dashboards, archive/calibration (07A), monitoring (07B), every verdict live (Phase 1), the dashboard-differentiator redesign (Phase 4). Migrations through 022.*
 *The premium demo is built honestly today so that capital turns it into production tomorrow, without a rewrite and without a lie. A missing value is shown as missing; a national provider keys on the address, never a constant; and a fabricated number never gets reasoned over.*

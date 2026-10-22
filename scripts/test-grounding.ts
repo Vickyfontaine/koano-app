@@ -75,6 +75,8 @@ const CLEAN_DEMAND = 'The mortgage originations rose year over year while the de
 check('clean demand prose passes', groundObservation(CLEAN_DEMAND, allowed).grounded);
 check('bannedLanguage is empty on clean prose', bannedLanguage(CLEAN_DEMAND).length === 0);
 check('"minority signals" (a KOANO term) is not banned', bannedLanguage('the minority signals cut against the call').length === 0);
+check('catches "higher-income households"', bannedLanguage('higher-income households moving in').length === 1);
+check('"low-income housing tax credit" (LIHTC) is not banned', bannedLanguage('a Low-Income Housing Tax Credit project').length === 0);
 
 console.log(`\n${failures === 0 ? '✓ ALL GROUNDING CHECKS PASSED' : `✗ ${failures} CHECK(S) FAILED`}\n`);
 process.exit(failures === 0 ? 0 : 1);

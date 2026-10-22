@@ -130,7 +130,7 @@ export default function ProvenanceLedger({ dataPoints, locationConfidence, addre
 
           {byAgent.map((g) => (
             <div key={g.agent}>
-              <div style={{ ...mono, color: "var(--brand-blue)", marginBottom: "8px" }}>
+              <div style={{ ...mono, color: "var(--mid-blue-ink)", marginBottom: "8px" }}>
                 {AGENT_LABELS[g.agent] ?? g.agent}
               </div>
               <div style={{ display: "flex", flexDirection: "column" }}>
@@ -151,11 +151,15 @@ export default function ProvenanceLedger({ dataPoints, locationConfidence, addre
                       {String(d.value ?? "—")}
                     </span>
                     <span style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
-                      <ProvenanceBadge provenance={d.provenance} labelOverride={recorded ? "Recorded" : undefined} />
+                      <ProvenanceBadge
+                        provenance={d.provenance}
+                        labelOverride={recorded ? "Recorded" : undefined}
+                        noteOverride={recorded ? "Recorded from the August 2026 example run, with its source." : undefined}
+                      />
                       {unconfirmed && (
                         <span
                           title="Location unverified. This figure may be for a nearby lot"
-                          style={{ ...mono, fontSize: "11px", color: "var(--signal-warning)", border: "1px solid var(--signal-warning)", borderRadius: "100px", padding: "2px 8px", textTransform: "uppercase" }}
+                          style={{ ...mono, fontSize: "11px", color: "var(--signal-warning-ink)", border: "1px solid var(--signal-warning)", borderRadius: "100px", padding: "2px 8px", textTransform: "uppercase" }}
                         >
                           loc?
                         </span>

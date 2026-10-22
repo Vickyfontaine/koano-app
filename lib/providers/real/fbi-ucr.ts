@@ -23,7 +23,7 @@ interface NypdGroupRow {
 // property = burglary, larceny, motor-vehicle theft, arson (plus criminal
 // mischief, the NYPD property-damage category).
 const VIOLENT_OFFENSE = /MURDER|MANSLAUGHTER|RAPE|ROBBERY|FELONY ASSAULT/i;
-const PROPERTY_OFFENSE = /BURGLARY|LARCENY|MOTOR VEHICLE|ARSON|CRIMINAL MISCHIEF|THEFT/i;
+const PROPERTY_OFFENSE = /BURGLARY|LARCENY|MOTOR VEHICLE|ARSON|CRIMINAL MISCHIEF/i;
 
 interface NypdCounts {
   violent: number;

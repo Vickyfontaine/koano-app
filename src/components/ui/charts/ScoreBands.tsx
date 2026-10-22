@@ -123,7 +123,6 @@ export default function ScoreBands({
                 fontWeight: chosen ? 700 : 500,
                 textTransform: "uppercase",
                 color: b.ink ?? b.color,
-                opacity: chosen ? 1 : 0.8,
               }}
             >
               {b.label}

@@ -49,7 +49,7 @@ export default function AddressInput({ onSubmit, busy = false }: AddressInputPro
         type="submit"
         className="btn-primary"
         disabled={busy || !value.trim()}
-        style={{ opacity: busy || !value.trim() ? 0.55 : 1, cursor: busy ? "wait" : "pointer" }}
+        style={{ cursor: busy ? "wait" : undefined }}
       >
         {busy ? "Running analysis…" : "Run analysis"}
         {!busy && <span aria-hidden="true">↗</span>}

@@ -1,9 +1,9 @@
 // KOANO document engine — Buyer / Seller Net Sheet (Transaction).
 // Estimated proceeds (seller) or cash-to-close (buyer) at an assumed price.
-// KOANO is explicit about what it CANNOT source: exact transfer taxes, title
+// The sheet is explicit about what it CANNOT source: exact transfer taxes, title
 // fees, commissions, and mortgage payoff are USER-SUPPLIED inputs, not figures
-// KOANO knows — structured as fill-ins (like the IC memo's analyst placeholders).
-// The one KOANO-derived figure — the assumed sale price — is labeled
+// the engine knows — structured as fill-ins (like the IC memo's analyst placeholders).
+// The one engine-derived figure — the assumed sale price — is labeled
 // unmistakably as an indicative value from recorded sales, NOT an appraisal,
 // listing, or offer price (it is the top line and the most likely to be misread
 // as authoritative). Deterministic (zero narrative calls).
@@ -11,8 +11,7 @@
 import type { ZoningInfo, MlsCompsSummary } from '../../providers/types';
 import type { DocumentData, Letterhead } from '../types';
 import type { RenderModel, RenderSection } from '../render/model';
-import { valuationGuard, excludeSubject } from '../valuation-guard';
-import { trimmedMedianPsf } from './pricing-sheet';
+import { valuationGuard, compPool } from '../valuation-guard';
 
 function fmtMoney(n: number | null | undefined): string {
   if (n == null || !Number.isFinite(n)) return '—';
@@ -46,9 +45,9 @@ export function extractNetSheetFacts(
   const area = zoning.building_area_sqft;
   const guard = valuationGuard(zoning);
   // The same pool + midpoint as the pricing sheet and CMA (subject excluded).
-  const pool = excludeSubject(comps.comps, data.resolved_address.normalized);
-  const psf = pool.map((c) => c.price_per_sqft).filter((n) => Number.isFinite(n) && n > 0).sort((a, b) => a - b);
-  const medianPsf = psf.length ? trimmedMedianPsf(psf) : comps.median_price_per_sqft;
+  const pool = compPool(comps, data.resolved_address.normalized);
+  const medianPsf = pool.medianPsf ?? comps.median_price_per_sqft;
+  const poolCount = pool.comps.length || comps.sales_count;
   return {
     ok: true,
     facts: {
@@ -56,7 +55,7 @@ export function extractNetSheetFacts(
       bbl: data.resolved_address.bbl,
       buildingAreaSqft: area,
       medianPsf,
-      salesCount: comps.sales_count,
+      salesCount: poolCount,
       scopeNote: comps.scope_note,
       indicativeValue: guard.allowed && area && area > 0 ? medianPsf * area : null,
       valuationBlockedReason: guard.allowed ? null : guard.reason,
@@ -73,12 +72,13 @@ export function buildNetSheetModel(args: {
   const { facts: f, letterhead, appendix, generatedAt } = args;
   const sections: RenderSection[] = [];
 
-  // 1 — The assumed sale price, labeled unmistakably as KOANO-derived indicative.
+  // 1 — The assumed sale price, labeled unmistakably as an indicative figure.
+  // WHITE-LABEL type: no brand name anywhere in the body copy.
   sections.push({
     heading: 'Assumed Sale Price',
     provenanceNote: {
       provenance: 'live',
-      text: 'THIS IS A KOANO-DERIVED INDICATIVE VALUE from recorded comparable sales. NOT an appraisal, a listing price, or an accepted offer. It is a starting figure for this estimate; replace it with your actual contract or list price.',
+      text: 'THIS IS AN INDICATIVE VALUE derived from recorded comparable sales. NOT an appraisal, a listing price, or an accepted offer. It is a starting figure for this estimate; replace it with your actual contract or list price.',
     },
     highlight: {
       figures: [
@@ -86,13 +86,13 @@ export function buildNetSheetModel(args: {
           ? {
               label: 'Indicative value (recorded sales)',
               value: 'Not available for this subject',
-              sub: `${fmtMoney(f.medianPsf)}/sq ft median across ${fmtInt(f.salesCount)} recorded sales; enter your contract or list price`,
+              sub: `${fmtMoney(f.medianPsf)}/sq ft median across ${fmtInt(f.salesCount)} comparable recorded sales; enter your contract or list price`,
               emphasis: true,
             }
           : {
-              label: 'KOANO indicative value (recorded sales)',
+              label: 'Indicative value (recorded sales)',
               value: fmtMoney(f.indicativeValue),
-              sub: `${fmtMoney(f.medianPsf)}/sq ft median × ${fmtInt(f.buildingAreaSqft)} sq ft · ${fmtInt(f.salesCount)} recorded sales`,
+              sub: `${fmtMoney(f.medianPsf)}/sq ft median × ${fmtInt(f.buildingAreaSqft)} sq ft · ${fmtInt(f.salesCount)} comparable recorded sales`,
               emphasis: true,
             },
       ],
@@ -103,23 +103,23 @@ export function buildNetSheetModel(args: {
     ],
   });
 
-  // 2 — The fill-in cost lines: what KOANO cannot source.
+  // 2 — The fill-in cost lines: what public data cannot source.
   sections.push({
     heading: 'Closing Costs: You Provide These',
     provenanceNote: {
       provenance: 'representative',
-      text: 'KOANO does not know these figures. Rates and amounts vary by property, party, lender, and contract. Fill them in from your closing statement, lender, and attorney.',
+      text: 'These figures are not in the public record. Rates and amounts vary by property, party, lender, and contract. Fill them in from your closing statement, lender, and attorney.',
     },
     table: {
-      columns: ['Line item', 'Amount', 'Why KOANO cannot source it'],
+      columns: ['Line item', 'Amount', 'Why it is not sourced'],
       rows: [
         ['Transfer taxes (NYC RPTT + NY State)', '_____________', 'Rate depends on price band, property type, and party. Enter from your calculation.'],
         ['Title insurance & search', '_____________', 'Set by the title company; not a public figure.'],
-        ['Broker commission', '_____________', 'Negotiated per engagement; KOANO does not hold your agreement.'],
+        ['Broker commission', '_____________', 'Negotiated per engagement; your agreement is not on the public record.'],
         ['Mortgage payoff (seller)', '_____________', 'Your outstanding loan balance, from your lender.'],
         ['Attorney / recording / misc.', '_____________', 'Varies by counsel and filing.'],
       ],
-      caption: 'These are inputs, not KOANO outputs. Leave blank until you have the real figures.',
+      caption: 'These are your inputs, not computed outputs. Leave blank until you have the real figures.',
     },
   });
 
@@ -130,8 +130,8 @@ export function buildNetSheetModel(args: {
       'Seller net proceeds  =  sale price  −  (transfer taxes  +  title  +  commission  +  mortgage payoff  +  attorney/misc.)',
       'Buyer cash to close  =  down payment  +  (transfer taxes  +  title  +  attorney/misc.)  −  credits',
       f.indicativeValue != null
-        ? `Using the assumed sale price of ${fmtMoney(f.indicativeValue)}, the net is that figure minus the totals you enter above. KOANO does not compute a net total, because the inputs are yours to supply. A number here would be false precision.`
-        : 'Enter your contract or list price as the sale price; the net is that figure minus the totals you enter above. KOANO does not compute a net total, because the inputs are yours to supply. A number here would be false precision.',
+        ? `Using the assumed sale price of ${fmtMoney(f.indicativeValue)}, the net is that figure minus the totals you enter above. No net total is computed, because the inputs are yours to supply. A number here would be false precision.`
+        : 'Enter your contract or list price as the sale price; the net is that figure minus the totals you enter above. No net total is computed, because the inputs are yours to supply. A number here would be false precision.',
     ],
   });
 

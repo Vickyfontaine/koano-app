@@ -18,6 +18,7 @@ import {
   FLOOD_SHADED_FILL,
 } from "@/components/ui/map/mapColors";
 import type { SiteDetailResponse } from "@/app/api/site-detail/route";
+import { compPool } from "../../../../lib/documents/valuation-guard";
 
 const SUPERFUND_RED = "#EF4444";
 const BROWNFIELD_AMBER = "#F59E0B";
@@ -153,7 +154,9 @@ export default function PropertyMap({
   if (mappableComps.length > 0) {
     const compProv = detail.mls_comps!.provenance;
     const psfs = mappableComps.map((c) => c.price_per_sqft);
-    const indicative = compsData!.median_price_per_sqft || psfs[Math.floor(psfs.length / 2)];
+    const indicative =
+      compPool(compsData, detail.resolved_address.normalized).medianPsf ??
+      (compsData!.median_price_per_sqft || psfs[Math.floor(psfs.length / 2)]);
     const lo = Math.min(...psfs);
     const hi = Math.max(...psfs);
     for (const c of mappableComps) {

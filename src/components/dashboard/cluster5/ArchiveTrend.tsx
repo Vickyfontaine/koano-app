@@ -67,7 +67,7 @@ export default function ArchiveTrend({ id, previewData }: { id?: string; preview
         backfilled.
       </p>
 
-      {error && <p style={{ fontSize: "13px", color: "var(--signal-negative)", margin: 0 }}>{error}</p>}
+      {error && <p style={{ fontSize: "13px", color: "var(--signal-negative-ink)", margin: 0 }}>{error}</p>}
       {!error && !data && <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>Loading…</p>}
 
       {data && data.observation.week_count === 0 && (
@@ -83,13 +83,13 @@ export default function ArchiveTrend({ id, previewData }: { id?: string; preview
             {weekLabel(data.observation.last_week!)}, {data.observation.first_week!.slice(0, 4)} ·{" "}
             {data.observation.week_count} weekly snapshot{data.observation.week_count === 1 ? "" : "s"}
             {data.gap_count > 0 && (
-              <span style={{ color: "var(--signal-warning)" }}> · {data.gap_count} gap{data.gap_count === 1 ? "" : "s"}</span>
+              <span style={{ color: "var(--signal-warning-ink)" }}> · {data.gap_count} gap{data.gap_count === 1 ? "" : "s"}</span>
             )}
           </div>
 
           {/* Coverage timeline: datasets × weeks. A captured cell shows its row
               count; a gap shows amber "gap" — the outage made visible, in place. */}
-          <div style={{ overflowX: "auto" }}>
+          <div className="scroll-x" style={{ overflowX: "auto", padding: "2px" }}>
             <table style={{ borderCollapse: "collapse", minWidth: "420px" }}>
               <thead>
                 <tr>
@@ -115,7 +115,7 @@ export default function ArchiveTrend({ id, previewData }: { id?: string; preview
                           textAlign: "right",
                           padding: "8px 12px",
                           borderTop: "1px solid var(--border-light)",
-                          color: c.is_gap ? "var(--signal-warning)" : "var(--ink-primary)",
+                          color: c.is_gap ? "var(--signal-warning-ink)" : "var(--ink-primary)",
                           background: c.is_gap ? "rgba(245,158,11,0.06)" : "transparent",
                         }}
                         title={c.is_gap ? "No capture this week: a gap, not zero activity" : `${fmt(c.rows_present)} rows captured`}
@@ -130,7 +130,7 @@ export default function ArchiveTrend({ id, previewData }: { id?: string; preview
           </div>
 
           <p style={{ fontSize: "12px", lineHeight: 1.55, color: "var(--ink-muted)", margin: 0, maxWidth: "680px" }}>
-            An amber <span style={{ color: "var(--signal-warning)" }}>gap</span> is a week a dataset
+            An amber <span style={{ color: "var(--signal-warning-ink)" }}>gap</span> is a week a dataset
             was not captured (a cron outage, not zero real-world activity). It is left as a hole, never
             filled with a guessed value. The record only ever contains real captures.
           </p>

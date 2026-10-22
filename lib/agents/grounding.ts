@@ -144,6 +144,8 @@ const BANNED_LANGUAGE: RegExp[] = [
   /\bimmigrant\w*/i,
   /\bworking[- ]class\b/i,
   /\bupper[- ]middle[- ]class\b/i,
+  /\b(high|higher|low|lower|mixed)[- ]income (households?|residents?|movers?|earners?|families|population|tenants?)\b/i,
+  /\b(wealthier|poorer|richer) (households?|residents?|movers?)\b/i,
 ];
 
 export function bannedLanguage(text: string): string[] {

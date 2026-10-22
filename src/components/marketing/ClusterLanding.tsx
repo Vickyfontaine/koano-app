@@ -185,7 +185,7 @@ export default function ClusterLanding({
                 fontWeight: 500,
                 letterSpacing: "0.08em",
                 textTransform: "uppercase",
-                color: "var(--brand-blue)",
+                color: "var(--mid-blue-ink)",
                 margin: "0 auto 16px",
               }}
             >

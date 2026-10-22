@@ -10,6 +10,7 @@ import Scatter, { type AxisTick, type ScatterPoint } from "@/components/ui/chart
 import { compDivergingColor } from "@/components/ui/map/mapColors";
 import { panelStyle, PanelHeader } from "../panels";
 import { isTrustedProvenance } from "@/components/ui/verdict";
+import { compPool } from "../../../../lib/documents/valuation-guard";
 import type { SiteDetailResponse } from "@/app/api/site-detail/route";
 
 const money = (n: number) => `$${Math.round(n).toLocaleString()}`;
@@ -41,7 +42,8 @@ export default function CompsScatter({
     );
   }
 
-  const indicative = data.median_price_per_sqft;
+  // Reference line = the same trimmed pool median the valuation panels use.
+  const indicative = compPool(data, detail?.resolved_address.normalized).medianPsf ?? data.median_price_per_sqft;
   const psfs = comps.map((c) => c.price_per_sqft);
   const lo = Math.min(...psfs);
   const hi = Math.max(...psfs);

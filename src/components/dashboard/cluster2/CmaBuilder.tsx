@@ -70,7 +70,7 @@ export default function CmaBuilder({ detail, detailError, id }: CmaBuilderProps)
           >
             Live recorded residential sales from NYC public records. {comps.data.scope_note}
           </div>
-          <div style={{ overflowX: "auto" }}>
+          <div className="scroll-x" style={{ overflowX: "auto", padding: "2px" }}>
             <table style={{ borderCollapse: "collapse", width: "100%", minWidth: "520px" }}>
               <thead>
                 <tr>
@@ -112,7 +112,7 @@ export default function CmaBuilder({ detail, detailError, id }: CmaBuilderProps)
               </tbody>
             </table>
           </div>
-          <Row label="Median" value={`${fmtMoney(comps.data.median_price_per_sqft)}/sq ft · ${comps.data.sales_count} sales · ${comps.data.price_trend}`} />
+          <Row label="Area median (all qualifying sales)" value={`${fmtMoney(comps.data.median_price_per_sqft)}/sq ft · ${comps.data.sales_count} sales · ${comps.data.price_trend}`} />
         </div>
       ) : comps?.data ? (
         // Live result with no qualifying comps — a coverage fact, not a failure.

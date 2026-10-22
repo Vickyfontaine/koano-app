@@ -117,7 +117,14 @@ export function extractStructuralFacts(agents: AgentVerdict[], subjectAddress?: 
   };
 }
 
-const COOP_CLASSES = new Set(['D4', 'C6', 'C8']);
+// DOF co-op building classes: D0 (elevator co-op, loft/warehouse conversion),
+// D4 (elevator co-op), C6 (walk-up co-op), C8 (walk-up co-op, conversion).
+// Condos are any R-class. Shared with the valuation guard.
+export const COOP_CLASSES = new Set(['D0', 'D4', 'C6', 'C8']);
+export function isCoopOrCondoClass(buildingClass: string | null | undefined): boolean {
+  const cls = (buildingClass ?? '').trim().toUpperCase();
+  return !!cls && (COOP_CLASSES.has(cls) || /^R/.test(cls));
+}
 
 export function occupancyGuard(f: StructuralFacts): { guard: StructuralDirection['guard']; reason: string } | null {
   if (f.subjectActiveConstruction.length > 0) {
@@ -127,7 +134,7 @@ export function occupancyGuard(f: StructuralFacts): { guard: StructuralDirection
     };
   }
   const cls = (f.buildingClass ?? '').toUpperCase();
-  if (cls && (COOP_CLASSES.has(cls) || /^R/.test(cls))) {
+  if (isCoopOrCondoClass(cls)) {
     return {
       guard: 'coop_condo',
       reason: `${COOP_CLASSES.has(cls) ? 'co-op' : 'condominium'} building class ${cls}: the development rights sit with the unit owners collectively, not with a buyer of one unit`,

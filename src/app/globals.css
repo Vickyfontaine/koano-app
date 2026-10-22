@@ -40,7 +40,7 @@
   --border: #D6EBF7;
   --border-light: #E8F3FA;
   /* An input boundary must read against white (1.4.11 non-text, 3:1). */
-  --border-input: #8AABB8;
+  --border-input: #6E8E9D;
 
   /* Spacing scale — 4px base. Every padding, gap and margin in the app is one
      of these; no one-off values (UI sprint, A12). */
@@ -122,7 +122,11 @@
 :focus-visible {
   outline: 2px solid var(--deep-navy);
   outline-offset: 2px;
-  border-radius: inherit;
+}
+/* Controls inside a horizontal scroll container (tables) would have the ring
+   clipped by the scroller; draw it inside the control instead. */
+.scroll-x :focus-visible {
+  outline-offset: -2px;
 }
 input:focus-visible,
 select:focus-visible,
@@ -257,14 +261,14 @@ body {
   transition-duration: 100ms;
 }
 
-/* A disabled control is flat and quiet: no glow, no lift, no pointer. It is
-   still readable (the label keeps AA contrast) so the state reads as "not yet",
-   never as broken. */
+/* A disabled control is flat and quiet: no glow, no lift, no pointer. The label
+   stays legible (--ink-secondary on --sky, 6.1:1) so the state reads as "not
+   yet", never as broken. */
 .btn-primary:disabled,
 .btn-primary[aria-disabled="true"] {
   background: var(--sky);
   border-color: var(--sky);
-  color: var(--ink-muted);
+  color: var(--ink-secondary);
   box-shadow: none;
   transform: none;
   cursor: not-allowed;

@@ -93,8 +93,8 @@ export const nycViolations: BuildingViolationsProvider = {
     const bin = realBin(addr.bin);
 
     // Out of market: no NYC lot key (BBL) or BIN → nothing to query. Coverage-
-    // absent, never the NYC-flavored stand-in (none: a failed call omits) (a real "mid-size
-    // registered multiple dwelling" profile — fabrication for a non-NYC address).
+    // absent. (A failed live call on a real NYC key omits too: data:null tagged
+    // fetch_failed; there is no stand-in profile in either case.)
     if (!parts && !bin) {
       return outOfMarketMunicipal<BuildingViolationsSummary>({
         layer: 'HPD/ECB/DOB violations',

@@ -10,7 +10,7 @@
 import type { ZoningInfo, MlsCompsSummary } from '../../providers/types';
 import type { DocumentData, Letterhead } from '../types';
 import type { RenderModel, RenderSection } from '../render/model';
-import { valuationGuard, excludeSubject } from '../valuation-guard';
+import { valuationGuard, compPool } from '../valuation-guard';
 
 const MAX_COMPS_SHOWN = 12;
 
@@ -23,16 +23,6 @@ function fmtInt(n: number | null | undefined): string {
   return Math.round(n).toLocaleString('en-US');
 }
 
-// Linear-interpolated percentile of a sorted ascending array.
-function percentile(sorted: number[], p: number): number {
-  if (sorted.length === 0) return NaN;
-  if (sorted.length === 1) return sorted[0];
-  const idx = (p / 100) * (sorted.length - 1);
-  const lo = Math.floor(idx);
-  const hi = Math.ceil(idx);
-  if (lo === hi) return sorted[lo];
-  return sorted[lo] + (sorted[hi] - sorted[lo]) * (idx - lo);
-}
 
 export interface PricingFacts {
   addressLabel: string;
@@ -69,16 +59,15 @@ export function extractPricingFacts(
   // adjustment: the distance-ranked comparables, with the subject's own recorded
   // sale excluded so a property never prices itself. The midpoint is the TRIMMED
   // median of that same pool (the pricing sheet, CMA and net sheet all share
-  // this function, so two KOANO documents on one property never disagree).
-  const pool = excludeSubject(comps.comps, data.resolved_address.normalized);
-  const subjectExcluded = pool.length !== comps.comps.length;
-  const psf = pool.map((c) => c.price_per_sqft).filter((n) => Number.isFinite(n) && n > 0).sort((a, b) => a - b);
-  if (psf.length === 0) {
+  // this function, so two documents on one property never disagree).
+  const pool = compPool(comps, data.resolved_address.normalized);
+  if (pool.medianPsf == null || pool.p25Psf == null || pool.p75Psf == null) {
     return { ok: false, error: 'No comparable recorded sales with a $/sq ft remain after excluding the subject. Cannot build a price band.' };
   }
-  const p25 = percentile(psf, 25);
-  const p75 = percentile(psf, 75);
-  const median = trimmedMedianPsf(psf);
+  const p25 = pool.p25Psf;
+  const p75 = pool.p75Psf;
+  const median = pool.medianPsf;
+  const subjectExcluded = pool.subjectExcluded;
   const guard = valuationGuard(zoning);
   const area = zoning.building_area_sqft;
   const scale = guard.allowed && area && area > 0 ? area : null;
@@ -92,7 +81,7 @@ export function extractPricingFacts(
       salesCount: comps.sales_count,
       priceTrend: comps.price_trend,
       scopeNote: comps.scope_note,
-      comps: pool,
+      comps: pool.comps,
       p25Psf: p25,
       medianPsf: median,
       p75Psf: p75,
@@ -103,16 +92,6 @@ export function extractPricingFacts(
       subjectExcluded,
     },
   };
-}
-
-// Trimmed median of a sorted ascending $/sq ft pool (drops 10% off each end
-// when there are at least 5 sales), so an outlier never sets the midpoint.
-export function trimmedMedianPsf(sorted: number[]): number {
-  if (sorted.length === 0) return 0;
-  const cut = sorted.length >= 5 ? Math.floor(sorted.length * 0.1) : 0;
-  const s = sorted.slice(cut, sorted.length - cut);
-  const m = Math.floor(s.length / 2);
-  return Math.round(s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2);
 }
 
 export function buildPricingModel(args: {
@@ -160,7 +139,7 @@ export function buildPricingModel(args: {
   sections.push({
     heading: 'How These Comparables Were Selected',
     paragraphs: [
-      'To keep the selection defensible rather than cherry-picked, KOANO applies a fixed rule to NYC DOF recorded sales. The analyst does not hand-pick the set:',
+      'To keep the selection defensible rather than cherry-picked, a fixed rule is applied to NYC DOF recorded sales. The analyst does not hand-pick the set:',
       '• Residential recorded sales only (DOF building classes 01, 02, 03, 09, 10, 12, 13: one- to three-family homes, condos, co-ops).',
       '• A trailing window of recent recorded sales, ranked by true distance from the subject (recorded sale → PLUTO centroid), preferring the nearest.',
       '• Sales with a recorded gross square footage (so a $/sq ft can be computed); sales without it are excluded.',

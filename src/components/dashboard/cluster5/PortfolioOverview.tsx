@@ -115,7 +115,7 @@ export default function PortfolioOverview({
           type="submit"
           className="btn-primary"
           disabled={adding || !address.trim()}
-          style={{ opacity: adding || !address.trim() ? 0.55 : 1, cursor: adding ? "wait" : "pointer" }}
+          style={{ cursor: adding ? "wait" : undefined }}
         >
           {adding ? "Adding…" : "Track property"}
           {!adding && <span aria-hidden="true">↗</span>}
@@ -125,10 +125,10 @@ export default function PortfolioOverview({
         <CandidatePicker candidates={candidates} onChoose={(c) => commitAdd({ candidate: c })} busy={adding} />
       )}
       {addError && (
-        <p style={{ fontSize: "13px", color: "var(--signal-negative)", margin: 0 }}>{addError}</p>
+        <p style={{ fontSize: "13px", color: "var(--signal-negative-ink)", margin: 0 }}>{addError}</p>
       )}
       {loadError && (
-        <p style={{ fontSize: "13px", color: "var(--signal-negative)", margin: 0 }}>{loadError}</p>
+        <p style={{ fontSize: "13px", color: "var(--signal-negative-ink)", margin: 0 }}>{loadError}</p>
       )}
 
       {/* Holdings table */}
@@ -139,7 +139,7 @@ export default function PortfolioOverview({
           No tracked properties yet. Add the first one above.
         </p>
       ) : properties && properties.length > 0 ? (
-        <div style={{ overflowX: "auto" }}>
+        <div className="scroll-x" style={{ overflowX: "auto", padding: "2px" }}>
           <table style={{ borderCollapse: "collapse", width: "100%", minWidth: "640px" }}>
             <thead>
               <tr>

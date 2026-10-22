@@ -125,7 +125,7 @@ export default function LoadingState({
               <span
                 style={{
                   fontSize: "14px",
-                  color: state === "pending" ? "var(--ink-faint)" : "var(--ink-secondary)",
+                  color: state === "pending" ? "var(--ink-muted)" : "var(--ink-secondary)",
                   minWidth: "180px",
                 }}
               >
@@ -174,7 +174,7 @@ export default function LoadingState({
           <span
             style={{
               fontSize: "14px",
-              color: phase === "synthesis" ? "var(--ink-secondary)" : "var(--ink-faint)",
+              color: phase === "synthesis" ? "var(--ink-secondary)" : "var(--ink-muted)",
               minWidth: "180px",
             }}
           >

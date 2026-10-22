@@ -286,11 +286,13 @@ function LetterheadBlock({ lh, s, whiteLabel }: { lh: Letterhead; s: Styles; whi
 // Numeric cells right-align (UI sprint A19). A column is numeric when most of
 // its filled cells are numbers, money, percentages or units.
 const NUMERIC_CELL = /^[\s$€£+\-−]?[\d,.]+\s?(%|x|mi|mo|sq ft|sf|units?|g|\/sq ft|\/sf|\/100|days?)?$|^—$|^[+\-−]?[\d,.]+ \/ [\d,.]+$/;
+// A leading-zero code ("01", "02" building classes) is a label, not a quantity.
+const CODE_CELL = /^0\d+$/;
 function numericColumns(table: RenderTable): boolean[] {
   return table.columns.map((_, ci) => {
     const cells = table.rows.map((r) => (r[ci] ?? '').trim()).filter((c) => c && c !== '—');
     if (cells.length === 0) return false;
-    const numeric = cells.filter((c) => NUMERIC_CELL.test(c)).length;
+    const numeric = cells.filter((c) => NUMERIC_CELL.test(c) && !CODE_CELL.test(c)).length;
     return numeric / cells.length >= 0.6;
   });
 }

@@ -95,7 +95,7 @@ export default function UpgradeScreen({
               fontSize: "11px",
               letterSpacing: "1.5px",
               textTransform: "uppercase",
-              color: "var(--brand-blue)",
+              color: "var(--mid-blue-ink)",
             }}
           >
             Upgrade
@@ -169,7 +169,7 @@ export default function UpgradeScreen({
         </div>
 
         {error && (
-          <p style={{ fontSize: "13px", color: "var(--signal-negative)", margin: 0 }}>{error}</p>
+          <p style={{ fontSize: "13px", color: "var(--signal-negative-ink)", margin: 0 }}>{error}</p>
         )}
 
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>

@@ -171,7 +171,7 @@ function AssetUpload({
             </button>
           )}
         </div>
-        {error && <span style={{ fontSize: "12px", color: "var(--signal-negative)" }}>{error}</span>}
+        {error && <span style={{ fontSize: "12px", color: "var(--signal-negative-ink)" }}>{error}</span>}
       </div>
     </div>
   );
@@ -241,7 +241,7 @@ export default function ProfileSettingsForm() {
     return <p style={{ color: "var(--ink-muted)", fontSize: "14px" }}>Loading your profile…</p>;
   }
   if (loadError) {
-    return <p style={{ color: "var(--signal-negative)", fontSize: "14px" }}>{loadError}</p>;
+    return <p style={{ color: "var(--signal-negative-ink)", fontSize: "14px" }}>{loadError}</p>;
   }
 
   return (
@@ -276,7 +276,7 @@ export default function ProfileSettingsForm() {
               }}
             />
             {errors[key] && (
-              <span style={{ fontSize: "12px", color: "var(--signal-negative)" }}>{errors[key]}</span>
+              <span style={{ fontSize: "12px", color: "var(--signal-negative-ink)" }}>{errors[key]}</span>
             )}
           </label>
         ))}
@@ -315,7 +315,7 @@ export default function ProfileSettingsForm() {
           {saving ? "Saving…" : "Save changes"}
         </button>
         {saveMsg && (
-          <span style={{ fontSize: "13px", color: saveMsg.ok ? "var(--signal-positive)" : "var(--signal-negative)" }}>
+          <span style={{ fontSize: "13px", color: saveMsg.ok ? "var(--signal-positive-ink)" : "var(--signal-negative)" }}>
             {saveMsg.text}
           </span>
         )}

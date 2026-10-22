@@ -24,7 +24,7 @@ function notFullyLiveNote(p: Provenance): string {
     case 'fetch_failed':
       return 'One or more live sources failed to fetch at generation time (labeled below). Usually transient. It is not fully live; regenerate to refresh.';
     case 'coverage_absent':
-      return "One or more data layers are outside KOANO's coverage for this market (labeled below) and were not available. It is not fully live.";
+      return 'One or more data layers are outside the engine\'s coverage for this market (labeled below) and were not available. It is not fully live.';
     case 'live':
       return 'Every figure in this document was fetched live from an authoritative public source at generation time.';
   }
@@ -156,8 +156,8 @@ export function appendixWithVerdict(
   const rows: ProvenanceAppendixRow[] = [
     ...base.rows,
     {
-      block: 'KOANO verdict',
-      source: 'KOANO synthesis engine (confidence-weighted v1)',
+      block: 'Verdict',
+      source: 'Synthesis engine (confidence-weighted v1)',
       provenance: opts.verdict.provenance,
       fetched_at: opts.verdict.generatedAt,
     },
@@ -168,10 +168,10 @@ export function appendixWithVerdict(
   ]);
   const overall_note =
     overall === 'live'
-      ? 'Every rendered figure AND the underlying KOANO verdict were derived from live, authoritative public data at generation time.'
+      ? 'Every rendered figure AND the underlying verdict were derived from live, authoritative public data at generation time.'
       : `This document is NOT fully live. ${
           !isTrustedProvenance(opts.verdict.provenance)
-            ? `The underlying KOANO verdict is ${PROVENANCE_LABEL[opts.verdict.provenance]} (see below). `
+            ? `The underlying verdict is ${PROVENANCE_LABEL[opts.verdict.provenance]} (see below). `
             : ''
         }${
           !isTrustedProvenance(blockOverall)

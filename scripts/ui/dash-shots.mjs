@@ -105,7 +105,7 @@ for (const cluster of CLUSTERS) {
       await page.waitForTimeout(9000);
     }
     await snap(page, `${cluster}-tracked`);
-    await page.locator('button:has-text("Analyze")').first().click();
+    await page.locator('button:has-text("Analyze"), button:has-text("Re-run")').first().click();
     await page.waitForTimeout(15000);
     await snap(page, `${cluster}-running`);
     await waitForDone(page);

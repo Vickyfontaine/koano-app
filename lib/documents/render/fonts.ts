@@ -28,8 +28,10 @@ export function registerPdfFonts(): void {
   // Hyphenation OFF (UI sprint A19): react-pdf's default callback split labels
   // and street names mid-word ("PROPERTIES AS-SESSED", "VER-NON BOULE-VARD").
   // Words wrap whole; long cells wrap at spaces only.
+  // A long unbroken token (a URL, a slashed source id) may still break after a
+  // "/" or "-", which is where a typesetter would break it.
   if (!hyphenationOff) {
-    Font.registerHyphenationCallback((word) => [word]);
+    Font.registerHyphenationCallback((word) => (word.length > 24 ? word.split(/(?<=[/-])/) : [word]));
     hyphenationOff = true;
   }
 }

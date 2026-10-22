@@ -32,7 +32,7 @@ import type {
 } from '../../providers/types';
 import type { SiteDetailBlock } from '../../providers/blocks';
 import type { DocumentData, Letterhead } from '../types';
-import { valuationGuard } from '../valuation-guard';
+import { valuationGuard, compPool } from '../valuation-guard';
 import type { RenderModel, RenderSection } from '../render/model';
 import { appendixWithVerdict, type ProvenanceAppendix } from '../disclaimer';
 import { getAnthropicClient, KOANO_RUNTIME_MODEL } from '../../agents/shared';
@@ -113,8 +113,10 @@ export function extractPropertyIntelligenceFacts(
 
   const area = zoning.building_area_sqft;
   const guard = valuationGuard(zoning);
+  const pool = compPool(comps, data.resolved_address.normalized);
+  const poolMedian = pool.medianPsf ?? (comps && comps.sales_count > 0 ? comps.median_price_per_sqft : null);
   const indicativeValue =
-    guard.allowed && comps && comps.sales_count > 0 && area && area > 0 ? comps.median_price_per_sqft * area : null;
+    guard.allowed && poolMedian != null && area && area > 0 ? poolMedian * area : null;
 
   return {
     ok: true,
@@ -129,7 +131,7 @@ export function extractPropertyIntelligenceFacts(
       buildingAreaSqft: area,
       indicativeValue,
       valuationBlockedReason: guard.allowed ? null : guard.reason,
-      medianPsf: comps && comps.sales_count > 0 ? comps.median_price_per_sqft : null,
+      medianPsf: poolMedian,
       salesCount: comps?.sales_count ?? 0,
       priceTrend: comps && comps.sales_count > 0 ? comps.price_trend : null,
       compsScopeNote: comps?.scope_note ?? null,

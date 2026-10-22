@@ -8,7 +8,7 @@
 
 import React from "react";
 import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
-import { valuationGuard } from "../../../../lib/documents/valuation-guard";
+import { valuationGuard, compPool } from "../../../../lib/documents/valuation-guard";
 import { VERDICT_COLORS, weakestProvenance, type SynthesisResult } from "@/components/ui/verdict";
 import { BlockError, PanelHeader, Row, fmtInt, fmtMoney, panelStyle } from "../panels";
 import type { SiteDetailResponse } from "@/app/api/site-detail/route";
@@ -27,7 +27,9 @@ export default function PricingPanel({ detail, detailError, verdict, id }: Prici
 
   const comps = detail.mls_comps;
   const zoning = detail.zoning;
-  const psf = comps?.data?.median_price_per_sqft ?? null;
+  // The SAME comp pool and trimmed median the pricing sheet and CMA print.
+  const pool = compPool(comps?.data, detail.resolved_address.normalized);
+  const psf = pool.medianPsf;
   const sqft = zoning?.data?.building_area_sqft ?? null;
   const trend = comps?.data?.price_trend ?? null;
   // A band needs a REAL $/sqft and a REAL area. psf === 0 is the "no comps"
@@ -85,7 +87,7 @@ export default function PricingPanel({ detail, detailError, verdict, id }: Prici
             {pricingProvenance && <ProvenanceBadge provenance={pricingProvenance} />}
           </div>
           <p style={{ fontSize: "12px", color: "var(--ink-muted)", margin: 0 }}>
-            Benchmark {fmtMoney(psf)}/sq ft (median recorded sale) × {fmtInt(sqft)} sq ft
+            Benchmark {fmtMoney(psf)}/sq ft (trimmed median of {pool.comps.length} nearby recorded sales{pool.subjectExcluded ? ", subject excluded" : ""}) × {fmtInt(sqft)} sq ft
             building area ({areaLive ? "live PLUTO" : "non-live area"}) = {fmtMoney(Math.round(base))}; {bandNote}.
             {pricingProvenance !== "live" && (
               <> Not fully live. A fully live band needs live recorded sales and live PLUTO area.</>
@@ -95,7 +97,7 @@ export default function PricingPanel({ detail, detailError, verdict, id }: Prici
       ) : !guard.allowed ? (
         <>
           <p style={{ fontSize: "16px", fontWeight: 500, color: "var(--ink-primary)", margin: 0 }}>
-            No unit-comparable valuation available
+            {guard.kind === "multifamily" ? "No building-area valuation available" : "No unit-comparable valuation available"}
           </p>
           <p style={{ fontSize: "13px", lineHeight: 1.55, color: "var(--ink-secondary)", margin: 0 }}>
             {guard.reason}

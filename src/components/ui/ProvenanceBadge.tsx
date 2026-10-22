@@ -8,7 +8,7 @@
 // or fetch-failed figure is never mislabeled "Representative" and never depends
 // on color alone. 11px floor, never smaller. The full note rides in aria-label.
 
-import React from "react";
+import React, { useId } from "react";
 import { PROVENANCE_META } from "./verdict";
 import type { Provenance, ProvenanceGlyph } from "./verdict";
 
@@ -20,6 +20,8 @@ interface ProvenanceBadgeProps {
   showNote?: boolean;
   /** Override the label (e.g. "Recorded" on a replay of a frozen run). */
   labelOverride?: string;
+  /** Override the note (title + aria) alongside labelOverride, so a replay never says "live". */
+  noteOverride?: string;
 }
 
 const pillBase: React.CSSProperties = {
@@ -39,6 +41,7 @@ const pillBase: React.CSSProperties = {
 };
 
 export function ProvenanceMark({ glyph, fill, size = 10 }: { glyph: ProvenanceGlyph; fill: string; size?: number }) {
+  const patternId = useId();
   const s = size;
   const c = s / 2;
   const r = s / 2 - 1;
@@ -60,11 +63,11 @@ export function ProvenanceMark({ glyph, fill, size = 10 }: { glyph: ProvenanceGl
       return (
         <svg {...common}>
           <defs>
-            <pattern id="prov-hatch" width="3" height="3" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <pattern id={patternId} width="3" height="3" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
               <rect width="1.4" height="3" fill={fill} />
             </pattern>
           </defs>
-          <rect x={1} y={1} width={s - 2} height={s - 2} rx={1.5} fill="url(#prov-hatch)" stroke={fill} strokeWidth={1} />
+          <rect x={1} y={1} width={s - 2} height={s - 2} rx={1.5} fill={`url(#${patternId})`} stroke={fill} strokeWidth={1} />
         </svg>
       );
     case "dashed":
@@ -88,17 +91,20 @@ export default function ProvenanceBadge({
   becomesLiveWith,
   showNote = false,
   labelOverride,
+  noteOverride,
 }: ProvenanceBadgeProps) {
   const meta = PROVENANCE_META[provenance];
   const note =
-    provenance === "representative" && becomesLiveWith
+    noteOverride ??
+    (provenance === "representative" && becomesLiveWith
       ? `Representative data. Becomes live with ${becomesLiveWith} integration`
-      : meta.note;
+      : meta.note);
   const label = labelOverride ?? meta.label;
 
   const pill = (
     <span
       style={{ ...pillBase, color: meta.color, background: meta.background }}
+      role="img"
       aria-label={`${label}: ${note}`}
       title={note}
     >

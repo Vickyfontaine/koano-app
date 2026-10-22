@@ -93,7 +93,7 @@ export default function SiteMathStrip({ sites }: { sites: StripSite[] }) {
               }}
             >
               <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
-                <span style={{ ...mono, color: "var(--brand-blue)" }}>#{s.rank}</span>
+                <span style={{ ...mono, color: "var(--mid-blue-ink)" }}>#{s.rank}</span>
                 <span style={{ fontSize: "14px", fontWeight: 500, color: "var(--ink-primary)" }}>{s.label}</span>
                 <span
                   style={{

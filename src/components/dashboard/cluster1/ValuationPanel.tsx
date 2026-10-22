@@ -11,7 +11,7 @@
 
 import React from "react";
 import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
-import { valuationGuard } from "../../../../lib/documents/valuation-guard";
+import { valuationGuard, compPool } from "../../../../lib/documents/valuation-guard";
 import { BlockError, PanelHeader, Row, fmtInt, fmtMoney, panelStyle } from "../panels";
 import type { SiteDetailResponse } from "@/app/api/site-detail/route";
 
@@ -31,7 +31,9 @@ export default function ValuationPanel({ detail, detailError, id }: ValuationPan
     return <BlockError title="Valuation" error={detailError ?? undefined} />;
   }
 
-  const psf = comps?.data?.median_price_per_sqft ?? null;
+  // The SAME comp pool and trimmed median every document uses (subject excluded).
+  const pool = compPool(comps?.data, detail?.resolved_address.normalized);
+  const psf = pool.medianPsf;
   const sqft = zoning?.data?.building_area_sqft ?? null;
   // No building-area valuation for a co-op, condo or 7+ unit subject (the
   // 1-3 family $/sq ft does not price those); the reason prints instead.
@@ -55,7 +57,9 @@ export default function ValuationPanel({ detail, detailError, id }: ValuationPan
             }}
           >
             {!guard.allowed
-              ? "No unit-comparable valuation"
+              ? guard.kind === "multifamily"
+                ? "No building-area valuation"
+                : "No unit-comparable valuation"
               : indicative != null
                 ? fmtMoney(indicative)
                 : "Not computable"}
@@ -67,8 +71,9 @@ export default function ValuationPanel({ detail, detailError, id }: ValuationPan
             guard.reason
           ) : (
             <>
-              Indicative value: median recorded-sale {psf != null ? fmtMoney(psf) : "—"}/sq ft ×{" "}
-              {sqft != null ? fmtInt(sqft) : "—"} sq ft building area (live PLUTO).
+              Indicative value: trimmed median of {pool.comps.length} nearby recorded sales
+              {psf != null ? ` ${fmtMoney(psf)}` : " —"}/sq ft × {sqft != null ? fmtInt(sqft) : "—"} sq ft
+              building area (live PLUTO){pool.subjectExcluded ? ", the subject's own sale excluded" : ""}.
               {comps && comps.provenance !== "live" && (
                 <> Not fetched live this run; the recorded-sales call did not succeed.</>
               )}
@@ -80,7 +85,7 @@ export default function ValuationPanel({ detail, detailError, id }: ValuationPan
       <div style={{ borderTop: "1px solid var(--border-light)", paddingTop: "14px", display: "flex", flexDirection: "column", gap: "8px" }}>
         {comps?.data && comps.data.sales_count > 0 && (
           <Row
-            label="Recorded residential sales (ZIP, 12mo)"
+            label="Recorded residential sales in the area (12mo, market median)"
             value={
               <span style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
                 {fmtInt(comps.data.sales_count)} sales · {comps.data.price_trend}

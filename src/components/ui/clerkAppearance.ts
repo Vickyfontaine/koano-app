@@ -14,7 +14,7 @@ export const koanoClerkAppearance = {
     colorDanger: "#EF4444",
     colorSuccess: "#22C55E",
     colorWarning: "#F59E0B",
-    borderRadius: "var(--radius-inner)",
+    borderRadius: "12px",
     fontFamily: "'Neue Montreal', 'DM Sans', system-ui, sans-serif",
     fontSize: "15px",
   },

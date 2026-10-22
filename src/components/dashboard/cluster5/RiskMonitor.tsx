@@ -8,7 +8,7 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
-import { PanelHeader, panelStyle, panelTitle, riskColor } from "../panels";
+import { PanelHeader, panelStyle, panelTitle, riskInk } from "../panels";
 import type { PortfolioProperty } from "@/app/api/properties/route";
 import type { SiteDetailResponse } from "@/app/api/site-detail/route";
 
@@ -98,7 +98,7 @@ export default function RiskMonitor({ properties, id }: RiskMonitorProps) {
       )}
 
       {rows.length > 0 && (
-        <div style={{ overflowX: "auto" }}>
+        <div className="scroll-x" style={{ overflowX: "auto", padding: "2px" }}>
           <table style={{ borderCollapse: "collapse", width: "100%", minWidth: "640px" }}>
             <thead>
               <tr>
@@ -131,7 +131,7 @@ export default function RiskMonitor({ properties, id }: RiskMonitorProps) {
                     <td style={{ padding: "8px 12px", fontSize: "13px", color: "var(--ink-secondary)", borderBottom: "1px solid var(--border-light)" }}>
                       {r.property.address_normalized ?? r.property.address_input}
                     </td>
-                    <td style={{ padding: "8px 12px", fontFamily: "var(--font-mono)", fontSize: "13px", fontWeight: 500, color: v ? riskColor(v.risk_score) : "var(--ink-faint)", borderBottom: "1px solid var(--border-light)" }}>
+                    <td style={{ padding: "8px 12px", fontFamily: "var(--font-mono)", fontSize: "13px", fontWeight: 500, color: v ? riskInk(v.risk_score) : "var(--ink-muted)", borderBottom: "1px solid var(--border-light)" }}>
                       {v ? `${v.risk_score}/100` : "not analyzed"}
                     </td>
                     <td style={{ padding: "8px 12px", fontSize: "12px", borderBottom: "1px solid var(--border-light)" }}>

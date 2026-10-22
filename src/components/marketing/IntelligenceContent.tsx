@@ -59,7 +59,7 @@ const AGENTS_DETAIL = [
     inputs: "CFPB HMDA · BLS QCEW · IRS migration · Census ACS",
     outputs: "Demand momentum · Credit access · Migration",
     description:
-      "Reads mortgage lending, employment and wages, household migration, and demographic change to gauge where housing demand is strengthening or softening.",
+      "Reads mortgage lending, employment and wages, household migration, and the local housing-cost level to gauge where housing demand is strengthening or softening.",
   },
   {
     number: "04",

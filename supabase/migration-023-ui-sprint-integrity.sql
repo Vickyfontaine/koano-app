@@ -19,6 +19,8 @@
 --
 -- Append-only guarantees are untouched: `verdicts` only gains a nullable column.
 
+begin;
+
 alter table public.verdicts drop constraint if exists verdicts_overall_provenance_check;
 alter table public.verdicts
   add constraint verdicts_overall_provenance_check
@@ -35,3 +37,5 @@ comment on column public.verdicts.weighting_breakdown is
 
 alter table if exists public.contamination_cache enable row level security;
 alter table if exists public.bps_cache enable row level security;
+
+commit;

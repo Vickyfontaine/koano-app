@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   AGENT_LABELS,
   SPECIALIST_AGENTS,
@@ -16,17 +16,17 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 const AGENT_TAG: Record<string, string> = {
   "market-timing": "HPI +5.6% YoY",
   infrastructure: "675 permits in tract",
-  "demand-sentiment": "Median income $165K",
+  "demand-sentiment": "Mortgage denials 31.9%",
   "risk-volatility": "Flood zone X · very low",
   "regulatory-policy": "97% unused FAR",
 };
 
 const VCHIP: Record<Verdict, { color: string; bg: string }> = {
-  buy: { color: "var(--signal-positive)", bg: "rgba(34,197,94,0.12)" },
+  buy: { color: "var(--signal-positive-ink)", bg: "rgba(34,197,94,0.12)" },
   hold: { color: "var(--mid-blue-ink)", bg: "rgba(90,155,190,0.14)" },
-  wait: { color: "var(--signal-warning)", bg: "rgba(245,158,11,0.14)" },
-  sell: { color: "var(--signal-negative)", bg: "rgba(239,68,68,0.12)" },
-  drop: { color: "var(--signal-negative)", bg: "rgba(239,68,68,0.12)" },
+  wait: { color: "var(--signal-warning-ink)", bg: "rgba(245,158,11,0.14)" },
+  sell: { color: "var(--signal-negative-ink)", bg: "rgba(239,68,68,0.12)" },
+  drop: { color: "var(--signal-negative-ink)", bg: "rgba(239,68,68,0.12)" },
 };
 
 // Ordered reading list, each row built from the real recorded summary + tag.
@@ -51,12 +51,18 @@ const rowVar = {
 export default function HeroDashboard() {
   const [cycle, setCycle] = useState(0);
   const [stage, setStage] = useState(0);
+  // Reduced motion: no replay loop, no pulse; the finished state renders once.
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
+    if (reduceMotion) {
+      setStage(6);
+      return;
+    }
     const timers = STEPS.map(([s, ms]) => setTimeout(() => setStage(s), ms));
     timers.push(setTimeout(() => setCycle((c) => c + 1), CYCLE_MS));
     return () => timers.forEach(clearTimeout);
-  }, [cycle]);
+  }, [cycle, reduceMotion]);
 
   const done = stage >= 6;
   const status =
@@ -107,8 +113,8 @@ export default function HeroDashboard() {
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "7px", flexShrink: 0 }}>
           <motion.span
-            animate={{ opacity: done ? 1 : [0.35, 1, 0.35] }}
-            transition={done ? { duration: 0.3 } : { duration: 1.1, repeat: Infinity, ease: "easeInOut" }}
+            animate={{ opacity: done || reduceMotion ? 1 : [0.35, 1, 0.35] }}
+            transition={done || reduceMotion ? { duration: 0.3 } : { duration: 1.1, repeat: Infinity, ease: "easeInOut" }}
             style={{ width: "7px", height: "7px", borderRadius: "50%", background: done ? "var(--signal-positive)" : "var(--mid-blue)" }}
           />
           <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", letterSpacing: "0.06em", color: "rgba(255,255,255,0.7)" }}>
@@ -176,7 +182,7 @@ export default function HeroDashboard() {
             <div style={{ fontFamily: "var(--font-mono)", fontSize: "11px", letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)", marginBottom: "3px" }}>
               Synthesis · one verdict
             </div>
-            <div style={{ fontSize: "34px", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1, color: "var(--signal-positive)" }}>
+            <div style={{ fontSize: "34px", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1, color: "var(--signal-positive-ink)" }}>
               {(EXAMPLE_VERDICT.verdict as string).toUpperCase()}
             </div>
           </div>

@@ -88,7 +88,7 @@ export default function MarketVelocityPanel({ detail, detailError, id }: MarketV
       provenance: mls_comps.provenance,
     });
     tiles.push({
-      label: "Median recorded $/sq ft",
+      label: "Area median $/sq ft (12mo)",
       value: `$${mls_comps.data.median_price_per_sqft.toLocaleString("en-US")}`,
       sub: "NYC DOF recorded sales",
       provenance: mls_comps.provenance,

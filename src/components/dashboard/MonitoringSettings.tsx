@@ -91,7 +91,7 @@ export default function MonitoringSettings({ id }: { id?: string }) {
                   <button key={v} type="button" onClick={() => {
                     const next = on ? [...p.muted_signal_types, v] : p.muted_signal_types.filter((x) => x !== v);
                     savePrefs({ muted_signal_types: next });
-                  }} style={{ border: "1px solid var(--border)", background: on ? "var(--sky)" : "transparent", color: on ? "var(--deep-navy)" : "var(--ink-faint)", borderRadius: 100, padding: "4px 12px", fontSize: 12, cursor: "pointer" }}>
+                  }} style={{ border: "1px solid var(--border)", background: on ? "var(--sky)" : "transparent", color: on ? "var(--deep-navy)" : "var(--ink-muted)", borderRadius: 100, padding: "4px 12px", fontSize: 12, cursor: "pointer" }}>
                     {l}
                   </button>
                 );
@@ -112,9 +112,9 @@ export default function MonitoringSettings({ id }: { id?: string }) {
                 <div key={pr.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, borderBottom: "1px solid var(--border-light)", paddingBottom: 8 }}>
                   <span style={{ fontSize: 13, color: "var(--ink-secondary)" }}>{pr.address}</span>
                   <span style={{ display: "inline-flex", alignItems: "center", gap: 10 }}>
-                    {pr.active && <span style={badge("var(--signal-positive)")}>Active</span>}
-                    {paused && <span style={badge("var(--signal-warning)")}>Paused: over {s.plan} limit</span>}
-                    {!pr.monitoring_enabled && <span style={badge("var(--ink-faint)")}>Not watched</span>}
+                    {pr.active && <span style={badge("var(--signal-positive-ink)")}>Active</span>}
+                    {paused && <span style={badge("var(--signal-warning-ink)")}>Paused: over {s.plan} limit</span>}
+                    {!pr.monitoring_enabled && <span style={badge("var(--ink-muted)")}>Not watched</span>}
                     {!isFree && (
                       <button type="button" onClick={() => void toggleWatch(pr.id, !pr.monitoring_enabled)} style={{ border: "1px solid var(--border)", background: "transparent", borderRadius: 100, padding: "4px 12px", fontSize: 12, color: "var(--ink-muted)", cursor: "pointer" }}>
                         {pr.monitoring_enabled ? "Unwatch" : "Watch"}

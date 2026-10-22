@@ -19,6 +19,7 @@ import {
   fmtPct,
   panelStyle,
   riskColor,
+  riskInk,
 } from "../panels";
 import PermitHistoryPanel from "../PermitHistoryPanel";
 import type { SiteDetailResponse } from "@/app/api/site-detail/route";
@@ -62,7 +63,7 @@ export default function SitePanels({ detail, detailError, verdict }: SitePanelsP
                   fontFamily: "var(--font-mono)",
                   fontSize: "28px",
                   fontWeight: 500,
-                  color: riskColor(regPolicy.risk_score),
+                  color: riskInk(regPolicy.risk_score),
                 }}
               >
                 {regPolicy.risk_score}/100

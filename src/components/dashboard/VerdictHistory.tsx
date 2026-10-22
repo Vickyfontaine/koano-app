@@ -117,7 +117,7 @@ export default function VerdictHistory({ id }: { id?: string }) {
       )}
 
       {error && (
-        <p style={{ fontSize: "13px", color: "var(--signal-negative)", margin: 0 }}>{error}</p>
+        <p style={{ fontSize: "13px", color: "var(--signal-negative-ink)", margin: 0 }}>{error}</p>
       )}
       {!error && rows === null && (
         <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>Loading…</p>
@@ -175,7 +175,7 @@ export default function VerdictHistory({ id }: { id?: string }) {
                         fontSize: "11px",
                         letterSpacing: "0.04em",
                         textTransform: "uppercase",
-                        color: "var(--signal-warning)",
+                        color: "var(--signal-warning-ink)",
                         background: "var(--white)",
                         border: "1px solid var(--signal-warning)",
                         borderRadius: "100px",

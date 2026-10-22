@@ -50,7 +50,7 @@ export default function OwnershipPanel({ portfolio, error, id }: OwnershipPanelP
         value={
           <span
             style={{
-              color: p.on_speculation_watch_list ? "var(--signal-negative)" : "var(--ink-primary)",
+              color: p.on_speculation_watch_list ? "var(--signal-negative-ink)" : "var(--ink-primary)",
               fontWeight: p.on_speculation_watch_list ? 500 : 400,
             }}
           >

@@ -800,7 +800,7 @@ function pricingSheetSample(): RenderModel {
       },
       {
         heading: 'How These Comparables Were Selected',
-        paragraphs: ['To keep the selection defensible rather than cherry-picked, KOANO applies a fixed rule to NYC DOF recorded sales:', '• Residential recorded sales only (DOF classes 01, 02, 03, 09, 10, 12, 13).', '• A trailing window keyed to the subject ZIP.', '• Sales with a recorded gross square footage.', '• A trimmed median for the central figure.'],
+        paragraphs: ['To keep the selection defensible rather than cherry-picked, a fixed rule is applied to NYC DOF recorded sales:', '• Residential recorded sales only (DOF classes 01, 02, 03, 09, 10, 12, 13).', '• A trailing window keyed to the subject ZIP.', '• Sales with a recorded gross square footage.', '• A trimmed median for the central figure.'],
       },
       {
         heading: 'Comparable Recorded Sales',
@@ -890,16 +890,16 @@ function netSheetSample(): RenderModel {
     sections: [
       {
         heading: 'Assumed Sale Price',
-        provenanceNote: { provenance: 'live', text: 'THIS IS A KOANO-DERIVED INDICATIVE VALUE from recorded comparable sales. NOT an appraisal, a listing price, or an accepted offer.' },
-        highlight: { figures: [{ label: 'KOANO indicative value (recorded sales)', value: '$3,660,000', sub: '$1,156/sq ft median × 3,166 sq ft · 141 recorded sales', emphasis: true }] },
+        provenanceNote: { provenance: 'live', text: 'THIS IS AN INDICATIVE VALUE derived from recorded comparable sales. NOT an appraisal, a listing price, or an accepted offer.' },
+        highlight: { figures: [{ label: 'Indicative value (recorded sales)', value: '$3,660,000', sub: '$1,156/sq ft median × 3,166 sq ft · 20 comparable recorded sales', emphasis: true }] },
         paragraphs: ['Every line below is estimated FROM this figure. If you have a contract or list price, use that instead.'],
       },
       {
         heading: 'Closing Costs: You Provide These',
-        provenanceNote: { provenance: 'representative', text: 'KOANO does not know these figures. Fill them in from your closing statement, lender, and attorney.' },
-        table: { columns: ['Line item', 'Amount', 'Why KOANO cannot source it'], rows: [['Transfer taxes (NYC RPTT + NY State)', '_____________', 'Rate depends on price band and party.'], ['Title insurance & search', '_____________', 'Set by the title company.'], ['Broker commission', '_____________', 'Negotiated per engagement.'], ['Mortgage payoff (seller)', '_____________', 'From your lender.']], caption: 'These are inputs, not KOANO outputs.' },
+        provenanceNote: { provenance: 'representative', text: 'These figures are not in the public record. Fill them in from your closing statement, lender, and attorney.' },
+        table: { columns: ['Line item', 'Amount', 'Why it is not sourced'], rows: [['Transfer taxes (NYC RPTT + NY State)', '_____________', 'Rate depends on price band and party.'], ['Title insurance & search', '_____________', 'Set by the title company.'], ['Broker commission', '_____________', 'Negotiated per engagement.'], ['Mortgage payoff (seller)', '_____________', 'From your lender.']], caption: 'These are your inputs, not computed outputs.' },
       },
-      { heading: 'Estimated Net', paragraphs: ['Seller net proceeds = sale price − (transfer taxes + title + commission + mortgage payoff + attorney/misc.)', 'KOANO does not compute a net total, because the inputs are yours to supply.'] },
+      { heading: 'Estimated Net', paragraphs: ['Seller net proceeds = sale price − (transfer taxes + title + commission + mortgage payoff + attorney/misc.)', 'No net total is computed, because the inputs are yours to supply.'] },
     ],
     appendix: { ...LIVE_APPENDIX, rows: LIVE_APPENDIX.rows.slice(0, 2) },
     generatedAt: GENERATED_AT,

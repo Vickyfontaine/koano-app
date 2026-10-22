@@ -228,7 +228,7 @@ export function deterministicExecSummary(f: IcMemoFacts): string[] {
   );
   const marketBits: string[] = [];
   if (f.hpi?.yoy_change_pct != null) marketBits.push(`the ${f.hpi.region ?? 'regional'} House Price Index is ${fmtPct(f.hpi.yoy_change_pct)} year over year`);
-  if (f.comps && f.comps.sales_count > 0) marketBits.push(`recorded residential sales are ${f.comps.price_trend} at a ${fmtMoney(f.comps.median_price_per_sqft)}/sq ft median across ${fmtInt(f.comps.sales_count)} sales`);
+  if (f.comps && f.comps.sales_count > 0) marketBits.push(`recorded residential sales are ${f.comps.price_trend} at a ${fmtMoney(f.comps.median_price_per_sqft)}/sq ft market median across ${fmtInt(f.comps.sales_count)} sales`);
   if (f.permits) marketBits.push(`the area recorded ${fmtInt(f.permits.total_permits_24mo)} permits over 24 months (${fmtInt(f.permits.new_building_permits)} new-building)`);
   if (marketBits.length) paras.push(`Market signals: ${marketBits.join('; ')}.`);
   const riskBits: string[] = [];
@@ -324,7 +324,7 @@ export function buildIcMemoModel(args: {
   const marketRows: string[][] = [
     ['House Price Index: YoY', f.hpi ? `${fmtPct(f.hpi.yoy_change_pct)}${f.hpi.region ? ` (${f.hpi.region})` : ''}` : '—'],
     ['House Price Index: 5-year', fmtPct(f.hpi?.five_yr_change_pct)],
-    ['Recorded sale $/sq ft (median)', fmtMoney(f.comps?.median_price_per_sqft)],
+    ['Area recorded sale $/sq ft (market median)', fmtMoney(f.comps?.median_price_per_sqft)],
     ['Recorded sales in scope / trend', f.comps ? `${fmtInt(f.comps.sales_count)} / ${f.comps.price_trend}` : '—'],
     ['Neighborhood permits (24 months)', fmtInt(f.permits?.total_permits_24mo)],
     ['New-building permits (24 months)', fmtInt(f.permits?.new_building_permits)],
@@ -401,7 +401,7 @@ export function buildIcMemoModel(args: {
     },
     paragraphs: [
       compsCount > 0
-        ? `${fmtInt(compsCount)} qualifying residential recorded sales are in scope, at a median of ${fmtMoney(f.comps?.median_price_per_sqft)}/sq ft with a ${f.comps?.price_trend} recent trend. ${f.comps?.scope_note ?? ''} The full comparable set is in Exhibit A.`
+        ? `${fmtInt(compsCount)} qualifying residential recorded sales are in scope, at a market median of ${fmtMoney(f.comps?.median_price_per_sqft)}/sq ft with a ${f.comps?.price_trend} recent trend. ${f.comps?.scope_note ?? ''} The full comparable set is in Exhibit A.`
         : 'No qualifying residential recorded sales were returned in scope for this address. See Exhibit A.',
     ],
   });
