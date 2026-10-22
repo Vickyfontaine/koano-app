@@ -166,6 +166,7 @@ export default function VerdictMathPanel({ verdict, recorded = false }: VerdictM
 
   return (
     <div
+      className="verdict-math"
       style={{
         background: "var(--white)",
         border: "1px solid var(--border)",

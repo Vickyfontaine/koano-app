@@ -6,6 +6,8 @@ import SectionNumber from "@/components/ui/SectionNumber";
 import Button from "@/components/ui/Button";
 import { HERO_PADDING_TOP } from "@/components/marketing/heroLayout";
 import CtaBackground from "@/components/marketing/CtaBackground";
+import HeroRender from "@/components/marketing/HeroRender";
+import { RENDERS } from "@/components/marketing/renders";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -90,6 +92,8 @@ export default function AboutContent() {
       {/* Hero */}
       <section
         ref={heroRef}
+        className="hero-with-render hero-about"
+        data-mobile-render={String(RENDERS.about.mobile)}
         style={{
           background: "var(--white)",
           // Top offset only; no bottom padding. The 210px bottom (legacy from
@@ -105,7 +109,7 @@ export default function AboutContent() {
           minHeight: "calc(100svh - var(--nav-h))",
         }}
       >
-        <div style={{ maxWidth: "1280px", margin: "0 auto", position: "relative", zIndex: 1 }}>
+        <div className="hero-copy" style={{ maxWidth: "1280px", margin: "0 auto", position: "relative", zIndex: 1 }}>
           <div
             className="about-hero-layout"
             style={{
@@ -230,27 +234,9 @@ export default function AboutContent() {
 
         {/* About hero render — brownstone row on white, flush to the right
             edge of the hero, sitting beside the left-aligned text. */}
-        <img
-          src="/renders/about.webp"
-          alt=""
-          aria-hidden="true"
-          style={{
-            position: "absolute",
-            right: 0,
-            bottom: 0,
-            // Size by the hero height so the render grows with the (now
-            // viewport-filling) hero, preserving the image-to-text proportion.
-            // Aspect is kept (width auto); its light/sidewalk left edge sits
-            // behind the text (zIndex 0) so no dark collision. Capped for very
-            // tall screens.
-            height: "calc(100svh - var(--nav-h))",
-            maxHeight: "940px",
-            width: "auto",
-            zIndex: 0,
-            pointerEvents: "none",
-            userSelect: "none",
-          }}
-        />
+        {/* Brownstone row, flush right, sized by the hero height (.hero-about
+            rules); below the copy at full width on phones. */}
+        <HeroRender slot={RENDERS.about} priority />
       </section>
 
       {/* Founding principles */}
@@ -545,6 +531,7 @@ export default function AboutContent() {
       {/* CTA */}
       <section
         ref={ctaRef}
+        className="cta-with-render"
         style={{
           background: "var(--white)",
           padding: "120px 32px",

@@ -4,6 +4,8 @@ import React from "react";
 import { motion } from "framer-motion";
 import Button from "../ui/Button";
 import HeroDashboard from "./HeroDashboard";
+import HeroRender from "./HeroRender";
+import { RENDERS } from "./renders";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -43,27 +45,23 @@ export default function HeroSection() {
     >
       {/* Hero background image — replaces the dark fill (near-black stays only as
           a load fallback behind it). Full-bleed, behind the content overlay. */}
-      <img
-        src="/renders/menu-hero.jpg"
-        alt=""
-        aria-hidden="true"
-        style={{
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          // Contain (not cover) so the image keeps its native proportions and
-          // isn't zoomed/cropped; grounded at the bottom so the buildings sit on
-          // the fold and only sky extends above (into the matching section bg).
-          objectFit: "contain",
-          objectPosition: "center bottom",
-          zIndex: 0,
-          pointerEvents: "none",
-        }}
+      <HeroRender
+        slot={RENDERS["menu-hero"]}
+        priority
+        // Contain (not cover) so the image keeps its native proportions and
+        // isn't zoomed/cropped; grounded at the bottom so the buildings sit on
+        // the fold and only sky extends above (into the matching section bg).
+        style={{ objectFit: "contain", objectPosition: "center bottom" }}
       />
+
+      {/* Scrim: a navy wash over the text column so white copy reads AA on the
+          light sky (5.3:1 on the blended ground); fades out under the card and
+          the buildings. On phones the copy block carries the same wash. */}
+      <div className="hero-scrim" aria-hidden="true" />
 
       {/* Content overlay */}
       <div
+        className="hero-inner"
         style={{
           position: "relative",
           zIndex: 1,
@@ -98,7 +96,7 @@ export default function HeroSection() {
                 fontFamily: "var(--font-mono)",
                 fontSize: "11px",
                 fontWeight: 500,
-                color: "var(--brand-blue)",
+                color: "rgba(255, 255, 255, 0.85)",
                 letterSpacing: "1.5px",
                 textTransform: "uppercase",
                 marginBottom: "24px",
@@ -173,13 +171,14 @@ export default function HeroSection() {
               initial="hidden"
               animate="visible"
               variants={fadeUp}
-              className="flex flex-wrap items-center"
+              className="hero-stats flex flex-wrap items-center"
               style={{ gap: "0" }}
             >
               {STATS.map((stat, i) => (
                 <React.Fragment key={stat.label}>
                   {i > 0 && (
                     <span
+                      className="hero-stat-sep"
                       style={{
                         color: "rgba(255, 255, 255, 0.3)",
                         margin: "0 20px",
@@ -225,6 +224,18 @@ export default function HeroSection() {
       </div>
 
       <style jsx>{`
+        .hero-scrim {
+          position: absolute;
+          inset: 0;
+          z-index: 0;
+          pointer-events: none;
+          background: linear-gradient(
+            90deg,
+            rgba(13, 43, 62, 0.62) 0%,
+            rgba(13, 43, 62, 0.58) 42%,
+            rgba(13, 43, 62, 0) 68%
+          );
+        }
         @media (max-width: 900px) {
           .hero-grid {
             grid-template-columns: 1fr !important;
@@ -232,6 +243,22 @@ export default function HeroSection() {
           }
           .hero-dashboard-col {
             justify-content: flex-start !important;
+          }
+        }
+        @media (max-width: 767px) {
+          .hero-scrim {
+            display: none;
+          }
+          .hero-inner {
+            background: rgba(13, 43, 62, 0.62);
+          }
+          .hero-stats {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: 6px !important;
+          }
+          .hero-stat-sep {
+            display: none;
           }
         }
       `}</style>

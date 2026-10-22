@@ -146,6 +146,7 @@ export default function DataContent() {
       {/* Hero */}
       <section
         ref={heroRef}
+        className="hero-plain"
         style={{
           background: "var(--white)",
           padding: "160px 32px 120px",
@@ -726,6 +727,7 @@ export default function DataContent() {
       {/* CTA */}
       <section
         ref={ctaRef}
+        className="cta-with-render"
         style={{
           background: "var(--pale-wash)",
           padding: "120px 32px",

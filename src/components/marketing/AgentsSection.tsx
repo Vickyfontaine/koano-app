@@ -123,6 +123,7 @@ export default function AgentsSection() {
               synthesis dot (7px = dot radius) — never past it. */}
           <div style={{ position: "relative" }}>
             <div
+              className="agents-spine"
               style={{
                 position: "absolute",
                 left: "50%",
@@ -154,6 +155,7 @@ export default function AgentsSection() {
                     middle. Row height = card height + 40px bottom padding,
                     so the card's center sits at calc(50% - 20px). */}
                 <div
+                  className="agents-dot"
                   style={{
                     position: "absolute",
                     left: "50%",

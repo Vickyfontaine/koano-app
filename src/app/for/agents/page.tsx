@@ -57,7 +57,7 @@ export default function AgentsPage() {
       <div style={{ height: "var(--nav-h)" }} />
       <ClusterLanding
         clusterNumber="C2"
-        render="/renders/for-professionals.webp"
+        render="for-professionals"
         clusterName="Transaction intelligence"
         tagline="Find opportunities before they hit the MLS. Make data-backed recommendations that close deals."
         price="From $149 / month"

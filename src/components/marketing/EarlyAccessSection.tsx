@@ -29,6 +29,7 @@ export default function EarlyAccessSection() {
     <section
       id="early-access-section"
       ref={ref}
+      className="cta-with-render"
       style={{
         background: "var(--white)",
         padding: "120px 32px",

@@ -72,6 +72,7 @@ export default function DivergingBar({
         return (
           <div
             key={d.key}
+            className="divbar-row"
             style={{
               display: "grid",
               gridTemplateColumns: `${labelWidth}px 1fr`,

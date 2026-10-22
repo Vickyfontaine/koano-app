@@ -1,12 +1,14 @@
 import React from "react";
+import HeroRender from "./HeroRender";
+import { RENDERS } from "./renders";
 
 /**
  * Background image for the CTA sections. The image (public/renders/cta.webp) has
  * an opaque white background with brownstones flanking a white center channel
  * for the copy. It is laid behind the text (z-index -1) so it covers the
- * section's own colour — on a pale-wash section you still see the image with
- * its white background — without affecting layout: it's absolutely positioned,
- * so it never changes the section's height or the text position.
+ * section's own colour without affecting layout. On phones (host section
+ * `.cta-with-render`) it drops below the copy as a full-width strip instead of
+ * being hidden (UI sprint, A1).
  *
  * The host section must be `position: relative` + `isolation: isolate` (so the
  * z-index:-1 paints above the section background but below the in-flow copy)
@@ -14,21 +16,14 @@ import React from "react";
  */
 export default function CtaBackground() {
   return (
-    <img
-      src="/renders/cta.webp"
-      alt=""
-      aria-hidden="true"
+    <HeroRender
+      slot={RENDERS.cta}
+      className="cta-render"
       style={{
         position: "absolute",
-        // Box is anchored at the section top and made 16px TALLER than the
-        // section (the extra 16px hangs below and is clipped by the host's
-        // overflow:hidden). With objectPosition center-bottom this lands the
-        // buildings' base on the footer's blue separator, while the top stays
-        // flush with the section top — no strip of the section's own colour
-        // (pale-wash blue, or a faint seam on white) is uncovered above.
-        // NOTE: height must be explicit — an absolutely-positioned <img> with
-        // height:auto resolves to the image's intrinsic height, which breaks
-        // object-fit's box. So we size it, not top/bottom.
+        // Anchored at the section top and 16px TALLER than the section (the
+        // extra hangs below and is clipped) so the buildings' base lands on the
+        // footer's separator with no strip of the section colour showing above.
         top: 0,
         left: 0,
         right: 0,

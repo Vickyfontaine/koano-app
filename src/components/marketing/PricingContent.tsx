@@ -11,6 +11,8 @@ import {
   HERO_SECTION_PADDING,
 } from "@/components/marketing/heroLayout";
 import CtaBackground from "@/components/marketing/CtaBackground";
+import HeroRender from "@/components/marketing/HeroRender";
+import { RENDERS } from "@/components/marketing/renders";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -124,6 +126,8 @@ export default function PricingContent() {
       {/* Hero */}
       <section
         ref={heroRef}
+        className="hero-with-render hero-group-a"
+        data-mobile-render={String(RENDERS.pricing.mobile)}
         style={{
           background: "var(--white)",
           position: "relative",
@@ -139,21 +143,10 @@ export default function PricingContent() {
       >
         {/* Hero render — full-bleed, BOTTOM-anchored so the park foreground sits
             on the fold; excess top sky overflows above and is clipped. */}
-        <img
-          src="/renders/pricing.webp"
-          alt=""
-          aria-hidden="true"
-          style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            width: "100%",
-            height: "auto",
-            display: "block",
-          }}
-        />
+        <HeroRender slot={RENDERS.pricing} priority />
 
         <div
+          className="hero-copy"
           style={{
             position: "absolute",
             inset: 0,
@@ -540,6 +533,7 @@ export default function PricingContent() {
       {/* Enterprise CTA */}
       <section
         ref={ctaRef}
+        className="cta-with-render"
         style={{
           background: "var(--pale-wash)",
           padding: "120px 32px",

@@ -560,86 +560,152 @@ body {
 }
 
 /* ============================================
-   MOBILE-ONLY FIXES (≤900px)
-   Everything below lives inside this media query and NEVER runs on
-   desktop (>900px). !important overrides components' inline styles; the
-   inline values themselves are left byte-identical, so desktop is
-   untouched. No DOM is reordered. Hero renders are temporarily hidden
-   here — to be reintroduced once the underlying layout is right.
+   Marketing responsive rules (UI sprint WS2)
+   Real class-based rules replace the former attribute-selector overrides
+   that matched inline style strings. Renders are never hidden on phones (A1):
+   without a supplied mobile render, a hero's desktop render drops below the
+   headline block at full width (the sprint's temporary layout); with one, the
+   4:5 mobile render stays full-bleed and the copy sits in its reserved upper
+   area (A2).
    ============================================ */
-@media (max-width: 900px) {
 
-  /* STEP 1 — hide every hero render + the CTA background image. */
-  img[src*="menu-hero"],
-  img[src*="how-it-works"],
-  img[src*="pricing.webp"],
-  img[src*="about.webp"],
-  img[src*="/renders/for-"],
-  img[src*="cta.webp"] {
-    display: none !important;
-  }
+/* Hero renders ---------------------------------------------------------- */
+.hero-render-bleed {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
+}
+.hero-render-block {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+}
+/* Group-A heroes (how-it-works, pricing): bottom-anchored, aspect preserved. */
+.hero-group-a .hero-render-bleed {
+  inset: auto 0 0 0;
+  height: auto;
+  object-fit: unset;
+}
+/* The about hero: the brownstone row flush right, sized by the hero height. */
+.hero-about .hero-render-bleed {
+  inset: auto 0 0 auto;
+  width: auto;
+  height: calc(100svh - var(--nav-h));
+  max-height: 940px;
+  object-fit: unset;
+}
 
-  /* --- Homepage hero: auto height, top-aligned, no vertical clip (the
-     eyebrow/headline/subhead are fully visible), and no horizontal
-     overflow (the dashboard card + CTA row fit / wrap). Homepage has NO
-     nav spacer, so its content needs top padding to clear the nav. --- */
-  #hero-section {
-    height: auto !important;
-    min-height: 0 !important;
-    overflow: visible !important;
-  }
-  #hero-section > div {
-    height: auto !important;
-    padding-top: 96px !important;
-    padding-bottom: 48px !important;
-  }
-  .hero-dashboard-col {
-    min-width: 0 !important;
-    max-width: 100% !important;
-  }
-  .hero-dashboard-col > div {
-    max-width: 100% !important;
-  }
-
-  /* --- Cluster heroes (/for/*): drop the fixed viewport height so the
-     Sign up / See pricing CTAs are never clipped on short screens. --- */
-  section:has(> img[src*="/renders/for-"]) {
+@media (max-width: 767px) {
+  /* Temporary mobile layout (no mobile render yet): the hero becomes an
+     in-flow column: copy, then the render below it at full width. */
+  .hero-with-render[data-mobile-render="false"] {
     height: auto !important;
     min-height: 0 !important;
     max-height: none !important;
     overflow: visible !important;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 0 !important;
   }
-
-  /* --- /about hero: auto height so the (previously oversized) render is
-     gone and the copy + quote flow without overlap. --- */
-  section:has(> img[src*="about.webp"]) {
-    height: auto !important;
-    min-height: 0 !important;
-    overflow: visible !important;
-  }
-
-  /* --- /pricing + /intelligence heroes (Group-A): their content overlay
-     is position:absolute; make it flow so the copy has room (no render
-     behind it) and the section sizes to the copy. --- */
-  section:has(> img[src*="pricing.webp"]),
-  section:has(> img[src*="how-it-works"]) {
-    height: auto !important;
-    min-height: 0 !important;
-    overflow: visible !important;
-  }
-  section:has(> img[src*="pricing.webp"]) > div,
-  section:has(> img[src*="how-it-works"]) > div {
+  .hero-with-render[data-mobile-render="false"] .hero-copy {
     position: static !important;
+    inset: auto !important;
+    padding-bottom: var(--space-6);
+    order: 1;
+  }
+  .hero-with-render[data-mobile-render="false"] .hero-render-bleed,
+  .hero-with-render[data-mobile-render="false"] .hero-picture {
+    order: 2;
+  }
+  .hero-with-render[data-mobile-render="false"] .hero-render-bleed {
+    position: static;
+    inset: auto;
+    width: 100%;
+    height: auto;
+    max-height: none;
+    object-fit: unset;
+    display: block;
+    margin-top: var(--space-2);
+  }
+  /* With a mobile render: full-bleed 4:5, copy over the clean upper area. */
+  .hero-with-render[data-mobile-render="true"] {
+    min-height: calc(100vw * 1.25) !important;
+    max-height: none !important;
+    height: auto !important;
+    align-items: flex-start;
+  }
+  .hero-with-render[data-mobile-render="true"] .hero-copy {
+    padding-bottom: 50%;
+  }
+  .hero-with-render[data-mobile-render="true"] .hero-render-bleed {
+    object-fit: cover;
+    object-position: center bottom;
+  }
+  /* The CTA brownstones: below the copy on phones, as a strip. */
+  .cta-with-render {
+    display: flex;
+    flex-direction: column;
+  }
+  .cta-with-render .cta-render {
+    position: static !important;
+    height: auto !important;
+    width: 100%;
+    margin-top: var(--space-6);
+    object-fit: unset !important;
   }
 
-  /* --- /data hero: trim the oversized top-padding gap. (Only the data
-     hero is a first section with no image, so this targets it alone.) --- */
-  section:first-of-type:not(:has(> img)) {
-    padding-top: 40px !important;
+  /* Homepage hero: auto height, copy first, replay card, then the render. */
+  #hero-section {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    display: flex;
+    flex-direction: column;
+  }
+  #hero-section > .hero-inner { order: 1; }
+  #hero-section > .hero-render-bleed { order: 2; }
+  #hero-section > .hero-inner {
+    height: auto !important;
+    padding-top: calc(var(--nav-h) + var(--space-6)) !important;
+    padding-bottom: 0 !important;
+  }
+  #hero-section .hero-grid {
+    grid-template-columns: 1fr !important;
+    gap: var(--space-6) !important;
+  }
+  #hero-section .hero-dashboard-col {
+    justify-content: flex-start !important;
+    min-width: 0;
+  }
+  #hero-section .hero-dashboard-col > div {
+    max-width: 100% !important;
+    transform: none !important;
+  }
+  #hero-section .hero-render-bleed {
+    position: static;
+    inset: auto;
+    width: 100%;
+    height: auto;
+    object-fit: unset;
+    display: block;
+    margin-top: var(--space-5);
   }
 
-  /* --- /intelligence agent cards: let the nowrap data-chip wrap so its
-     intrinsic width can't push the grid column wider than the screen. --- */
+  /* /data hero: trim the oversized top padding. */
+  .hero-plain {
+    padding-top: var(--space-7) !important;
+    padding-bottom: var(--space-8) !important;
+  }
+
+  /* Intelligence agent cards: chips wrap instead of widening the column. */
   .intelligence-agents-grid > * {
     min-width: 0 !important;
   }
@@ -647,46 +713,26 @@ body {
     white-space: normal !important;
   }
 
-  /* --- Homepage AgentsSection: hide the center timeline spine + the
-     per-agent dots (absolutely placed at left:50% for the desktop
-     zigzag) so they don't run over the full-width stacked cards. --- */
-  #agents-section [style*="left:50%"] {
+  /* Homepage agent timeline: no center spine or dots when cards stack. */
+  #agents-section .agents-spine,
+  #agents-section .agents-dot {
     display: none !important;
   }
 
-  /* --- ProvenanceLedger rows: the 4-column grid (label/value/badge/source)
-     sums past the screen and overflows the homepage. Restack to 2 columns
-     on mobile. Targeted by its unique inline grid template (no id/class). --- */
-  [style*="grid-template-columns:minmax(160px"] {
+  /* Provenance ledger rows: two columns on phones. */
+  .ledger-row {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
-    gap: 4px 12px !important;
+    gap: var(--space-1) var(--space-3) !important;
   }
 
-  /* --- Homepage dashboard-card header: stack the address block above the live
-     status so the address shows in full (was truncating to "175…") and the long
-     status ("Five agents reading the record") no longer collides with it. --- */
-  .hero-dashboard-col > div > div:first-child {
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 8px !important;
+  /* Verdict math panel: tighter padding; bar rows stack label over track. */
+  .verdict-math {
+    padding: var(--space-4) !important;
   }
-
-  /* --- VerdictMathPanel (homepage): its diverging-bar rows clip on the right
-     ("no directional signal" was cut to "no direc…"). Reduce the panel padding,
-     stack each bar row (label above the bar → full-width track), and shrink the
-     neutral note so it fits. Selectors match the components' unique inline
-     styles (no id/class): panel root = padding:28px + gap:24px; bar row =
-     grid 176px 1fr; neutral note = left:calc(50% + 12px). --- */
-  [style*="padding:28px"][style*="gap:24px"] {
-    padding: 18px !important;
-  }
-  [style*="grid-template-columns:176px 1fr"] {
+  .divbar-row {
     grid-template-columns: 1fr !important;
-    gap: 8px !important;
+    gap: var(--space-2) !important;
   }
-  /* Neutral rows: left-align the "no directional signal" note (it read as
-     smooshed to the right of the track) and drop the center node, so it reads
-     as a plain left-aligned label under the agent name. */
   .divbar-neutral-note {
     left: 0 !important;
   }
@@ -694,15 +740,14 @@ body {
     display: none !important;
   }
 
-  /* --- /intelligence architecture (nested "Russian doll"): the accumulated
-     nested padding crushed the inner layers to a ~2-words-per-line column.
-     Trim the padding at each level and left-align the innermost box. --- */
-  .arch-l1 { padding: 22px !important; }
-  .arch-l2 { padding: 18px !important; }
-  .arch-l3 { padding: 16px !important; text-align: left !important; }
+  /* Intelligence architecture (nested doll): trim the nested padding. */
+  .arch-l1 { padding: var(--space-5) !important; }
+  .arch-l2 { padding: var(--space-4) !important; }
+  .arch-l3 { padding: var(--space-4) !important; text-align: left !important; }
 
-  /* --- /intelligence verdict reasoning chain: stack the agent name above its
-     explanation (was a cramped 130px label beside a squeezed column). --- */
-  .reason-row { flex-direction: column !important; gap: 3px !important; }
+  /* Intelligence verdict card: agent name above its explanation. */
+  .reason-row { flex-direction: column !important; gap: var(--space-1) !important; }
   .reason-agent { width: auto !important; }
 }
+
+/* Tablet: two-column marketing grids collapse handled per component. */

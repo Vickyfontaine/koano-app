@@ -10,6 +10,8 @@ import {
   HERO_SECTION_PADDING,
 } from "@/components/marketing/heroLayout";
 import CtaBackground from "@/components/marketing/CtaBackground";
+import HeroRender from "@/components/marketing/HeroRender";
+import { RENDERS } from "@/components/marketing/renders";
 import { VERDICT_COLORS } from "@/components/ui/verdict";
 import {
   EXAMPLE_VERDICT,
@@ -138,6 +140,8 @@ export default function IntelligenceContent() {
       {/* Hero */}
       <section
         ref={heroRef}
+        className="hero-with-render hero-group-a"
+        data-mobile-render={String(RENDERS["how-it-works"].mobile)}
         style={{
           background: "var(--white)",
           position: "relative",
@@ -159,21 +163,10 @@ export default function IntelligenceContent() {
             is taller than the window its empty top sky overflows above and is
             clipped (never the buildings). object-fit is deliberately NOT used —
             aspect is preserved and nothing meaningful is cropped. */}
-        <img
-          src="/renders/how-it-works.webp"
-          alt=""
-          aria-hidden="true"
-          style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            width: "100%",
-            height: "auto",
-            display: "block",
-          }}
-        />
+        <HeroRender slot={RENDERS["how-it-works"]} priority />
 
         <div
+          className="hero-copy"
           style={{
             position: "absolute",
             inset: 0,
@@ -889,6 +882,7 @@ export default function IntelligenceContent() {
       {/* CTA */}
       <section
         ref={ctaRef}
+        className="cta-with-render"
         style={{
           background: "var(--pale-wash)",
           padding: "120px 32px",

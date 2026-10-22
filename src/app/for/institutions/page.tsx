@@ -62,7 +62,7 @@ export default function InstitutionsPage() {
       <div style={{ height: "var(--nav-h)" }} />
       <ClusterLanding
         clusterNumber="C3"
-        render="/renders/for-institutions.webp"
+        render="for-institutions"
         clusterName="Portfolio intelligence"
         tagline="Monitor everything. Miss nothing. Make institutional decisions with intelligence infrastructure that was previously available only to the world's largest firms."
         price="From $1,499 / month"

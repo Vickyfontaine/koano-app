@@ -11,6 +11,8 @@ import {
   HERO_PADDING_TOP,
 } from "@/components/marketing/heroLayout";
 import CtaBackground from "@/components/marketing/CtaBackground";
+import HeroRender from "@/components/marketing/HeroRender";
+import { RENDERS, type RenderName } from "@/components/marketing/renders";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -51,8 +53,9 @@ interface ClusterLandingProps {
     items: Feature[];
   };
   users: string;
-  /** Optional hero background render, placed full-bleed behind the text. */
-  render?: string;
+  /** Optional hero render slot (see renders.ts), full-bleed behind the text on
+   *  desktop; below the headline on phones until its mobile render exists. */
+  render?: RenderName;
 }
 
 export default function ClusterLanding({
@@ -81,6 +84,8 @@ export default function ClusterLanding({
       {/* Hero section — light, with render slot */}
       <section
         ref={heroRef}
+        className="hero-with-render hero-group-b"
+        data-mobile-render={render ? String(RENDERS[render].mobile) : "false"}
         style={{
           background: "var(--white)",
           // Group-B viewport fit: cap the section to the below-nav viewport.
@@ -101,25 +106,10 @@ export default function ClusterLanding({
         {/* Hero render — full-bleed behind the text block. The image was
             composed against the hero's text width + padding, so the copy lands
             in its blank strip. */}
-        {render && (
-          <img
-            src={render}
-            alt=""
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              inset: 0,
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              objectPosition: "center",
-              zIndex: 0,
-              pointerEvents: "none",
-            }}
-          />
-        )}
+        {render && <HeroRender slot={RENDERS[render]} priority />}
 
         <div
+          className="hero-copy"
           style={{
             maxWidth: HERO_CONTAINER_MAX,
             width: "100%",
@@ -398,6 +388,7 @@ export default function ClusterLanding({
       {/* Pricing CTA section */}
       <section
         ref={pricingRef}
+        className="cta-with-render"
         style={{
           background: secondaryFeatures ? "var(--pale-wash)" : "var(--white)",
           padding: "120px 32px",

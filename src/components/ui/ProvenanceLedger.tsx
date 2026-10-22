@@ -137,6 +137,7 @@ export default function ProvenanceLedger({ dataPoints, locationConfidence, addre
                 {g.rows.map((d, i) => (
                   <div
                     key={`${d.label}-${i}`}
+                    className="ledger-row"
                     style={{
                       display: "grid",
                       gridTemplateColumns: "minmax(160px, 1.4fr) minmax(80px, 1fr) auto minmax(120px, 1.2fr)",
