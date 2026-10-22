@@ -232,6 +232,7 @@ export default function VerdictHistory({ id }: { id?: string }) {
                         verdict: r.verdict as Verdict,
                         overall_provenance: r.overall_provenance,
                         agent_summaries: r.agent_summaries,
+                        weighting_breakdown: r.weighting_breakdown,
                       }}
                     />
                   </div>

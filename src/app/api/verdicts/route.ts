@@ -6,7 +6,8 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { supabaseAdmin } from '../../../../lib/supabase/server';
 import { requireApproved } from '../../../../lib/koano-guard';
-import type { AgentSummary } from '../../../../lib/agents/breakdown';
+import type { AgentSummary, WeightingBreakdown } from '../../../../lib/agents/breakdown';
+import type { Provenance } from '../../../../lib/providers/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,11 +20,14 @@ export interface VerdictHistoryRow {
   risk_score: number;
   signal_window_months: number;
   headline: string;
-  overall_provenance: 'live' | 'representative';
+  overall_provenance: Provenance;
   created_at: string;
-  // Stored votes — enough to RE-DERIVE the verdict math for a history row with no
-  // model call (weighting_breakdown isn't persisted; it's a pure function of these).
+  // Stored votes — enough to RE-DERIVE the agent-vote part of the verdict math
+  // for a row written before weighting_breakdown was persisted (migration-023).
   agent_summaries: AgentSummary[];
+  // The scored math as computed at generation time (incl. the structural nudge
+  // and guard). Null on older rows and until migration-023 is applied.
+  weighting_breakdown: WeightingBreakdown | null;
   // User-curated "hide from view" flag (side table; the verdict itself is
   // immutable). The UI hides these by default with a "show hidden" toggle.
   hidden: boolean;
@@ -41,14 +45,30 @@ export async function GET(req: Request) {
   const limitRaw = Number(url.searchParams.get('limit') ?? 20);
   const limit = Number.isFinite(limitRaw) ? Math.min(100, Math.max(1, Math.floor(limitRaw))) : 20;
 
-  const { data, error } = await supabaseAdmin()
+  const BASE_COLS =
+    'id, address_input, address_normalized, verdict, confidence, risk_score, signal_window_months, headline, overall_provenance, created_at, agent_summaries';
+  // Deploy-safe: select the persisted math when the column exists (migration-023),
+  // else fall back to the base columns and let the UI re-derive.
+  let data: Record<string, unknown>[] | null = null;
+  let error: { message: string } | null = null;
+  const withMath = await supabaseAdmin()
     .from('verdicts')
-    .select(
-      'id, address_input, address_normalized, verdict, confidence, risk_score, signal_window_months, headline, overall_provenance, created_at, agent_summaries',
-    )
+    .select(`${BASE_COLS}, weighting_breakdown`)
     .eq('clerk_user_id', userId)
     .order('created_at', { ascending: false })
     .limit(limit);
+  data = (withMath.data as Record<string, unknown>[] | null) ?? null;
+  error = withMath.error;
+  if (error && /weighting_breakdown/.test(error.message)) {
+    const plain = await supabaseAdmin()
+      .from('verdicts')
+      .select(BASE_COLS)
+      .eq('clerk_user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(limit);
+    data = (plain.data as Record<string, unknown>[] | null) ?? null;
+    error = plain.error;
+  }
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -67,6 +87,7 @@ export async function GET(req: Request) {
 
   const verdicts = ((data ?? []) as Record<string, unknown>[]).map((r) => ({
     ...(r as object),
+    weighting_breakdown: (r.weighting_breakdown as WeightingBreakdown | undefined) ?? null,
     hidden: hiddenSet.has(r.id as string),
   })) as VerdictHistoryRow[];
   return NextResponse.json({ verdicts });

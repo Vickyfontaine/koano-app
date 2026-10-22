@@ -64,7 +64,7 @@ import {
   icMemoAppendix,
   type IcMemoVerdict,
 } from '../../../../lib/documents/builders/ic-memo';
-import { breakdownFromSummaries, type AgentSummary } from '../../../../lib/agents/synthesis';
+import { breakdownFromSummaries, type AgentSummary, type WeightingBreakdown } from '../../../../lib/agents/synthesis';
 import type { Verdict, ReasoningStep } from '../../../../lib/agents/shared';
 import { extractOnePagerFacts, buildOnePagerModel } from '../../../../lib/documents/builders/asset-one-pager';
 import { buildMondayBriefingModel } from '../../../../lib/documents/builders/monday-briefing';
@@ -133,36 +133,38 @@ async function loadLatestVerdict(
   bbl: string | null,
   addressNormalized: string | null,
 ): Promise<IcMemoVerdict | null> {
-  const cols =
+  const baseCols =
     'verdict, confidence, risk_score, signal_window_months, headline, overall_provenance, reasoning_chain, agent_summaries, created_at';
   const db = supabaseAdmin();
+  // Deploy-safe: read the persisted math when the column exists (migration-023).
+  const selectLatest = async (col: string, val: string): Promise<Record<string, unknown> | null> => {
+    const withMath = await db
+      .from('verdicts')
+      .select(`${baseCols}, weighting_breakdown`)
+      .eq('clerk_user_id', userId)
+      .eq(col, val)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (!withMath.error) return (withMath.data as Record<string, unknown> | null) ?? null;
+    const { data } = await db
+      .from('verdicts')
+      .select(baseCols)
+      .eq('clerk_user_id', userId)
+      .eq(col, val)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    return (data as Record<string, unknown> | null) ?? null;
+  };
   let row: Record<string, unknown> | null = null;
-  if (bbl) {
-    const { data } = await db
-      .from('verdicts')
-      .select(cols)
-      .eq('clerk_user_id', userId)
-      .eq('bbl', bbl)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    row = data ?? null;
-  }
-  if (!row && addressNormalized) {
-    const { data } = await db
-      .from('verdicts')
-      .select(cols)
-      .eq('clerk_user_id', userId)
-      .eq('address_normalized', addressNormalized)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    row = data ?? null;
-  }
+  if (bbl) row = await selectLatest('bbl', bbl);
+  if (!row && addressNormalized) row = await selectLatest('address_normalized', addressNormalized);
   if (!row) return null;
 
   const summaries = (row.agent_summaries as AgentSummary[]) ?? [];
   const verdict = row.verdict as Verdict;
+  const stored = row.weighting_breakdown as WeightingBreakdown | null | undefined;
   return {
     verdict,
     confidence: row.confidence as number,
@@ -171,7 +173,8 @@ async function loadLatestVerdict(
     headline: (row.headline as string) ?? '',
     overall_provenance: row.overall_provenance as IcMemoVerdict['overall_provenance'],
     reasoning_chain: (row.reasoning_chain as ReasoningStep[]) ?? [],
-    breakdown: breakdownFromSummaries(summaries, verdict),
+    // The stored math (with the nudge) when present; else the re-derivation.
+    breakdown: stored && Array.isArray(stored.agents) && stored.agents.length > 0 ? stored : breakdownFromSummaries(summaries, verdict),
     verdictGeneratedAt: row.created_at as string,
   };
 }
