@@ -89,7 +89,7 @@ interface Aggregate {
 
 // Pure function of the agent outputs — identical inputs give identical results.
 // Exported so the determinism harness can prove it without any LLM call.
-export function aggregate(agents: AgentVerdict[]): Aggregate {
+export function aggregate(agents: AgentVerdict[], subjectAddress?: string | null): Aggregate {
   const contribs: AgentContribution[] = agents.map((a) => ({
     agent: a.agent,
     verdict: a.verdict,
@@ -106,7 +106,7 @@ export function aggregate(agents: AgentVerdict[]): Aggregate {
   // over-max variance requirement, active ground-up development) adds a
   // directional lean the votes alone don't express. Only fires on unambiguous
   // facts — genuine hold survives. The verdict is read from the NUDGED score.
-  const dir = structuralDirection(extractStructuralFacts(agents));
+  const dir = structuralDirection(extractStructuralFacts(agents, subjectAddress));
   const score = agentScore + dir.nudge;
   const verdict = verdictFromScore(score);
 
@@ -145,6 +145,7 @@ export function aggregate(agents: AgentVerdict[]): Aggregate {
       chosen_verdict: verdict,
       structural_nudge: dir.nudge,
       structural_drivers: dir.drivers,
+      structural_guard: dir.guard,
       final_score: Math.round(score * 100) / 100, // agentScore + nudge → the verdict
     },
     verdict,
@@ -179,7 +180,7 @@ export async function runSynthesis(
   agents: AgentVerdict[]
 ): Promise<SynthesisResult> {
   // --- 1. DETERMINISTIC decision: verdict, confidence, risk, window ---
-  const agg = aggregate(agents);
+  const agg = aggregate(agents, addr.normalized || addr.input);
 
   // --- 2. NARRATOR: the model explains the decision; it cannot change it ---
   const dataPoints = agents.flatMap((a) => {

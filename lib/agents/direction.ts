@@ -5,6 +5,23 @@
 // This computes a directional lean from the zoning + permit FACTS and adds it to
 // the synthesis score — but ONLY on unambiguous facts, so genuine hold survives.
 //
+// GUARDS (UI sprint WS1 / Phase 0 item 30-1, kill-list #24). The FAR-headroom
+// buy-lean reads "this lot can be built up as-of-right, so a buyer captures the
+// upside". That is false, and was shown to be false on the 175 3rd St demo, when:
+//   - the lot already has ACTIVE ground-up construction (a new-building,
+//     demolition or foundation permit on the subject itself): the upside is being
+//     executed by the current owner, not waiting for a buyer;
+//   - the building is a CO-OP or CONDO (DOF classes D4/C6/C8, any R-class): the
+//     development rights sit with the unit owners collectively, not with a buyer
+//     of one unit;
+//   - the building is LIKELY RENT-STABILIZED (6+ units, built before 1974):
+//     redevelopment is constrained by tenant protections.
+// When a guard fires the positive FAR nudge is SUPPRESSED and the site is FLAGGED
+// (the driver names the guard), so the verdict math shows why the headroom was
+// not counted. The over-max "needs a variance" lean is a subject constraint and
+// still applies. Landmark status is not a fact the engine fetches yet (a Phase 0
+// data task), so it is not guarded here.
+//
 // Pure and client-safe (types only). Returns the nudge (on the score's [-2,2]
 // axis) and the drivers, so the panel can SHOW which facts produced the lean.
 
@@ -16,11 +33,20 @@ export interface StructuralFacts {
   maxResidentialFar: number | null;
   maxCommercialFar: number | null;
   newBuildingPermits: number | null; // tract, 24mo
+  // Occupancy / tenure facts (regulatory-policy data points).
+  buildingClass: string | null;
+  residentialUnits: number | null;
+  yearBuilt: number | null;
+  // Ground-up permits on the SUBJECT lot (infrastructure data points, matched
+  // to the subject address): e.g. "Foundation permit issued 2026-03-04".
+  subjectActiveConstruction: string[];
 }
 
 export interface StructuralDirection {
   nudge: number; // added to the aggregate score; + = buy-ward, − = wait/sell-ward
   drivers: string[]; // the facts that produced the lean (shown to the user)
+  // The guard that suppressed the FAR lean, if any (shown as a flag on the site).
+  guard: 'active_construction' | 'coop_condo' | 'likely_stabilized' | null;
 }
 
 function num(v: unknown): number | null {
@@ -28,20 +54,92 @@ function num(v: unknown): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
+function str(v: unknown): string | null {
+  return typeof v === 'string' && v.trim() ? v.trim() : null;
+}
+
+// "175 3 STREET, Brooklyn, NY, USA" and "175 3 STREET" → "175 3 st"; tolerant of
+// ordinal suffixes and the usual street-type abbreviations DOF/DOB print.
+export function streetKey(address: string): string {
+  const first = (address.split(',')[0] ?? '').toLowerCase();
+  return first
+    .replace(/\b(\d+)(st|nd|rd|th)\b/g, '$1')
+    .replace(/\bstreet\b/g, 'st')
+    .replace(/\bavenue\b/g, 'ave')
+    .replace(/\bboulevard\b/g, 'blvd')
+    .replace(/\bplace\b/g, 'pl')
+    .replace(/\broad\b/g, 'rd')
+    .replace(/[^a-z0-9 ]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+const GROUND_UP = /new building|demolition|foundation|excavation|earthwork/i;
+const DEAD_STATUS = /expired|revoked|withdrawn|rejected|disapproved/i;
+
 // Pull the structural facts out of the agents' data points (regulatory-policy
-// carries zoning, infrastructure carries permits). Tolerant to which agent holds
-// which point — scans them all.
-export function extractStructuralFacts(agents: AgentVerdict[]): StructuralFacts {
+// carries zoning + occupancy, infrastructure carries permits). Tolerant to which
+// agent holds which point — scans them all. `subjectAddress` (the normalized
+// address) lets the subject's OWN permits be told apart from the tract's.
+export function extractStructuralFacts(agents: AgentVerdict[], subjectAddress?: string | null): StructuralFacts {
   const byLabel = new Map<string, unknown>();
   for (const a of agents) for (const d of a.data_points) if (!byLabel.has(d.label)) byLabel.set(d.label, d.value);
   const find = (re: RegExp): unknown => Array.from(byLabel).find(([label]) => re.test(label))?.[1];
+
+  const subjectKey = subjectAddress ? streetKey(subjectAddress) : '';
+  const subjectActiveConstruction: string[] = [];
+  if (subjectKey) {
+    for (const [label, value] of Array.from(byLabel)) {
+      if (!/^recent_permit_\d+$/.test(label) || typeof value !== 'string') continue;
+      // "2026-03-04 — Foundation / Foundation (Permit Issued) @ 175 3 STREET, BROOKLYN"
+      const at = value.lastIndexOf(' @ ');
+      if (at < 0) continue;
+      const where = value.slice(at + 3);
+      const what = value.slice(0, at);
+      if (streetKey(where) !== subjectKey) continue;
+      if (!GROUND_UP.test(what) || DEAD_STATUS.test(what)) continue;
+      const date = what.match(/^(\d{4}-\d{2}-\d{2})/)?.[1];
+      const kind = what.match(/—\s*([^/(]+)/)?.[1]?.trim() ?? 'ground-up';
+      subjectActiveConstruction.push(`${kind} permit${date ? ` issued ${date}` : ''}`);
+    }
+  }
+
   return {
     unusedFarPct: num(find(/^unused_far_pct/)),
     builtFar: num(find(/^built_far$/)),
     maxResidentialFar: num(find(/^max_residential_far$/)),
     maxCommercialFar: num(find(/^max_commercial_far$/)),
     newBuildingPermits: num(find(/^new_building_permits/)),
+    buildingClass: str(find(/^building_class$/)),
+    residentialUnits: num(find(/^residential_units$/)),
+    yearBuilt: num(find(/^year_built$/)),
+    subjectActiveConstruction: Array.from(new Set(subjectActiveConstruction)),
   };
+}
+
+const COOP_CLASSES = new Set(['D4', 'C6', 'C8']);
+
+export function occupancyGuard(f: StructuralFacts): { guard: StructuralDirection['guard']; reason: string } | null {
+  if (f.subjectActiveConstruction.length > 0) {
+    return {
+      guard: 'active_construction',
+      reason: `active construction on the lot (${f.subjectActiveConstruction.slice(0, 2).join('; ')}): the as-of-right upside is already being executed by the current owner, not waiting for a buyer`,
+    };
+  }
+  const cls = (f.buildingClass ?? '').toUpperCase();
+  if (cls && (COOP_CLASSES.has(cls) || /^R/.test(cls))) {
+    return {
+      guard: 'coop_condo',
+      reason: `${COOP_CLASSES.has(cls) ? 'co-op' : 'condominium'} building class ${cls}: the development rights sit with the unit owners collectively, not with a buyer of one unit`,
+    };
+  }
+  if (f.residentialUnits != null && f.residentialUnits >= 6 && f.yearBuilt != null && f.yearBuilt > 0 && f.yearBuilt < 1974) {
+    return {
+      guard: 'likely_stabilized',
+      reason: `${f.residentialUnits} units built ${f.yearBuilt}, likely rent-stabilized: redevelopment is constrained by tenant protections`,
+    };
+  }
+  return null;
 }
 
 export function structuralDirection(f: StructuralFacts): StructuralDirection {
@@ -52,6 +150,7 @@ export function structuralDirection(f: StructuralFacts): StructuralDirection {
     (f.builtFar != null && f.maxResidentialFar != null && f.maxResidentialFar > 0 && f.builtFar >= f.maxResidentialFar &&
       (f.maxCommercialFar == null || f.maxCommercialFar <= 0 || f.builtFar >= f.maxCommercialFar));
   const zeroHeadroom = f.unusedFarPct != null && f.unusedFarPct <= 0;
+  const guard = occupancyGuard(f);
 
   // Over-max / zero headroom — the SUBJECT can't develop as-of-right; realizing
   // any value needs a discretionary variance. This is a subject-level constraint,
@@ -59,6 +158,9 @@ export function structuralDirection(f: StructuralFacts): StructuralDirection {
   if (zeroHeadroom || overMax) {
     nudge -= 0.7;
     drivers.push('no as-of-right FAR headroom (built at/over the district max): realizing value needs a variance → wait');
+  } else if (guard && f.unusedFarPct != null && f.unusedFarPct >= 50) {
+    // The headroom is real but a buyer cannot capture it: flag, do not lean.
+    drivers.push(`${f.unusedFarPct}% unused FAR not counted as upside: ${guard.reason}`);
   } else if (f.unusedFarPct != null && f.unusedFarPct >= 80) {
     // Very high as-of-right headroom — strong latent development upside.
     nudge += 1.0;
@@ -71,12 +173,13 @@ export function structuralDirection(f: StructuralFacts): StructuralDirection {
   // middle the hold bias is meant to catch.
 
   // Active ground-up development in the tract reinforces a buy — but only when the
-  // subject itself has room (not over-max), so it never offsets the variance wait.
-  if (!zeroHeadroom && !overMax && f.newBuildingPermits != null && f.newBuildingPermits >= 3) {
+  // subject itself has room (not over-max) and is not guarded, so it never offsets
+  // the variance wait and never reads the subject's own job as neighborhood momentum.
+  if (!zeroHeadroom && !overMax && !guard && f.newBuildingPermits != null && f.newBuildingPermits >= 3) {
     nudge += 0.3;
     drivers.push(`${f.newBuildingPermits} new-building permits in the tract (24mo): active ground-up development → buy-lean`);
   }
 
   // Clamp so the nudge complements agent consensus, never steamrolls it.
-  return { nudge: Math.max(-1.5, Math.min(1.5, Math.round(nudge * 100) / 100)), drivers };
+  return { nudge: Math.max(-1.5, Math.min(1.5, Math.round(nudge * 100) / 100)), drivers, guard: guard?.guard ?? null };
 }
