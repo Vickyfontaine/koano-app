@@ -189,6 +189,15 @@ const DETERMINISTIC_DOC_TYPES = new Set([
   'buyer_seller_net_sheet',
 ]);
 
+// WHITE-LABEL types (locked decision): client-facing documents a professional
+// sends under their own name carry no KOANO mark, paragraph or author metadata.
+const WHITE_LABEL_DOC_TYPES = new Set([
+  'cma',
+  'client_neighborhood_report',
+  'pricing_recommendation_sheet',
+  'buyer_seller_net_sheet',
+]);
+
 // Always-generate documents: they inherently make one narrative call every time
 // (no stored artifact to reuse), so force the fresh path so the guard meters the
 // generation. The Monday Briefing PDF reruns generateBriefing each export.
@@ -566,6 +575,8 @@ export async function POST(req: Request) {
       { status: 502 },
     );
   }
+
+  if (WHITE_LABEL_DOC_TYPES.has(doc.id)) model.whiteLabel = true;
 
   let buffer: Buffer;
   try {

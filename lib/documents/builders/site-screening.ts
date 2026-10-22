@@ -299,7 +299,7 @@ function factsForModel(f: ScreeningFacts, v: ScreeningVerdict) {
 
 export function deterministicReasoning(f: ScreeningFacts, v: ScreeningVerdict): string[] {
   return [
-    `${SELECTION_RULE} On that rule, this site is a ${v.decision} at confidence ${v.confidence}.`,
+    `${SELECTION_RULE} On that rule, this site is a ${v.decision} with a site score of ${v.confidence}.`,
     `${v.rationale} Development headroom is ${f.unusedFarPct != null ? `${f.unusedFarPct}% unused FAR` : 'unavailable'}, and the community district’s recorded approval rate is ${f.approvalRatio != null ? `${f.approvalRatio}%` : 'unavailable'} with a median filing timeline of ${f.cdMedianTimelineDays != null ? `${f.cdMedianTimelineDays} days` : 'unavailable'}. This is a screening read of public record, not a feasibility study. It carries no financial modelling.`,
   ];
 }
@@ -382,7 +382,7 @@ export function buildScreeningModel(args: {
   const sections: RenderSection[] = [];
 
   // 1. Verdict headline (pyramid — the conclusion first).
-  sections.push({ verdict: { decision: v.decision, tone: v.tone, confidence: v.confidence, rationale: v.rationale } });
+  sections.push({ verdict: { decision: v.decision, tone: v.tone, confidence: v.confidence, rationale: v.rationale, scoreLabel: 'Site score' } });
 
   // 2. Site identity band.
   sections.push({

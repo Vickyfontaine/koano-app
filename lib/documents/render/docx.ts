@@ -31,11 +31,11 @@ import type { Provenance } from '../../providers/types';
 import { isTrustedProvenance } from '../../providers/provenance';
 
 const INK = '0D2B3E';
-const INK_MUTED = '5A7A8C';
-const INK_FAINT = '8AABB8';
-const BRAND = '5A9BBE';
-const GREEN = '22C55E';
-const AMBER = 'F59E0B';
+const INK_MUTED = '527082';
+const INK_FAINT = '6E8E9D';
+const BRAND = '2F6F94';
+const GREEN = '15803D';
+const AMBER = 'B45309';
 const BORDER = 'D6EBF7';
 
 // Font family for the long-form (IC memo) DOCX. The PDF renders in Helvetica
@@ -59,20 +59,25 @@ function provColor(p: Provenance): string {
   }
 }
 
-function letterheadParagraphs(lh: Letterhead): Paragraph[] {
+// Letterhead: the preparer's identity, plus the KOANO mark ONLY on a KOANO-
+// branded document. A white-label document never carries the mark or a
+// "Prepared with KOANO" line; an empty letterhead is suppressed entirely.
+function letterheadParagraphs(lh: Letterhead, whiteLabel: boolean): Paragraph[] {
   const out: Paragraph[] = [];
-  out.push(
-    new Paragraph({
-      children: [new TextRun({ text: 'KOANO', bold: true, color: BRAND, size: 22 })],
-    }),
-  );
   const lines = [
     lh.full_name,
     lh.company_name,
     lh.license_number ? `License ${lh.license_number}` : null,
     [lh.phone, lh.contact_email].filter(Boolean).join('  ·  ') || null,
   ].filter(Boolean) as string[];
-  if (lines.length === 0) lines.push('Prepared with KOANO');
+  if (whiteLabel && lines.length === 0) return out;
+  if (!whiteLabel) {
+    out.push(
+      new Paragraph({
+        children: [new TextRun({ text: 'KOANO', bold: true, color: BRAND, size: 22 })],
+      }),
+    );
+  }
   for (const l of lines) {
     out.push(new Paragraph({ children: [new TextRun({ text: l, size: 18, color: INK_MUTED })] }));
   }
@@ -258,7 +263,7 @@ function longFormFrontMatter(model: RenderModel): (Paragraph | TableOfContents)[
   const memoDate = new Date(model.generatedAt).toISOString().slice(0, 10);
   const vDate = model.verdictGeneratedAt ? new Date(model.verdictGeneratedAt).toISOString().slice(0, 10) : null;
   const out: (Paragraph | TableOfContents)[] = [];
-  out.push(...letterheadParagraphs(model.letterhead));
+  out.push(...letterheadParagraphs(model.letterhead, !!model.whiteLabel));
   out.push(new Paragraph({ text: model.docTitle, heading: HeadingLevel.TITLE }));
   if (model.subtitle) {
     out.push(new Paragraph({ children: [new TextRun({ text: model.subtitle, size: 24, color: INK_MUTED })] }));
@@ -323,6 +328,10 @@ function longFormFrontMatter(model: RenderModel): (Paragraph | TableOfContents)[
 // other type renders exactly as before.
 export async function renderDocx(model: RenderModel): Promise<Buffer> {
   const generated = new Date(model.generatedAt).toISOString().slice(0, 10);
+  // Document metadata: the preparer authors a white-label document.
+  const creator = model.whiteLabel
+    ? model.letterhead.full_name || model.letterhead.company_name || undefined
+    : 'KOANO';
 
   if (model.longForm) {
     const body: (Paragraph | Table | TableOfContents)[] = [
@@ -331,7 +340,7 @@ export async function renderDocx(model: RenderModel): Promise<Buffer> {
       ...appendixParagraphs(model),
     ];
     const doc = new Document({
-      creator: 'KOANO',
+      creator,
       title: model.docTitle,
       // Word updates the TOC page numbers on open.
       features: { updateFields: true },
@@ -342,7 +351,7 @@ export async function renderDocx(model: RenderModel): Promise<Buffer> {
   }
 
   const body: (Paragraph | Table)[] = [
-    ...letterheadParagraphs(model.letterhead),
+    ...letterheadParagraphs(model.letterhead, !!model.whiteLabel),
     new Paragraph({ text: model.docTitle, heading: HeadingLevel.TITLE }),
     new Paragraph({
       children: [
@@ -358,7 +367,7 @@ export async function renderDocx(model: RenderModel): Promise<Buffer> {
   ];
 
   const doc = new Document({
-    creator: 'KOANO',
+    creator,
     title: model.docTitle,
     sections: [{ footers: { default: disclaimerFooter() }, children: body }],
   });

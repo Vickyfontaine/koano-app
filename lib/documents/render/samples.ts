@@ -163,7 +163,7 @@ function siteScreeningSample(): RenderModel {
     letterhead: EMPTY_LETTERHEAD,
     compact: true,
     sections: [
-      { verdict: { decision: 'ADVANCE', tone: 'positive', confidence: 87, rationale: 'Material unused FAR and a 95% CD approval rate, with no disqualifying flags.' } },
+      { verdict: { decision: 'ADVANCE', tone: 'positive', confidence: 87, rationale: 'Material unused FAR and a 95% CD approval rate, with no disqualifying flags.', scoreLabel: 'Site score' } },
       {
         heading: 'Site Identity',
         band: {

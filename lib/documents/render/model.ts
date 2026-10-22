@@ -23,6 +23,9 @@ export interface RenderVerdict {
   tone: 'positive' | 'warning' | 'negative';
   confidence: number; // 0–100
   rationale: string; // one line
+  // Label printed before the 0-100 figure. Defaults to "Confidence"; the
+  // screening memo uses "Site score" (one vocabulary per lens, Phase 0 30-17).
+  scoreLabel?: string;
 }
 
 // A compact horizontal band of label/value pairs (e.g. site identity).
@@ -105,4 +108,10 @@ export interface RenderModel {
   // by the strictly-one-page asset one-pager so the mandatory appendix fits
   // without ever trimming content. The appendix is still fully present.
   compactProvenance?: boolean;
+  // WHITE-LABEL (locked decision): a client-facing document (CMA, client
+  // neighborhood report, pricing sheet, net sheet) carries NO KOANO mark, no
+  // KOANO paragraph and no KOANO author metadata; the preparer is the author
+  // and the only identity on the page. The disclaimer and the provenance
+  // appendix stay (they name no brand). Set by the documents route per type.
+  whiteLabel?: boolean;
 }

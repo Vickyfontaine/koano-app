@@ -119,7 +119,7 @@ function factsForModel(sites: ComparisonSite[]) {
 
 export function deterministicComparisonReasoning(sites: ComparisonSite[]): string[] {
   const ranked = [...sites].sort((a, b) => rankKey(b.verdict) - rankKey(a.verdict));
-  const order = ranked.map((s) => `${shortAddr(s.address)} (${s.verdict.decision}, conf ${s.verdict.confidence})`).join(', then ');
+  const order = ranked.map((s) => `${shortAddr(s.address)} (${s.verdict.decision}, site score ${s.verdict.confidence})`).join(', then ');
   return [
     `${SELECTION_RULE} Applying that rule across the sites, the ranking is: ${order}.`,
     `The top-ranked site leads on development headroom and the community district’s entitlement record, net of any flood, violation, or speculation flag. This is a screening comparison of public record, not a feasibility study. It carries no financial modelling.`,
@@ -158,7 +158,7 @@ export function buildComparisonModel(args: {
   const row = (label: string, val: (s: ComparisonSite) => string): string[] => [label, ...sites.map(val)];
 
   const rows: string[][] = [
-    row('KOANO verdict', (s) => `${s.verdict.decision} (${s.verdict.confidence})`),
+    row('KOANO verdict (site score)', (s) => `${s.verdict.decision} (${s.verdict.confidence})`),
     row('Risk-adjusted rank', (s) => `#${rankOf.get(s)}`),
     row('Zoning district', (s) => s.facts.zoningDistrict ?? '—'),
     row('Base max floor area', (s) => `${fmtInt(s.facts.baseMaxFloorArea)} sf`),

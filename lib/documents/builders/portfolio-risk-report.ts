@@ -71,7 +71,7 @@ export function buildPortfolioRiskModel(args: {
       figures: [
         { label: 'Properties assessed', value: `${rows.length} of ${portfolioSize}`, emphasis: true },
         { label: 'In a Special Flood Hazard Area', value: fmtInt(inSfha) },
-        { label: 'With a Superfund site ≤2 mi', value: fmtInt(withSuperfund) },
+        { label: 'With a Superfund site within 2 mi', value: fmtInt(withSuperfund) },
         { label: 'With a disaster declared (10 yr)', value: fmtInt(withDisasters) },
       ],
     },
@@ -84,7 +84,7 @@ export function buildPortfolioRiskModel(args: {
   sections.push({
     heading: 'Per-Property Risk',
     table: {
-      columns: ['Property', 'FEMA flood', 'Superfund ≤2mi', 'Seismic PGA (g)', 'Disasters (10yr)', 'Crime trend'],
+      columns: ['Property', 'FEMA flood', 'Superfund within 2 mi', 'Seismic PGA (g)', 'Disasters (10yr)', 'Crime trend'],
       rows: rows.map((r) => [
         r.address,
         r.floodZone ? `${r.floodZone}${r.inSfha ? ' · SFHA' : ''}` : '—',

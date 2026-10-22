@@ -26,7 +26,7 @@ import {
 const ADDRESS = process.argv[2] ?? '175 3rd Street, Brooklyn, NY';
 const generatedAt = new Date().toISOString();
 const LH: Letterhead = {
-  full_name: 'Analyst Name', company_name: 'KOANO Capital Partners', license_number: null,
+  full_name: null, company_name: null, license_number: null,
   phone: null, contact_email: null, logo_url: null, headshot_url: null,
 };
 

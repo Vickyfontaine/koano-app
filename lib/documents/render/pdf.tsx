@@ -26,17 +26,20 @@ import { isTrustedProvenance } from '../../providers/provenance';
 import type { Letterhead } from '../types';
 
 // Coastal-Intelligence palette (subset used in print).
+// Print palette = the UI's AA ink tokens: the smallest text is --ink-muted
+// (5.25:1), --ink-faint is rules only, verdict words and callouts use the
+// -ink signal variants (never the fill hue as text).
 const INK = '#0D2B3E';
 const INK_SECONDARY = '#3D5A6E';
-const INK_MUTED = '#5A7A8C';
-const INK_FAINT = '#8AABB8';
+const INK_MUTED = '#527082';
+const INK_FAINT = '#6E8E9D'; // rules and borders only
 const BORDER = '#D6EBF7';
-const BRAND = '#5A9BBE';
+const BRAND = '#2F6F94'; // --mid-blue-ink
 
 const TONE_COLOR: Record<'positive' | 'warning' | 'negative', string> = {
-  positive: '#22C55E',
-  warning: '#F59E0B',
-  negative: '#EF4444',
+  positive: '#15803D',
+  warning: '#B45309',
+  negative: '#B91C1C',
 };
 
 // pick(compact, airyValue, compactValue)
@@ -84,8 +87,10 @@ function makeStyles(compact: boolean) {
     tRow: { flexDirection: 'row', borderBottomWidth: 0.5, borderBottomColor: BORDER },
     tHeadRow: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: INK_FAINT },
     tCell: { flex: 1, fontSize: p(9, 8.5), color: INK_SECONDARY, paddingVertical: p(3, 1.5), paddingRight: 6 },
+    tCellNum: { flex: 1, fontSize: p(9, 8.5), color: INK_SECONDARY, paddingVertical: p(3, 1.5), paddingRight: 6, textAlign: 'right' },
     tHeadCell: { flex: 1, fontSize: 8.5, fontFamily: PDF_FONT_FAMILY_BOLD, color: INK, paddingVertical: p(3, 1.5), paddingRight: 6 },
-    caption: { fontSize: 8, color: INK_FAINT, marginTop: 3 },
+    tHeadCellNum: { flex: 1, fontSize: 8.5, fontFamily: PDF_FONT_FAMILY_BOLD, color: INK, paddingVertical: p(3, 1.5), paddingRight: 6, textAlign: 'right' },
+    caption: { fontSize: 8, color: INK_MUTED, marginTop: 3 },
     // appendix
     appRow: { flexDirection: 'row', borderBottomWidth: 0.5, borderBottomColor: BORDER, paddingVertical: p(3, 1.5) },
     appBlock: { flex: 1.2, fontSize: p(8.5, 8), color: INK },
@@ -93,7 +98,7 @@ function makeStyles(compact: boolean) {
     appProv: { flex: 0.8, fontSize: p(8.5, 8) },
     appNote: { fontSize: 8.5, color: INK_SECONDARY, marginTop: p(8, 4), marginBottom: p(4, 2), lineHeight: 1.4 },
     provCompact: { fontSize: 8, color: INK_MUTED, lineHeight: 1.5 },
-    swapNote: { fontSize: 7.5, color: INK_FAINT, marginTop: 1 },
+    swapNote: { fontSize: 7.5, color: INK_MUTED, marginTop: 1 },
     // footer (fixed on every page)
     footer: {
       position: 'absolute',
@@ -108,7 +113,7 @@ function makeStyles(compact: boolean) {
       alignItems: 'flex-start',
     },
     disclaimer: { flex: 1, fontSize: 7, color: INK_MUTED, paddingRight: 12 },
-    pageNo: { fontSize: 7, color: INK_FAINT },
+    pageNo: { fontSize: 7, color: INK_MUTED },
     // verdict headline (pyramid — the conclusion, not a title)
     verdictWord: { fontFamily: PDF_FONT_FAMILY_BOLD, fontSize: p(26, 21), letterSpacing: 1 },
     verdictMeta: { fontSize: 10, color: INK_MUTED, marginTop: 2 },
@@ -125,7 +130,7 @@ function makeStyles(compact: boolean) {
       marginBottom: 4,
     },
     bandItem: { marginRight: 18, marginVertical: 2 },
-    bandLabel: { fontSize: 7, color: INK_FAINT, textTransform: 'uppercase', letterSpacing: 0.5 },
+    bandLabel: { fontSize: 7, color: INK_MUTED, textTransform: 'uppercase', letterSpacing: 0.5 },
     bandValue: { fontSize: 10, color: INK, fontFamily: PDF_FONT_FAMILY_BOLD },
     // highlight figures (base vs affordable FAR — a headline, not a table row)
     hlRow: { flexDirection: 'row', gap: 10, marginVertical: 4 },
@@ -134,7 +139,7 @@ function makeStyles(compact: boolean) {
     hlLabel: { fontSize: 8, color: INK_MUTED, textTransform: 'uppercase', letterSpacing: 0.5 },
     hlValue: { fontFamily: PDF_FONT_FAMILY_BOLD, fontSize: p(17, 15), color: INK, marginTop: 3 },
     hlSub: { fontSize: 8.5, color: INK_MUTED, marginTop: 2 },
-    trimNote: { fontSize: 8, color: INK_FAINT, fontStyle: 'italic', marginTop: 3 },
+    trimNote: { fontSize: 8, color: INK_MUTED, fontStyle: 'italic', marginTop: 3 },
     // ---- long-form (IC memo) ----
     titlePage: { flexDirection: 'column' },
     titleSpacerTop: { marginTop: 90 },
@@ -170,7 +175,7 @@ function makeStyles(compact: boolean) {
       letterSpacing: 0.3,
     },
     docProvLive: { fontSize: 9, color: INK_MUTED, marginTop: 14, marginBottom: 4, letterSpacing: 0.3 },
-    titleConfidential: { fontSize: 8, color: INK_FAINT, marginTop: 24, letterSpacing: 0.5, textTransform: 'uppercase' },
+    titleConfidential: { fontSize: 8, color: INK_MUTED, marginTop: 24, letterSpacing: 0.5, textTransform: 'uppercase' },
     tocTitle: { fontFamily: PDF_FONT_FAMILY_BOLD, fontSize: 16, color: INK, marginBottom: 14, borderBottomWidth: 0.5, borderBottomColor: BORDER, paddingBottom: 4 },
     tocRow: { flexDirection: 'row', alignItems: 'flex-end', borderBottomWidth: 0.5, borderBottomColor: BORDER, paddingVertical: 5 },
     tocNum: { width: 34, fontSize: 10, color: INK_MUTED, fontFamily: PDF_FONT_FAMILY_BOLD },
@@ -228,29 +233,43 @@ function sanitizeModelForPdf(model: RenderModel): RenderModel {
   ) as RenderModel;
 }
 
+// Provenance text colors in print: AA ink per state (the UI's -ink tokens).
 function provColor(p: Provenance): string {
   switch (p) {
     case 'live':
-      return '#22C55E';
+      return '#15803D';
     case 'partner':
-      return '#5A9BBE';
+      return '#2F6F94';
     case 'representative':
     case 'fetch_failed':
-      return '#F59E0B';
+      return '#B45309';
     case 'coverage_absent':
-      return '#8AABB8';
+      return INK_MUTED;
   }
 }
+function provBackground(p: Provenance): string {
+  return p === 'live' ? '#F0FDF4' : p === 'partner' ? '#F0F7FC' : p === 'coverage_absent' ? '#F0F7FC' : '#FFFBEB';
+}
 
-function LetterheadBlock({ lh, s }: { lh: Letterhead; s: Styles }) {
-  const lines = [
+function letterheadLines(lh: Letterhead): string[] {
+  return [
     lh.company_name,
     lh.license_number ? `License ${lh.license_number}` : null,
     [lh.phone, lh.contact_email].filter(Boolean).join('  ·  ') || null,
   ].filter(Boolean) as string[];
-  // Left = the PREPARER's identity; right = the KOANO brand mark (once). When
-  // there is no preparer identity, the left is left blank — never a second
-  // "KOANO", which duplicated the wordmark.
+}
+export function letterheadIsEmpty(lh: Letterhead): boolean {
+  return !lh.full_name && letterheadLines(lh).length === 0;
+}
+
+// Left = the PREPARER's identity; right = the KOANO brand mark, ONLY on a
+// KOANO-branded document. A white-label document never carries the mark. An
+// empty letterhead is suppressed entirely (no placeholder name, no stray rule)
+// rather than printing a fabricated-looking firm line.
+function LetterheadBlock({ lh, s, whiteLabel }: { lh: Letterhead; s: Styles; whiteLabel: boolean }) {
+  const lines = letterheadLines(lh);
+  const empty = letterheadIsEmpty(lh);
+  if (empty && whiteLabel) return null;
   return (
     <View style={s.letterhead}>
       <View>
@@ -259,23 +278,41 @@ function LetterheadBlock({ lh, s }: { lh: Letterhead; s: Styles }) {
           <Text key={i} style={s.letterheadLine}>{l}</Text>
         ))}
       </View>
-      <Text style={s.brandMark}>KOANO</Text>
+      {whiteLabel ? null : <Text style={s.brandMark}>KOANO</Text>}
     </View>
   );
 }
 
+// Numeric cells right-align (UI sprint A19). A column is numeric when most of
+// its filled cells are numbers, money, percentages or units.
+const NUMERIC_CELL = /^[\s$€£+\-−]?[\d,.]+\s?(%|x|mi|mo|sq ft|sf|units?|g|\/sq ft|\/sf|\/100|days?)?$|^—$|^[+\-−]?[\d,.]+ \/ [\d,.]+$/;
+function numericColumns(table: RenderTable): boolean[] {
+  return table.columns.map((_, ci) => {
+    const cells = table.rows.map((r) => (r[ci] ?? '').trim()).filter((c) => c && c !== '—');
+    if (cells.length === 0) return false;
+    const numeric = cells.filter((c) => NUMERIC_CELL.test(c)).length;
+    return numeric / cells.length >= 0.6;
+  });
+}
+
 function Table({ table, s }: { table: RenderTable; s: Styles }) {
+  const numeric = numericColumns(table);
+  // Text columns (addresses, labels) get more width than numeric ones so a
+  // street name wraps at a space instead of breaking mid-word (hyphenation is
+  // off). A two-column label/value table keeps an even split.
+  const wide = table.columns.length > 2;
+  const flexFor = (i: number) => (wide && !numeric[i] ? 1.7 : 1);
   return (
     <View>
       <View style={s.tHeadRow}>
         {table.columns.map((c, i) => (
-          <Text key={i} style={s.tHeadCell}>{c}</Text>
+          <Text key={i} style={{ ...(numeric[i] ? s.tHeadCellNum : s.tHeadCell), flex: flexFor(i) }}>{c}</Text>
         ))}
       </View>
       {table.rows.map((row, ri) => (
         <View key={ri} style={s.tRow} wrap={false}>
           {row.map((cell, ci) => (
-            <Text key={ci} style={s.tCell}>{cell}</Text>
+            <Text key={ci} style={{ ...(numeric[ci] ? s.tCellNum : s.tCell), flex: flexFor(ci) }}>{cell}</Text>
           ))}
         </View>
       ))}
@@ -288,7 +325,7 @@ function VerdictHeadline({ v, s }: { v: NonNullable<RenderSection['verdict']>; s
   return (
     <View wrap={false}>
       <Text style={{ ...s.verdictWord, color: TONE_COLOR[v.tone] }}>{v.decision}</Text>
-      <Text style={s.verdictMeta}>Confidence {v.confidence} / 100</Text>
+      <Text style={s.verdictMeta}>{v.scoreLabel ?? 'Confidence'} {v.confidence} / 100</Text>
       <Text style={s.verdictRationale}>{v.rationale}</Text>
     </View>
   );
@@ -371,7 +408,7 @@ function Section({ section, s, sink }: { section: RenderSection; s: Styles; sink
         <Text
           style={{
             ...s.provNote,
-            backgroundColor: section.provenanceNote.provenance === 'live' ? '#F0FDF4' : '#FFFBEB',
+            backgroundColor: provBackground(section.provenanceNote.provenance),
             color: provColor(section.provenanceNote.provenance),
           }}
         >
@@ -446,7 +483,7 @@ function TitlePage({ model, s }: { model: RenderModel; s: Styles }) {
   const banner = model.titleBanner;
   return (
     <View style={s.titlePage}>
-      <LetterheadBlock lh={model.letterhead} s={s} />
+      <LetterheadBlock lh={model.letterhead} s={s} whiteLabel={!!model.whiteLabel} />
       <View style={s.titleSpacerTop}>
         <Text style={s.titleDoc}>{model.docTitle}</Text>
         {model.subtitle ? <Text style={s.titleSub}>{model.subtitle}</Text> : null}
@@ -527,10 +564,14 @@ function KoanoPdf({
 }) {
   const s = makeStyles(!!model.compact);
   const generated = new Date(model.generatedAt).toISOString().slice(0, 10);
+  // PDF metadata: the preparer authors a white-label document; KOANO authors its own.
+  const author = model.whiteLabel
+    ? model.letterhead.full_name || model.letterhead.company_name || undefined
+    : 'KOANO';
 
   if (model.longForm) {
     return (
-      <Document title={model.docTitle} author="KOANO">
+      <Document title={model.docTitle} author={author}>
         <Page size="A4" style={s.page}>
           <TitlePage model={model} s={s} />
           <TocPage model={model} tocMap={tocMap ?? null} s={s} />
@@ -548,9 +589,9 @@ function KoanoPdf({
   }
 
   return (
-    <Document title={model.docTitle} author="KOANO">
+    <Document title={model.docTitle} author={author}>
       <Page size="A4" style={s.page}>
-        <LetterheadBlock lh={model.letterhead} s={s} />
+        <LetterheadBlock lh={model.letterhead} s={s} whiteLabel={!!model.whiteLabel} />
         <Text style={s.docTitle}>{model.docTitle}</Text>
         {model.subtitle ? (
           <Text style={s.subtitle}>{model.subtitle}  ·  Generated {generated}</Text>

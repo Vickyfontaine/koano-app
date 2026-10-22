@@ -14,12 +14,22 @@
 //   Font.register({ family: 'NeueMontreal', fonts: [{ src: buffer, fontWeight: 400 }, ...] });
 //   export const PDF_FONT_FAMILY = 'NeueMontreal';
 
+import { Font } from '@react-pdf/renderer';
+
 export const PDF_FONT_FAMILY = 'Helvetica';
 export const PDF_FONT_FAMILY_BOLD = 'Helvetica-Bold';
 
 // Registers bundled brand fonts. No-op today (Helvetica is built in). Kept so
 // the render path always calls it — the day a brand .ttf is bundled, only this
 // function body and the family constants change.
+let hyphenationOff = false;
 export function registerPdfFonts(): void {
   /* no bundled custom fonts yet */
+  // Hyphenation OFF (UI sprint A19): react-pdf's default callback split labels
+  // and street names mid-word ("PROPERTIES AS-SESSED", "VER-NON BOULE-VARD").
+  // Words wrap whole; long cells wrap at spaces only.
+  if (!hyphenationOff) {
+    Font.registerHyphenationCallback((word) => [word]);
+    hyphenationOff = true;
+  }
 }
