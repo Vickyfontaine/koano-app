@@ -49,6 +49,12 @@ Before = the pre-sprint capture set (`build-log/ui-ws-1/before/`) unless a later
 | The demo carries its "recorded example" label everywhere it appears | Met | `ui-ws-6/after/home-1440-fold.jpg` (hero card), `home-390.jpg` (verdict math and ledger sections), `intelligence-1440.jpg` (demo video and verdict card), `vision-1440.jpg`; no LIVE badge on the replay (the WS2 review confirmed the single "LIVE" on the site is the /data provider catalog) |
 | Font and logo unchanged; pre-push gate green | Met | Neue Montreal via the unchanged Fontshare link in `layout.tsx`; `/logo.png` untouched since before the sprint (the WS2 review checked the commit); the gate ran before every commit on `ui-sprint` (`build-log/gate.log` holds the last run) |
 
+## Workstream 6
+
+- **`/vision`** (`src/app/vision`, `VisionContent.tsx`): four concept previews drawn in HTML and SVG on the recorded 175 3rd St run (radar of the five votes, sentence to building resolving to the recorded lot and its recorded figures, the ownership graph with no counts because the sample stored none, the track record with "not yet measured" placeholders that say so). The page and every section carry "Concept preview"; no control runs anything; it is linked from the marketing footer only. Captures: `ui-ws-6/after/vision-{390,768,1440}.jpg`.
+- **Mobile renders**: `scripts/ui/render-manifest.mjs` lists each manifest entry and whether `public/renders/mobile/<name>.webp` exists (0 of 9 today). The drop-in is `mobile: true` per entry in `renders.ts`.
+- **Final QA**: the capture sets described below and one whole-sprint independent review (its findings and resolutions follow).
+
 ## Final QA pass
 
 Captured on the finished branch into `build-log/ui-ws-6/after/`: thirteen marketing and auth routes at 390, 768 and 1440 (full page and first viewport), all four lenses in empty, running and done states at the three widths through real analyses, plus the WS2 to WS5 interaction sets re-run in their workstream folders. One whole-sprint independent review follows this section's findings.

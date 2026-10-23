@@ -1,0 +1,455 @@
+[
+  {
+    "name": "cluster_1-empty",
+    "width": 1440,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "scrollHeight": 3034,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": [
+      "warning: Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview",
+      "warning: Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+    ]
+  },
+  {
+    "name": "cluster_1-empty",
+    "width": 768,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 768,
+    "clientWidth": 768,
+    "scrollHeight": 4973,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_1-empty",
+    "width": 390,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "scrollHeight": 7425,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_1-running",
+    "width": 1440,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "scrollHeight": 3720,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": [
+      "warning: [.WebGL-0x12c0044c800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+      "warning: [.WebGL-0x12c0044c800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+      "warning: [.WebGL-0x12c0044c800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+      "warning: [.WebGL-0x12c0044c800]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+    ]
+  },
+  {
+    "name": "cluster_1-running",
+    "width": 768,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 768,
+    "clientWidth": 768,
+    "scrollHeight": 5693,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_1-running",
+    "width": 390,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "scrollHeight": 7865,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_1-done",
+    "width": 1440,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "scrollHeight": 5742,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": [
+      "warning: The resource http://localhost:3000/_next/static/css/app/dashboard/page.css?v=1792742746555 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.",
+      "warning: The resource http://localhost:3000/_next/static/css/app/layout.css?v=1792742746555 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally."
+    ]
+  },
+  {
+    "name": "cluster_1-done",
+    "width": 768,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 768,
+    "clientWidth": 768,
+    "scrollHeight": 8114,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": [
+      "error: Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
+      "error: Failed to load resource: net::ERR_INTERNET_DISCONNECTED"
+    ]
+  },
+  {
+    "name": "cluster_1-done",
+    "width": 390,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "scrollHeight": 11439,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": [
+      "warning: The resource http://localhost:3000/_next/static/css/app/dashboard/page.css?v=1792742746555 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.",
+      "warning: The resource http://localhost:3000/_next/static/css/app/layout.css?v=1792742746555 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.",
+      "error: Failed to load resource: net::ERR_INTERNET_DISCONNECTED"
+    ]
+  },
+  {
+    "name": "cluster_2-empty",
+    "width": 1440,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "scrollHeight": 2938,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": [
+      "warning: Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+    ]
+  },
+  {
+    "name": "cluster_2-empty",
+    "width": 768,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 768,
+    "clientWidth": 768,
+    "scrollHeight": 4877,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_2-empty",
+    "width": 390,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "scrollHeight": 7351,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_2-running",
+    "width": 1440,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "scrollHeight": 6995,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_2-running",
+    "width": 768,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 768,
+    "clientWidth": 768,
+    "scrollHeight": 9268,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_2-running",
+    "width": 390,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "scrollHeight": 12504,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_2-done",
+    "width": 1440,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "scrollHeight": 6954,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_2-done",
+    "width": 768,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 768,
+    "clientWidth": 768,
+    "scrollHeight": 9371,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_2-done",
+    "width": 390,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "scrollHeight": 12087,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_4-empty",
+    "width": 1440,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "scrollHeight": 3322,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": [
+      "warning: Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+    ]
+  },
+  {
+    "name": "cluster_4-empty",
+    "width": 768,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 768,
+    "clientWidth": 768,
+    "scrollHeight": 5293,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_4-empty",
+    "width": 390,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "scrollHeight": 7901,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_4-running",
+    "width": 1440,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "scrollHeight": 3859,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_4-running",
+    "width": 768,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 768,
+    "clientWidth": 768,
+    "scrollHeight": 5942,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_4-running",
+    "width": 390,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "scrollHeight": 9268,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_4-done",
+    "width": 1440,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "scrollHeight": 8851,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_4-done",
+    "width": 768,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 768,
+    "clientWidth": 768,
+    "scrollHeight": 11652,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_4-done",
+    "width": 390,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "scrollHeight": 16517,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_5-empty",
+    "width": 1440,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "scrollHeight": 5532,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": [
+      "warning: Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+    ]
+  },
+  {
+    "name": "cluster_5-empty",
+    "width": 768,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 768,
+    "clientWidth": 768,
+    "scrollHeight": 7998,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_5-empty",
+    "width": 390,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "scrollHeight": 11018,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_5-tracked",
+    "width": 1440,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "scrollHeight": 5532,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_5-tracked",
+    "width": 768,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 768,
+    "clientWidth": 768,
+    "scrollHeight": 7998,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_5-tracked",
+    "width": 390,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "scrollHeight": 11018,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_5-running",
+    "width": 1440,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "scrollHeight": 5825,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_5-running",
+    "width": 768,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 768,
+    "clientWidth": 768,
+    "scrollHeight": 8325,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_5-running",
+    "width": 390,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "scrollHeight": 11549,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_5-done",
+    "width": 1440,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "scrollHeight": 6101,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_5-done",
+    "width": 768,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 768,
+    "clientWidth": 768,
+    "scrollHeight": 8593,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_5-done",
+    "width": 390,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "scrollHeight": 11908,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  }
+]
