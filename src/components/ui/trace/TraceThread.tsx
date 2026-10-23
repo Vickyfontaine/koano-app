@@ -12,7 +12,7 @@ export default function TraceThread() {
   const { on, thread, focus } = useTrace();
   if (!on) return null;
   return (
-    <div className="trace-thread" aria-live="polite" aria-atomic="true">
+    <div className="trace-thread" role="region" aria-label="Trace thread">
       {thread.length === 0 ? (
         <p className="trace-hint">
           Trace is on. Hover or focus the verdict, a figure, a vote or a source row to follow its thread. Press T to leave.

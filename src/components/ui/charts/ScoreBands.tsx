@@ -139,6 +139,7 @@ export default function ScoreBands({
             left: `${scorePct}%`,
             width: "3px",
             transform: "translateX(-1.5px)",
+            transition: "left 500ms var(--ease-out)",
             background: "var(--ink-primary)",
             borderRadius: "2px",
           }}

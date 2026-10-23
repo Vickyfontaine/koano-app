@@ -11,6 +11,9 @@ import VerdictMathPanel from "./VerdictMathPanel";
 import ReasoningChain from "./ReasoningChain";
 import { AGENT_LABELS, VERDICT_COLORS, type AgentName, type Verdict, type Provenance, type ReasoningStep, type MinoritySignal } from "./verdict";
 import type { WeightingBreakdown, AgentSummary } from "../../../lib/agents/breakdown";
+import TraceProvider, { useTrace } from "./trace/TraceProvider";
+import TraceThread from "./trace/TraceThread";
+import { useEffect } from "react";
 
 interface SealedRow {
   id: string;
@@ -34,12 +37,31 @@ function riskInk(score: number): string {
   return score >= 67 ? "var(--signal-negative-ink)" : score >= 34 ? "var(--signal-warning-ink)" : "var(--signal-positive-ink)";
 }
 
-export default function SealedVerdict({ row, owner }: { row: SealedRow; owner: boolean }) {
+export default function SealedVerdict(props: { row: SealedRow; owner: boolean; recordedLabel: string }) {
+  return (
+    <TraceProvider>
+      <SealedVerdictInner {...props} />
+    </TraceProvider>
+  );
+}
+
+function SealedVerdictInner({ row, owner, recordedLabel }: { row: SealedRow; owner: boolean; recordedLabel: string }) {
+  const trace = useTrace();
+  const setResult = trace.setResult;
+  useEffect(() => {
+    // The record holds no evidence bundle: the thread stops at the votes.
+    setResult({
+      verdict: row.verdict as Verdict,
+      overall_provenance: row.overall_provenance as Provenance,
+      agent_summaries: row.agent_summaries,
+      weighting_breakdown: row.weighting_breakdown ?? undefined,
+      data_points: [],
+    } as unknown as Parameters<typeof setResult>[0]);
+  }, [setResult, row]);
   const verdict = row.verdict as Verdict;
   const prov = row.overall_provenance as Provenance;
   const chain = Array.isArray(row.reasoning_chain) ? (row.reasoning_chain as ReasoningStep[]) : [];
   const minority = Array.isArray(row.minority_signals) ? (row.minority_signals as MinoritySignal[]) : [];
-  const when = new Date(row.created_at);
   return (
     <div className="sealed">
       <header className="sealed-head">
@@ -63,7 +85,7 @@ export default function SealedVerdict({ row, owner }: { row: SealedRow; owner: b
                 Verdict
                 <ProvenanceBadge provenance={prov} />
               </div>
-              <div className="band-word" style={{ color: VERDICT_COLORS[verdict] ?? "var(--ink-primary)" }}>
+              <div className="band-word" style={{ color: VERDICT_COLORS[verdict] ?? "var(--ink-primary)" }} data-trace="verdict" tabIndex={trace.on ? 0 : undefined}>
                 {row.verdict}
               </div>
               <p className="band-address">
@@ -72,7 +94,7 @@ export default function SealedVerdict({ row, owner }: { row: SealedRow; owner: b
               </p>
               <p className="band-headline">{row.headline}</p>
             </div>
-            <dl className="band-metrics">
+            <dl className="band-metrics" data-trace="score" tabIndex={trace.on ? 0 : undefined}>
               <div>
                 <dt>Confidence</dt>
                 <dd>{row.confidence}</dd>
@@ -92,9 +114,22 @@ export default function SealedVerdict({ row, owner }: { row: SealedRow; owner: b
           </div>
           <div className="band-foot">
             <p className="band-summary band-mono">
-              Recorded {when.toLocaleDateString()} {when.toLocaleTimeString()} · append-only record · decision support, not financial advice
+              Recorded {recordedLabel} · append-only record · decision support, not financial advice
             </p>
+            <div className="band-actions">
+              <button
+                type="button"
+                className="btn-ghost band-btn"
+                aria-pressed={trace.on}
+                onClick={trace.toggle}
+                title="Follow the verdict to the votes behind it (T)"
+                style={trace.on ? { background: "var(--deep-navy)", color: "var(--white)", borderColor: "var(--deep-navy)" } : undefined}
+              >
+                Trace
+              </button>
+            </div>
           </div>
+          <TraceThread />
         </section>
 
         <section className="sealed-panel" aria-label="Agent votes">

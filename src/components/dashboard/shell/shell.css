@@ -1326,9 +1326,9 @@ body.trace-on [data-trace].trace-hit {
   border-left-style: dotted;
 }
 .trace-seg-representative .trace-line::before {
-  border-left-style: double;
-  border-left-width: 3px;
-  border-color: var(--signal-warning);
+  border-left: 0;
+  width: 3px;
+  background: repeating-linear-gradient(180deg, var(--signal-warning) 0 4px, transparent 4px 7px);
 }
 .trace-seg-fetch_failed .trace-line::before {
   border-left-style: dashed;

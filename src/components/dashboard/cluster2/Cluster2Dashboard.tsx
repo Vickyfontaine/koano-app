@@ -76,7 +76,7 @@ export default function Cluster2Dashboard() {
     void fetchDetail(payload);
   });
 
-  const { status, result } = stream;
+  const { result } = stream;
   const activeCandidate: AddressCandidate | null =
     activePayload && "candidate" in activePayload ? activePayload.candidate : null;
   const subjectAddress =
@@ -146,7 +146,7 @@ export default function Cluster2Dashboard() {
           />
           <PermitTrend detail={detail} id="c2-permits" />
           <NarrativePanel address={subjectAddress} candidate={activeCandidate} id="c2-narrative" />
-          {subjectAddress && <StickyAction label="Documents" targetId="c2-documents" hint="Neighborhood report, pricing sheet, net sheet" />}
+          {subjectAddress && <StickyAction label="Documents" targetId="c2-documents" hint="Neighborhood report, pricing sheet, net sheet, CMA" />}
 
           {/* Downloadable documents — grouped, matching the Cluster 1 & 5 pattern */}
           {subjectAddress && (
@@ -203,7 +203,11 @@ export default function Cluster2Dashboard() {
                   title="Comparative Market Analysis"
                   address={subjectAddress}
                   formats={["pdf", "docx"]}
-                  hasRecentVerdict={status === "done"}
+                  hasRecentVerdict={true}
+                  sourceCopy={{
+                    verdict: { title: "Deterministic narrative", body: "The comps, the band and the market narrative written from the record alone. No generation used." },
+                    fresh: { title: "Model-written narrative", body: "The same figures with a model-written market narrative. Uses one generation." },
+                  }}
                   id="c2-cma-doc"
                 />
               </div>

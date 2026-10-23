@@ -148,6 +148,7 @@ export default function ReasoningChain({
           border: "1px solid var(--border)",
           background: "transparent",
           borderRadius: "100px",
+          minHeight: "44px",
           padding: "8px 24px",
           fontFamily: "inherit",
           fontSize: "13px",

@@ -53,14 +53,21 @@ export function buildThread(result: SynthesisResult, node: TraceNodeId): TraceSe
       provenance: prov,
     };
   };
+  // The figures an agent read: its own data points, notes excluded (a
+  // coverage or scope note is context, not a figure), sources it cited first.
+  const cited: string[] = Array.from(
+    new Set((result.reasoning_chain ?? []).flatMap((r) => (r as { sources?: string[] }).sources ?? [])),
+  );
+  const citedBy = (source: string) => cited.some((c) => c && source.includes(c));
   const pointSegs = (agent: string, max: number): TraceSegment[] =>
     points
-      .filter((p) => p.agent === agent)
+      .filter((p) => p.agent === agent && !/note|coverage|jurisdiction/i.test(p.label))
+      .sort((a, b) => Number(citedBy(b.source)) - Number(citedBy(a.source)))
       .slice(0, max)
       .map((p) => ({
         id: pointId(agent, p.label),
         label: `${p.label} = ${String(p.value ?? "n/a")}`,
-        op: p.source,
+        op: `read from ${p.source}`,
         provenance: p.provenance,
       }));
 

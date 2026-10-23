@@ -48,10 +48,13 @@ export default function TraceProvider({ children }: { children: React.ReactNode 
   const [result, setResult] = useState<SynthesisResult | null>(null);
   const toggle = useCallback(() => setOn((v) => !v), []);
 
-  // T toggles Trace mode (never while typing).
+  // T toggles Trace mode: never while typing, only with a result to trace,
+  // and not while a sheet or drawer dialog is open (they own the keyboard).
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() === "t" && !e.metaKey && !e.ctrlKey && !e.altKey && !isTypingTarget(e.target)) {
+        const dialogOpen = !!document.querySelector('[role="dialog"]:not(#evidence-drawer)');
+        if (!result || dialogOpen) return;
         e.preventDefault();
         setOn((v) => !v);
       }
@@ -59,7 +62,11 @@ export default function TraceProvider({ children }: { children: React.ReactNode 
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, []);
+  }, [result]);
+  // Trace turns off when the result goes away.
+  useEffect(() => {
+    if (!result) setOn(false);
+  }, [result]);
 
   // One listener for every data-trace element: hover or focus sets the thread.
   useEffect(() => {
@@ -85,12 +92,19 @@ export default function TraceProvider({ children }: { children: React.ReactNode 
   const thread = useMemo(() => (on && focus && result ? buildThread(result, focus) : []), [on, focus, result]);
 
   // Highlight the nodes on the thread; dim the rest (CSS does the dimming).
+  // Nodes mounted later (the drawer opening) are classified by the observer.
   useEffect(() => {
     const ids = threadIds(thread);
-    const all = Array.from(document.querySelectorAll<HTMLElement>("[data-trace]"));
-    for (const el of all) el.classList.toggle("trace-hit", ids.has(el.getAttribute("data-trace") ?? ""));
-    document.body.classList.toggle("trace-focused", ids.size > 0);
+    const apply = () => {
+      const all = Array.from(document.querySelectorAll<HTMLElement>("[data-trace]"));
+      for (const el of all) el.classList.toggle("trace-hit", ids.has(el.getAttribute("data-trace") ?? ""));
+      document.body.classList.toggle("trace-focused", ids.size > 0);
+    };
+    apply();
+    const mo = typeof MutationObserver !== "undefined" ? new MutationObserver(() => apply()) : null;
+    mo?.observe(document.body, { childList: true, subtree: true });
     return () => {
+      mo?.disconnect();
       document.body.classList.remove("trace-focused");
     };
   }, [thread]);

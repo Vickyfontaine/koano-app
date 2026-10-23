@@ -26,6 +26,8 @@ interface DocumentButtonProps {
   // to make, so hide the source selector entirely and always build deterministic.
   singleAction?: boolean;
   id?: string;
+  /** Replace the two source options' wording when a document's buildSource means something else. */
+  sourceCopy?: { verdict: { title: string; body: string }; fresh: { title: string; body: string } };
 }
 
 function filenameFromDisposition(header: string | null, fallback: string): string {
@@ -43,6 +45,7 @@ export default function DocumentButton({
   hasRecentVerdict = false,
   singleAction = false,
   id,
+  sourceCopy,
 }: DocumentButtonProps) {
   const isMulti = Array.isArray(addresses) && addresses.length > 0;
   // Evidentiary (singleAction) docs always build deterministically from record.
@@ -140,11 +143,11 @@ export default function DocumentButton({
           />
           <span>
             <strong style={{ fontWeight: 500, color: "var(--ink-primary)" }}>
-              Build from my last analysis
+              {sourceCopy?.verdict.title ?? "Build from my last analysis"}
             </strong>
             <br />
-            Reuses the analysis you just ran. No new generation used.
-            {!hasRecentVerdict && (
+            {sourceCopy?.verdict.body ?? "Reuses the analysis you just ran. No new generation used."}
+            {!sourceCopy && !hasRecentVerdict && (
               <span style={{ color: "var(--ink-muted)" }}> Run an analysis first to enable.</span>
             )}
           </span>
@@ -158,9 +161,9 @@ export default function DocumentButton({
             style={{ marginTop: "2px" }}
           />
           <span>
-            <strong style={{ fontWeight: 500, color: "var(--ink-primary)" }}>Fresh</strong>
+            <strong style={{ fontWeight: 500, color: "var(--ink-primary)" }}>{sourceCopy?.fresh.title ?? "Fresh"}</strong>
             <br />
-            Writes a new, model-tailored document. Uses one generation.
+            {sourceCopy?.fresh.body ?? "Writes a new, model-tailored document. Uses one generation."}
           </span>
         </label>
       </div>

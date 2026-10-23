@@ -24,6 +24,8 @@ export interface DivergingDatum {
   color: string;
   /** Representative data → hatched, washed bar. */
   muted?: boolean;
+  /** No event yet (the Bench before an agent reports): an empty track, no node, no note. */
+  pending?: boolean;
   /** Text rendered at the bar's outer end (e.g. "+0.41"). */
   valueLabel?: string;
   /** Rendered in the label column, next to the sub-label (e.g. a provenance dot). */
@@ -127,7 +129,21 @@ export default function DivergingBar({
                   opacity: d.neutral ? 0.7 : 0.5,
                 }}
               />
-              {d.neutral ? (
+              {d.pending ? (
+                /* The bar element exists at width 0 so the vote GROWS when it lands. */
+                <div
+                  aria-hidden="true"
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    bottom: 0,
+                    left: `${zeroPct}%`,
+                    width: "0%",
+                    transition: "width 400ms var(--ease-out), left 400ms var(--ease-out)",
+                    background: "transparent",
+                  }}
+                />
+              ) : d.neutral ? (
                 <>
                   {/* A hollow node sitting on the zero line: consulted, returned nothing */}
                   <span
@@ -167,7 +183,7 @@ export default function DivergingBar({
               ) : (
                 <>
                   {/* The bar */}
-                  {width > 0.01 && (
+                  {(
                     <div
                       style={{
                         position: "absolute",

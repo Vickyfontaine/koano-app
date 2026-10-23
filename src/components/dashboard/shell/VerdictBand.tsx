@@ -69,7 +69,7 @@ function ShareButton({ verdictId }: { verdictId: string }) {
       <button type="button" className="btn-ghost band-btn" onClick={share} disabled={state === "busy"}>
         {state === "copied" ? "Link copied" : state === "error" ? "Link failed" : "Share link"}
       </button>
-      {state === "shown" && url && (
+      {(state === "shown" || state === "copied") && url && (
         <a href={url} className="band-mono" style={{ color: "var(--mid-blue-ink)" }}>
           Open the record
         </a>

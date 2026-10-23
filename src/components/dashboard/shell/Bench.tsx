@@ -55,7 +55,8 @@ export default function Bench({ run }: { run: ShellRun }) {
       sublabel: done ? `${p!.verdict} · conf ${p!.confidence}` : "reading",
       value: done ? (p!.contribution ?? 0) : 0,
       color: VERDICT_FILLS[v] ?? "var(--mid-blue)",
-      neutral: done ? (p!.contribution ?? 0) === 0 : true,
+      neutral: done ? (p!.contribution ?? 0) === 0 : false,
+      pending: !done,
     };
   });
 
@@ -69,6 +70,15 @@ export default function Bench({ run }: { run: ShellRun }) {
       ]
     : null;
   const finalScore = wb?.final_score ?? wb?.aggregate_score ?? 0;
+  const [needle, setNeedle] = useState(0);
+  useEffect(() => {
+    if (!d) {
+      setNeedle(0);
+      return;
+    }
+    const id = requestAnimationFrame(() => setNeedle(finalScore));
+    return () => cancelAnimationFrame(id);
+  }, [d, finalScore]);
 
   const title =
     run.phase === "geocoding"
@@ -139,7 +149,7 @@ export default function Bench({ run }: { run: ShellRun }) {
           <ScoreBands
             domain={SCORE_DOMAIN}
             bands={bands}
-            score={finalScore}
+            score={needle}
             verdictLabel={d.verdict}
             verdictColor={VERDICT_COLORS[d.verdict]}
             ticks={[SCORE_DOMAIN[0], wb!.thresholds.wait, wb!.thresholds.hold, wb!.thresholds.buy, SCORE_DOMAIN[1]]}

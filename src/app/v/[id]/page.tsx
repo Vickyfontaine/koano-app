@@ -62,5 +62,7 @@ export default async function SealedVerdictPage({ params, searchParams }: { para
   const owner = !!userId && userId === row.clerk_user_id;
   if (!owner && !verifyShareToken(id, searchParams.t)) notFound();
 
-  return <SealedVerdict row={{ ...row, weighting_breakdown: row.weighting_breakdown ?? null }} owner={owner} />;
+  const when = new Date(row.created_at);
+  const recordedLabel = `${when.toLocaleDateString("en-US", { timeZone: "UTC", year: "numeric", month: "short", day: "numeric" })} ${when.toLocaleTimeString("en-US", { timeZone: "UTC", hour: "2-digit", minute: "2-digit" })} UTC`;
+  return <SealedVerdict row={{ ...row, weighting_breakdown: row.weighting_breakdown ?? null }} owner={owner} recordedLabel={recordedLabel} />;
 }
