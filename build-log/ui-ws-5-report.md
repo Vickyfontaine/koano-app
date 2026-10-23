@@ -16,7 +16,7 @@ Baseline: `build-log/ui-ws-4/after/`. After: `build-log/ui-ws-5/after/interactio
 
 | Claim | Evidence |
 |---|---|
-| Decision lands before the narration and matches the final verdict | `interactions/bench-checks.json`: decision at 29s, done at 56s, decision word equals the done word; `interactions/bench-decision-1440.jpg`, `bench-decision-390.jpg` |
+| Decision lands before the narration and matches the final verdict | `interactions/bench-checks.json` (decision before done, decision word equals the done word, timings in the file); `interactions/bench-decision-1440.jpg`, `bench-decision-390.jpg` |
 | Columns seal on real events, counters are real counts | `interactions/bench-reading-1440.jpg` (1 of 5 in, 10 figures read) |
 | Trace thread, highlight and dimming | `interactions/trace-verdict-1440.jpg`, `trace-agent-drawer-1440.jpg`, `trace-ledger-drawer-1440.jpg`, `trace-verdict-390.jpg`; `trace-checks.json` (10, 11 and 4 segments; T toggles; typing T does not) |
 | Documents wired | `interactions/documents-price-1440.jpg`, `documents-price-390.jpg` |
@@ -24,11 +24,31 @@ Baseline: `build-log/ui-ws-4/after/`. After: `build-log/ui-ws-5/after/interactio
 
 ## Self-review against the bar
 
-(filled after the after set)
+- The fixture replays byte-identical after the stream changes (gate green on every commit); the narrator's inputs are untouched.
+- Every Bench mark maps to a stream event; after the review, a not-yet-reported agent shows an empty track (no node, no note).
+- Trace: thread figures equal the Math and Sources tabs (checked by the reviewer against the breakdown); T never fires while typing, with no result, or while a sheet is open; ledger rows are keyboard reachable in Trace mode.
+- The record page: no horizontal overflow at 390, 768 or 1440; bad and missing tokens 404 (designed page); server-formatted timestamp (no hydration mismatch across locales).
+- Console: Clerk's development-keys notice and headless-Chromium GL messages only.
 
 ## Independent review and resolutions
 
-(filled after the review)
+The reviewer (a fresh subagent given the sprint row, the spec's Bench and Trace sections, the plan, the draft report, the diff and the captures, with its own offline fixture replay and one live run) reported four material code findings, one environment finding and eight minor ones, no blocker.
+
+| # | Finding | Resolution |
+|---|---|---|
+| 1 | The Bench showed the neutral node and "no directional signal" for agents that had not reported | Fixed: a `pending` row renders an empty track; the node and note appear only on the agent's event |
+| 2 | The record page hydrated with a mismatch for viewers in another timezone or locale | Fixed: the timestamp is formatted once on the server in a fixed locale and UTC and says "UTC" |
+| 3 | Trace highlights went stale for nodes mounted after the thread (the drawer opening) | Fixed: a MutationObserver re-classifies new nodes; the drawer's rows highlight on open |
+| 4 | The needle did not sweep and the vote bars did not grow; the report claimed they did | Fixed: the bar element exists at width 0 and grows on the event; the needle mounts at 0 and moves to the score on the next frame; the marker rule carries the transition |
+| 5 | Migration-023 is not applied in the Supabase project, so every record shows the rebuilt math | Founder blocker (`blockers.md`); the page handles it honestly |
+| 6 | The thread's "cited figures" were the first three points in provider order, notes included | Fixed: notes excluded, the agent's cited sources first, worded "read from" |
+| 7 | The CMA tile's source copy described a verdict reuse the route does not do | Fixed: "Deterministic narrative" vs "Model-written narrative, one generation" |
+| 8 | The record's 404 was Next's unstyled default | Fixed: a branded not-found page |
+| 9 | Share links were signed with the cron secret | Fixed locally (`KOANO_SHARE_SECRET` in `.env.local`); the Vercel setting and the no-revocation property are logged in `blockers.md` |
+| 10 | "View full reasoning chain" under 44px on phones | Fixed |
+| 11 | The permalink was not Trace-enabled as the spec says | Fixed for the verdict, score and votes (the record holds no evidence bundle, so the thread stops there) |
+| 12 | T armed with no run and inside any sheet | Fixed |
+| 13 | Nits: the thread re-announced on every hover; the copied link vanished; representative segments were double-ruled not hatched; the report's timings were from an earlier run; the Price sticky hint omitted the CMA; spec durations are literals | Fixed except the literal durations (the spec's timing table values, kept as written in the CSS with the token easing); the timings in this report are from the after set |
 
 ## Not fully satisfied
 
