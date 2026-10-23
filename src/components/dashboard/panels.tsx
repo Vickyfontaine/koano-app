@@ -92,7 +92,7 @@ export function Row({ label, value }: { label: string; value: React.ReactNode })
           color: "var(--ink-primary)",
           textAlign: "right",
           maxWidth: "62%",
-          overflowWrap: "anywhere",
+          overflowWrap: "break-word",
         }}
       >
         {value}
