@@ -15,6 +15,7 @@ import KoanoMap, {
 } from "@/components/ui/map/KoanoMap";
 import { OZ_FILL, LOT_LINE } from "@/components/ui/map/mapColors";
 import type { SiteDetailResponse } from "@/app/api/site-detail/route";
+import MapFrame from "@/components/ui/map/MapFrame";
 
 export interface MultiSite {
   label: string; // "Site A"
@@ -35,7 +36,7 @@ function hasCoords(d: SiteDetailResponse | null): d is SiteDetailResponse {
   );
 }
 
-export default function MultiSiteMap({ sites }: { sites: MultiSite[] }) {
+export default function MultiSiteMap({ sites, focusIndex = null, onFocus }: { sites: MultiSite[]; focusIndex?: number | null; onFocus?: (i: number | null) => void }) {
   const withCoords = sites.filter((s) => hasCoords(s.detail));
   if (withCoords.length === 0) return null;
 
@@ -105,14 +106,22 @@ export default function MultiSiteMap({ sites }: { sites: MultiSite[] }) {
   if (anyLot)
     legend.push({ label: "Subject lot", kind: "flood", provenance: "live", accent: LOT_LINE });
 
+  const focusLot = focusIndex !== null && polygons.some((p) => p.id === `lot-${focusIndex}`) ? `lot-${focusIndex}` : null;
   return (
-    <KoanoMap
-      center={center}
-      markers={markers}
-      polygons={polygons}
-      legend={legend}
-      height={460}
-      note="Sites, their Opportunity-Zone tract shading, and each subject lot: all live. Zoning + FAR headroom in each pin."
-    />
+    <MapFrame
+      title="Sites on the map"
+      summary={`${withCoords.length} site${withCoords.length === 1 ? "" : "s"}${anyOz ? " · Opportunity Zone tract" : ""}${anyLot ? " · subject lots" : ""}`}
+    >
+      <KoanoMap
+        center={center}
+        markers={markers}
+        polygons={polygons}
+        legend={legend}
+        height={460}
+        focusLot={focusLot}
+        onFrameChange={onFocus ? (lot) => onFocus(lot ? Number(lot.replace("lot-", "")) : null) : undefined}
+        note="Sites, their Opportunity-Zone tract shading, and each subject lot: all live. Zoning + FAR headroom in each pin."
+      />
+    </MapFrame>
   );
 }

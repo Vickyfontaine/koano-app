@@ -107,6 +107,9 @@ export interface MapLegendItem {
 }
 
 interface KoanoMapProps {
+  /** A lot polygon layer id to zoom to (lot-zoom frame); null frames the markers. */
+  focusLot?: string | null;
+  onFrameChange?: (lot: string | null) => void;
   center: [number, number]; // [lon, lat] — the subject
   markers: MapMarker[];
   polygons?: MapPolygonLayer[];
@@ -232,7 +235,25 @@ function legendGlyph(
   );
 }
 
-export default function KoanoMap({ center, markers, polygons = [], legend, height = 440, note }: KoanoMapProps) {
+function polygonBounds(features: Array<{ geometry: PolyGeometry }>): [[number, number], [number, number]] | null {
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  const visit = (c: unknown) => {
+    if (Array.isArray(c) && typeof c[0] === "number") {
+      const [x, y] = c as number[];
+      if (x < minX) minX = x;
+      if (x > maxX) maxX = x;
+      if (y < minY) minY = y;
+      if (y > maxY) maxY = y;
+    } else if (Array.isArray(c)) c.forEach(visit);
+  };
+  features.forEach((f) => visit(f.geometry.coordinates));
+  return Number.isFinite(minX) ? [[minX, minY], [maxX, maxY]] : null;
+}
+
+export default function KoanoMap({ center, markers, polygons = [], legend, height = 440, note ,
+  focusLot = null,
+  onFrameChange,
+}: KoanoMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapboxMap | null>(null);
   const markerObjs = useRef<MapboxMarker[]>([]);
@@ -276,11 +297,24 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
         map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), "top-right");
         popupRef.current = new mapboxgl.Popup({ closeButton: false, closeOnClick: false, offset: 12, className: "koano-map-popup" });
         map.on("load", () => {
-          // Strip decorative labels — keep only what aids orientation.
+          // Branded base (A9): only street names and neighborhood names stay,
+          // set in the ink-muted color with a white halo. Points of interest,
+          // transit, airports, cities, water and natural labels are off, so a
+          // Brooklyn map never reads "Newark" or "LGA".
           try {
             for (const layer of map!.getStyle().layers ?? []) {
-              if (/poi|transit|natural-point|water-point-label/.test(layer.id)) {
+              if (layer.type !== "symbol") continue;
+              const keep = /^road-label|^settlement-subdivision-label/.test(layer.id);
+              if (!keep) {
                 map!.setLayoutProperty(layer.id, "visibility", "none");
+                continue;
+              }
+              try {
+                map!.setPaintProperty(layer.id, "text-color", "#527082");
+                map!.setPaintProperty(layer.id, "text-halo-color", "#FFFFFF");
+                map!.setPaintProperty(layer.id, "text-halo-width", 1.2);
+              } catch {
+                /* non-fatal */
               }
             }
           } catch {
@@ -423,10 +457,23 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
       const finite = (m: MapMarker) => Number.isFinite(m.lon) && Number.isFinite(m.lat);
       const framed = markers.filter((m) => m.frame && finite(m));
       const pts = framed.length >= 1 ? framed : markers.filter(finite);
-      if (pts.length >= 2) {
+      const lotLayer = focusLot ? polygons.find((p) => p.id === focusLot && p.kind === "lot") : null;
+      const lotBounds = lotLayer ? polygonBounds(lotLayer.features) : null;
+      if (lotBounds) {
+        // Lot-zoom frame: the subject's footprint fills the view.
+        map.fitBounds(lotBounds, { padding: 80, maxZoom: 17.5, duration: 0 });
+      } else if (pts.length >= 2) {
         const b = new mapboxgl!.LngLatBounds();
         pts.forEach((m) => b.extend([m.lon, m.lat]));
         map.fitBounds(b, { padding: 64, maxZoom: 16, duration: 0 });
+      } else if (pts.length === 1 && polygons.some((p) => p.kind === "lot")) {
+        const only = polygons.find((p) => p.kind === "lot")!;
+        const bb = polygonBounds(only.features);
+        if (bb) map.fitBounds(bb, { padding: 80, maxZoom: 17, duration: 0 });
+        else {
+          map.setCenter(center);
+          map.setZoom(14);
+        }
       } else {
         map.setCenter(center);
         map.setZoom(14);
@@ -472,7 +519,7 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ready, signature]);
+  }, [ready, signature, focusLot]);
 
   if (!TOKEN || failed) {
     return (
@@ -505,6 +552,16 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
   return (
     <div style={{ position: "relative", borderRadius: "var(--radius-card)", overflow: "hidden", border: "1px solid var(--border)" }}>
       <div ref={containerRef} style={{ height, width: "100%" }} />
+      {onFrameChange && polygons.some((p) => p.kind === "lot") && (
+        <div className="map-frame-controls" role="group" aria-label="Map frame">
+          <button type="button" aria-pressed={!!focusLot} onClick={() => onFrameChange(polygons.find((p) => p.kind === "lot")!.id)}>
+            Lot
+          </button>
+          <button type="button" aria-pressed={!focusLot} onClick={() => onFrameChange(null)}>
+            All
+          </button>
+        </div>
+      )}
       {/* In-map legend — provenance lives ON the canvas, not in a caption elsewhere. */}
       <div
         style={{

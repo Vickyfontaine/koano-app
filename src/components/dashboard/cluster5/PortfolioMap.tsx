@@ -17,6 +17,7 @@ import React from "react";
 import KoanoMap, { type MapLegendItem, type MapMarker } from "@/components/ui/map/KoanoMap";
 import { riskPinColor, RISK_LOW, RISK_MID, RISK_HIGH, RISK_UNKNOWN } from "@/components/ui/map/mapColors";
 import type { PortfolioProperty } from "@/app/api/properties/route";
+import MapFrame from "@/components/ui/map/MapFrame";
 
 const NYC_DEFAULT_CENTER: [number, number] = [-73.95, 40.7]; // fallback if nothing frames
 
@@ -141,7 +142,7 @@ export default function PortfolioMap({
     (anyUncertain ? " Dashed pins have an unverified location." : "");
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+    <MapFrame title="Holdings on the map" summary={note}>
       <KoanoMap center={center} markers={markers} legend={legend} height={520} note={note} />
       {unpinnable.length > 0 && (
         <div
@@ -163,6 +164,6 @@ export default function PortfolioMap({
           </p>
         </div>
       )}
-    </div>
+    </MapFrame>
   );
 }

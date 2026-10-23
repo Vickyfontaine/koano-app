@@ -5,7 +5,7 @@
 // EPA cleanup sites, and mappable comparable sales. Each layer carries the
 // provenance of the block it came from, straight onto the map.
 
-import React from "react";
+import React, { useState } from "react";
 import KoanoMap, {
   type MapLegendItem,
   type MapMarker,
@@ -18,6 +18,8 @@ import {
   FLOOD_SHADED_FILL,
 } from "@/components/ui/map/mapColors";
 import type { SiteDetailResponse } from "@/app/api/site-detail/route";
+import MapFrame from "@/components/ui/map/MapFrame";
+import { LOT_LINE } from "@/components/ui/map/mapColors";
 import { compPool } from "../../../../lib/documents/valuation-guard";
 
 const SUPERFUND_RED = "#EF4444";
@@ -26,14 +28,6 @@ const BROWNFIELD_AMBER = "#F59E0B";
 function money(n: number): string {
   return `$${Math.round(n).toLocaleString()}`;
 }
-
-const panelTitle: React.CSSProperties = {
-  fontFamily: "var(--font-mono)",
-  fontSize: "11px",
-  letterSpacing: "0.08em",
-  textTransform: "uppercase",
-  color: "var(--ink-muted)",
-};
 
 export default function PropertyMap({
   detail,
@@ -49,11 +43,11 @@ export default function PropertyMap({
 }) {
   const ra = detail?.resolved_address;
   const hasCoords = !!ra && Number.isFinite(ra.latitude) && Number.isFinite(ra.longitude);
+  const [focusLot, setFocusLot] = useState<string | null>(null);
 
   if (!detail || !hasCoords) {
     return (
-      <section id={id} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-        <span style={panelTitle}>{title}</span>
+      <MapFrame id={id} title={title} summary={detailError ? "The map could not be built for this run." : "Loads with the first block of data."}>
         <div
           style={{
             height: 440,
@@ -69,7 +63,7 @@ export default function PropertyMap({
             {detailError ? `Map data unavailable: ${detailError}` : "Loading map…"}
           </p>
         </div>
-      </section>
+      </MapFrame>
     );
   }
 
@@ -93,6 +87,18 @@ export default function PropertyMap({
     title: [ra!.normalized, floodLine].filter(Boolean).join("\n"),
   });
   legend.push({ label: "Subject property", provenance: "live", kind: "subject" });
+
+  // The subject lot footprint (live MapPLUTO), so the map can zoom to the lot.
+  const geo = detail.geometry?.data;
+  if (geo?.lot_polygon) {
+    polygons.push({
+      id: "lot",
+      kind: "lot",
+      provenance: detail.geometry?.provenance ?? "live",
+      features: [{ geometry: geo.lot_polygon }],
+    });
+    legend.push({ label: "Subject lot", provenance: detail.geometry?.provenance ?? "live", kind: "flood", accent: LOT_LINE });
+  }
 
   // Flood-hazard polygons.
   const fz = detail.flood_zones;
@@ -189,16 +195,18 @@ export default function PropertyMap({
     });
   }
 
+  const summary = legend.map((l) => l.label).filter(Boolean).slice(0, 3).join(" · ");
   return (
-    <section id={id} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-      <span style={panelTitle}>{title}</span>
+    <MapFrame id={id} title={title} summary={summary}>
       <KoanoMap
         center={center}
         markers={markers}
         polygons={polygons}
         legend={legend}
+        focusLot={focusLot}
+        onFrameChange={setFocusLot}
         note={fz?.data && fz.data.zones.length > 0 ? "FEMA NFHL · minimal-hazard areas omitted" : undefined}
       />
-    </section>
+    </MapFrame>
   );
 }
