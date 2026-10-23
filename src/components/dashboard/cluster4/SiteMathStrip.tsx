@@ -70,6 +70,7 @@ export default function SiteMathStrip({ sites }: { sites: StripSite[] }) {
     <div>
       <div style={{ ...mono, marginBottom: "10px" }}>Verdict math, side by side</div>
       <div
+        className="site-math-strip"
         style={{
           display: "grid",
           gridTemplateColumns: `repeat(${Math.min(sites.length, 3)}, minmax(0, 1fr))`,

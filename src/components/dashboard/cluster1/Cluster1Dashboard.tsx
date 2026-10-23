@@ -23,6 +23,7 @@ import type { SiteDetailResponse } from "@/app/api/site-detail/route";
 
 const PROPERTY_BLOCKS = [
   "zoning",
+  "geometry",
   "permits",
   "opportunity_zone",
   "flood",
@@ -71,13 +72,16 @@ export default function Cluster1Dashboard() {
     void fetchDetail(payload);
   });
 
+  // Owner or renter: the same findings, ordered and worded for the reader.
+  // The engine computes one verdict; the switch never changes it.
+  const [persona, setPersona] = useState<"owner" | "renter">("owner");
   const { status, result } = stream;
   // The shell's verdict band and evidence drawer render this run.
   useRegisterRun(stream, { subject: lastInput });
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-      <div id="c1-property">
+      <div id="c1-property" style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
         <h1
           style={{
             fontSize: "32px",
@@ -101,6 +105,14 @@ export default function Cluster1Dashboard() {
         >
           {c.audience}
         </p>
+        <div className="segmented" role="group" aria-label="I am">
+          <button type="button" aria-pressed={persona === "owner"} onClick={() => setPersona("owner")}>
+            I own this home
+          </button>
+          <button type="button" aria-pressed={persona === "renter"} onClick={() => setPersona("renter")}>
+            I rent here
+          </button>
+        </div>
       </div>
 
       <LocationConfidenceNote confidence={detail?.resolved_address?.location_confidence} />
@@ -130,32 +142,36 @@ export default function Cluster1Dashboard() {
       {status === "done" && result && (
         <>
 
+          <AlertsPanel detail={detail} detailError={detailError} id="c1-alerts" persona={persona} />
+
           <div
+            className="c1-panels"
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
               gap: "16px",
             }}
           >
-            <ValuationPanel detail={detail} detailError={detailError} id="c1-valuation" />
-            <PermitHistoryPanel permits={detail?.permits} error={detailError} id="c1-permits" />
-            <ViolationsPanel
-              violations={detail?.building_violations}
-              error={detailError}
-              id="c1-violations"
-            />
-            <OwnershipPanel
-              portfolio={detail?.landlord_portfolio}
-              error={detailError}
-              id="c1-ownership"
-            />
+            {persona === "owner" ? (
+              <>
+                <ValuationPanel detail={detail} detailError={detailError} id="c1-valuation" />
+                <PermitHistoryPanel permits={detail?.permits} error={detailError} id="c1-permits" />
+                <ViolationsPanel violations={detail?.building_violations} error={detailError} id="c1-violations" />
+                <OwnershipPanel portfolio={detail?.landlord_portfolio} error={detailError} id="c1-ownership" />
+              </>
+            ) : (
+              <>
+                <ViolationsPanel violations={detail?.building_violations} error={detailError} id="c1-violations" />
+                <OwnershipPanel portfolio={detail?.landlord_portfolio} error={detailError} id="c1-ownership" />
+                <PermitHistoryPanel permits={detail?.permits} error={detailError} id="c1-permits" />
+                <ValuationPanel detail={detail} detailError={detailError} id="c1-valuation" />
+              </>
+            )}
           </div>
-
-          <AlertsPanel detail={detail} detailError={detailError} id="c1-alerts" />
 
           {/* Downloadable documents — the Community document set, all built
               from the analyzed address on live NYC public data. */}
-          <div id="c1-documents" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          <div id="c1-documents" className="lens-documents" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
             <div>
               <h2
                 style={{

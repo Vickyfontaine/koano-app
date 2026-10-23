@@ -11,6 +11,7 @@ import React from "react";
 import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
 import { BlockError, PanelHeader, Row, fmtInt, fmtMoney, panelStyle, panelTitle } from "../panels";
 import { deriveAlerts } from "../cluster1/AlertsPanel";
+import CompCards from "./CompCards";
 import type { SiteDetailResponse } from "@/app/api/site-detail/route";
 
 interface CmaBuilderProps {
@@ -70,7 +71,8 @@ export default function CmaBuilder({ detail, detailError, id }: CmaBuilderProps)
           >
             Live recorded residential sales from NYC public records. {comps.data.scope_note}
           </div>
-          <div className="scroll-x" style={{ overflowX: "auto", padding: "2px" }}>
+          <CompCards comps={comps.data.comps} provenance={comps.provenance} />
+          <div className="scroll-x wide-only" style={{ overflowX: "auto", padding: "2px" }}>
             <table style={{ borderCollapse: "collapse", width: "100%", minWidth: "520px" }}>
               <thead>
                 <tr>

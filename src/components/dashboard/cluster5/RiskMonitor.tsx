@@ -98,7 +98,48 @@ export default function RiskMonitor({ properties, id }: RiskMonitorProps) {
       )}
 
       {rows.length > 0 && (
-        <div className="scroll-x" style={{ overflowX: "auto", padding: "2px" }}>
+        <div className="phone-only" style={{ flexDirection: "column", gap: "var(--space-3)" }} role="list" aria-label="Hazard signals by holding">
+          {rows.map((r) => {
+            const v = r.property.latest_verdict;
+            const flood = r.detail?.flood;
+            const contamination = r.detail?.contamination;
+            const seismic = r.detail?.seismic;
+            const disaster = r.detail?.disaster_history;
+            return (
+              <div key={r.property.id} className="holding-card" role="listitem" aria-busy={r.loading}>
+                <span className="card-title">{r.property.address_normalized ?? r.property.address_input}</span>
+                <dl className="card-figures" style={{ gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }}>
+                  <div>
+                    <dt>Verdict risk</dt>
+                    <dd style={{ color: v ? riskInk(v.risk_score) : "var(--ink-muted)" }}>{v ? v.risk_score : "n/a"}</dd>
+                  </div>
+                  <div>
+                    <dt>FEMA flood</dt>
+                    <dd style={{ fontSize: "var(--text-ui)" }}>
+                      {r.loading ? "…" : flood?.data ? `zone ${flood.data.flood_zone ?? "n/a"}${flood.data.in_special_flood_hazard_area ? " · SFHA" : ""}` : "n/a"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Superfund ≤2mi</dt>
+                    <dd>{contamination?.data ? contamination.data.superfund_sites_within_radius : r.loading ? "…" : "n/a"}</dd>
+                  </div>
+                  <div>
+                    <dt>Disasters 10yr</dt>
+                    <dd>{disaster?.data ? disaster.data.declarations_last_10yr : r.loading ? "…" : "n/a"}</dd>
+                  </div>
+                </dl>
+                <span className="card-note">
+                  Seismic {seismic?.data && seismic.data.pga_g != null ? `${seismic.data.pga_g}g PGA` : "n/a"}
+                  {r.error ? ` · ${r.error}` : ""}
+                </span>
+                {flood?.data && <ProvenanceBadge provenance={flood.provenance} />}
+              </div>
+            );
+          })}
+        </div>
+      )}
+      {rows.length > 0 && (
+        <div className="scroll-x wide-only" style={{ overflowX: "auto", padding: "2px" }}>
           <table style={{ borderCollapse: "collapse", width: "100%", minWidth: "640px" }}>
             <thead>
               <tr>

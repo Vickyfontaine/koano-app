@@ -19,6 +19,8 @@ import ArchiveTrend from "./ArchiveTrend";
 import MondayBriefing from "./MondayBriefing";
 import RiskMonitor from "./RiskMonitor";
 import DocumentButton from "../DocumentButton";
+import StickyAction from "../shell/StickyAction";
+import ThisWeek from "./ThisWeek";
 import type { PortfolioProperty } from "@/app/api/properties/route";
 
 export default function Cluster5Dashboard() {
@@ -117,8 +119,11 @@ export default function Cluster5Dashboard() {
           </p>
         </div>
 
-        <PortfolioMap properties={properties} loadError={loadError} />
       </div>
+
+      <ThisWeek properties={properties} id="c5-week" />
+
+      <PortfolioMap properties={properties} loadError={loadError} />
 
       <PortfolioOverview
         properties={properties}
@@ -132,13 +137,14 @@ export default function Cluster5Dashboard() {
 
       {/* Active analysis */}
 
+      {!!properties && properties.length > 0 && <StickyAction label="Generate briefing" targetId="c5-briefing" hint="The Monday portfolio briefing" />}
       <MondayBriefing hasProperties={!!properties && properties.length > 0} id="c5-briefing" />
 
       <MonitoringFeed id="c5-monitoring" />
 
       {/* Downloadable documents — portfolio briefing PDF + per-asset one-pager,
           matching the Cluster 1 grouped pattern. */}
-      <div id="c5-documents" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+      <div id="c5-documents" className="lens-documents" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
         <div>
           <h2
             style={{

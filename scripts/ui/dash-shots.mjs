@@ -91,6 +91,11 @@ for (const cluster of CLUSTERS) {
   const addrs = ADDR[cluster];
   if (cluster === "cluster_4") {
     await page.fill("#site-0", addrs[0]);
+    // Slots open one at a time since WS4: add the second site first.
+    if ((await page.locator("#site-1").count()) === 0) {
+      await page.locator('button:has-text("Add site")').click();
+      await page.waitForTimeout(300);
+    }
     await page.fill("#site-1", addrs[1]);
     await page.locator('button:has-text("Run comparison")').click();
     await page.waitForTimeout(15000);
@@ -109,7 +114,7 @@ for (const cluster of CLUSTERS) {
       await page.waitForTimeout(9000);
     }
     await snap(page, `${cluster}-tracked`);
-    await page.locator('button:has-text("Analyze"), button:has-text("Re-run")').first().click();
+    await page.locator('button:has-text("Analyze"), button:has-text("Re-run")').locator('visible=true').first().click();
     await page.waitForTimeout(15000);
     await snap(page, `${cluster}-running`);
     await waitForDone(page);

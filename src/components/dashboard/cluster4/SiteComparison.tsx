@@ -17,6 +17,8 @@ import type { RunPayload } from "../useAddressResolver";
 import { useRegisterRun, usePendingSubject, useSubject } from "../shell/SubjectProvider";
 import RunDegradationNote from "@/components/ui/RunDegradationNote";
 import SitePanels from "./SitePanels";
+import SiteCards from "./SiteCards";
+import StickyAction from "../shell/StickyAction";
 import MultiSiteMap, { type MultiSite } from "./MultiSiteMap";
 import SiteMathStrip, { type StripSite } from "./SiteMathStrip";
 import MonitoringFeed from "../cluster5/MonitoringFeed";
@@ -56,6 +58,10 @@ const monoLabel: React.CSSProperties = {
 
 export default function SiteComparison() {
   const [addresses, setAddresses] = useState<string[]>(["", "", ""]);
+  // Slots open one at a time ("Add site"); a filled slot keeps the next one open.
+  const [openSlots, setOpenSlots] = useState(1);
+  const visibleSlots = Math.max(openSlots, addresses.reduce((n, a, i) => (a.trim() ? i + 1 : n), 1));
+  const [mapFocus, setMapFocus] = useState<number | null>(null);
   // The site shown in the shell's verdict band (and its evidence drawer).
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
   const { openDrawer } = useSubject();
@@ -234,7 +240,7 @@ export default function SiteComparison() {
             gap: "12px",
           }}
         >
-          {SLOT_LABELS.map((label, i) => (
+          {SLOT_LABELS.slice(0, visibleSlots).map((label, i) => (
             <div key={label} style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
               <label htmlFor={`site-${i}`} style={monoLabel}>
                 {label}
@@ -271,8 +277,18 @@ export default function SiteComparison() {
             {running ? "Comparing sites…" : "Run comparison"}
             {!running && <span aria-hidden="true">↗</span>}
           </button>
+          {visibleSlots < 3 && (
+            <button
+              type="button"
+              className="btn-ghost"
+              onClick={() => setOpenSlots((n) => Math.min(3, Math.max(n, visibleSlots) + 1))}
+              disabled={running}
+            >
+              Add site
+            </button>
+          )}
           <span style={{ fontSize: "12px", color: "var(--ink-muted)" }}>
-            Up to three sites · all five agents run on each · ~1–3 min
+            Up to three sites · all five agents run on each · about 1 to 3 minutes
           </span>
         </div>
       </form>
@@ -389,10 +405,26 @@ export default function SiteComparison() {
           <RunDegradationNote degradation={runDegradation} />
 
           {/* The three sites in space — Opportunity-Zone tract shading + subject lots, all live. */}
-          <MultiSiteMap sites={rankedSites} />
+          <SiteCards
+            sites={ranked.map((slot, rank) => ({
+              slot,
+              rank: rank + 1,
+              address: streams[slot].result!.resolved_address.normalized,
+              verdict: streams[slot].result!.verdict,
+              detail: details[slot].data,
+            }))}
+            selected={bandSlot}
+            onSelect={(slot) => {
+              setSelectedSlot(slot);
+              setMapFocus(ranked.indexOf(slot));
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+          />
 
-          {/* Summary table */}
-          <div className="scroll-x" style={{ overflowX: "auto", padding: "2px" }}>
+          <MultiSiteMap sites={rankedSites} focusIndex={mapFocus} onFocus={setMapFocus} />
+
+          {/* Summary table (from 768px; the cards above carry it on phones) */}
+          <div className="scroll-x wide-only" style={{ overflowX: "auto", padding: "2px" }}>
             <table style={{ borderCollapse: "collapse", width: "100%", minWidth: "560px" }}>
               <thead>
                 <tr>
@@ -547,6 +579,8 @@ export default function SiteComparison() {
               </div>
             );
           })}
+
+          <StickyAction label="Documents" targetId={`c4-screening-${ranked[0]}`} hint="Screening memo, entitlement memo, comparison brief" />
 
           {/* One comparison brief across the ranked sites */}
           {ranked.length >= 2 && (

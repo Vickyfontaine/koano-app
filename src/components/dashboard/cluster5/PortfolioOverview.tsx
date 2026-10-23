@@ -10,6 +10,7 @@ import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
 import CandidatePicker from "@/components/ui/CandidatePicker";
 import { VERDICT_COLORS, type Verdict, type AddressCandidate } from "@/components/ui/verdict";
 import { PanelHeader, panelStyle, panelTitle } from "../panels";
+import HoldingCards from "./HoldingCards";
 import type { RunPayload } from "../useAddressResolver";
 import type { PortfolioProperty } from "@/app/api/properties/route";
 
@@ -133,13 +134,20 @@ export default function PortfolioOverview({
 
       {/* Holdings table */}
       {properties === null && !loadError ? (
-        <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>Loading portfolio…</p>
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }} aria-busy="true">
+          {[0, 1].map((i) => (
+            <div key={i} className="koano-pulse" style={{ height: "var(--space-3)", width: `${70 - i * 20}%`, borderRadius: "var(--radius-chip)", background: "var(--border-light)" }} />
+          ))}
+          <span className="sr-only">Loading the book</span>
+        </div>
       ) : properties && properties.length === 0 ? (
         <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
           No tracked properties yet. Add the first one above.
         </p>
       ) : properties && properties.length > 0 ? (
-        <div className="scroll-x" style={{ overflowX: "auto", padding: "2px" }}>
+        <>
+        <HoldingCards properties={properties} analyzingId={analyzingId} onAnalyze={onAnalyze} onRemove={(id) => void onRemove(id)} />
+        <div className="scroll-x wide-only" style={{ overflowX: "auto", padding: "2px" }}>
           <table style={{ borderCollapse: "collapse", width: "100%", minWidth: "640px" }}>
             <thead>
               <tr>
@@ -237,6 +245,7 @@ export default function PortfolioOverview({
             </tbody>
           </table>
         </div>
+        </>
       ) : null}
 
       <p style={{ fontSize: "11px", color: "var(--ink-muted)", margin: 0 }}>

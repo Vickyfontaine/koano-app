@@ -23,10 +23,12 @@ import PricingPanel from "./PricingPanel";
 import PermitTrend from "./PermitTrend";
 import NarrativePanel from "./NarrativePanel";
 import DocumentButton from "../DocumentButton";
+import StickyAction from "../shell/StickyAction";
 import type { SiteDetailResponse } from "@/app/api/site-detail/route";
 
 const MARKET_BLOCKS = [
   "zoning",
+  "geometry",
   "permits",
   "hpi",
   "demographics",
@@ -143,10 +145,11 @@ export default function Cluster2Dashboard() {
           />
           <PermitTrend detail={detail} id="c2-permits" />
           <NarrativePanel address={subjectAddress} candidate={activeCandidate} id="c2-narrative" />
+          {subjectAddress && <StickyAction label="Documents" targetId="c2-documents" hint="Neighborhood report, pricing sheet, net sheet" />}
 
           {/* Downloadable documents — grouped, matching the Cluster 1 & 5 pattern */}
           {subjectAddress && (
-            <div id="c2-documents" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            <div id="c2-documents" className="lens-documents" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
               <div>
                 <h2
                   style={{

@@ -163,6 +163,14 @@ interface AlertsPanelProps {
   detail: SiteDetailResponse | null;
   detailError: string | null;
   id?: string;
+  /** Orders the findings for the reader: a renter sees the building's record first. */
+  persona?: "owner" | "renter";
+}
+
+const RENTER_FIRST = /violation|owner|speculation|flood|demolition/i;
+function orderFor(persona: "owner" | "renter", alerts: AlertItem[]): AlertItem[] {
+  if (persona === "owner") return alerts;
+  return [...alerts].sort((a, b) => Number(RENTER_FIRST.test(b.text)) - Number(RENTER_FIRST.test(a.text)));
 }
 
 const NOTIF_COLOR: Record<string, string> = {
@@ -171,7 +179,7 @@ const NOTIF_COLOR: Record<string, string> = {
   info: "var(--mid-blue)",
 };
 
-export default function AlertsPanel({ detail, detailError, id }: AlertsPanelProps) {
+export default function AlertsPanel({ detail, detailError, id, persona = "owner" }: AlertsPanelProps) {
   const bbl = detail?.resolved_address.bbl ?? null;
   const [feed, setFeed] = useState<NotificationRow[] | null>(null);
 
@@ -224,11 +232,14 @@ export default function AlertsPanel({ detail, detailError, id }: AlertsPanelProp
   }
 
   // FALLBACK — point-in-time signals (no monitoring history yet, or no changes).
-  const alerts = deriveAlerts(detail);
+  const alerts = orderFor(persona, deriveAlerts(detail));
 
   return (
     <div style={panelStyle} id={id}>
-      <PanelHeader title="Alerts: derived from this analysis" />
+      <PanelHeader
+        title={persona === "renter" ? "What the record says about this building" : "What the record says about this property"}
+        sub="Plain findings from this analysis, each with its source"
+      />
       {alerts.length === 0 ? (
         <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
           No notable signals in the fetched data.
