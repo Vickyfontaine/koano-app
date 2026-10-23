@@ -1,0 +1,3661 @@
+diff --git a/scripts/ui/ws2-interactions.mjs b/scripts/ui/ws2-interactions.mjs
+new file mode 100644
+index 0000000..193de7f
+--- /dev/null
++++ b/scripts/ui/ws2-interactions.mjs
+@@ -0,0 +1,87 @@
++// WS2 interaction captures: phone nav sheet, signed-in nav, hero address box states.
++// node scripts/ui/ws2-interactions.mjs --out build-log/ui-ws-2/after/interactions
++import { chromium } from 'playwright';
++import fs from 'node:fs';
++import path from 'node:path';
++
++const args = Object.fromEntries(process.argv.slice(2).map((a, i, arr) => a.startsWith('--') ? [a.slice(2), arr[i + 1]] : []).filter(Boolean));
++const out = args.out ?? 'build-log/ui-ws-2/after/interactions';
++const base = args.base ?? 'http://localhost:3000';
++const state = args.state ?? '/private/tmp/claude-501/-Users-victor/5925fa8b-5f90-4f71-b53e-01ddc67bbac9/scratchpad/state.json';
++fs.mkdirSync(out, { recursive: true });
++const shot = (page, name) => page.screenshot({ path: path.join(out, `${name}.jpg`), type: 'jpeg', quality: 78 });
++const errors = [];
++
++const browser = await chromium.launch();
++async function ctx(width, opts = {}) {
++  const c = await browser.newContext({ viewport: { width, height: width < 500 ? 844 : 900 }, deviceScaleFactor: 1, ...opts });
++  const p = await c.newPage();
++  p.on('console', async (m) => {
++    if (m.type() !== 'error' && m.type() !== 'warning') return;
++    let vals = [];
++    try { vals = await Promise.all(m.args().slice(0, 4).map((a) => a.jsonValue().catch(() => '?'))); } catch {}
++    errors.push(`[${m.type()}] ${m.text().slice(0, 160)} | args: ${JSON.stringify(vals).slice(0, 2500)}`);
++  });
++  p.on('pageerror', (e) => errors.push(`[pageerror] ${String(e).slice(0, 160)}`));
++  return { c, p };
++}
++
++// 1. Phone nav sheet: open, focus trap, Escape
++{
++  const { c, p } = await ctx(390);
++  await p.goto(base + '/', { waitUntil: 'networkidle' });
++  await p.click('#nav-mobile-toggle');
++  await p.waitForSelector('#nav-mobile-menu');
++  await p.waitForTimeout(600);
++  await shot(p, 'nav-sheet-390');
++  const focused1 = await p.evaluate(() => document.activeElement?.textContent?.trim());
++  for (let i = 0; i < 12; i++) await p.keyboard.press('Tab');
++  const stillInside = await p.evaluate(() => !!document.activeElement?.closest('#nav-mobile-menu, #nav-mobile-toggle'));
++  await p.keyboard.press('Escape');
++  await p.waitForTimeout(400);
++  const closed = (await p.$('#nav-mobile-menu')) === null;
++  const focusBack = await p.evaluate(() => document.activeElement?.id);
++  fs.writeFileSync(path.join(out, 'nav-sheet.json'), JSON.stringify({ firstFocus: focused1, tabStaysInside: stillInside, closedOnEscape: closed, focusReturnedTo: focusBack }, null, 2));
++  await c.close();
++}
++
++// 2. Signed-in nav (desktop + phone)
++if (fs.existsSync(state)) {
++  for (const w of [1440, 768, 390]) {
++    const { c, p } = await ctx(w, { storageState: state });
++    await p.goto(base + '/', { waitUntil: 'networkidle' });
++    await p.waitForTimeout(2500);
++    if (w !== 1440) { await p.click('#nav-mobile-toggle'); await p.waitForTimeout(600); }
++    await shot(p, `nav-signed-in-${w}`);
++    await c.close();
++  }
++}
++
++// 3. Address box states
++const cases = [
++  ['example', '175 3rd Street, Brooklyn'],
++  ['nyc', '74 Grand Avenue, Brooklyn'],
++  ['non-nyc', '233 S Wacker Dr, Chicago, IL'],
++  ['none', 'asdfgh qwerty'],
++];
++for (const w of [1440, 390]) {
++  const { c, p } = await ctx(w);
++  await p.goto(base + '/', { waitUntil: 'networkidle' });
++  for (const [name, addr] of cases) {
++    await p.fill('.hero-address-input', addr);
++    await p.click('.hero-address-btn');
++    await p.waitForSelector('.hero-address-card:not(.hero-address-card-quiet), .hero-address-card[role="status"]', { timeout: 30000 });
++    await p.waitForTimeout(300);
++    if (w === 390) await p.locator('.hero-address').scrollIntoViewIfNeeded();
++    await shot(p, `address-${name}-${w}`);
++  }
++  // loading state
++  await p.fill('.hero-address-input', '100 Main St, Flushing');
++  await p.click('.hero-address-btn');
++  await p.waitForTimeout(120);
++  await shot(p, `address-loading-${w}`);
++  await c.close();
++}
++await browser.close();
++fs.writeFileSync(path.join(out, 'console.json'), JSON.stringify(errors, null, 2));
++console.log('done; console entries:', errors.length);
+diff --git a/src/app/api/public/resolve/route.ts b/src/app/api/public/resolve/route.ts
+new file mode 100644
+index 0000000..f0bf627
+--- /dev/null
++++ b/src/app/api/public/resolve/route.ts
+@@ -0,0 +1,75 @@
++// Public address check for the homepage hero (UI sprint WS2).
++// POST { address } → { status: 'resolved', normalized, bbl, borough, lat, lon, example }
++//                  | { status: 'ambiguous', candidates: [{ id, label, borough, zip }] }
++//                  | { status: 'none', error }
++//
++// Unauthenticated by design: it ONLY resolves an address to a lot (the same
++// geocoder the product uses) so a visitor sees that KOANO found their building
++// and is invited to create an account to run the five agents on it. It never
++// runs an agent, never returns a verdict, never fabricates anything; the one
++// address it can show a result for is the recorded example (flagged `example`).
++// Rate-limited per IP in memory (best effort per instance) so the geocoder
++// cannot be used as a free bulk service.
++
++import { NextResponse } from 'next/server';
++import { registry } from '../../../../../lib/providers/registry';
++
++export const dynamic = 'force-dynamic';
++export const maxDuration = 20;
++
++const EXAMPLE_BBL = '3009720058'; // 175 3rd Street, Brooklyn — the recorded example run
++const WINDOW_MS = 60_000;
++const MAX_PER_WINDOW = 20;
++const hits = new Map<string, number[]>();
++
++function limited(ip: string): boolean {
++  const now = Date.now();
++  const arr = (hits.get(ip) ?? []).filter((t) => now - t < WINDOW_MS);
++  if (arr.length >= MAX_PER_WINDOW) {
++    hits.set(ip, arr);
++    return true;
++  }
++  arr.push(now);
++  hits.set(ip, arr);
++  if (hits.size > 5000) hits.clear();
++  return false;
++}
++
++export async function POST(req: Request) {
++  const ip = (req.headers.get('x-forwarded-for') ?? 'local').split(',')[0].trim();
++  if (limited(ip)) {
++    return NextResponse.json({ status: 'none', error: 'Too many checks from this connection. Try again in a minute.' }, { status: 429 });
++  }
++  let body: { address?: unknown };
++  try {
++    body = await req.json();
++  } catch {
++    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
++  }
++  const address = typeof body.address === 'string' ? body.address.trim().slice(0, 200) : '';
++  if (address.length < 5) return NextResponse.json({ status: 'none', error: 'Enter a street address.' });
++
++  const r = await registry.geocode.resolveDetailed(address);
++  if (r.kind === 'resolved') {
++    const a = r.address;
++    return NextResponse.json({
++      status: 'resolved',
++      normalized: a.normalized,
++      bbl: a.bbl,
++      borough: a.borough,
++      lat: a.latitude,
++      lon: a.longitude,
++      nyc: !!a.bbl,
++      example: a.bbl === EXAMPLE_BBL,
++    });
++  }
++  if (r.kind === 'ambiguous') {
++    return NextResponse.json({
++      status: 'ambiguous',
++      candidates: r.candidates.slice(0, 4).map((c) => ({ id: c.id, label: c.label, borough: c.borough, zip: c.zip })),
++    });
++  }
++  // The geocoder's reason is logged server-side; the visitor gets a plain next step.
++  console.info('[public/resolve] no match:', r.error);
++  return NextResponse.json({ status: 'none', error: 'No lot matched that address. Try adding the borough or ZIP.' });
++}
+diff --git a/src/app/for/agents/page.tsx b/src/app/for/agents/page.tsx
+index 0bd17fb..ec51b4e 100644
+--- a/src/app/for/agents/page.tsx
++++ b/src/app/for/agents/page.tsx
+@@ -57,7 +57,7 @@ export default function AgentsPage() {
+       <div style={{ height: "var(--nav-h)" }} />
+       <ClusterLanding
+         clusterNumber="C2"
+-        render="/renders/for-professionals.webp"
++        render="for-professionals"
+         clusterName="Transaction intelligence"
+         tagline="Find opportunities before they hit the MLS. Make data-backed recommendations that close deals."
+         price="From $149 / month"
+diff --git a/src/app/for/community/page.tsx b/src/app/for/community/page.tsx
+index 9afb1e7..5fe2a02 100644
+--- a/src/app/for/community/page.tsx
++++ b/src/app/for/community/page.tsx
+@@ -61,7 +61,7 @@ export default function CommunityPage() {
+       <div style={{ height: "var(--nav-h)" }} />
+       <ClusterLanding
+         clusterNumber="C4"
+-        render="/renders/for-community.webp"
++        render="for-community"
+         clusterName="Property intelligence"
+         tagline="Know what's happening to your property's value before your neighbors do, and know what to do about it."
+         price="From $19 / month"
+diff --git a/src/app/for/developers/page.tsx b/src/app/for/developers/page.tsx
+index 663c33b..1c4b828 100644
+--- a/src/app/for/developers/page.tsx
++++ b/src/app/for/developers/page.tsx
+@@ -57,7 +57,7 @@ export default function DevelopersPage() {
+       <div style={{ height: "var(--nav-h)" }} />
+       <ClusterLanding
+         clusterNumber="C1"
+-        render="/renders/for-developers.webp"
++        render="for-developers"
+         clusterName="Development intelligence"
+         tagline="Find your best site. Model your deal. Understand your entitlement risk. Before anyone else does."
+         price="From $499 / month"
+diff --git a/src/app/for/institutions/page.tsx b/src/app/for/institutions/page.tsx
+index bfee8f0..6060411 100644
+--- a/src/app/for/institutions/page.tsx
++++ b/src/app/for/institutions/page.tsx
+@@ -62,7 +62,7 @@ export default function InstitutionsPage() {
+       <div style={{ height: "var(--nav-h)" }} />
+       <ClusterLanding
+         clusterNumber="C3"
+-        render="/renders/for-institutions.webp"
++        render="for-institutions"
+         clusterName="Portfolio intelligence"
+         tagline="Monitor everything. Miss nothing. Make institutional decisions with intelligence infrastructure that was previously available only to the world's largest firms."
+         price="From $1,499 / month"
+diff --git a/src/app/globals.css b/src/app/globals.css
+index fa1a5b3..7efdf39 100644
+--- a/src/app/globals.css
++++ b/src/app/globals.css
+@@ -12,6 +12,9 @@
+   --nav-h: 64px;
+   /* Content width shared by every dashboard lens (UI sprint, A5). */
+   --content-max: 1200px;
++  /* Marketing site (WS2): one section width, one prose width. */
++  --content-marketing: 1200px;
++  --content-prose: 720px;
+ 
+   /* Backgrounds */
+   --white: #FFFFFF;
+@@ -325,7 +328,7 @@ body {
+ .btn-ghost-light {
+   background: transparent;
+   color: rgba(255, 255, 255, 0.85);
+-  border: 1px solid rgba(255, 255, 255, 0.35);
++  border: 1px solid rgba(255, 255, 255, 0.6);
+   border-radius: 100px;
+   padding: 13px 28px;
+   font-weight: 400;
+@@ -560,86 +563,183 @@ body {
+ }
+ 
+ /* ============================================
+-   MOBILE-ONLY FIXES (≤900px)
+-   Everything below lives inside this media query and NEVER runs on
+-   desktop (>900px). !important overrides components' inline styles; the
+-   inline values themselves are left byte-identical, so desktop is
+-   untouched. No DOM is reordered. Hero renders are temporarily hidden
+-   here — to be reintroduced once the underlying layout is right.
++   Marketing responsive rules (UI sprint WS2)
++   Real class-based rules replace the former attribute-selector overrides
++   that matched inline style strings. Renders are never hidden on phones (A1):
++   without a supplied mobile render, a hero's desktop render drops below the
++   headline block at full width (the sprint's temporary layout); with one, the
++   4:5 mobile render stays full-bleed and the copy sits in its reserved upper
++   area (A2).
+    ============================================ */
+-@media (max-width: 900px) {
+-
+-  /* STEP 1 — hide every hero render + the CTA background image. */
+-  img[src*="menu-hero"],
+-  img[src*="how-it-works"],
+-  img[src*="pricing.webp"],
+-  img[src*="about.webp"],
+-  img[src*="/renders/for-"],
+-  img[src*="cta.webp"] {
+-    display: none !important;
+-  }
+ 
+-  /* --- Homepage hero: auto height, top-aligned, no vertical clip (the
+-     eyebrow/headline/subhead are fully visible), and no horizontal
+-     overflow (the dashboard card + CTA row fit / wrap). Homepage has NO
+-     nav spacer, so its content needs top padding to clear the nav. --- */
+-  #hero-section {
+-    height: auto !important;
++/* Hero renders ---------------------------------------------------------- */
++.hero-render-bleed {
++  position: absolute;
++  inset: 0;
++  width: 100%;
++  height: 100%;
++  object-fit: cover;
++  object-position: center;
++  z-index: 0;
++  pointer-events: none;
++  user-select: none;
++}
++.hero-render-block {
++  display: block;
++  width: 100%;
++  height: auto;
++  pointer-events: none;
++  user-select: none;
++}
++/* Group-A heroes (how-it-works, pricing): bottom-anchored, aspect preserved. */
++.hero-group-a .hero-render-bleed {
++  inset: auto 0 0 0;
++  height: auto;
++  object-fit: unset;
++}
++/* The about hero: the brownstone row flush right, sized by the hero height. */
++.hero-about .hero-render-bleed {
++  inset: auto 0 0 auto;
++  width: auto;
++  height: calc(100svh - var(--nav-h));
++  max-height: 940px;
++  object-fit: unset;
++}
++
++/* Tablet (768 to 1023): the about render is sized by the viewport height and
++   would sit on the copy column, so it stacks below the copy as on phones. */
++@media (min-width: 768px) and (max-width: 1023px) {
++  .hero-about[data-mobile-render="false"] {
+     min-height: 0 !important;
+-    overflow: visible !important;
++    display: flex;
++    flex-direction: column;
++    padding-bottom: 0 !important;
+   }
+-  #hero-section > div {
+-    height: auto !important;
+-    padding-top: 96px !important;
+-    padding-bottom: 48px !important;
++  .hero-about[data-mobile-render="false"] .hero-copy {
++    order: 1;
++    padding-bottom: var(--space-6);
+   }
+-  .hero-dashboard-col {
+-    min-width: 0 !important;
+-    max-width: 100% !important;
++  .hero-about[data-mobile-render="false"] .hero-render-bleed {
++    order: 2;
++    position: static;
++    inset: auto;
++    width: 100%;
++    max-width: 560px;
++    height: auto;
++    max-height: none;
++    margin: var(--space-2) 0 0 auto;
++    display: block;
+   }
+-  .hero-dashboard-col > div {
+-    max-width: 100% !important;
++  .about-hero-layout {
++    grid-template-columns: 1fr !important;
++    gap: var(--space-6) !important;
+   }
++}
+ 
+-  /* --- Cluster heroes (/for/*): drop the fixed viewport height so the
+-     Sign up / See pricing CTAs are never clipped on short screens. --- */
+-  section:has(> img[src*="/renders/for-"]) {
++@media (max-width: 767px) {
++  /* Temporary mobile layout (no mobile render yet): the hero becomes an
++     in-flow column: copy, then the render below it at full width. */
++  .hero-with-render[data-mobile-render="false"] {
+     height: auto !important;
+     min-height: 0 !important;
+     max-height: none !important;
+     overflow: visible !important;
++    display: flex;
++    flex-direction: column;
++    padding-bottom: 0 !important;
+   }
+-
+-  /* --- /about hero: auto height so the (previously oversized) render is
+-     gone and the copy + quote flow without overlap. --- */
+-  section:has(> img[src*="about.webp"]) {
++  .hero-with-render[data-mobile-render="false"] .hero-copy {
++    position: static !important;
++    inset: auto !important;
++    /* The desktop heroes carry a legacy 210px bottom offset inline. */
++    padding-bottom: var(--space-6) !important;
++    order: 1;
++  }
++  .hero-with-render[data-mobile-render="false"] .hero-render-bleed,
++  .hero-with-render[data-mobile-render="false"] .hero-picture {
++    order: 2;
++  }
++  .hero-with-render[data-mobile-render="false"] .hero-render-bleed {
++    position: static;
++    inset: auto;
++    width: 100%;
++    height: auto;
++    max-height: none;
++    object-fit: unset;
++    display: block;
++    margin-top: var(--space-2);
++  }
++  /* With a mobile render: full-bleed 4:5, copy over the clean upper area. */
++  .hero-with-render[data-mobile-render="true"] {
++    min-height: calc(100vw * 1.25) !important;
++    max-height: none !important;
+     height: auto !important;
+-    min-height: 0 !important;
+-    overflow: visible !important;
++    align-items: flex-start;
++  }
++  .hero-with-render[data-mobile-render="true"] .hero-copy {
++    padding-bottom: 50%;
++  }
++  .hero-with-render[data-mobile-render="true"] .hero-render-bleed {
++    object-fit: cover;
++    object-position: center bottom;
++  }
++  /* The CTA brownstones: below the copy on phones, as a strip. */
++  .cta-with-render {
++    display: flex;
++    flex-direction: column;
++  }
++  .cta-with-render .cta-render {
++    position: static !important;
++    height: auto !important;
++    width: 100%;
++    margin-top: var(--space-6);
++    object-fit: unset !important;
+   }
+ 
+-  /* --- /pricing + /intelligence heroes (Group-A): their content overlay
+-     is position:absolute; make it flow so the copy has room (no render
+-     behind it) and the section sizes to the copy. --- */
+-  section:has(> img[src*="pricing.webp"]),
+-  section:has(> img[src*="how-it-works"]) {
++  /* Homepage hero: auto height, copy first, replay card, then the render. */
++  #hero-section {
+     height: auto !important;
+     min-height: 0 !important;
+     overflow: visible !important;
++    display: flex;
++    flex-direction: column;
+   }
+-  section:has(> img[src*="pricing.webp"]) > div,
+-  section:has(> img[src*="how-it-works"]) > div {
+-    position: static !important;
++  #hero-section > .hero-inner { order: 1; }
++  #hero-section > .hero-render-bleed { order: 2; }
++  #hero-section > .hero-inner {
++    height: auto !important;
++    padding-top: calc(var(--nav-h) + var(--space-6)) !important;
++    padding-bottom: 0 !important;
++  }
++  #hero-section .hero-grid {
++    grid-template-columns: 1fr !important;
++    gap: var(--space-6) !important;
++  }
++  #hero-section .hero-dashboard-col {
++    justify-content: flex-start !important;
++    min-width: 0;
++  }
++  #hero-section .hero-dashboard-col > div {
++    max-width: 100% !important;
++    transform: none !important;
++  }
++  #hero-section .hero-render-bleed {
++    position: static;
++    inset: auto;
++    width: 100%;
++    height: auto;
++    object-fit: unset;
++    display: block;
++    margin-top: var(--space-5);
+   }
+ 
+-  /* --- /data hero: trim the oversized top-padding gap. (Only the data
+-     hero is a first section with no image, so this targets it alone.) --- */
+-  section:first-of-type:not(:has(> img)) {
+-    padding-top: 40px !important;
++  /* /data hero: trim the oversized top padding. */
++  .hero-plain {
++    padding-top: var(--space-7) !important;
++    padding-bottom: var(--space-8) !important;
+   }
+ 
+-  /* --- /intelligence agent cards: let the nowrap data-chip wrap so its
+-     intrinsic width can't push the grid column wider than the screen. --- */
++  /* Intelligence agent cards: chips wrap instead of widening the column. */
+   .intelligence-agents-grid > * {
+     min-width: 0 !important;
+   }
+@@ -647,62 +747,44 @@ body {
+     white-space: normal !important;
+   }
+ 
+-  /* --- Homepage AgentsSection: hide the center timeline spine + the
+-     per-agent dots (absolutely placed at left:50% for the desktop
+-     zigzag) so they don't run over the full-width stacked cards. --- */
+-  #agents-section [style*="left:50%"] {
++  /* Homepage agent timeline: no center spine or dots when cards stack. */
++  #agents-section .agents-spine,
++  #agents-section .agents-dot {
+     display: none !important;
+   }
+ 
+-  /* --- ProvenanceLedger rows: the 4-column grid (label/value/badge/source)
+-     sums past the screen and overflows the homepage. Restack to 2 columns
+-     on mobile. Targeted by its unique inline grid template (no id/class). --- */
+-  [style*="grid-template-columns:minmax(160px"] {
++  /* Provenance ledger rows: two columns on phones. */
++  .ledger-row {
+     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+-    gap: 4px 12px !important;
+-  }
+-
+-  /* --- Homepage dashboard-card header: stack the address block above the live
+-     status so the address shows in full (was truncating to "175…") and the long
+-     status ("Five agents reading the record") no longer collides with it. --- */
+-  .hero-dashboard-col > div > div:first-child {
+-    flex-direction: column !important;
+-    align-items: flex-start !important;
+-    gap: 8px !important;
++    gap: var(--space-1) var(--space-3) !important;
+   }
+ 
+-  /* --- VerdictMathPanel (homepage): its diverging-bar rows clip on the right
+-     ("no directional signal" was cut to "no direc…"). Reduce the panel padding,
+-     stack each bar row (label above the bar → full-width track), and shrink the
+-     neutral note so it fits. Selectors match the components' unique inline
+-     styles (no id/class): panel root = padding:28px + gap:24px; bar row =
+-     grid 176px 1fr; neutral note = left:calc(50% + 12px). --- */
+-  [style*="padding:28px"][style*="gap:24px"] {
+-    padding: 18px !important;
++  /* Verdict math panel: tighter padding; bar rows stack label over track. */
++  .verdict-math {
++    padding: var(--space-4) !important;
+   }
+-  [style*="grid-template-columns:176px 1fr"] {
++  .divbar-row {
+     grid-template-columns: 1fr !important;
+-    gap: 8px !important;
++    gap: var(--space-2) !important;
+   }
+-  /* Neutral rows: left-align the "no directional signal" note (it read as
+-     smooshed to the right of the track) and drop the center node, so it reads
+-     as a plain left-aligned label under the agent name. */
+   .divbar-neutral-note {
+     left: 0 !important;
+   }
+-  .divbar-node {
++  /* The note sits at the left edge on phones, so the zero line would cut
++     through it: the neutral rows drop the line and the node. */
++  .divbar-node,
++  .divbar-zero-neutral {
+     display: none !important;
+   }
+ 
+-  /* --- /intelligence architecture (nested "Russian doll"): the accumulated
+-     nested padding crushed the inner layers to a ~2-words-per-line column.
+-     Trim the padding at each level and left-align the innermost box. --- */
+-  .arch-l1 { padding: 22px !important; }
+-  .arch-l2 { padding: 18px !important; }
+-  .arch-l3 { padding: 16px !important; text-align: left !important; }
++  /* Intelligence architecture (nested doll): trim the nested padding. */
++  .arch-l1 { padding: var(--space-5) !important; }
++  .arch-l2 { padding: var(--space-4) !important; }
++  .arch-l3 { padding: var(--space-4) !important; text-align: left !important; }
+ 
+-  /* --- /intelligence verdict reasoning chain: stack the agent name above its
+-     explanation (was a cramped 130px label beside a squeezed column). --- */
+-  .reason-row { flex-direction: column !important; gap: 3px !important; }
++  /* Intelligence verdict card: agent name above its explanation. */
++  .reason-row { flex-direction: column !important; gap: var(--space-1) !important; }
+   .reason-agent { width: auto !important; }
+ }
++
++/* Tablet: two-column marketing grids collapse handled per component. */
+diff --git a/src/components/marketing/AboutContent.tsx b/src/components/marketing/AboutContent.tsx
+index 985d43a..034c92b 100644
+--- a/src/components/marketing/AboutContent.tsx
++++ b/src/components/marketing/AboutContent.tsx
+@@ -1,26 +1,15 @@
+ "use client";
+ 
+ import React, { useRef } from "react";
+-import { motion, useInView } from "framer-motion";
++import { motion } from "framer-motion";
++import { useReveal, fadeUp } from "./Reveal";
+ import SectionNumber from "@/components/ui/SectionNumber";
+ import Button from "@/components/ui/Button";
+ import { HERO_PADDING_TOP } from "@/components/marketing/heroLayout";
+ import CtaBackground from "@/components/marketing/CtaBackground";
++import HeroRender from "@/components/marketing/HeroRender";
++import { RENDERS } from "@/components/marketing/renders";
+ 
+-const EASE = [0.16, 1, 0.3, 1] as const;
+-
+-const fadeUp = {
+-  hidden: { opacity: 0, y: 20 },
+-  visible: (i: number) => ({
+-    opacity: 1,
+-    y: 0,
+-    transition: {
+-      delay: i * 0.08,
+-      duration: 0.5,
+-      ease: EASE,
+-    },
+-  }),
+-};
+ 
+ const WHAT_WE_ARE_NOT = [
+   {
+@@ -79,17 +68,19 @@ export default function AboutContent() {
+   const teamRef = useRef<HTMLElement>(null);
+   const ctaRef = useRef<HTMLElement>(null);
+ 
+-  const heroInView = useInView(heroRef, { once: true, amount: 0.15 });
+-  const principlesInView = useInView(principlesRef, { once: true, amount: 0.1 });
+-  const notInView = useInView(notRef, { once: true, amount: 0.1 });
+-  const teamInView = useInView(teamRef, { once: true, amount: 0.15 });
+-  const ctaInView = useInView(ctaRef, { once: true, amount: 0.15 });
++  const heroInView = useReveal(heroRef, { once: true, amount: 0.15 });
++  const principlesInView = useReveal(principlesRef, { once: true, amount: 0.1 });
++  const notInView = useReveal(notRef, { once: true, amount: 0.1 });
++  const teamInView = useReveal(teamRef, { once: true, amount: 0.15 });
++  const ctaInView = useReveal(ctaRef, { once: true, amount: 0.15 });
+ 
+   return (
+     <>
+       {/* Hero */}
+       <section
+         ref={heroRef}
++        className="hero-with-render hero-about"
++        data-mobile-render={String(RENDERS.about.mobile)}
+         style={{
+           background: "var(--white)",
+           // Top offset only; no bottom padding. The 210px bottom (legacy from
+@@ -105,7 +96,7 @@ export default function AboutContent() {
+           minHeight: "calc(100svh - var(--nav-h))",
+         }}
+       >
+-        <div style={{ maxWidth: "1280px", margin: "0 auto", position: "relative", zIndex: 1 }}>
++        <div className="hero-copy" style={{ maxWidth: "var(--content-marketing)", margin: "0 auto", position: "relative", zIndex: 1 }}>
+           <div
+             className="about-hero-layout"
+             style={{
+@@ -117,7 +108,7 @@ export default function AboutContent() {
+           >
+             <div>
+               <motion.div
+-                initial="hidden"
++                initial={false}
+                 animate={heroInView ? "visible" : "hidden"}
+                 variants={fadeUp}
+                 custom={0}
+@@ -127,7 +118,7 @@ export default function AboutContent() {
+ 
+               {/* Hero — approved copy (KOANO_COPY.md) */}
+               <motion.h1
+-                initial="hidden"
++                initial={false}
+                 animate={heroInView ? "visible" : "hidden"}
+                 variants={fadeUp}
+                 custom={1}
+@@ -144,7 +135,7 @@ export default function AboutContent() {
+                 intelligence.
+               </motion.h1>
+               <motion.p
+-                initial="hidden"
++                initial={false}
+                 animate={heroInView ? "visible" : "hidden"}
+                 variants={fadeUp}
+                 custom={1.5}
+@@ -162,7 +153,7 @@ export default function AboutContent() {
+               </motion.p>
+ 
+               <motion.div
+-                initial="hidden"
++                initial={false}
+                 animate={heroInView ? "visible" : "hidden"}
+                 variants={fadeUp}
+                 custom={2}
+@@ -187,7 +178,7 @@ export default function AboutContent() {
+ 
+               {/* Founding promise — restored under the CTAs */}
+               <motion.div
+-                initial="hidden"
++                initial={false}
+                 animate={heroInView ? "visible" : "hidden"}
+                 variants={fadeUp}
+                 custom={3}
+@@ -230,27 +221,9 @@ export default function AboutContent() {
+ 
+         {/* About hero render — brownstone row on white, flush to the right
+             edge of the hero, sitting beside the left-aligned text. */}
+-        <img
+-          src="/renders/about.webp"
+-          alt=""
+-          aria-hidden="true"
+-          style={{
+-            position: "absolute",
+-            right: 0,
+-            bottom: 0,
+-            // Size by the hero height so the render grows with the (now
+-            // viewport-filling) hero, preserving the image-to-text proportion.
+-            // Aspect is kept (width auto); its light/sidewalk left edge sits
+-            // behind the text (zIndex 0) so no dark collision. Capped for very
+-            // tall screens.
+-            height: "calc(100svh - var(--nav-h))",
+-            maxHeight: "940px",
+-            width: "auto",
+-            zIndex: 0,
+-            pointerEvents: "none",
+-            userSelect: "none",
+-          }}
+-        />
++        {/* Brownstone row, flush right, sized by the hero height (.hero-about
++            rules); below the copy at full width on phones. */}
++        <HeroRender slot={RENDERS.about} priority />
+       </section>
+ 
+       {/* Founding principles */}
+@@ -258,9 +231,9 @@ export default function AboutContent() {
+         ref={principlesRef}
+         style={{ background: "var(--pale-wash)", padding: "120px 32px" }}
+       >
+-        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
++        <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
+           <motion.div
+-            initial="hidden"
++            initial={false}
+             animate={principlesInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={0}
+@@ -291,7 +264,7 @@ export default function AboutContent() {
+               <motion.div
+                 key={item.title}
+                 custom={i + 1}
+-                initial="hidden"
++                initial={false}
+                 animate={principlesInView ? "visible" : "hidden"}
+                 variants={fadeUp}
+                 className="card"
+@@ -335,9 +308,9 @@ export default function AboutContent() {
+         ref={notRef}
+         style={{ background: "var(--white)", padding: "120px 32px" }}
+       >
+-        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
++        <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
+           <motion.div
+-            initial="hidden"
++            initial={false}
+             animate={notInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={0}
+@@ -379,7 +352,7 @@ export default function AboutContent() {
+               <motion.div
+                 key={item.label}
+                 custom={i + 1}
+-                initial="hidden"
++                initial={false}
+                 animate={notInView ? "visible" : "hidden"}
+                 variants={fadeUp}
+                 className="card"
+@@ -434,9 +407,9 @@ export default function AboutContent() {
+         ref={teamRef}
+         style={{ background: "var(--pale-wash)", padding: "120px 32px" }}
+       >
+-        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
++        <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
+           <motion.div
+-            initial="hidden"
++            initial={false}
+             animate={teamInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={0}
+@@ -457,12 +430,12 @@ export default function AboutContent() {
+ 
+           {/* Founding story — approved copy (KOANO_COPY.md) */}
+           <motion.div
+-            initial="hidden"
++            initial={false}
+             animate={teamInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={1}
+             style={{
+-              maxWidth: "720px",
++              maxWidth: "var(--content-prose)",
+               display: "flex",
+               flexDirection: "column",
+               gap: "16px",
+@@ -545,6 +518,7 @@ export default function AboutContent() {
+       {/* CTA */}
+       <section
+         ref={ctaRef}
++        className="cta-with-render"
+         style={{
+           background: "var(--white)",
+           padding: "120px 32px",
+@@ -562,7 +536,7 @@ export default function AboutContent() {
+           }}
+         >
+           <motion.div
+-            initial="hidden"
++            initial={false}
+             animate={ctaInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={0}
+diff --git a/src/components/marketing/AgentsSection.tsx b/src/components/marketing/AgentsSection.tsx
+index 225ece9..a10bf68 100644
+--- a/src/components/marketing/AgentsSection.tsx
++++ b/src/components/marketing/AgentsSection.tsx
+@@ -1,7 +1,8 @@
+ "use client";
+ 
+ import React, { useRef } from "react";
+-import { motion, useInView } from "framer-motion";
++import { motion } from "framer-motion";
++import { useReveal, fadeUp } from "./Reveal";
+ import SectionNumber from "../ui/SectionNumber";
+ import VerdictMathPanel from "../ui/VerdictMathPanel";
+ import { VERDICT_COLORS } from "../ui/verdict";
+@@ -44,24 +45,10 @@ const AGENTS = [
+   },
+ ];
+ 
+-const EASE = [0.16, 1, 0.3, 1] as const;
+-
+-const fadeUp = {
+-  hidden: { opacity: 0, y: 20 },
+-  visible: (i: number) => ({
+-    opacity: 1,
+-    y: 0,
+-    transition: {
+-      delay: i * 0.1,
+-      duration: 0.5,
+-      ease: EASE,
+-    },
+-  }),
+-};
+ 
+ export default function AgentsSection() {
+   const ref = useRef<HTMLElement>(null);
+-  const isInView = useInView(ref, { once: true, amount: 0.1 });
++  const isInView = useReveal(ref, { once: true, amount: 0.1 });
+ 
+   return (
+     <section
+@@ -89,10 +76,10 @@ export default function AgentsSection() {
+         }}
+       />
+ 
+-      <div style={{ maxWidth: "1280px", margin: "0 auto", position: "relative" }}>
++      <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto", position: "relative" }}>
+         {/* Section header */}
+         <motion.div
+-          initial="hidden"
++          initial={false}
+           animate={isInView ? "visible" : "hidden"}
+           variants={fadeUp}
+           custom={0}
+@@ -123,6 +110,7 @@ export default function AgentsSection() {
+               synthesis dot (7px = dot radius) — never past it. */}
+           <div style={{ position: "relative" }}>
+             <div
++              className="agents-spine"
+               style={{
+                 position: "absolute",
+                 left: "50%",
+@@ -140,7 +128,7 @@ export default function AgentsSection() {
+               <motion.div
+                 key={agent.number}
+                 custom={i + 1}
+-                initial="hidden"
++                initial={false}
+                 animate={isInView ? "visible" : "hidden"}
+                 variants={fadeUp}
+                 style={{
+@@ -154,6 +142,7 @@ export default function AgentsSection() {
+                     middle. Row height = card height + 40px bottom padding,
+                     so the card's center sits at calc(50% - 20px). */}
+                 <div
++                  className="agents-dot"
+                   style={{
+                     position: "absolute",
+                     left: "50%",
+@@ -228,7 +217,7 @@ export default function AgentsSection() {
+           {/* Synthesis node */}
+           <motion.div
+             custom={6}
+-            initial="hidden"
++            initial={false}
+             animate={isInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             style={{
+@@ -270,7 +259,7 @@ export default function AgentsSection() {
+               renders, fed a frozen real run. Not a mock, not a demo card. */}
+           <motion.div
+             custom={7}
+-            initial="hidden"
++            initial={false}
+             animate={isInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             style={{ display: "flex", flexDirection: "column", gap: "18px" }}
+diff --git a/src/components/marketing/ArchiveSection.tsx b/src/components/marketing/ArchiveSection.tsx
+index 178836c..6d70280 100644
+--- a/src/components/marketing/ArchiveSection.tsx
++++ b/src/components/marketing/ArchiveSection.tsx
+@@ -7,19 +7,10 @@
+ // per-week coverage view lives in the dashboards, behind auth.
+ 
+ import React, { useRef } from "react";
+-import { motion, useInView } from "framer-motion";
++import { motion } from "framer-motion";
++import { useReveal, fadeUp } from "./Reveal";
+ import SectionNumber from "../ui/SectionNumber";
+ 
+-const EASE = [0.16, 1, 0.3, 1] as const;
+-
+-const fadeUp = {
+-  hidden: { opacity: 0, y: 20 },
+-  visible: (i: number) => ({
+-    opacity: 1,
+-    y: 0,
+-    transition: { delay: i * 0.08, duration: 0.5, ease: EASE },
+-  }),
+-};
+ 
+ const DATASETS = ["Permits", "Violations", "Zoning", "Ownership"];
+ // Capture status per week. Honest current picture: two captures, one gap.
+@@ -51,14 +42,14 @@ function Cell({ status }: { status: "captured" | "gap" | "upcoming" }) {
+ 
+ export default function ArchiveSection() {
+   const ref = useRef<HTMLElement>(null);
+-  const isInView = useInView(ref, { once: true, amount: 0.15 });
++  const isInView = useReveal(ref, { once: true, amount: 0.15 });
+ 
+   return (
+     <section ref={ref} style={{ background: "var(--white)", padding: "120px 32px" }}>
+       <div
+         className="archive-layout"
+         style={{
+-          maxWidth: "1080px",
++          maxWidth: "var(--content-marketing)",
+           margin: "0 auto",
+           display: "grid",
+           gridTemplateColumns: "1.1fr 0.9fr",
+@@ -68,7 +59,7 @@ export default function ArchiveSection() {
+       >
+         {/* Words carry the weight */}
+         <motion.div
+-          initial="hidden"
++          initial={false}
+           animate={isInView ? "visible" : "hidden"}
+           variants={fadeUp}
+           custom={0}
+@@ -107,7 +98,7 @@ export default function ArchiveSection() {
+ 
+         {/* The thin, honest coverage strip */}
+         <motion.div
+-          initial="hidden"
++          initial={false}
+           animate={isInView ? "visible" : "hidden"}
+           variants={fadeUp}
+           custom={1}
+diff --git a/src/components/marketing/ClusterLanding.tsx b/src/components/marketing/ClusterLanding.tsx
+index a59889c..8e07be7 100644
+--- a/src/components/marketing/ClusterLanding.tsx
++++ b/src/components/marketing/ClusterLanding.tsx
+@@ -1,7 +1,8 @@
+ "use client";
+ 
+ import React, { useRef } from "react";
+-import { motion, useInView } from "framer-motion";
++import { motion } from "framer-motion";
++import { useReveal, fadeUp } from "./Reveal";
+ import SectionNumber from "@/components/ui/SectionNumber";
+ import Button from "@/components/ui/Button";
+ import {
+@@ -11,21 +12,9 @@ import {
+   HERO_PADDING_TOP,
+ } from "@/components/marketing/heroLayout";
+ import CtaBackground from "@/components/marketing/CtaBackground";
++import HeroRender from "@/components/marketing/HeroRender";
++import { RENDERS, type RenderName } from "@/components/marketing/renders";
+ 
+-const EASE = [0.16, 1, 0.3, 1] as const;
+-
+-const fadeUp = {
+-  hidden: { opacity: 0, y: 20 },
+-  visible: (i: number) => ({
+-    opacity: 1,
+-    y: 0,
+-    transition: {
+-      delay: i * 0.08,
+-      duration: 0.5,
+-      ease: EASE,
+-    },
+-  }),
+-};
+ 
+ interface Feature {
+   title: string;
+@@ -51,8 +40,9 @@ interface ClusterLandingProps {
+     items: Feature[];
+   };
+   users: string;
+-  /** Optional hero background render, placed full-bleed behind the text. */
+-  render?: string;
++  /** Optional hero render slot (see renders.ts), full-bleed behind the text on
++   *  desktop; below the headline on phones until its mobile render exists. */
++  render?: RenderName;
+ }
+ 
+ export default function ClusterLanding({
+@@ -72,15 +62,17 @@ export default function ClusterLanding({
+   const heroRef = useRef<HTMLElement>(null);
+   const featuresRef = useRef<HTMLElement>(null);
+   const pricingRef = useRef<HTMLElement>(null);
+-  const heroInView = useInView(heroRef, { once: true, amount: 0.15 });
+-  const featuresInView = useInView(featuresRef, { once: true, amount: 0.1 });
+-  const pricingInView = useInView(pricingRef, { once: true, amount: 0.15 });
++  const heroInView = useReveal(heroRef, { once: true, amount: 0.15 });
++  const featuresInView = useReveal(featuresRef, { once: true, amount: 0.1 });
++  const pricingInView = useReveal(pricingRef, { once: true, amount: 0.15 });
+ 
+   return (
+     <>
+       {/* Hero section — light, with render slot */}
+       <section
+         ref={heroRef}
++        className="hero-with-render hero-group-b"
++        data-mobile-render={render ? String(RENDERS[render].mobile) : "false"}
+         style={{
+           background: "var(--white)",
+           // Group-B viewport fit: cap the section to the below-nav viewport.
+@@ -101,25 +93,10 @@ export default function ClusterLanding({
+         {/* Hero render — full-bleed behind the text block. The image was
+             composed against the hero's text width + padding, so the copy lands
+             in its blank strip. */}
+-        {render && (
+-          <img
+-            src={render}
+-            alt=""
+-            aria-hidden="true"
+-            style={{
+-              position: "absolute",
+-              inset: 0,
+-              width: "100%",
+-              height: "100%",
+-              objectFit: "cover",
+-              objectPosition: "center",
+-              zIndex: 0,
+-              pointerEvents: "none",
+-            }}
+-          />
+-        )}
++        {render && <HeroRender slot={RENDERS[render]} priority />}
+ 
+         <div
++          className="hero-copy"
+           style={{
+             maxWidth: HERO_CONTAINER_MAX,
+             width: "100%",
+@@ -130,7 +107,7 @@ export default function ClusterLanding({
+           }}
+         >
+           <motion.div
+-            initial="hidden"
++            initial={false}
+             animate={heroInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={0}
+@@ -140,7 +117,7 @@ export default function ClusterLanding({
+ 
+           {/* Headline + subhead — approved copy (KOANO_COPY.md) */}
+           <motion.h1
+-            initial="hidden"
++            initial={false}
+             animate={heroInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={1}
+@@ -157,7 +134,7 @@ export default function ClusterLanding({
+             {headline}
+           </motion.h1>
+           <motion.p
+-            initial="hidden"
++            initial={false}
+             animate={heroInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={2}
+@@ -175,7 +152,7 @@ export default function ClusterLanding({
+ 
+           {stanceLine && (
+             <motion.p
+-              initial="hidden"
++              initial={false}
+               animate={heroInView ? "visible" : "hidden"}
+               variants={fadeUp}
+               custom={2}
+@@ -195,7 +172,7 @@ export default function ClusterLanding({
+ 
+           {/* Approved tagline from Section 10 */}
+           <motion.p
+-            initial="hidden"
++            initial={false}
+             animate={heroInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={2}
+@@ -213,7 +190,7 @@ export default function ClusterLanding({
+ 
+           {/* Users label */}
+           <motion.p
+-            initial="hidden"
++            initial={false}
+             animate={heroInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={3}
+@@ -232,7 +209,7 @@ export default function ClusterLanding({
+ 
+           {/* CTAs */}
+           <motion.div
+-            initial="hidden"
++            initial={false}
+             animate={heroInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={4}
+@@ -257,9 +234,9 @@ export default function ClusterLanding({
+           padding: "120px 32px",
+         }}
+       >
+-        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
++        <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
+           <motion.div
+-            initial="hidden"
++            initial={false}
+             animate={featuresInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={0}
+@@ -291,7 +268,7 @@ export default function ClusterLanding({
+               <motion.div
+                 key={feature.title}
+                 custom={i + 1}
+-                initial="hidden"
++                initial={false}
+                 animate={featuresInView ? "visible" : "hidden"}
+                 variants={fadeUp}
+                 className="card"
+@@ -333,7 +310,7 @@ export default function ClusterLanding({
+             padding: "120px 32px",
+           }}
+         >
+-          <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
++          <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
+             <div style={{ marginBottom: "64px" }}>
+               <SectionNumber number="02" label={secondaryFeatures.title} />
+               <h2
+@@ -398,6 +375,7 @@ export default function ClusterLanding({
+       {/* Pricing CTA section */}
+       <section
+         ref={pricingRef}
++        className="cta-with-render"
+         style={{
+           background: secondaryFeatures ? "var(--pale-wash)" : "var(--white)",
+           padding: "120px 32px",
+@@ -415,7 +393,7 @@ export default function ClusterLanding({
+           }}
+         >
+           <motion.div
+-            initial="hidden"
++            initial={false}
+             animate={pricingInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={0}
+diff --git a/src/components/marketing/ClustersSection.tsx b/src/components/marketing/ClustersSection.tsx
+index 74be3cb..fc06c22 100644
+--- a/src/components/marketing/ClustersSection.tsx
++++ b/src/components/marketing/ClustersSection.tsx
+@@ -1,7 +1,8 @@
+ "use client";
+ 
+ import React, { useRef } from "react";
+-import { motion, useInView } from "framer-motion";
++import { motion } from "framer-motion";
++import { useReveal, fadeUp, EASE } from "./Reveal";
+ import SectionNumber from "../ui/SectionNumber";
+ 
+ // Ordered by KOANO's positioning priority (CLAUDE.md Section 01):
+@@ -33,24 +34,10 @@ const CLUSTERS = [
+   },
+ ];
+ 
+-const EASE = [0.16, 1, 0.3, 1] as const;
+-
+-const fadeUp = {
+-  hidden: { opacity: 0, y: 20 },
+-  visible: (i: number) => ({
+-    opacity: 1,
+-    y: 0,
+-    transition: {
+-      delay: i * 0.08,
+-      duration: 0.5,
+-      ease: EASE,
+-    },
+-  }),
+-};
+ 
+ export default function ClustersSection() {
+   const ref = useRef<HTMLElement>(null);
+-  const isInView = useInView(ref, { once: true, amount: 0.15 });
++  const isInView = useReveal(ref, { once: true, amount: 0.15 });
+ 
+   return (
+     <section
+@@ -61,10 +48,10 @@ export default function ClustersSection() {
+         padding: "120px 32px",
+       }}
+     >
+-      <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
++      <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
+         {/* Section header */}
+         <motion.div
+-          initial="hidden"
++          initial={false}
+           animate={isInView ? "visible" : "hidden"}
+           variants={fadeUp}
+           custom={0}
+@@ -98,7 +85,7 @@ export default function ClustersSection() {
+               href={cluster.href}
+               id={`cluster-card-${i + 1}`}
+               custom={i + 1}
+-              initial="hidden"
++              initial={false}
+               animate={isInView ? "visible" : "hidden"}
+               variants={fadeUp}
+               whileHover={{ y: -3, transition: { duration: 0.26, ease: EASE } }}
+diff --git a/src/components/marketing/CtaBackground.tsx b/src/components/marketing/CtaBackground.tsx
+index cc3b4e5..8e9b425 100644
+--- a/src/components/marketing/CtaBackground.tsx
++++ b/src/components/marketing/CtaBackground.tsx
+@@ -1,12 +1,14 @@
+ import React from "react";
++import HeroRender from "./HeroRender";
++import { RENDERS } from "./renders";
+ 
+ /**
+  * Background image for the CTA sections. The image (public/renders/cta.webp) has
+  * an opaque white background with brownstones flanking a white center channel
+  * for the copy. It is laid behind the text (z-index -1) so it covers the
+- * section's own colour — on a pale-wash section you still see the image with
+- * its white background — without affecting layout: it's absolutely positioned,
+- * so it never changes the section's height or the text position.
++ * section's own colour without affecting layout. On phones (host section
++ * `.cta-with-render`) it drops below the copy as a full-width strip instead of
++ * being hidden (UI sprint, A1).
+  *
+  * The host section must be `position: relative` + `isolation: isolate` (so the
+  * z-index:-1 paints above the section background but below the in-flow copy)
+@@ -14,21 +16,14 @@ import React from "react";
+  */
+ export default function CtaBackground() {
+   return (
+-    <img
+-      src="/renders/cta.webp"
+-      alt=""
+-      aria-hidden="true"
++    <HeroRender
++      slot={RENDERS.cta}
++      className="cta-render"
+       style={{
+         position: "absolute",
+-        // Box is anchored at the section top and made 16px TALLER than the
+-        // section (the extra 16px hangs below and is clipped by the host's
+-        // overflow:hidden). With objectPosition center-bottom this lands the
+-        // buildings' base on the footer's blue separator, while the top stays
+-        // flush with the section top — no strip of the section's own colour
+-        // (pale-wash blue, or a faint seam on white) is uncovered above.
+-        // NOTE: height must be explicit — an absolutely-positioned <img> with
+-        // height:auto resolves to the image's intrinsic height, which breaks
+-        // object-fit's box. So we size it, not top/bottom.
++        // Anchored at the section top and 16px TALLER than the section (the
++        // extra hangs below and is clipped) so the buildings' base lands on the
++        // footer's separator with no strip of the section colour showing above.
+         top: 0,
+         left: 0,
+         right: 0,
+diff --git a/src/components/marketing/DataContent.tsx b/src/components/marketing/DataContent.tsx
+index a0f2e71..badccd9 100644
+--- a/src/components/marketing/DataContent.tsx
++++ b/src/components/marketing/DataContent.tsx
+@@ -1,7 +1,8 @@
+ "use client";
+ 
+ import React, { useRef } from "react";
+-import { motion, useInView } from "framer-motion";
++import { motion } from "framer-motion";
++import { useReveal, fadeUp } from "./Reveal";
+ import SectionNumber from "@/components/ui/SectionNumber";
+ import Button from "@/components/ui/Button";
+ import CtaBackground from "@/components/marketing/CtaBackground";
+@@ -11,20 +12,6 @@ import {
+   type ProviderCatalogEntry,
+ } from "../../../lib/providers/catalog";
+ 
+-const EASE = [0.16, 1, 0.3, 1] as const;
+-
+-const fadeUp = {
+-  hidden: { opacity: 0, y: 20 },
+-  visible: (i: number) => ({
+-    opacity: 1,
+-    y: 0,
+-    transition: {
+-      delay: i * 0.08,
+-      duration: 0.5,
+-      ease: EASE,
+-    },
+-  }),
+-};
+ 
+ // Non-staling replacements for the old source counts. These describe the system,
+ // so they never go out of date as the underlying list grows.
+@@ -134,18 +121,19 @@ export default function DataContent() {
+   const pipelineRef = useRef<HTMLElement>(null);
+   const ctaRef = useRef<HTMLElement>(null);
+ 
+-  const heroInView = useInView(heroRef, { once: true, amount: 0.15 });
+-  const liveInView = useInView(liveRef, { once: true, amount: 0.05 });
+-  const repInView = useInView(repRef, { once: true, amount: 0.1 });
+-  const provInView = useInView(provRef, { once: true, amount: 0.1 });
+-  const pipelineInView = useInView(pipelineRef, { once: true, amount: 0.1 });
+-  const ctaInView = useInView(ctaRef, { once: true, amount: 0.15 });
++  const heroInView = useReveal(heroRef, { once: true, amount: 0.15 });
++  const liveInView = useReveal(liveRef, { once: true, amount: 0.05 });
++  const repInView = useReveal(repRef, { once: true, amount: 0.1 });
++  const provInView = useReveal(provRef, { once: true, amount: 0.1 });
++  const pipelineInView = useReveal(pipelineRef, { once: true, amount: 0.1 });
++  const ctaInView = useReveal(ctaRef, { once: true, amount: 0.15 });
+ 
+   return (
+     <>
+       {/* Hero */}
+       <section
+         ref={heroRef}
++        className="hero-plain"
+         style={{
+           background: "var(--white)",
+           padding: "160px 32px 120px",
+@@ -154,7 +142,7 @@ export default function DataContent() {
+       >
+         <div style={{ maxWidth: "800px", margin: "0 auto" }}>
+           <motion.div
+-            initial="hidden"
++            initial={false}
+             animate={heroInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={0}
+@@ -163,7 +151,7 @@ export default function DataContent() {
+           </motion.div>
+ 
+           <motion.h1
+-            initial="hidden"
++            initial={false}
+             animate={heroInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={1}
+@@ -178,7 +166,7 @@ export default function DataContent() {
+           </motion.h1>
+ 
+           <motion.p
+-            initial="hidden"
++            initial={false}
+             animate={heroInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={2}
+@@ -197,7 +185,7 @@ export default function DataContent() {
+           </motion.p>
+ 
+           <motion.div
+-            initial="hidden"
++            initial={false}
+             animate={heroInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={3}
+@@ -253,9 +241,9 @@ export default function DataContent() {
+         ref={liveRef}
+         style={{ background: "var(--pale-wash)", padding: "120px 32px" }}
+       >
+-        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
++        <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
+           <motion.div
+-            initial="hidden"
++            initial={false}
+             animate={liveInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={0}
+@@ -301,7 +289,7 @@ export default function DataContent() {
+               <motion.div
+                 key={family.group}
+                 custom={gi + 1}
+-                initial="hidden"
++                initial={false}
+                 animate={liveInView ? "visible" : "hidden"}
+                 variants={fadeUp}
+               >
+@@ -383,9 +371,9 @@ export default function DataContent() {
+         ref={repRef}
+         style={{ background: "var(--white)", padding: "120px 32px" }}
+       >
+-        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
++        <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
+           <motion.div
+-            initial="hidden"
++            initial={false}
+             animate={repInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={0}
+@@ -419,7 +407,7 @@ export default function DataContent() {
+           </motion.div>
+ 
+           <motion.div
+-            initial="hidden"
++            initial={false}
+             animate={repInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={1}
+@@ -521,9 +509,9 @@ export default function DataContent() {
+         ref={provRef}
+         style={{ background: "var(--pale-wash)", padding: "120px 32px" }}
+       >
+-        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
++        <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
+           <motion.div
+-            initial="hidden"
++            initial={false}
+             animate={provInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={0}
+@@ -567,7 +555,7 @@ export default function DataContent() {
+               <motion.div
+                 key={state.key}
+                 custom={i + 1}
+-                initial="hidden"
++                initial={false}
+                 animate={provInView ? "visible" : "hidden"}
+                 variants={fadeUp}
+                 className="card"
+@@ -608,9 +596,9 @@ export default function DataContent() {
+         ref={pipelineRef}
+         style={{ background: "var(--white)", padding: "120px 32px" }}
+       >
+-        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
++        <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
+           <motion.div
+-            initial="hidden"
++            initial={false}
+             animate={pipelineInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={0}
+@@ -632,7 +620,7 @@ export default function DataContent() {
+           <div
+             style={{
+               position: "relative",
+-              maxWidth: "720px",
++              maxWidth: "var(--content-prose)",
+               margin: "0 auto",
+             }}
+           >
+@@ -659,7 +647,7 @@ export default function DataContent() {
+                 <motion.div
+                   key={step.number}
+                   custom={i + 1}
+-                  initial="hidden"
++                  initial={false}
+                   animate={pipelineInView ? "visible" : "hidden"}
+                   variants={fadeUp}
+                   style={{
+@@ -726,6 +714,7 @@ export default function DataContent() {
+       {/* CTA */}
+       <section
+         ref={ctaRef}
++        className="cta-with-render"
+         style={{
+           background: "var(--pale-wash)",
+           padding: "120px 32px",
+@@ -743,7 +732,7 @@ export default function DataContent() {
+           }}
+         >
+           <motion.div
+-            initial="hidden"
++            initial={false}
+             animate={ctaInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={0}
+diff --git a/src/components/marketing/EarlyAccessSection.tsx b/src/components/marketing/EarlyAccessSection.tsx
+index cf77838..064c1e5 100644
+--- a/src/components/marketing/EarlyAccessSection.tsx
++++ b/src/components/marketing/EarlyAccessSection.tsx
+@@ -1,34 +1,22 @@
+ "use client";
+ 
+ import React, { useRef } from "react";
+-import { motion, useInView } from "framer-motion";
++import { motion } from "framer-motion";
++import { useReveal, fadeUp } from "./Reveal";
+ import SectionNumber from "../ui/SectionNumber";
+ import Button from "../ui/Button";
+ import CtaBackground from "./CtaBackground";
+ 
+-const EASE = [0.16, 1, 0.3, 1] as const;
+-
+-const fadeUp = {
+-  hidden: { opacity: 0, y: 20 },
+-  visible: (i: number) => ({
+-    opacity: 1,
+-    y: 0,
+-    transition: {
+-      delay: i * 0.08,
+-      duration: 0.5,
+-      ease: EASE,
+-    },
+-  }),
+-};
+ 
+ export default function EarlyAccessSection() {
+   const ref = useRef<HTMLElement>(null);
+-  const isInView = useInView(ref, { once: true, amount: 0.15 });
++  const isInView = useReveal(ref, { once: true, amount: 0.15 });
+ 
+   return (
+     <section
+       id="early-access-section"
+       ref={ref}
++      className="cta-with-render"
+       style={{
+         background: "var(--white)",
+         padding: "120px 32px",
+@@ -47,7 +35,7 @@ export default function EarlyAccessSection() {
+       >
+         {/* Section number */}
+         <motion.div
+-          initial="hidden"
++          initial={false}
+           animate={isInView ? "visible" : "hidden"}
+           variants={fadeUp}
+           custom={0}
+@@ -57,7 +45,7 @@ export default function EarlyAccessSection() {
+ 
+         {/* Headline + subhead — approved copy (KOANO_COPY.md) */}
+         <motion.h2
+-          initial="hidden"
++          initial={false}
+           animate={isInView ? "visible" : "hidden"}
+           variants={fadeUp}
+           custom={1}
+@@ -72,7 +60,7 @@ export default function EarlyAccessSection() {
+         </motion.h2>
+ 
+         <motion.p
+-          initial="hidden"
++          initial={false}
+           animate={isInView ? "visible" : "hidden"}
+           variants={fadeUp}
+           custom={2}
+@@ -90,7 +78,7 @@ export default function EarlyAccessSection() {
+ 
+         {/* Self-serve signup CTA (replaced the retired waitlist email form) */}
+         <motion.div
+-          initial="hidden"
++          initial={false}
+           animate={isInView ? "visible" : "hidden"}
+           variants={fadeUp}
+           custom={3}
+diff --git a/src/components/marketing/Footer.tsx b/src/components/marketing/Footer.tsx
+index ed2c46c..5bed861 100644
+--- a/src/components/marketing/Footer.tsx
++++ b/src/components/marketing/Footer.tsx
+@@ -12,7 +12,7 @@ const COLUMN_1 = [
+ // professional and institutional first, homeowners last.
+ const COLUMN_2 = [
+   { label: "For developers", href: "/for/developers" },
+-  { label: "For agents", href: "/for/agents" },
++  { label: "For professionals", href: "/for/agents" },
+   { label: "For institutions", href: "/for/institutions" },
+   { label: "For communities", href: "/for/community" },
+ ];
+@@ -29,7 +29,7 @@ export default function Footer() {
+       <div
+         className="mx-auto flex flex-col md:flex-row items-start justify-between"
+         style={{
+-          maxWidth: "1280px",
++          maxWidth: "var(--content-marketing)",
+           padding: "48px 32px",
+           gap: "48px",
+         }}
+@@ -40,6 +40,9 @@ export default function Footer() {
+             href="/"
+             id="footer-logo"
+             style={{
++              display: "inline-flex",
++              alignItems: "center",
++              minHeight: "44px",
+               fontWeight: 500,
+               fontSize: "15px",
+               color: "var(--near-black)",
+@@ -61,23 +64,26 @@ export default function Footer() {
+         </div>
+ 
+         {/* Right — link columns */}
+-        <div className="flex" style={{ gap: "80px" }}>
++        <div className="flex flex-wrap" style={{ gap: "16px 64px" }}>
+           {/* Column 1 */}
+-          <div className="flex flex-col" style={{ gap: "14px" }}>
++          <div className="flex flex-col" style={{ gap: "0" }}>
+             {COLUMN_1.map((link) => (
+               <a
+                 key={link.href}
+                 href={link.href}
+                 id={`footer-link-${link.href.replace(/\//g, "-").slice(1)}`}
+                 style={{
++                  display: "inline-flex",
++                  alignItems: "center",
++                  minHeight: "44px",
+                   fontSize: "14px",
+                   color: "var(--ink-muted)",
+                   textDecoration: "none",
+                   fontWeight: 400,
+-                  transition: "color 0.2s ease",
++                  transition: "color var(--dur-2) var(--ease-out)",
+                 }}
+                 onMouseEnter={(e) =>
+-                  (e.currentTarget.style.color = "var(--brand-blue)")
++                  (e.currentTarget.style.color = "var(--ink-primary)")
+                 }
+                 onMouseLeave={(e) =>
+                   (e.currentTarget.style.color = "var(--ink-muted)")
+@@ -89,21 +95,24 @@ export default function Footer() {
+           </div>
+ 
+           {/* Column 2 */}
+-          <div className="flex flex-col" style={{ gap: "14px" }}>
++          <div className="flex flex-col" style={{ gap: "0" }}>
+             {COLUMN_2.map((link) => (
+               <a
+                 key={link.href}
+                 href={link.href}
+                 id={`footer-link-${link.href.replace(/\//g, "-").slice(1)}`}
+                 style={{
++                  display: "inline-flex",
++                  alignItems: "center",
++                  minHeight: "44px",
+                   fontSize: "14px",
+                   color: "var(--ink-muted)",
+                   textDecoration: "none",
+                   fontWeight: 400,
+-                  transition: "color 0.2s ease",
++                  transition: "color var(--dur-2) var(--ease-out)",
+                 }}
+                 onMouseEnter={(e) =>
+-                  (e.currentTarget.style.color = "var(--brand-blue)")
++                  (e.currentTarget.style.color = "var(--ink-primary)")
+                 }
+                 onMouseLeave={(e) =>
+                   (e.currentTarget.style.color = "var(--ink-muted)")
+diff --git a/src/components/marketing/HeroAddressBox.tsx b/src/components/marketing/HeroAddressBox.tsx
+new file mode 100644
+index 0000000..dad0fe7
+--- /dev/null
++++ b/src/components/marketing/HeroAddressBox.tsx
+@@ -0,0 +1,372 @@
++"use client";
++
++// Homepage address box (UI sprint WS2, slice 2). A visitor types an address and
++// KOANO resolves it against the same geocoder the product uses, through the
++// public, rate-limited /api/public/resolve route. It shows the lot it found and
++// invites the visitor to create an account to run the five agents on it. It
++// never runs an agent and never shows a verdict for an arbitrary address: the
++// one address with a result on this page is the recorded example, and for that
++// one the box points at the recorded run further down the page.
++
++import React, { useId, useRef, useState } from "react";
++import { EXAMPLE_VERDICT_ADDRESS } from "./exampleVerdict";
++
++type Candidate = { id: string; label: string; borough?: string | null; zip?: string | null };
++
++type Result =
++  | { status: "idle" }
++  | { status: "loading" }
++  | {
++      status: "resolved";
++      normalized: string;
++      bbl: string | null;
++      borough: string | null;
++      nyc: boolean;
++      example: boolean;
++    }
++  | { status: "ambiguous"; candidates: Candidate[] }
++  | { status: "none"; error: string };
++
++const RECORDED_RUN_ANCHOR = "#agents-section";
++
++export default function HeroAddressBox() {
++  const inputId = useId();
++  const [value, setValue] = useState("");
++  const [result, setResult] = useState<Result>({ status: "idle" });
++  const inflight = useRef<AbortController | null>(null);
++
++  async function check(address: string) {
++    const q = address.trim();
++    if (q.length < 5) {
++      setResult({ status: "none", error: "Enter a street address, with the borough or ZIP if you have it." });
++      return;
++    }
++    inflight.current?.abort();
++    const ctl = new AbortController();
++    inflight.current = ctl;
++    setResult({ status: "loading" });
++    try {
++      const res = await fetch("/api/public/resolve", {
++        method: "POST",
++        headers: { "Content-Type": "application/json" },
++        body: JSON.stringify({ address: q }),
++        signal: ctl.signal,
++      });
++      const data = (await res.json()) as Record<string, unknown>;
++      if (ctl.signal.aborted) return;
++      if (data.status === "resolved") {
++        setResult({
++          status: "resolved",
++          normalized: String(data.normalized ?? q),
++          bbl: (data.bbl as string | null) ?? null,
++          borough: (data.borough as string | null) ?? null,
++          nyc: data.nyc === true,
++          example: data.example === true,
++        });
++      } else if (data.status === "ambiguous" && Array.isArray(data.candidates)) {
++        setResult({ status: "ambiguous", candidates: data.candidates as Candidate[] });
++      } else {
++        setResult({
++          status: "none",
++          error: typeof data.error === "string" && data.error ? data.error : "No lot matched that address. Try adding the borough or ZIP.",
++        });
++      }
++    } catch (e) {
++      if ((e as { name?: string }).name === "AbortError") return;
++      setResult({ status: "none", error: "The address check did not complete. Try again in a moment." });
++    }
++  }
++
++  return (
++    <form
++      className="hero-address"
++      role="search"
++      aria-label="Check an address"
++      onSubmit={(e) => {
++        e.preventDefault();
++        void check(value);
++      }}
++    >
++      <label htmlFor={inputId} className="sr-only">
++        Street address
++      </label>
++      <div className="hero-address-field">
++        <input
++          id={inputId}
++          className="hero-address-input"
++          type="text"
++          inputMode="text"
++          autoComplete="street-address"
++          enterKeyHint="search"
++          placeholder="Enter a New York City address"
++          value={value}
++          onChange={(e) => setValue(e.target.value)}
++          aria-describedby={`${inputId}-result`}
++        />
++        <button type="submit" className="btn-primary hero-address-btn" disabled={result.status === "loading"}>
++          Check the record
++          <span aria-hidden="true" className="btn-arrow">
++            ↗
++          </span>
++        </button>
++      </div>
++      <div className="hero-address-hint">
++        Try the recorded example:{" "}
++        <button
++          type="button"
++          className="hero-address-example"
++          onClick={() => {
++            setValue(EXAMPLE_VERDICT_ADDRESS);
++            void check(EXAMPLE_VERDICT_ADDRESS);
++          }}
++        >
++          {EXAMPLE_VERDICT_ADDRESS}
++        </button>
++      </div>
++
++      <div id={`${inputId}-result`} aria-live="polite" aria-atomic="true">
++        {result.status === "loading" && (
++          <div className="hero-address-card hero-address-card-quiet">
++            <span className="hero-address-pulse" aria-hidden="true" />
++            Checking the public record for this address
++          </div>
++        )}
++
++        {result.status === "resolved" && (
++          <div className="hero-address-card">
++            <div className="hero-address-found">{result.normalized}</div>
++            {result.bbl && (
++              <div className="hero-address-meta">
++                BBL {result.bbl}
++                {result.borough ? ` · ${result.borough}` : ""}
++              </div>
++            )}
++            {result.example ? (
++              <>
++                <p className="hero-address-copy">
++                  This is the recorded example run shown on this page. The five agents, their figures and the synthesis are laid out below.
++                </p>
++                <a href={RECORDED_RUN_ANCHOR} className="btn-ghost hero-address-cta">
++                  See the recorded run
++                </a>
++              </>
++            ) : result.nyc ? (
++              <>
++                <p className="hero-address-copy">
++                  Found in the city record. Create an account to run the five agents on this lot and read every figure they used.
++                </p>
++                <a href="/signup" className="btn-primary hero-address-cta">
++                  Create an account
++                  <span aria-hidden="true" className="btn-arrow">
++                    ↗
++                  </span>
++                </a>
++              </>
++            ) : (
++              <>
++                <p className="hero-address-copy">
++                  Outside New York City. The federal layers (prices, lending, hazards, employment) run here today. Permits, zoning and
++                  violations cover New York City.
++                </p>
++                <a href="/signup" className="btn-primary hero-address-cta">
++                  Create an account
++                  <span aria-hidden="true" className="btn-arrow">
++                    ↗
++                  </span>
++                </a>
++              </>
++            )}
++          </div>
++        )}
++
++        {result.status === "ambiguous" && (
++          <div className="hero-address-card">
++            <div className="hero-address-found">Which one did you mean?</div>
++            <ul className="hero-address-candidates">
++              {result.candidates.map((c) => (
++                <li key={c.id}>
++                  <button
++                    type="button"
++                    className="hero-address-candidate"
++                    onClick={() => {
++                      setValue(c.label);
++                      void check(c.label);
++                    }}
++                  >
++                    <span>{c.label}</span>
++                    {(c.borough || c.zip) && (
++                      <span className="hero-address-meta">{[c.borough, c.zip].filter(Boolean).join(" · ")}</span>
++                    )}
++                  </button>
++                </li>
++              ))}
++            </ul>
++          </div>
++        )}
++
++        {result.status === "none" && (
++          <div className="hero-address-card hero-address-card-quiet" role="status">
++            {result.error}
++          </div>
++        )}
++      </div>
++
++      <style jsx>{`
++        .hero-address {
++          width: 100%;
++          max-width: 520px;
++          margin-bottom: 28px;
++        }
++        .hero-address-field {
++          display: flex;
++          align-items: stretch;
++          gap: 8px;
++          background: var(--white);
++          border: 1px solid var(--border);
++          border-radius: var(--radius-pill);
++          padding: 6px 6px 6px 20px;
++          box-shadow: var(--shadow-hover);
++        }
++        .hero-address-input {
++          flex: 1 1 auto;
++          min-width: 0;
++          border: 0;
++          background: transparent;
++          font: inherit;
++          font-size: 15px;
++          color: var(--ink-primary);
++          min-height: 44px;
++        }
++        .hero-address-input::placeholder {
++          color: var(--ink-muted);
++        }
++        .hero-address-input:focus-visible {
++          outline: none;
++        }
++        .hero-address-field:focus-within {
++          outline: 2px solid var(--white);
++          outline-offset: 2px;
++        }
++        .hero-address-field :global(.hero-address-btn) {
++          white-space: nowrap;
++          padding: 11px 22px;
++          min-height: 44px;
++        }
++        .hero-address-hint {
++          font-family: var(--font-mono);
++          font-size: 11px;
++          letter-spacing: 0.04em;
++          color: rgba(255, 255, 255, 0.85);
++          margin-top: 10px;
++        }
++        .hero-address-example {
++          font: inherit;
++          background: transparent;
++          border: 0;
++          padding: 10px 0;
++          min-height: 44px;
++          color: var(--white);
++          text-decoration: underline;
++          text-underline-offset: 3px;
++          cursor: pointer;
++        }
++        .hero-address-example:focus-visible {
++          outline-color: var(--white);
++        }
++        .hero-address-card {
++          margin-top: 12px;
++          background: var(--white);
++          border: 1px solid var(--border);
++          border-radius: var(--radius-inner);
++          padding: 14px 16px;
++          color: var(--ink-primary);
++          font-size: 14px;
++          line-height: 1.5;
++        }
++        .hero-address-card-quiet {
++          display: flex;
++          align-items: center;
++          gap: 10px;
++          color: var(--ink-secondary);
++        }
++        .hero-address-pulse {
++          width: 8px;
++          height: 8px;
++          border-radius: 50%;
++          background: var(--mid-blue);
++          animation: hero-address-pulse 1.1s ease-in-out infinite;
++          flex: none;
++        }
++        @keyframes hero-address-pulse {
++          0%,
++          100% {
++            opacity: 0.35;
++          }
++          50% {
++            opacity: 1;
++          }
++        }
++        .hero-address-found {
++          font-weight: 500;
++          font-size: 15px;
++        }
++        .hero-address-meta {
++          font-family: var(--font-mono);
++          font-size: 11px;
++          letter-spacing: 0.06em;
++          color: var(--ink-muted);
++          margin-top: 2px;
++        }
++        .hero-address-copy {
++          margin: 8px 0 12px;
++          color: var(--ink-secondary);
++        }
++        .hero-address-card :global(.hero-address-cta) {
++          padding: 10px 20px;
++          min-height: 44px;
++        }
++        .hero-address-candidates {
++          list-style: none;
++          margin: 8px 0 0;
++          padding: 0;
++          display: flex;
++          flex-direction: column;
++          gap: 6px;
++        }
++        .hero-address-candidate {
++          width: 100%;
++          text-align: left;
++          font: inherit;
++          font-size: 14px;
++          color: var(--ink-primary);
++          background: var(--pale-wash);
++          border: 1px solid var(--border);
++          border-radius: var(--radius-chip);
++          padding: 10px 12px;
++          min-height: 44px;
++          cursor: pointer;
++          display: flex;
++          flex-direction: column;
++          gap: 2px;
++        }
++        .hero-address-candidate:hover {
++          border-color: var(--mid-blue);
++        }
++        @media (max-width: 767px) {
++          .hero-address-field {
++            flex-direction: column;
++            border-radius: var(--radius-card);
++            padding: 8px;
++            gap: 6px;
++          }
++          .hero-address-input {
++            padding: 0 12px;
++          }
++          .hero-address-field :global(.hero-address-btn) {
++            width: 100%;
++          }
++        }
++      `}</style>
++    </form>
++  );
++}
+diff --git a/src/components/marketing/HeroDashboard.tsx b/src/components/marketing/HeroDashboard.tsx
+index c0c52fb..be4e64a 100644
+--- a/src/components/marketing/HeroDashboard.tsx
++++ b/src/components/marketing/HeroDashboard.tsx
+@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from "framer-motion";
+ import {
+   AGENT_LABELS,
+   SPECIALIST_AGENTS,
++  VERDICT_COLORS,
+   type Verdict,
+ } from "@/components/ui/verdict";
+ import { EXAMPLE_VERDICT, EXAMPLE_VERDICT_ADDRESS, EXAMPLE_VERDICT_LABEL } from "./exampleVerdict";
+@@ -73,17 +74,14 @@ export default function HeroDashboard() {
+       style={{
+         width: "100%",
+         maxWidth: "460px",
+-        // Translucent over the dark hero: the near-black shows through as a
+-        // frosted panel. Deliberate §10 exception (hero dashboard is normally
+-        // solid); text below is flipped to light so it stays legible. The blur
+-        // does nothing over today's flat hero but frosts a hero video later.
+-        background: "rgba(255,255,255,0.08)",
+-        backdropFilter: "blur(20px) saturate(1.3)",
+-        WebkitBackdropFilter: "blur(20px) saturate(1.3)",
++        // A SOLID white card (CLAUDE.md §10): glass over a render blurred the
++        // buildings into the chips and made BUY/HOLD illegible (A4). Solid
++        // white with the navy-tinted raised shadow reads on the sky render.
++        background: "var(--white)",
+         borderRadius: "var(--radius-card)",
+-        border: "1px solid rgba(255,255,255,0.16)",
+-        boxShadow: "0 40px 80px -30px rgba(0,0,0,0.6)",
+-        padding: "22px",
++        border: "1px solid var(--border)",
++        boxShadow: "var(--shadow-hover)",
++        padding: "24px",
+         fontFamily: "inherit",
+         // The card is already centered in the hero section, but the fixed nav
+         // overlaps the top ~64px, so it reads high. Nudge down half the nav
+@@ -93,7 +91,7 @@ export default function HeroDashboard() {
+       }}
+     >
+       {/* Header: address + live status */}
+-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
++      <div className="hero-card-head" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
+         <div style={{ minWidth: 0 }}>
+           <div
+             style={{
+@@ -101,13 +99,13 @@ export default function HeroDashboard() {
+               fontSize: "11px",
+               letterSpacing: "0.12em",
+               textTransform: "uppercase",
+-              color: "rgba(255,255,255,0.55)",
++              color: "var(--ink-muted)",
+               marginBottom: "4px",
+             }}
+           >
+             Recorded example
+           </div>
+-          <div style={{ fontSize: "15px", fontWeight: 500, color: "#FFFFFF", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
++          <div style={{ fontSize: "15px", fontWeight: 500, color: "var(--ink-primary)", lineHeight: 1.3 }}>
+             {EXAMPLE_VERDICT_ADDRESS}
+           </div>
+         </div>
+@@ -117,13 +115,13 @@ export default function HeroDashboard() {
+             transition={done || reduceMotion ? { duration: 0.3 } : { duration: 1.1, repeat: Infinity, ease: "easeInOut" }}
+             style={{ width: "7px", height: "7px", borderRadius: "50%", background: done ? "var(--signal-positive)" : "var(--mid-blue)" }}
+           />
+-          <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", letterSpacing: "0.06em", color: "rgba(255,255,255,0.7)" }}>
++          <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", letterSpacing: "0.06em", color: "var(--ink-muted)" }}>
+             {status}
+           </span>
+         </div>
+       </div>
+ 
+-      <div style={{ height: "1px", background: "rgba(255,255,255,0.12)", margin: "16px 0 6px" }} />
++      <div style={{ height: "1px", background: "var(--border-light)", margin: "16px 0 6px" }} />
+ 
+       {/* Five specialist agents streaming in */}
+       <div>
+@@ -135,14 +133,14 @@ export default function HeroDashboard() {
+               initial="hidden"
+               animate={stage >= i + 1 ? "visible" : "hidden"}
+               variants={rowVar}
+-              style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px", padding: "9px 0", borderBottom: "1px solid rgba(255,255,255,0.1)" }}
++              style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px", padding: "9px 0", borderBottom: "1px solid var(--border-light)" }}
+             >
+               <div style={{ minWidth: 0 }}>
+-                <div style={{ fontSize: "14px", fontWeight: 500, color: "rgba(255,255,255,0.92)", lineHeight: 1.25 }}>{a.name}</div>
+-                <div style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "rgba(255,255,255,0.55)", marginTop: "2px" }}>{a.tag}</div>
++                <div style={{ fontSize: "14px", fontWeight: 500, color: "var(--ink-primary)", lineHeight: 1.25 }}>{a.name}</div>
++                <div style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--ink-muted)", marginTop: "2px" }}>{a.tag}</div>
+               </div>
+               <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
+-                <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>{a.conf}%</span>
++                <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--ink-muted)" }}>{a.conf}%</span>
+                 <span
+                   style={{
+                     fontFamily: "var(--font-mono)",
+@@ -171,29 +169,29 @@ export default function HeroDashboard() {
+         variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE } } }}
+         style={{
+           marginTop: "14px",
+-          background: "rgba(255,255,255,0.06)",
+-          border: "1px solid rgba(255,255,255,0.14)",
++          background: "var(--pale-wash)",
++          border: "1px solid var(--border)",
+           borderRadius: "var(--radius-inner)",
+           padding: "16px 18px",
+         }}
+       >
+         <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: "12px" }}>
+           <div>
+-            <div style={{ fontFamily: "var(--font-mono)", fontSize: "11px", letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)", marginBottom: "3px" }}>
++            <div style={{ fontFamily: "var(--font-mono)", fontSize: "11px", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ink-muted)", marginBottom: "3px" }}>
+               Synthesis · one verdict
+             </div>
+-            <div style={{ fontSize: "34px", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1, color: "var(--signal-positive-ink)" }}>
++            <div style={{ fontSize: "34px", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1, color: VERDICT_COLORS[EXAMPLE_VERDICT.verdict] }}>
+               {(EXAMPLE_VERDICT.verdict as string).toUpperCase()}
+             </div>
+           </div>
+-          <div style={{ textAlign: "right", fontFamily: "var(--font-mono)", fontSize: "11px", color: "rgba(255,255,255,0.6)", lineHeight: 1.7 }}>
+-            <div><b style={{ color: "#FFFFFF" }}>{EXAMPLE_VERDICT.confidence}</b> confidence</div>
+-            <div><b style={{ color: "#FFFFFF" }}>{EXAMPLE_VERDICT.risk_score}</b> risk</div>
+-            <div><b style={{ color: "#FFFFFF" }}>{EXAMPLE_VERDICT.signal_window_months}mo</b> window</div>
++          <div style={{ textAlign: "right", fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--ink-muted)", lineHeight: 1.7 }}>
++            <div><b style={{ color: "var(--ink-primary)" }}>{EXAMPLE_VERDICT.confidence}</b> confidence</div>
++            <div><b style={{ color: "var(--ink-primary)" }}>{EXAMPLE_VERDICT.risk_score}</b> risk</div>
++            <div><b style={{ color: "var(--ink-primary)" }}>{EXAMPLE_VERDICT.signal_window_months}mo</b> window</div>
+           </div>
+         </div>
+-        <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.75)", lineHeight: 1.5, marginTop: "12px" }}>{DRIVER}</div>
+-        <div style={{ fontFamily: "var(--font-mono)", fontSize: "11px", lineHeight: 1.5, letterSpacing: "0.04em", color: "rgba(255,255,255,0.65)", marginTop: "12px" }}>
++        <div style={{ fontSize: "13px", color: "var(--ink-secondary)", lineHeight: 1.5, marginTop: "12px" }}>{DRIVER}</div>
++        <div style={{ fontFamily: "var(--font-mono)", fontSize: "11px", lineHeight: 1.5, letterSpacing: "0.04em", color: "var(--ink-muted)", marginTop: "12px" }}>
+           {EXAMPLE_VERDICT_LABEL} Replayed at about 30x.
+         </div>
+       </motion.div>
+diff --git a/src/components/marketing/HeroRender.tsx b/src/components/marketing/HeroRender.tsx
+new file mode 100644
+index 0000000..67cb613
+--- /dev/null
++++ b/src/components/marketing/HeroRender.tsx
+@@ -0,0 +1,57 @@
++"use client";
++
++// HeroRender — art-directed hero image (UI sprint WS2, A1 and A2).
++//
++// A <picture> that serves the 4:5 mobile render below 768px when the founder
++// has supplied one, and the desktop render otherwise, with explicit intrinsic
++// dimensions so the slot reserves its height before the bytes arrive (no layout
++// shift), lazy loading below the fold and a high fetch priority for the first
++// hero. Decorative: empty alt, aria-hidden.
++//
++// Two placements, chosen by the parent with `variant`:
++//   "bleed"  — the desktop composition: absolutely positioned behind the copy
++//              (the parent positions it). On phones WITHOUT a mobile render the
++//              CSS in globals.css turns it into an in-flow block below the
++//              headline at full width (the sprint's temporary layout); WITH a
++//              mobile render it stays full-bleed and the copy sits in the
++//              reserved upper area.
++//   "block"  — always in flow (used where the image is already a block).
++
++import React from "react";
++import { mobileSrc, type RenderSlot } from "./renders";
++
++interface HeroRenderProps {
++  slot: RenderSlot;
++  variant?: "bleed" | "block";
++  priority?: boolean;
++  /** Extra class for the parent's own placement rules. */
++  className?: string;
++  style?: React.CSSProperties;
++}
++
++export default function HeroRender({ slot, variant = "bleed", priority = false, className = "", style }: HeroRenderProps) {
++  const mobile = mobileSrc(slot);
++  const img = (
++    // eslint-disable-next-line @next/next/no-img-element
++    <img
++      src={slot.src}
++      width={slot.width}
++      height={slot.height}
++      alt=""
++      aria-hidden="true"
++      decoding="async"
++      loading={priority ? "eager" : "lazy"}
++      // eslint-disable-next-line react/no-unknown-property
++      fetchPriority={priority ? "high" : "auto"}
++      className={`hero-render hero-render-${variant} ${className}`.trim()}
++      style={style}
++    />
++  );
++  if (!mobile) return img;
++  return (
++    <picture className={`hero-picture hero-picture-${variant}`}>
++      <source media="(max-width: 767px)" srcSet={mobile} width={1728} height={2160} />
++      {img}
++    </picture>
++  );
++}
+diff --git a/src/components/marketing/HeroSection.tsx b/src/components/marketing/HeroSection.tsx
+index 154c686..d36e68a 100644
+--- a/src/components/marketing/HeroSection.tsx
++++ b/src/components/marketing/HeroSection.tsx
+@@ -1,24 +1,11 @@
+ "use client";
+ 
+ import React from "react";
+-import { motion } from "framer-motion";
+ import Button from "../ui/Button";
+ import HeroDashboard from "./HeroDashboard";
+-
+-const EASE = [0.16, 1, 0.3, 1] as const;
+-
+-const fadeUp = {
+-  hidden: { opacity: 0, y: 20 },
+-  visible: (i: number) => ({
+-    opacity: 1,
+-    y: 0,
+-    transition: {
+-      delay: 0.3 + i * 0.08,
+-      duration: 0.5,
+-      ease: EASE,
+-    },
+-  }),
+-};
++import HeroAddressBox from "./HeroAddressBox";
++import HeroRender from "./HeroRender";
++import { RENDERS } from "./renders";
+ 
+ const STATS = [
+   { value: "Every figure", label: "Data-Sourced" },
+@@ -33,8 +20,9 @@ export default function HeroSection() {
+       style={{
+         position: "relative",
+         width: "100%",
+-        height: "100vh",
+-        minHeight: "700px",
++        // Fills the viewport and GROWS with its content (the address box can
++        // open a result card), so the copy never slides under the nav.
++        minHeight: "max(700px, 100vh)",
+         overflow: "hidden",
+         // Sky colour sampled from the hero image, so the area above the
+         // contained (uncropped) image blends into its sky seamlessly.
+@@ -43,34 +31,30 @@ export default function HeroSection() {
+     >
+       {/* Hero background image — replaces the dark fill (near-black stays only as
+           a load fallback behind it). Full-bleed, behind the content overlay. */}
+-      <img
+-        src="/renders/menu-hero.jpg"
+-        alt=""
+-        aria-hidden="true"
+-        style={{
+-          position: "absolute",
+-          inset: 0,
+-          width: "100%",
+-          height: "100%",
+-          // Contain (not cover) so the image keeps its native proportions and
+-          // isn't zoomed/cropped; grounded at the bottom so the buildings sit on
+-          // the fold and only sky extends above (into the matching section bg).
+-          objectFit: "contain",
+-          objectPosition: "center bottom",
+-          zIndex: 0,
+-          pointerEvents: "none",
+-        }}
++      <HeroRender
++        slot={RENDERS["menu-hero"]}
++        priority
++        // Contain (not cover) so the image keeps its native proportions and
++        // isn't zoomed/cropped; grounded at the bottom so the buildings sit on
++        // the fold and only sky extends above (into the matching section bg).
++        style={{ objectFit: "contain", objectPosition: "center bottom" }}
+       />
+ 
++      {/* Scrim: a navy wash over the text column so white copy reads AA on the
++          light sky (5.3:1 on the blended ground); fades out under the card and
++          the buildings. On phones the copy block carries the same wash. */}
++      <div className="hero-scrim" aria-hidden="true" />
++
+       {/* Content overlay */}
+       <div
++        className="hero-inner"
+         style={{
+           position: "relative",
+           zIndex: 1,
+-          maxWidth: "1280px",
++          maxWidth: "var(--content-marketing)",
+           margin: "0 auto",
+-          padding: "0 32px",
+-          height: "100%",
++          padding: "calc(var(--nav-h) + 32px) 32px 56px",
++          minHeight: "max(700px, 100vh)",
+           display: "flex",
+           alignItems: "center",
+         }}
+@@ -88,32 +72,28 @@ export default function HeroSection() {
+           {/* Left — copy */}
+           <div>
+             {/* Eyebrow tag */}
+-            <motion.span
+-              custom={0}
+-              initial="hidden"
+-              animate="visible"
+-              variants={fadeUp}
++            <span
++              className="hero-enter"
+               style={{
++                animationDelay: "0.30s",
+                 display: "block",
+                 fontFamily: "var(--font-mono)",
+                 fontSize: "11px",
+                 fontWeight: 500,
+-                color: "var(--brand-blue)",
++                color: "rgba(255, 255, 255, 0.85)",
+                 letterSpacing: "1.5px",
+                 textTransform: "uppercase",
+                 marginBottom: "24px",
+               }}
+             >
+               Real estate reasoning engine
+-            </motion.span>
++            </span>
+ 
+             {/* Headline */}
+-            <motion.h1
+-              custom={1}
+-              initial="hidden"
+-              animate="visible"
+-              variants={fadeUp}
++            <h1
++              className="hero-enter"
+               style={{
++                animationDelay: "0.38s",
+                 fontSize: "clamp(34px, 3.8vw, 58px)",
+                 fontWeight: 700,
+                 letterSpacing: "-0.02em",
+@@ -126,38 +106,37 @@ export default function HeroSection() {
+               SMART DATA.
+               <br />
+               SMARTER REAL ESTATE DECISIONS.
+-            </motion.h1>
++            </h1>
+ 
+             {/* Subhead */}
+-            <motion.p
+-              custom={2}
+-              initial="hidden"
+-              animate="visible"
+-              variants={fadeUp}
++            <p
++              className="hero-enter"
+               style={{
++                animationDelay: "0.46s",
+                 fontSize: "18px",
+                 fontWeight: 500,
+                 lineHeight: 1.6,
+                 color: "#FFFFFF",
+                 maxWidth: "520px",
+                 marginTop: "24px",
+-                marginBottom: "36px",
++                marginBottom: "28px",
+               }}
+             >
+               KOANO deploys five specialist agents that read every public record
+               touching a property, scattered across federal, state and city
+               agencies. Each weighs its own evidence, and the verdict they
+               produce shows its arithmetic figure by figure.
+-            </motion.p>
++            </p>
++
++            {/* Address box: resolve a lot against the public record, no account needed */}
++            <div className="hero-enter" style={{ animationDelay: "0.54s" }}>
++              <HeroAddressBox />
++            </div>
+ 
+             {/* CTA row */}
+-            <motion.div
+-              custom={3}
+-              initial="hidden"
+-              animate="visible"
+-              variants={fadeUp}
+-              className="flex flex-wrap items-center"
+-              style={{ gap: "16px", marginBottom: "40px" }}
++            <div
++              className="hero-enter flex flex-wrap items-center"
++              style={{ animationDelay: "0.62s", gap: "16px", marginBottom: "32px" }}
+             >
+               <Button variant="primary" href="/signup" id="hero-cta-primary">
+                 Sign up
+@@ -165,21 +144,18 @@ export default function HeroSection() {
+               <Button variant="ghost-light" href="/intelligence" id="hero-cta-secondary">
+                 See how it works
+               </Button>
+-            </motion.div>
++            </div>
+ 
+             {/* Stats row */}
+-            <motion.div
+-              custom={4}
+-              initial="hidden"
+-              animate="visible"
+-              variants={fadeUp}
+-              className="flex flex-wrap items-center"
+-              style={{ gap: "0" }}
++            <div
++              className="hero-enter hero-stats flex flex-wrap items-center"
++              style={{ animationDelay: "0.70s", gap: "0" }}
+             >
+               {STATS.map((stat, i) => (
+                 <React.Fragment key={stat.label}>
+                   {i > 0 && (
+                     <span
++                      className="hero-stat-sep"
+                       style={{
+                         color: "rgba(255, 255, 255, 0.3)",
+                         margin: "0 20px",
+@@ -201,30 +177,55 @@ export default function HeroSection() {
+                     <span style={{ fontWeight: 700, marginRight: "6px" }}>
+                       {stat.value}
+                     </span>
+-                    <span style={{ fontWeight: 400, opacity: 0.7 }}>
++                    <span style={{ fontWeight: 400, opacity: 0.85 }}>
+                       {stat.label}
+                     </span>
+                   </span>
+                 </React.Fragment>
+               ))}
+-            </motion.div>
++            </div>
+           </div>
+ 
+           {/* Right — animated dashboard demonstrating a real KOANO run */}
+-          <motion.div
+-            className="hero-dashboard-col"
+-            custom={2}
+-            initial="hidden"
+-            animate="visible"
+-            variants={fadeUp}
+-            style={{ display: "flex", justifyContent: "flex-end" }}
++          <div
++            className="hero-enter hero-dashboard-col"
++            style={{ animationDelay: "0.46s", display: "flex", justifyContent: "flex-end" }}
+           >
+             <HeroDashboard />
+-          </motion.div>
++          </div>
+         </div>
+       </div>
+ 
+       <style jsx>{`
++        .hero-enter {
++          animation: hero-enter 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
++        }
++        @keyframes hero-enter {
++          from {
++            opacity: 0;
++            transform: translateY(20px);
++          }
++          to {
++            opacity: 1;
++            transform: translateY(0);
++          }
++        }
++        /* White copy on the navy wash: the focus ring is white here. */
++        #hero-section :global(:focus-visible) {
++          outline-color: var(--white);
++        }
++        .hero-scrim {
++          position: absolute;
++          inset: 0;
++          z-index: 0;
++          pointer-events: none;
++          background: linear-gradient(
++            90deg,
++            rgba(13, 43, 62, 0.62) 0%,
++            rgba(13, 43, 62, 0.58) 42%,
++            rgba(13, 43, 62, 0) 68%
++          );
++        }
+         @media (max-width: 900px) {
+           .hero-grid {
+             grid-template-columns: 1fr !important;
+@@ -234,6 +235,22 @@ export default function HeroSection() {
+             justify-content: flex-start !important;
+           }
+         }
++        @media (max-width: 767px) {
++          .hero-scrim {
++            display: none;
++          }
++          .hero-inner {
++            background: rgba(13, 43, 62, 0.62);
++          }
++          .hero-stats {
++            flex-direction: column;
++            align-items: flex-start !important;
++            gap: 6px !important;
++          }
++          .hero-stat-sep {
++            display: none;
++          }
++        }
+       `}</style>
+     </section>
+   );
+diff --git a/src/components/marketing/IntelligenceContent.tsx b/src/components/marketing/IntelligenceContent.tsx
+index 356fde4..d83cf76 100644
+--- a/src/components/marketing/IntelligenceContent.tsx
++++ b/src/components/marketing/IntelligenceContent.tsx
+@@ -1,7 +1,8 @@
+ "use client";
+ 
+ import React, { useRef } from "react";
+-import { motion, useInView } from "framer-motion";
++import { motion } from "framer-motion";
++import { useReveal, fadeUp } from "./Reveal";
+ import SectionNumber from "@/components/ui/SectionNumber";
+ import Button from "@/components/ui/Button";
+ import {
+@@ -10,6 +11,8 @@ import {
+   HERO_SECTION_PADDING,
+ } from "@/components/marketing/heroLayout";
+ import CtaBackground from "@/components/marketing/CtaBackground";
++import HeroRender from "@/components/marketing/HeroRender";
++import { RENDERS } from "@/components/marketing/renders";
+ import { VERDICT_COLORS } from "@/components/ui/verdict";
+ import {
+   EXAMPLE_VERDICT,
+@@ -18,20 +21,6 @@ import {
+   EXAMPLE_VERDICT_LABEL_SHORT,
+ } from "@/components/marketing/exampleVerdict";
+ 
+-const EASE = [0.16, 1, 0.3, 1] as const;
+-
+-const fadeUp = {
+-  hidden: { opacity: 0, y: 20 },
+-  visible: (i: number) => ({
+-    opacity: 1,
+-    y: 0,
+-    transition: {
+-      delay: i * 0.08,
+-      duration: 0.5,
+-      ease: EASE,
+-    },
+-  }),
+-};
+ 
+ const AGENTS_DETAIL = [
+   {
+@@ -126,18 +115,20 @@ export default function IntelligenceContent() {
+   const verdictRef = useRef<HTMLElement>(null);
+   const ctaRef = useRef<HTMLElement>(null);
+ 
+-  const heroInView = useInView(heroRef, { once: true, amount: 0.15 });
+-  const architectureInView = useInView(architectureRef, { once: true, amount: 0.1 });
+-  const agentsInView = useInView(agentsRef, { once: true, amount: 0.05 });
+-  const synthesisInView = useInView(synthesisRef, { once: true, amount: 0.1 });
+-  const verdictInView = useInView(verdictRef, { once: true, amount: 0.15 });
+-  const ctaInView = useInView(ctaRef, { once: true, amount: 0.15 });
++  const heroInView = useReveal(heroRef, { once: true, amount: 0.15 });
++  const architectureInView = useReveal(architectureRef, { once: true, amount: 0.1 });
++  const agentsInView = useReveal(agentsRef, { once: true, amount: 0.05 });
++  const synthesisInView = useReveal(synthesisRef, { once: true, amount: 0.1 });
++  const verdictInView = useReveal(verdictRef, { once: true, amount: 0.15 });
++  const ctaInView = useReveal(ctaRef, { once: true, amount: 0.15 });
+ 
+   return (
+     <>
+       {/* Hero */}
+       <section
+         ref={heroRef}
++        className="hero-with-render hero-group-a"
++        data-mobile-render={String(RENDERS["how-it-works"].mobile)}
+         style={{
+           background: "var(--white)",
+           position: "relative",
+@@ -159,21 +150,10 @@ export default function IntelligenceContent() {
+             is taller than the window its empty top sky overflows above and is
+             clipped (never the buildings). object-fit is deliberately NOT used —
+             aspect is preserved and nothing meaningful is cropped. */}
+-        <img
+-          src="/renders/how-it-works.webp"
+-          alt=""
+-          aria-hidden="true"
+-          style={{
+-            position: "absolute",
+-            bottom: 0,
+-            left: 0,
+-            width: "100%",
+-            height: "auto",
+-            display: "block",
+-          }}
+-        />
++        <HeroRender slot={RENDERS["how-it-works"]} priority />
+ 
+         <div
++          className="hero-copy"
+           style={{
+             position: "absolute",
+             inset: 0,
+@@ -187,7 +167,7 @@ export default function IntelligenceContent() {
+         >
+           <div style={{ maxWidth: HERO_CONTAINER_MAX, width: "100%" }}>
+           <motion.div
+-            initial="hidden"
++            initial={false}
+             animate={heroInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={0}
+@@ -197,7 +177,7 @@ export default function IntelligenceContent() {
+ 
+           {/* Headline + body — approved copy (KOANO_COPY.md) */}
+           <motion.h1
+-            initial="hidden"
++            initial={false}
+             animate={heroInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={1}
+@@ -215,7 +195,7 @@ export default function IntelligenceContent() {
+           </motion.h1>
+ 
+           <motion.div
+-            initial="hidden"
++            initial={false}
+             animate={heroInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={2}
+@@ -237,9 +217,8 @@ export default function IntelligenceContent() {
+       <section style={{ background: "var(--white)", padding: "120px 32px" }}>
+         <div style={{ maxWidth: "1000px", margin: "0 auto", textAlign: "center" }}>
+           <motion.div
+-            initial="hidden"
+-            whileInView="visible"
+-            viewport={{ once: true, amount: 0.2 }}
++            initial={false}
++            animate="visible"
+             variants={fadeUp}
+             custom={0}
+             style={{ marginBottom: "40px" }}
+@@ -263,9 +242,8 @@ export default function IntelligenceContent() {
+ 
+           {/* Demo video slot — 16:9. */}
+           <motion.div
+-            initial="hidden"
+-            whileInView="visible"
+-            viewport={{ once: true, amount: 0.15 }}
++            initial={false}
++            animate="visible"
+             variants={fadeUp}
+             custom={1}
+             style={{
+@@ -294,9 +272,9 @@ export default function IntelligenceContent() {
+         ref={architectureRef}
+         style={{ background: "var(--pale-wash)", padding: "120px 32px" }}
+       >
+-        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
++        <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
+           <motion.div
+-            initial="hidden"
++            initial={false}
+             animate={architectureInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={0}
+@@ -326,11 +304,11 @@ export default function IntelligenceContent() {
+ 
+           {/* Russian doll nested visual */}
+           <motion.div
+-            initial="hidden"
++            initial={false}
+             animate={architectureInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={1}
+-            style={{ maxWidth: "720px", margin: "0 auto" }}
++            style={{ maxWidth: "var(--content-prose)", margin: "0 auto" }}
+           >
+             {/* Layer 1 — outer */}
+             <div
+@@ -485,13 +463,13 @@ export default function IntelligenceContent() {
+ 
+         <div
+           style={{
+-            maxWidth: "1280px",
++            maxWidth: "var(--content-marketing)",
+             margin: "0 auto",
+             position: "relative",
+           }}
+         >
+           <motion.div
+-            initial="hidden"
++            initial={false}
+             animate={agentsInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={0}
+@@ -520,7 +498,7 @@ export default function IntelligenceContent() {
+               <motion.div
+                 key={agent.number}
+                 custom={i + 1}
+-                initial="hidden"
++                initial={false}
+                 animate={agentsInView ? "visible" : "hidden"}
+                 variants={fadeUp}
+                 className="card"
+@@ -626,9 +604,9 @@ export default function IntelligenceContent() {
+         ref={synthesisRef}
+         style={{ background: "var(--pale-wash)", padding: "120px 32px" }}
+       >
+-        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
++        <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
+           <motion.div
+-            initial="hidden"
++            initial={false}
+             animate={synthesisInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={0}
+@@ -672,7 +650,7 @@ export default function IntelligenceContent() {
+               <motion.div
+                 key={item.title}
+                 custom={i + 1}
+-                initial="hidden"
++                initial={false}
+                 animate={synthesisInView ? "visible" : "hidden"}
+                 variants={fadeUp}
+                 className="card"
+@@ -718,7 +696,7 @@ export default function IntelligenceContent() {
+       >
+         <div style={{ maxWidth: "960px", margin: "0 auto" }}>
+           <motion.div
+-            initial="hidden"
++            initial={false}
+             animate={verdictInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={0}
+@@ -746,7 +724,7 @@ export default function IntelligenceContent() {
+           </motion.div>
+ 
+           <motion.div
+-            initial="hidden"
++            initial={false}
+             animate={verdictInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={1}
+@@ -889,6 +867,7 @@ export default function IntelligenceContent() {
+       {/* CTA */}
+       <section
+         ref={ctaRef}
++        className="cta-with-render"
+         style={{
+           background: "var(--pale-wash)",
+           padding: "120px 32px",
+@@ -906,7 +885,7 @@ export default function IntelligenceContent() {
+           }}
+         >
+           <motion.div
+-            initial="hidden"
++            initial={false}
+             animate={ctaInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={0}
+diff --git a/src/components/marketing/MonitoringSection.tsx b/src/components/marketing/MonitoringSection.tsx
+index 9439d05..9962924 100644
+--- a/src/components/marketing/MonitoringSection.tsx
++++ b/src/components/marketing/MonitoringSection.tsx
+@@ -7,19 +7,10 @@
+ // engine's own arrows and the sale-vs-re-registration caveat that leads by design.
+ 
+ import React, { useRef } from "react";
+-import { motion, useInView } from "framer-motion";
++import { motion } from "framer-motion";
++import { useReveal, fadeUp } from "./Reveal";
+ import SectionNumber from "../ui/SectionNumber";
+ 
+-const EASE = [0.16, 1, 0.3, 1] as const;
+-
+-const fadeUp = {
+-  hidden: { opacity: 0, y: 20 },
+-  visible: (i: number) => ({
+-    opacity: 1,
+-    y: 0,
+-    transition: { delay: i * 0.08, duration: 0.5, ease: EASE },
+-  }),
+-};
+ 
+ // Verbatim KOANO notification templates, filled with illustrative values.
+ const EXAMPLE_ALERTS = [
+@@ -41,13 +32,13 @@ const EXAMPLE_ALERTS = [
+ 
+ export default function MonitoringSection() {
+   const ref = useRef<HTMLElement>(null);
+-  const isInView = useInView(ref, { once: true, amount: 0.1 });
++  const isInView = useReveal(ref, { once: true, amount: 0.1 });
+ 
+   return (
+     <section ref={ref} style={{ background: "var(--pale-wash)", padding: "120px 32px" }}>
+       <div style={{ maxWidth: "900px", margin: "0 auto" }}>
+         <motion.div
+-          initial="hidden"
++          initial={false}
+           animate={isInView ? "visible" : "hidden"}
+           variants={fadeUp}
+           custom={0}
+@@ -74,7 +65,7 @@ export default function MonitoringSection() {
+         </motion.div>
+ 
+         <motion.div
+-          initial="hidden"
++          initial={false}
+           animate={isInView ? "visible" : "hidden"}
+           variants={fadeUp}
+           custom={1}
+@@ -132,7 +123,7 @@ export default function MonitoringSection() {
+         </motion.div>
+ 
+         <motion.p
+-          initial="hidden"
++          initial={false}
+           animate={isInView ? "visible" : "hidden"}
+           variants={fadeUp}
+           custom={2}
+diff --git a/src/components/marketing/Nav.tsx b/src/components/marketing/Nav.tsx
+index bcb5b46..47c167a 100644
+--- a/src/components/marketing/Nav.tsx
++++ b/src/components/marketing/Nav.tsx
+@@ -1,7 +1,8 @@
+ "use client";
+ 
+-import React, { useState, useEffect } from "react";
++import React, { useState, useEffect, useRef, useCallback } from "react";
+ import { motion, AnimatePresence } from "framer-motion";
++import { useUser, UserButton } from "@clerk/nextjs";
+ import Button from "../ui/Button";
+ 
+ // Cluster links ordered by positioning priority (CLAUDE.md Section 01):
+@@ -16,9 +17,18 @@ const NAV_LINKS = [
+   { label: "Pricing", href: "/pricing" },
+ ];
+ 
++const FOCUSABLE = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
++
+ export default function Nav() {
+   const [scrolled, setScrolled] = useState(false);
+   const [mobileOpen, setMobileOpen] = useState(false);
++  // Auth-aware (UI sprint WS2): a signed-in visitor sees "Dashboard" and the
++  // account button instead of Sign in / Sign up. Until Clerk has loaded, the
++  // signed-out pair renders (the common case), so nothing jumps for a visitor.
++  const { isLoaded, isSignedIn } = useUser();
++  const signedIn = isLoaded && isSignedIn === true;
++  const sheetRef = useRef<HTMLDivElement>(null);
++  const toggleRef = useRef<HTMLButtonElement>(null);
+ 
+   useEffect(() => {
+     const handleScroll = () => {
+@@ -28,7 +38,7 @@ export default function Nav() {
+     return () => window.removeEventListener("scroll", handleScroll);
+   }, []);
+ 
+-  // Lock body scroll when mobile menu is open
++  // Lock body scroll when the phone sheet is open
+   useEffect(() => {
+     if (mobileOpen) {
+       document.body.style.overflow = "hidden";
+@@ -40,103 +50,136 @@ export default function Nav() {
+     };
+   }, [mobileOpen]);
+ 
++  const close = useCallback(() => {
++    setMobileOpen(false);
++    // Return focus to the control that opened the sheet.
++    requestAnimationFrame(() => toggleRef.current?.focus());
++  }, []);
++
++  // Phone sheet: move focus in, trap Tab inside, close on Escape.
++  useEffect(() => {
++    if (!mobileOpen) return;
++    const sheet = sheetRef.current;
++    const first = sheet?.querySelector<HTMLElement>(FOCUSABLE);
++    first?.focus();
++    const onKey = (e: KeyboardEvent) => {
++      if (e.key === "Escape") {
++        e.preventDefault();
++        close();
++        return;
++      }
++      if (e.key !== "Tab" || !sheet) return;
++      const items = Array.from(sheet.querySelectorAll<HTMLElement>(FOCUSABLE)).filter((el) => el.offsetParent !== null);
++      // The hamburger (now a close button) stays in the cycle as the last stop.
++      const cycle = toggleRef.current ? [...items, toggleRef.current] : items;
++      if (cycle.length === 0) return;
++      const i = cycle.indexOf(document.activeElement as HTMLElement);
++      // Always move within the cycle (sheet links, buttons, then the close
++      // control), so focus can never land on the page under the sheet.
++      e.preventDefault();
++      const next = i === -1 ? 0 : (i + (e.shiftKey ? -1 : 1) + cycle.length) % cycle.length;
++      cycle[next].focus();
++    };
++    document.addEventListener("keydown", onKey);
++    return () => document.removeEventListener("keydown", onKey);
++  }, [mobileOpen, close]);
++
+   return (
+     <>
+       <nav
+         id="main-nav"
+         className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
++        aria-label="Main"
+         style={{
+           // Solid nav. Glass was retired: our palette is too light and the
+-          // heroes too sky-heavy for backdrop-filter to ever refract — it read
+-          // as a plain white haze on every background except the flat dark
+-          // homepage hero, which is translucency, not glass. Instead the bar is
++          // heroes too sky-heavy for backdrop-filter to ever refract. The bar is
+           // always solid white with the hairline border, and on scroll it lifts
+-          // off the content with a quiet navy-tinted shadow. That "detach on
+-          // scroll" cue reads honestly on light AND dark backgrounds.
++          // off the content with a quiet navy-tinted shadow.
+           background: "var(--white)",
+           borderBottom: "1px solid var(--border-light)",
+           boxShadow: scrolled ? "var(--shadow-raised)" : "none",
+         }}
+       >
+         <div
+-          className="mx-auto flex items-center justify-between"
++          className="mx-auto flex items-center justify-between nav-inner"
+           style={{
+-            maxWidth: "1280px",
++            maxWidth: "var(--content-marketing)",
+             padding: "0 32px",
+             height: "var(--nav-h)",
+           }}
+         >
+-          {/* Logo */}
++          {/* Logo: the original blue mark, unchanged */}
+           <a
+             href="/"
+             id="nav-logo"
+             className="flex items-center"
+-            style={{ textDecoration: "none" }}
++            style={{ textDecoration: "none", minHeight: "44px" }}
+             aria-label="KOANO home"
+           >
++            {/* eslint-disable-next-line @next/next/no-img-element */}
+             <img
+               src="/logo.png"
+               alt="KOANO"
++              width={50}
++              height={50}
+               style={{ height: "50px", width: "auto", display: "block" }}
+             />
+           </a>
+ 
+-          {/* Center links — desktop */}
+-          <div
+-            className="hidden md:flex items-center"
+-            style={{ gap: "32px" }}
+-          >
++          {/* Center links, desktop */}
++          <div className="hidden lg:flex items-center" style={{ gap: "28px" }}>
+             {NAV_LINKS.map((link) => (
+               <a
+                 key={link.href}
+                 href={link.href}
+                 id={`nav-link-${link.href.replace(/\//g, "-").slice(1)}`}
+-                style={{
+-                  fontSize: "13px",
+-                  color: "var(--ink-muted)",
+-                  textDecoration: "none",
+-                  fontWeight: 400,
+-                  transition: "color 0.2s ease",
+-                }}
+-                onMouseEnter={(e) =>
+-                  (e.currentTarget.style.color = "var(--ink-primary)")
+-                }
+-                onMouseLeave={(e) =>
+-                  (e.currentTarget.style.color = "var(--ink-muted)")
+-                }
++                className="nav-link"
+               >
+                 {link.label}
+               </a>
+             ))}
+           </div>
+ 
+-          {/* Right — desktop CTAs */}
+-          <div
+-            className="hidden md:flex items-center"
+-            style={{ gap: "12px" }}
+-          >
+-            <Button variant="ghost" href="/login" id="nav-sign-in">
+-              Sign in
+-            </Button>
+-            <Button variant="primary" href="/signup" id="nav-sign-up">
+-              Sign up
+-            </Button>
++          {/* Right, desktop: auth-aware */}
++          <div className="hidden lg:flex items-center" style={{ gap: "12px" }}>
++            {signedIn ? (
++              <>
++                <Button variant="primary" href="/dashboard" id="nav-dashboard">
++                  Dashboard
++                </Button>
++                <UserButton />
++              </>
++            ) : (
++              <>
++                <Button variant="ghost" href="/login" id="nav-sign-in">
++                  Sign in
++                </Button>
++                <Button variant="primary" href="/signup" id="nav-sign-up">
++                  Sign up
++                </Button>
++              </>
++            )}
+           </div>
+ 
+-          {/* Mobile hamburger */}
++          {/* Phone: hamburger (44px target) */}
+           <button
+-            className="md:hidden flex flex-col items-center justify-center"
++            ref={toggleRef}
++            className="lg:hidden flex flex-col items-center justify-center"
+             id="nav-mobile-toggle"
+-            onClick={() => setMobileOpen(!mobileOpen)}
++            onClick={() => (mobileOpen ? close() : setMobileOpen(true))}
+             aria-label={mobileOpen ? "Close menu" : "Open menu"}
++            aria-expanded={mobileOpen}
++            aria-controls="nav-mobile-menu"
+             style={{
+-              width: "40px",
+-              height: "40px",
++              width: "44px",
++              height: "44px",
++              marginRight: "-8px",
+               background: "transparent",
+               border: "none",
+               cursor: "pointer",
+               gap: "5px",
+               padding: 0,
++              borderRadius: "var(--radius-chip)",
+             }}
+           >
+             <span
+@@ -146,9 +189,7 @@ export default function Nav() {
+                 height: "1.5px",
+                 background: "var(--near-black)",
+                 transition: "all 0.3s ease",
+-                transform: mobileOpen
+-                  ? "rotate(45deg) translateY(3.25px)"
+-                  : "none",
++                transform: mobileOpen ? "rotate(45deg) translateY(3.25px)" : "none",
+               }}
+             />
+             <span
+@@ -168,16 +209,14 @@ export default function Nav() {
+                 height: "1.5px",
+                 background: "var(--near-black)",
+                 transition: "all 0.3s ease",
+-                transform: mobileOpen
+-                  ? "rotate(-45deg) translateY(-3.25px)"
+-                  : "none",
++                transform: mobileOpen ? "rotate(-45deg) translateY(-3.25px)" : "none",
+               }}
+             />
+           </button>
+         </div>
+       </nav>
+ 
+-      {/* Mobile menu overlay */}
++      {/* Phone sheet */}
+       <AnimatePresence>
+         {mobileOpen && (
+           <motion.div
+@@ -185,61 +224,102 @@ export default function Nav() {
+             initial={{ opacity: 0 }}
+             animate={{ opacity: 1 }}
+             exit={{ opacity: 0 }}
+-            transition={{ duration: 0.3 }}
+-            className="fixed inset-0 z-40 md:hidden"
++            transition={{ duration: 0.2 }}
++            className="fixed inset-0 z-40 lg:hidden"
+             style={{
+               background: "var(--white)",
+-              paddingTop: "80px",
++              paddingTop: "var(--nav-h)",
++              overflowY: "auto",
+             }}
+           >
++            {/* The ref lives on an inner element: AnimatePresence's direct child
++                must not carry one (framer-motion 12 warns and drops it). */}
+             <div
+-              className="flex flex-col items-center"
+-              style={{ gap: "32px", paddingTop: "40px" }}
++              ref={sheetRef}
++              role="dialog"
++              aria-modal="true"
++              aria-label="Menu"
++              className="flex flex-col items-stretch"
++              style={{ padding: "24px 32px 40px" }}
+             >
+               {NAV_LINKS.map((link, i) => (
+                 <motion.a
+                   key={link.href}
+                   href={link.href}
+-                  initial={{ opacity: 0, y: 20 }}
++                  className="nav-sheet-link"
++                  initial={{ opacity: 0, y: 12 }}
+                   animate={{ opacity: 1, y: 0 }}
+-                  transition={{
+-                    delay: i * 0.08,
+-                    duration: 0.5,
+-                    ease: [0.16, 1, 0.3, 1],
+-                  }}
++                  transition={{ delay: i * 0.04, duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                   onClick={() => setMobileOpen(false)}
+-                  style={{
+-                    fontSize: "20px",
+-                    color: "var(--ink-primary)",
+-                    textDecoration: "none",
+-                    fontWeight: 500,
+-                  }}
+                 >
+                   {link.label}
+                 </motion.a>
+               ))}
+               <motion.div
+-                initial={{ opacity: 0, y: 20 }}
++                initial={{ opacity: 0, y: 12 }}
+                 animate={{ opacity: 1, y: 0 }}
+-                transition={{
+-                  delay: NAV_LINKS.length * 0.08,
+-                  duration: 0.5,
+-                  ease: [0.16, 1, 0.3, 1],
+-                }}
+-                className="flex flex-col items-center"
+-                style={{ gap: "16px", marginTop: "16px" }}
++                transition={{ delay: NAV_LINKS.length * 0.04, duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
++                className="flex flex-col"
++                style={{ gap: "12px", marginTop: "24px" }}
+               >
+-                <Button variant="ghost" href="/login">
+-                  Sign in
+-                </Button>
+-                <Button variant="primary" href="/signup">
+-                  Sign up
+-                </Button>
++                {signedIn ? (
++                  <>
++                    <Button variant="primary" href="/dashboard" className="nav-sheet-btn">
++                      Dashboard
++                    </Button>
++                    <div className="flex items-center" style={{ gap: "12px", padding: "8px 0", color: "var(--ink-secondary)", fontSize: "14px" }}>
++                      <UserButton />
++                      <span>Account</span>
++                    </div>
++                  </>
++                ) : (
++                  <>
++                    <Button variant="primary" href="/signup" className="nav-sheet-btn">
++                      Sign up
++                    </Button>
++                    <Button variant="ghost" href="/login" className="nav-sheet-btn">
++                      Sign in
++                    </Button>
++                  </>
++                )}
+               </motion.div>
+             </div>
+           </motion.div>
+         )}
+       </AnimatePresence>
++
++      <style jsx global>{`
++        .nav-link {
++          display: inline-flex;
++          align-items: center;
++          min-height: 44px;
++          font-size: 13px;
++          font-weight: 400;
++          color: var(--ink-muted);
++          text-decoration: none;
++          transition: color var(--dur-2) var(--ease-out);
++          border-radius: var(--radius-chip);
++        }
++        .nav-link:hover {
++          color: var(--ink-primary);
++        }
++        .nav-sheet-link {
++          display: flex;
++          align-items: center;
++          min-height: 52px;
++          padding: 4px 0;
++          font-size: 20px;
++          font-weight: 500;
++          color: var(--ink-primary);
++          text-decoration: none;
++          border-bottom: 1px solid var(--border-light);
++          border-radius: var(--radius-chip);
++        }
++        .nav-sheet-btn {
++          width: 100%;
++          min-height: 48px;
++        }
++      `}</style>
+     </>
+   );
+ }
+diff --git a/src/components/marketing/PricingContent.tsx b/src/components/marketing/PricingContent.tsx
+index bc26587..8baed3c 100644
+--- a/src/components/marketing/PricingContent.tsx
++++ b/src/components/marketing/PricingContent.tsx
+@@ -1,7 +1,8 @@
+ "use client";
+ 
+ import React, { useRef } from "react";
+-import { motion, useInView } from "framer-motion";
++import { motion } from "framer-motion";
++import { useReveal, fadeUp, EASE } from "./Reveal";
+ import SectionNumber from "@/components/ui/SectionNumber";
+ import Button from "@/components/ui/Button";
+ import {
+@@ -11,21 +12,9 @@ import {
+   HERO_SECTION_PADDING,
+ } from "@/components/marketing/heroLayout";
+ import CtaBackground from "@/components/marketing/CtaBackground";
++import HeroRender from "@/components/marketing/HeroRender";
++import { RENDERS } from "@/components/marketing/renders";
+ 
+-const EASE = [0.16, 1, 0.3, 1] as const;
+-
+-const fadeUp = {
+-  hidden: { opacity: 0, y: 20 },
+-  visible: (i: number) => ({
+-    opacity: 1,
+-    y: 0,
+-    transition: {
+-      delay: i * 0.08,
+-      duration: 0.5,
+-      ease: EASE,
+-    },
+-  }),
+-};
+ 
+ // Ordered C1–C4 by KOANO's positioning priority (developers, professionals,
+ // institutions, communities), matching the nav and homepage cluster order.
+@@ -114,16 +103,18 @@ export default function PricingContent() {
+   const faqRef = useRef<HTMLElement>(null);
+   const ctaRef = useRef<HTMLElement>(null);
+ 
+-  const heroInView = useInView(heroRef, { once: true, amount: 0.15 });
+-  const tiersInView = useInView(tiersRef, { once: true, amount: 0.05 });
+-  const faqInView = useInView(faqRef, { once: true, amount: 0.1 });
+-  const ctaInView = useInView(ctaRef, { once: true, amount: 0.15 });
++  const heroInView = useReveal(heroRef, { once: true, amount: 0.15 });
++  const tiersInView = useReveal(tiersRef, { once: true, amount: 0.05 });
++  const faqInView = useReveal(faqRef, { once: true, amount: 0.1 });
++  const ctaInView = useReveal(ctaRef, { once: true, amount: 0.15 });
+ 
+   return (
+     <>
+       {/* Hero */}
+       <section
+         ref={heroRef}
++        className="hero-with-render hero-group-a"
++        data-mobile-render={String(RENDERS.pricing.mobile)}
+         style={{
+           background: "var(--white)",
+           position: "relative",
+@@ -139,21 +130,10 @@ export default function PricingContent() {
+       >
+         {/* Hero render — full-bleed, BOTTOM-anchored so the park foreground sits
+             on the fold; excess top sky overflows above and is clipped. */}
+-        <img
+-          src="/renders/pricing.webp"
+-          alt=""
+-          aria-hidden="true"
+-          style={{
+-            position: "absolute",
+-            bottom: 0,
+-            left: 0,
+-            width: "100%",
+-            height: "auto",
+-            display: "block",
+-          }}
+-        />
++        <HeroRender slot={RENDERS.pricing} priority />
+ 
+         <div
++          className="hero-copy"
+           style={{
+             position: "absolute",
+             inset: 0,
+@@ -167,7 +147,7 @@ export default function PricingContent() {
+         >
+           <div style={{ maxWidth: HERO_CONTAINER_MAX, width: "100%" }}>
+           <motion.div
+-            initial="hidden"
++            initial={false}
+             animate={heroInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={0}
+@@ -177,7 +157,7 @@ export default function PricingContent() {
+ 
+           {/* Headline + framing — approved copy (KOANO_COPY.md) */}
+           <motion.h1
+-            initial="hidden"
++            initial={false}
+             animate={heroInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={1}
+@@ -194,7 +174,7 @@ export default function PricingContent() {
+             Start free. Upgrade when you hit the limit.
+           </motion.h1>
+           <motion.p
+-            initial="hidden"
++            initial={false}
+             animate={heroInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={1.5}
+@@ -211,7 +191,7 @@ export default function PricingContent() {
+             actually requires.
+           </motion.p>
+           <motion.p
+-            initial="hidden"
++            initial={false}
+             animate={heroInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={2}
+@@ -229,7 +209,7 @@ export default function PricingContent() {
+           </motion.p>
+ 
+           <motion.p
+-            initial="hidden"
++            initial={false}
+             animate={heroInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={2}
+@@ -252,7 +232,7 @@ export default function PricingContent() {
+         ref={tiersRef}
+         style={{ background: "var(--pale-wash)", padding: "80px 32px 120px" }}
+       >
+-        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
++        <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
+           <div
+             className="pricing-grid"
+             style={{
+@@ -266,7 +246,7 @@ export default function PricingContent() {
+               <motion.div
+                 key={tier.cluster}
+                 custom={i}
+-                initial="hidden"
++                initial={false}
+                 animate={tiersInView ? "visible" : "hidden"}
+                 variants={fadeUp}
+                 whileHover={{ y: -3, transition: { duration: 0.26, ease: EASE } }}
+@@ -439,7 +419,7 @@ export default function PricingContent() {
+       >
+         <div style={{ maxWidth: "800px", margin: "0 auto" }}>
+           <motion.div
+-            initial="hidden"
++            initial={false}
+             animate={faqInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={0}
+@@ -459,7 +439,7 @@ export default function PricingContent() {
+           </motion.div>
+ 
+           <motion.div
+-            initial="hidden"
++            initial={false}
+             animate={faqInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={1}
+@@ -540,6 +520,7 @@ export default function PricingContent() {
+       {/* Enterprise CTA */}
+       <section
+         ref={ctaRef}
++        className="cta-with-render"
+         style={{
+           background: "var(--pale-wash)",
+           padding: "120px 32px",
+@@ -557,7 +538,7 @@ export default function PricingContent() {
+           }}
+         >
+           <motion.div
+-            initial="hidden"
++            initial={false}
+             animate={ctaInView ? "visible" : "hidden"}
+             variants={fadeUp}
+             custom={0}
+diff --git a/src/components/marketing/ProvenanceSection.tsx b/src/components/marketing/ProvenanceSection.tsx
+index 0daef41..7c614fe 100644
+--- a/src/components/marketing/ProvenanceSection.tsx
++++ b/src/components/marketing/ProvenanceSection.tsx
+@@ -1,25 +1,16 @@
+ "use client";
+ 
+ import React, { useRef } from "react";
+-import { motion, useInView } from "framer-motion";
++import { motion } from "framer-motion";
++import { useReveal, fadeUp } from "./Reveal";
+ import SectionNumber from "../ui/SectionNumber";
+ import ProvenanceLedger from "../ui/ProvenanceLedger";
+ import { EXAMPLE_LEDGER, EXAMPLE_VERDICT_ADDRESS, EXAMPLE_VERDICT_LABEL } from "./exampleVerdict";
+ 
+-const EASE = [0.16, 1, 0.3, 1] as const;
+-
+-const fadeUp = {
+-  hidden: { opacity: 0, y: 20 },
+-  visible: (i: number) => ({
+-    opacity: 1,
+-    y: 0,
+-    transition: { delay: i * 0.08, duration: 0.5, ease: EASE },
+-  }),
+-};
+ 
+ export default function ProvenanceSection() {
+   const ref = useRef<HTMLElement>(null);
+-  const isInView = useInView(ref, { once: true, amount: 0.1 });
++  const isInView = useReveal(ref, { once: true, amount: 0.1 });
+ 
+   return (
+     <section
+@@ -28,7 +19,7 @@ export default function ProvenanceSection() {
+     >
+       <div style={{ maxWidth: "900px", margin: "0 auto" }}>
+         <motion.div
+-          initial="hidden"
++          initial={false}
+           animate={isInView ? "visible" : "hidden"}
+           variants={fadeUp}
+           custom={0}
+@@ -67,7 +58,7 @@ export default function ProvenanceSection() {
+         </motion.div>
+ 
+         <motion.div
+-          initial="hidden"
++          initial={false}
+           animate={isInView ? "visible" : "hidden"}
+           variants={fadeUp}
+           custom={1}
+@@ -82,7 +73,7 @@ export default function ProvenanceSection() {
+         </motion.div>
+ 
+         <motion.p
+-          initial="hidden"
++          initial={false}
+           animate={isInView ? "visible" : "hidden"}
+           variants={fadeUp}
+           custom={2}
+diff --git a/src/components/marketing/Reveal.tsx b/src/components/marketing/Reveal.tsx
+new file mode 100644
+index 0000000..5fff7c1
+--- /dev/null
++++ b/src/components/marketing/Reveal.tsx
+@@ -0,0 +1,84 @@
++"use client";
++
++// Reveal — the one scroll-entrance mechanism for the marketing site (UI sprint
++// WS2, A18). Content is VISIBLE by default: in the server HTML, with no
++// JavaScript, for crawlers and link-preview bots, in a headless full-page
++// capture, and under reduced motion. The fade-up only runs when an
++// IntersectionObserver exists, reduced motion is off, and the element is below
++// the fold at mount. A section can never render blank; motion is an
++// enhancement, never a gate on content.
++//
++// Two ways to use it:
++//   const show = useReveal(ref);          // boolean; pair with `fadeUp`
++//   <motion.div ref={ref} initial={false} animate={show ? "visible" : "hidden"} variants={fadeUp} custom={i} />
++// or the `<Reveal>` wrapper for a single block.
++//
++// Entrance per CLAUDE.md §10: fade-up only (y 20 to 0, opacity 0 to 1), 0.5s,
++// easing [0.16, 1, 0.3, 1], stagger 0.08s, no spring, no scale.
++
++import React, { useLayoutEffect, useRef, useState, type RefObject } from "react";
++import { motion, useInView, useReducedMotion } from "framer-motion";
++
++export const EASE = [0.16, 1, 0.3, 1] as const;
++
++export const fadeUp = {
++  // The hidden state is applied instantly (never a visible fade-out).
++  hidden: { opacity: 0, y: 20, transition: { duration: 0 } },
++  visible: (i: number = 0) => ({
++    opacity: 1,
++    y: 0,
++    transition: { delay: i * 0.08, duration: 0.5, ease: EASE },
++  }),
++};
++
++/**
++ * True until the element is known to be below the fold on a client that can
++ * animate; then false until it scrolls into view (once). Server render and the
++ * first client render always return true, so the HTML is complete and hydration
++ * matches.
++ */
++export function useReveal(ref: RefObject<Element>, options: { amount?: number; once?: boolean } = {}): boolean {
++  const { amount = 0.15 } = options;
++  const reduce = useReducedMotion();
++  const [armed, setArmed] = useState(false);
++  const inView = useInView(ref as RefObject<Element>, { once: true, amount });
++
++  useLayoutEffect(() => {
++    if (typeof IntersectionObserver === "undefined" || reduce) return;
++    const r = ref.current?.getBoundingClientRect();
++    const alreadyVisible = !!r && r.top < window.innerHeight * 0.9 && r.bottom > 0;
++    if (!alreadyVisible) setArmed(true);
++  }, [ref, reduce]);
++
++  return !armed || inView;
++}
++
++interface RevealProps {
++  children: React.ReactNode;
++  delay?: number;
++  /** Fraction of the element that must be visible before it animates. */
++  amount?: number;
++  className?: string;
++  style?: React.CSSProperties;
++  id?: string;
++  as?: "div" | "section" | "p" | "h1" | "h2" | "span" | "li";
++}
++
++export default function Reveal({ children, delay = 0, amount = 0.15, className, style, id, as = "div" }: RevealProps) {
++  const ref = useRef<HTMLDivElement>(null);
++  const show = useReveal(ref, { amount });
++  const Tag = motion[as] as typeof motion.div;
++  return (
++    <Tag
++      ref={ref}
++      id={id}
++      className={className}
++      style={style}
++      initial={false}
++      animate={show ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
++      transition={show ? { duration: 0.5, delay, ease: EASE } : { duration: 0 }}
++    >
++      {children}
++    </Tag>
++  );
++}
+diff --git a/src/components/marketing/renders.ts b/src/components/marketing/renders.ts
+new file mode 100644
+index 0000000..739683a
+--- /dev/null
++++ b/src/components/marketing/renders.ts
+@@ -0,0 +1,35 @@
++// The marketing render slots (UI sprint WS2). One entry per delivered render:
++// the desktop WebP, its intrinsic pixel size (explicit width/height prevent
++// layout shift), and whether the founder has supplied the matching MOBILE
++// render (4:5, diorama house style, buildings in the lower half, clean upper
++// area for the headline) at `public/renders/mobile/<name>.webp`.
++//
++// Until a mobile render exists the hero uses the temporary layout the sprint
++// specifies: the desktop render is placed BELOW the headline block at full
++// width on phones, never hidden. Flip `mobile` to true when the file lands.
++export interface RenderSlot {
++  name: string;
++  src: string;
++  width: number;
++  height: number;
++  /** `public/renders/mobile/<name>.webp` exists (4:5, 2160px on the long edge). */
++  mobile: boolean;
++}
++
++export const RENDERS = {
++  "how-it-works": { name: "how-it-works", src: "/renders/how-it-works.webp", width: 4202, height: 2304, mobile: false },
++  pricing: { name: "pricing", src: "/renders/pricing.webp", width: 4202, height: 2304, mobile: false },
++  "for-developers": { name: "for-developers", src: "/renders/for-developers.webp", width: 4128, height: 2304, mobile: false },
++  "for-professionals": { name: "for-professionals", src: "/renders/for-professionals.webp", width: 4128, height: 2304, mobile: false },
++  "for-institutions": { name: "for-institutions", src: "/renders/for-institutions.webp", width: 4128, height: 2304, mobile: false },
++  "for-community": { name: "for-community", src: "/renders/for-community.webp", width: 4128, height: 2304, mobile: false },
++  about: { name: "about", src: "/renders/about.webp", width: 2066, height: 2000, mobile: false },
++  cta: { name: "cta", src: "/renders/cta.webp", width: 3840, height: 1319, mobile: false },
++  "menu-hero": { name: "menu-hero", src: "/renders/menu-hero.jpg", width: 2267, height: 1114, mobile: false },
++} as const satisfies Record<string, RenderSlot>;
++
++export type RenderName = keyof typeof RENDERS;
++
++export function mobileSrc(slot: RenderSlot): string | null {
++  return slot.mobile ? `/renders/mobile/${slot.name}.webp` : null;
++}
+diff --git a/src/components/ui/ProvenanceLedger.tsx b/src/components/ui/ProvenanceLedger.tsx
+index 031a430..58ff553 100644
+--- a/src/components/ui/ProvenanceLedger.tsx
++++ b/src/components/ui/ProvenanceLedger.tsx
+@@ -137,6 +137,7 @@ export default function ProvenanceLedger({ dataPoints, locationConfidence, addre
+                 {g.rows.map((d, i) => (
+                   <div
+                     key={`${d.label}-${i}`}
++                    className="ledger-row"
+                     style={{
+                       display: "grid",
+                       gridTemplateColumns: "minmax(160px, 1.4fr) minmax(80px, 1fr) auto minmax(120px, 1.2fr)",
+diff --git a/src/components/ui/VerdictMathPanel.tsx b/src/components/ui/VerdictMathPanel.tsx
+index 56aec13..cb75354 100644
+--- a/src/components/ui/VerdictMathPanel.tsx
++++ b/src/components/ui/VerdictMathPanel.tsx
+@@ -166,6 +166,7 @@ export default function VerdictMathPanel({ verdict, recorded = false }: VerdictM
+ 
+   return (
+     <div
++      className="verdict-math"
+       style={{
+         background: "var(--white)",
+         border: "1px solid var(--border)",
+diff --git a/src/components/ui/charts/DivergingBar.tsx b/src/components/ui/charts/DivergingBar.tsx
+index 5e07f80..ff3aa41 100644
+--- a/src/components/ui/charts/DivergingBar.tsx
++++ b/src/components/ui/charts/DivergingBar.tsx
+@@ -72,6 +72,7 @@ export default function DivergingBar({
+         return (
+           <div
+             key={d.key}
++            className="divbar-row"
+             style={{
+               display: "grid",
+               gridTemplateColumns: `${labelWidth}px 1fr`,
+@@ -111,6 +112,7 @@ export default function DivergingBar({
+               {/* Zero baseline — full opacity for neutral rows (it's the whole point) */}
+               <div
+                 aria-hidden="true"
++                className={d.neutral ? "divbar-zero divbar-zero-neutral" : "divbar-zero"}
+                 style={{
+                   position: "absolute",
+                   top: "-3px",

@@ -101,7 +101,7 @@ export default function AgentsSection() {
         <div
           style={{
             position: "relative",
-            maxWidth: "900px",
+            maxWidth: "var(--content-reading)",
             margin: "0 auto",
           }}
         >
@@ -332,7 +332,11 @@ export default function AgentsSection() {
               <a
                 href="/signup"
                 style={{
-                  fontSize: "14px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  minHeight: "44px",
+                  padding: "var(--space-3) 0",
+                  fontSize: "var(--text-body)",
                   fontWeight: 500,
                   color: "var(--mid-blue-ink)",
                   textDecoration: "none",

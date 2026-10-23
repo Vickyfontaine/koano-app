@@ -29,6 +29,11 @@ type Result =
 
 const RECORDED_RUN_ANCHOR = "#agents-section";
 
+function houseNumber(s: string): string | null {
+  const m = s.trim().match(/^(\d+)[A-Za-z]?\b/);
+  return m ? m[1] : null;
+}
+
 export default function HeroAddressBox() {
   const inputId = useId();
   const [value, setValue] = useState("");
@@ -141,7 +146,17 @@ export default function HeroAddressBox() {
                 {result.borough ? ` · ${result.borough}` : ""}
               </div>
             )}
-            {result.example ? (
+            {!result.example && result.nyc && houseNumber(value) && houseNumber(result.normalized) && houseNumber(value) !== houseNumber(result.normalized) ? (
+              <>
+                <p className="hero-address-copy">
+                  The city record&apos;s closest match is a different house number. If that is not your building, add the
+                  borough or ZIP and check again.
+                </p>
+                <a href="/signup" className="btn-ghost hero-address-cta">
+                  Create an account
+                </a>
+              </>
+            ) : result.example ? (
               <>
                 <p className="hero-address-copy">
                   This is the recorded example run shown on this page. The five agents, their figures and the synthesis are laid out below.
@@ -215,16 +230,16 @@ export default function HeroAddressBox() {
         .hero-address {
           width: 100%;
           max-width: 520px;
-          margin-bottom: 28px;
+          margin-bottom: var(--space-6);
         }
         .hero-address-field {
           display: flex;
           align-items: stretch;
-          gap: 8px;
+          gap: var(--space-2);
           background: var(--white);
           border: 1px solid var(--border);
           border-radius: var(--radius-pill);
-          padding: 6px 6px 6px 20px;
+          padding: var(--space-2) var(--space-2) var(--space-2) var(--space-5);
           box-shadow: var(--shadow-hover);
         }
         .hero-address-input {
@@ -233,7 +248,7 @@ export default function HeroAddressBox() {
           border: 0;
           background: transparent;
           font: inherit;
-          font-size: 15px;
+          font-size: var(--text-ui);
           color: var(--ink-primary);
           min-height: 44px;
         }
@@ -241,11 +256,9 @@ export default function HeroAddressBox() {
           color: var(--ink-muted);
         }
         .hero-address-input:focus-visible {
-          outline: none;
-        }
-        .hero-address-field:focus-within {
-          outline: 2px solid var(--white);
-          outline-offset: 2px;
+          outline: 2px solid var(--deep-navy);
+          outline-offset: -2px;
+          border-radius: var(--radius-pill);
         }
         .hero-address-field :global(.hero-address-btn) {
           white-space: nowrap;
@@ -254,16 +267,16 @@ export default function HeroAddressBox() {
         }
         .hero-address-hint {
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: var(--text-micro);
           letter-spacing: 0.04em;
           color: rgba(255, 255, 255, 0.85);
-          margin-top: 10px;
+          margin-top: var(--space-3);
         }
         .hero-address-example {
           font: inherit;
           background: transparent;
           border: 0;
-          padding: 10px 0;
+          padding: var(--space-3) 0;
           min-height: 44px;
           color: var(--white);
           text-decoration: underline;
@@ -274,19 +287,19 @@ export default function HeroAddressBox() {
           outline-color: var(--white);
         }
         .hero-address-card {
-          margin-top: 12px;
+          margin-top: var(--space-3);
           background: var(--white);
           border: 1px solid var(--border);
           border-radius: var(--radius-inner);
-          padding: 14px 16px;
+          padding: var(--space-4) var(--space-4);
           color: var(--ink-primary);
-          font-size: 14px;
+          font-size: var(--text-body);
           line-height: 1.5;
         }
         .hero-address-card-quiet {
           display: flex;
           align-items: center;
-          gap: 10px;
+          gap: var(--space-3);
           color: var(--ink-secondary);
         }
         .hero-address-pulse {
@@ -308,46 +321,46 @@ export default function HeroAddressBox() {
         }
         .hero-address-found {
           font-weight: 500;
-          font-size: 15px;
+          font-size: var(--text-ui);
         }
         .hero-address-meta {
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: var(--text-micro);
           letter-spacing: 0.06em;
           color: var(--ink-muted);
-          margin-top: 2px;
+          margin-top: var(--space-1);
         }
         .hero-address-copy {
-          margin: 8px 0 12px;
+          margin: var(--space-2) 0 var(--space-3);
           color: var(--ink-secondary);
         }
         .hero-address-card :global(.hero-address-cta) {
-          padding: 10px 20px;
+          padding: var(--space-3) var(--space-5);
           min-height: 44px;
         }
         .hero-address-candidates {
           list-style: none;
-          margin: 8px 0 0;
+          margin: var(--space-2) 0 0;
           padding: 0;
           display: flex;
           flex-direction: column;
-          gap: 6px;
+          gap: var(--space-2);
         }
         .hero-address-candidate {
           width: 100%;
           text-align: left;
           font: inherit;
-          font-size: 14px;
+          font-size: var(--text-body);
           color: var(--ink-primary);
           background: var(--pale-wash);
           border: 1px solid var(--border);
           border-radius: var(--radius-chip);
-          padding: 10px 12px;
+          padding: var(--space-3) var(--space-3);
           min-height: 44px;
           cursor: pointer;
           display: flex;
           flex-direction: column;
-          gap: 2px;
+          gap: var(--space-1);
         }
         .hero-address-candidate:hover {
           border-color: var(--mid-blue);
@@ -356,11 +369,11 @@ export default function HeroAddressBox() {
           .hero-address-field {
             flex-direction: column;
             border-radius: var(--radius-card);
-            padding: 8px;
-            gap: 6px;
+            padding: var(--space-2);
+            gap: var(--space-2);
           }
           .hero-address-input {
-            padding: 0 12px;
+            padding: 0 var(--space-3);
           }
           .hero-address-field :global(.hero-address-btn) {
             width: 100%;

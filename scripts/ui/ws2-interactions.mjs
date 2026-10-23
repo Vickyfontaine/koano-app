@@ -57,11 +57,24 @@ if (fs.existsSync(state)) {
   }
 }
 
+// 2b. Replay card pause control
+{
+  const { c, p } = await ctx(1440);
+  await p.goto(base + '/', { waitUntil: 'networkidle' });
+  await p.click('button[aria-label="Pause the replay"]');
+  await p.waitForTimeout(400);
+  const pressed = await p.getAttribute('button[aria-label="Play the replay"]', 'aria-pressed');
+  fs.writeFileSync(path.join(out, 'pause.json'), JSON.stringify({ pausedPressed: pressed }));
+  await shot(p, 'hero-paused-1440');
+  await c.close();
+}
+
 // 3. Address box states
 const cases = [
   ['example', '175 3rd Street, Brooklyn'],
   ['nyc', '74 Grand Avenue, Brooklyn'],
   ['non-nyc', '233 S Wacker Dr, Chicago, IL'],
+  ['fuzzy', '100 Main St'],
   ['none', 'asdfgh qwerty'],
 ];
 for (const w of [1440, 390]) {

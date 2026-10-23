@@ -149,7 +149,7 @@ export default function ProvenanceLedger({ dataPoints, locationConfidence, addre
                   >
                     <span style={{ fontSize: "13px", color: "var(--ink-secondary)" }}>{d.label}</span>
                     <span style={{ ...mono, fontSize: "12px", color: "var(--ink-primary)", wordBreak: "break-word" }}>
-                      {String(d.value ?? "—")}
+                      {String(d.value ?? "n/a")}
                     </span>
                     <span style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
                       <ProvenanceBadge

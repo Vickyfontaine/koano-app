@@ -215,7 +215,7 @@ export default function IntelligenceContent() {
 
       {/* Product demo video */}
       <section style={{ background: "var(--white)", padding: "120px 32px" }}>
-        <div style={{ maxWidth: "1000px", margin: "0 auto", textAlign: "center" }}>
+        <div style={{ maxWidth: "var(--content-reading)", margin: "0 auto", textAlign: "center" }}>
           <motion.div
             initial={false}
             animate="visible"
@@ -490,7 +490,7 @@ export default function IntelligenceContent() {
               display: "grid",
               gridTemplateColumns: "repeat(2, 1fr)",
               gap: "20px",
-              maxWidth: "960px",
+              maxWidth: "var(--content-reading)",
               margin: "0 auto",
             }}
           >
@@ -694,7 +694,7 @@ export default function IntelligenceContent() {
         ref={verdictRef}
         style={{ background: "var(--white)", padding: "120px 32px" }}
       >
-        <div style={{ maxWidth: "960px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "var(--content-reading)", margin: "0 auto" }}>
           <motion.div
             initial={false}
             animate={verdictInView ? "visible" : "hidden"}
@@ -851,6 +851,10 @@ export default function IntelligenceContent() {
               <a
                 href="/#agents-section"
                 style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  minHeight: "44px",
+                  padding: "var(--space-3) 0",
                   fontSize: "14px",
                   fontWeight: 500,
                   color: "var(--mid-blue-ink)",

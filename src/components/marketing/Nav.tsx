@@ -127,7 +127,7 @@ export default function Nav() {
           </a>
 
           {/* Center links, desktop */}
-          <div className="hidden lg:flex items-center" style={{ gap: "28px" }}>
+          <div className="hidden lg:flex items-center" style={{ gap: "var(--space-5)" }}>
             {NAV_LINKS.map((link) => (
               <a
                 key={link.href}
@@ -141,7 +141,11 @@ export default function Nav() {
           </div>
 
           {/* Right, desktop: auth-aware */}
-          <div className="hidden lg:flex items-center" style={{ gap: "12px" }}>
+          <div
+            className="hidden lg:flex items-center"
+            style={{ gap: "var(--space-3)", visibility: isLoaded ? "visible" : "hidden" }}
+            aria-hidden={!isLoaded}
+          >
             {signedIn ? (
               <>
                 <Button variant="primary" href="/dashboard" id="nav-dashboard">
@@ -293,7 +297,7 @@ export default function Nav() {
           display: inline-flex;
           align-items: center;
           min-height: 44px;
-          font-size: 13px;
+          font-size: var(--text-data);
           font-weight: 400;
           color: var(--ink-muted);
           text-decoration: none;
@@ -307,8 +311,8 @@ export default function Nav() {
           display: flex;
           align-items: center;
           min-height: 52px;
-          padding: 4px 0;
-          font-size: 20px;
+          padding: var(--space-1) 0;
+          font-size: var(--text-h2);
           font-weight: 500;
           color: var(--ink-primary);
           text-decoration: none;

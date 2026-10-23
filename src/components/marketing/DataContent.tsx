@@ -140,7 +140,7 @@ export default function DataContent() {
           textAlign: "center",
         }}
       >
-        <div style={{ maxWidth: "800px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "var(--content-reading)", margin: "0 auto" }}>
           <motion.div
             initial={false}
             animate={heroInView ? "visible" : "hidden"}

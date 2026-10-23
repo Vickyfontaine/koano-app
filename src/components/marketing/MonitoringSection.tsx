@@ -36,7 +36,7 @@ export default function MonitoringSection() {
 
   return (
     <section ref={ref} style={{ background: "var(--pale-wash)", padding: "120px 32px" }}>
-      <div style={{ maxWidth: "900px", margin: "0 auto" }}>
+      <div style={{ maxWidth: "var(--content-reading)", margin: "0 auto" }}>
         <motion.div
           initial={false}
           animate={isInView ? "visible" : "hidden"}

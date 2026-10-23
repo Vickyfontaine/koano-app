@@ -417,7 +417,7 @@ export default function PricingContent() {
         ref={faqRef}
         style={{ background: "var(--white)", padding: "120px 32px" }}
       >
-        <div style={{ maxWidth: "800px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "var(--content-reading)", margin: "0 auto" }}>
           <motion.div
             initial={false}
             animate={faqInView ? "visible" : "hidden"}
