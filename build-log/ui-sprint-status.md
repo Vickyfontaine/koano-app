@@ -1,15 +1,18 @@
-# UI sprint status (session cut off by the usage limit, 2026-10-22)
+# UI sprint status (session cut off by the usage limit, 2026-10-23)
 
 ## Done and committed on `ui-sprint`
-- WS1 complete (13 commits through 544efbc, report in `ui-ws-1-report.md`).
-- WS2 slices 1 to 5 plus self-review fixes committed (9897409, 9a9c310, cba1552, 2c086d1, and the self-review commit). Gate green on HEAD; the two intermediate commits typecheck. Final captures in `build-log/ui-ws-2/after/` (33 page captures, overflow 0, console clean apart from Clerk's development-keys notice) and `build-log/ui-ws-2/after/interactions/` (nav sheet focus trap verified, signed-in nav, address box states). Diff for review: `build-log/ui-ws-2-diff.patch`.
+- WS1, WS2, WS3, WS4: complete with plans, after sets, independent reviews applied, reports and CLAUDE.md updates (v5.4 to v5.7). Latest WS4 commit: 9be6b89.
+- WS5 slices 1 to 5 committed (69fd34a, 5ac4410): the three stream events, the Bench, Trace, the CMA / IC memo / portfolio risk report buttons, the sealed record page with signed share links. Gate green; the fixture replays byte-identical. The after set is in `build-log/ui-ws-5/after/interactions/` (bench, trace, documents, share captures with checks). Draft report in `ui-ws-5-report.md` (self-review and review sections still to fill). CLAUDE.md v5.8 (WS5 section, `KOANO_SHARE_SECRET` in §18) is written but UNCOMMITTED.
 
-## WS2 still open
-- The independent subagent review was launched but its findings never arrived before the cut-off. Re-run it (brief: sprint file, `ui-ws-2-plan.md`, `ui-ws-2-diff.patch`, before = `ui-ws-1/after`, after = `ui-ws-2/after` + `interactions`), fix the findings, then write `ui-ws-2-report.md` and update CLAUDE.md (§10 marketing: HeroRender/renders.ts, Reveal/useReveal, the address box and `/api/public/resolve`, auth-aware Nav, `--content-marketing`/`--content-prose`).
-- Known, not yet fixed: the Group-B cluster heroes at 768 show the desktop composition's empty center as a sparse strip below the copy (the mobile render set closes it, founder blocker in `blockers.md`); the homepage replay card's loop still starts hidden in the server HTML (by design, noted).
+## In flight when the limit hit
+- The WS5 independent review subagent was running; its findings never arrived. Re-launch it (brief: sprint row 5, spec lines 42 to 100, `ui-ws-5-plan.md`, `ui-ws-5-report.md`, `ui-ws-5-diff.patch`, the after captures), fix the findings, fill the report, commit with CLAUDE.md v5.8.
+- WS6 slice 1, the `/vision` concept page, is coded and typechecks but is UNCOMMITTED and not gated: `src/app/vision/page.tsx`, `src/components/marketing/VisionContent.tsx`, the footer link in `Footer.tsx`. Captures in `build-log/ui-ws-6/wip/` look right at 1440 and 390 (four labeled concept previews on the recorded sample). Next: `sh scripts/ui/gate.sh`, commit, then WS6 slices 2 and 3 per `ui-ws-6-plan.md`.
 
-## WS3 in progress, UNCOMMITTED, not gated
-Slice 1 (responsive shell) is coded and typechecks; empty-state captures of two lenses at 390/768/1440 are in `build-log/ui-ws-3/wip/` (no overflow, no console errors). Files: `src/components/dashboard/shell/{icons,TopBar,BottomTabs,Sheet,WatchSheet}.tsx`, `shell/shell.css`, `Sidebar.tsx` (rewritten), `DashboardShell.tsx` (grid shell), `clusters.ts` (`lens`, `LENS_ORDER`, `PLAN_LABELS`), `src/app/dashboard/page.tsx` (passes `plan`), eyebrow numbers removed from the four dashboards, `OnboardingClusters`, `UpgradeScreen`, `ClusterPlaceholderView` (slice 5 part). Next: run `sh scripts/ui/gate.sh`, commit as `ui-ws2`-style slices, then slice 2 (SubjectProvider, VerdictBand, EvidenceDrawer) per `ui-ws-3-plan.md`.
+## Local environment notes
+- `.env.local` `KOANO_DAILY_RUN_CAP` was raised to 120 for the capture runs (dev server only, gitignored); the production cap is unchanged. The dev server was restarted and runs on port 3000.
+- Test user, storage state and harness scripts are as in the earlier notes (`scripts/ui/*.mjs`).
 
 ## Remaining
-WS3 slices 2 to 6, WS4, WS5, WS6, the final QA pass and `ui-sprint-report.md`.
+- WS5: review, fixes, report, CLAUDE.md commit.
+- WS6: commit `/vision`; mobile renders stay a founder blocker (`blockers.md`); full QA capture of every page and lens at 390/768/1440 (re-run `shots.mjs`, `dash-shots.mjs` and the ws2 to ws5 interaction scripts); one final independent review of the whole sprint; `build-log/ui-sprint-report.md` with A1 to A19 and every acceptance criterion checked against screenshots.
+- Founder blockers unchanged: apply migration-023; supply the mobile render set.

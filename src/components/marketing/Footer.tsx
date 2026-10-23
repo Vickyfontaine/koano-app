@@ -6,6 +6,7 @@ const COLUMN_1 = [
   { label: "How it works", href: "/intelligence" },
   { label: "Pricing", href: "/pricing" },
   { label: "Data", href: "/data" },
+  { label: "Vision (concept previews)", href: "/vision" },
 ];
 
 // Ordered by positioning priority (CLAUDE.md Section 01):
