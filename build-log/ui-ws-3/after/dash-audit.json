@@ -1,0 +1,451 @@
+[
+  {
+    "name": "cluster_2-empty",
+    "width": 1440,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "scrollHeight": 1661,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": [
+      "warning: Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview",
+      "warning: Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+    ]
+  },
+  {
+    "name": "cluster_2-empty",
+    "width": 768,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 768,
+    "clientWidth": 768,
+    "scrollHeight": 2572,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_2-empty",
+    "width": 390,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "scrollHeight": 3326,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_2-running",
+    "width": 1440,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "scrollHeight": 4959,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": [
+      "warning: [.WebGL-0x12400436000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+      "warning: [.WebGL-0x12400436000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+      "warning: [.WebGL-0x12400436000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+      "warning: [.WebGL-0x12400436000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+    ]
+  },
+  {
+    "name": "cluster_2-running",
+    "width": 768,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 768,
+    "clientWidth": 768,
+    "scrollHeight": 6330,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_2-running",
+    "width": 390,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "scrollHeight": 8478,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_2-done",
+    "width": 1440,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "scrollHeight": 5207,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_2-done",
+    "width": 768,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 768,
+    "clientWidth": 768,
+    "scrollHeight": 6683,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_2-done",
+    "width": 390,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "scrollHeight": 8827,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_4-empty",
+    "width": 1440,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "scrollHeight": 2136,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": [
+      "warning: Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+    ]
+  },
+  {
+    "name": "cluster_4-empty",
+    "width": 768,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 768,
+    "clientWidth": 768,
+    "scrollHeight": 3235,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_4-empty",
+    "width": 390,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "scrollHeight": 4267,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_4-running",
+    "width": 1440,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "scrollHeight": 2380,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_4-running",
+    "width": 768,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 768,
+    "clientWidth": 768,
+    "scrollHeight": 3628,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_4-running",
+    "width": 390,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "scrollHeight": 5099,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_4-done",
+    "width": 1440,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "scrollHeight": 7364,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_4-done",
+    "width": 768,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 768,
+    "clientWidth": 768,
+    "scrollHeight": 9289,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_4-done",
+    "width": 390,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "scrollHeight": 13152,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_1-empty",
+    "width": 1440,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "scrollHeight": 1956,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": [
+      "warning: Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview",
+      "warning: Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+    ]
+  },
+  {
+    "name": "cluster_1-empty",
+    "width": 768,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 768,
+    "clientWidth": 768,
+    "scrollHeight": 3109,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_1-empty",
+    "width": 390,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "scrollHeight": 4011,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_1-running",
+    "width": 1440,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "scrollHeight": 2325,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": [
+      "warning: [.WebGL-0x12c0044c200]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+      "warning: [.WebGL-0x12c0044c200]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+      "warning: [.WebGL-0x12c0044c200]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+      "warning: [.WebGL-0x12c0044c200]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+    ]
+  },
+  {
+    "name": "cluster_1-running",
+    "width": 768,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 768,
+    "clientWidth": 768,
+    "scrollHeight": 3550,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_1-running",
+    "width": 390,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "scrollHeight": 4499,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_1-done",
+    "width": 1440,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "scrollHeight": 4626,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_1-done",
+    "width": 768,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 768,
+    "clientWidth": 768,
+    "scrollHeight": 6211,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_1-done",
+    "width": 390,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "scrollHeight": 8344,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_5-empty",
+    "width": 1440,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "scrollHeight": 4246,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": [
+      "warning: Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+    ]
+  },
+  {
+    "name": "cluster_5-empty",
+    "width": 768,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 768,
+    "clientWidth": 768,
+    "scrollHeight": 5818,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_5-empty",
+    "width": 390,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "scrollHeight": 7152,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_5-tracked",
+    "width": 1440,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "scrollHeight": 4246,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_5-tracked",
+    "width": 768,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 768,
+    "clientWidth": 768,
+    "scrollHeight": 5818,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_5-tracked",
+    "width": 390,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "scrollHeight": 7152,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_5-running",
+    "width": 1440,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "scrollHeight": 4246,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_5-running",
+    "width": 768,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 768,
+    "clientWidth": 768,
+    "scrollHeight": 5911,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_5-running",
+    "width": 390,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "scrollHeight": 7341,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_5-done",
+    "width": 1440,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "scrollHeight": 4418,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_5-done",
+    "width": 768,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 768,
+    "clientWidth": 768,
+    "scrollHeight": 6123,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  },
+  {
+    "name": "cluster_5-done",
+    "width": 390,
+    "title": "KOANO Dashboard",
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "scrollHeight": 7640,
+    "horizontalOverflow": false,
+    "offenders": [],
+    "console": []
+  }
+]

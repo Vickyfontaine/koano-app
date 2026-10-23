@@ -1,0 +1,98 @@
+[
+  {
+    "name": "login",
+    "width": 390,
+    "url": "http://localhost:3000/login",
+    "file": "build-log/ui-ws-3/after/login-390.jpg",
+    "console": [
+      "warning: Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview",
+      "warning: Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+    ],
+    "title": "Log in to KOANO",
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "scrollHeight": 939,
+    "horizontalOverflow": false,
+    "offenders": []
+  },
+  {
+    "name": "login",
+    "width": 768,
+    "url": "http://localhost:3000/login",
+    "file": "build-log/ui-ws-3/after/login-768.jpg",
+    "console": [
+      "warning: Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview",
+      "warning: Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+    ],
+    "title": "Log in to KOANO",
+    "scrollWidth": 768,
+    "clientWidth": 768,
+    "scrollHeight": 1024,
+    "horizontalOverflow": false,
+    "offenders": []
+  },
+  {
+    "name": "login",
+    "width": 1440,
+    "url": "http://localhost:3000/login",
+    "file": "build-log/ui-ws-3/after/login-1440.jpg",
+    "console": [
+      "warning: Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview",
+      "warning: Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+    ],
+    "title": "Log in to KOANO",
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "scrollHeight": 900,
+    "horizontalOverflow": false,
+    "offenders": []
+  },
+  {
+    "name": "signup",
+    "width": 390,
+    "url": "http://localhost:3000/signup",
+    "file": "build-log/ui-ws-3/after/signup-390.jpg",
+    "console": [
+      "warning: Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview",
+      "warning: Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+    ],
+    "title": "Sign up for KOANO",
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "scrollHeight": 1120,
+    "horizontalOverflow": false,
+    "offenders": []
+  },
+  {
+    "name": "signup",
+    "width": 768,
+    "url": "http://localhost:3000/signup",
+    "file": "build-log/ui-ws-3/after/signup-768.jpg",
+    "console": [
+      "warning: Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview",
+      "warning: Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+    ],
+    "title": "Sign up for KOANO",
+    "scrollWidth": 768,
+    "clientWidth": 768,
+    "scrollHeight": 1080,
+    "horizontalOverflow": false,
+    "offenders": []
+  },
+  {
+    "name": "signup",
+    "width": 1440,
+    "url": "http://localhost:3000/signup",
+    "file": "build-log/ui-ws-3/after/signup-1440.jpg",
+    "console": [
+      "warning: Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview",
+      "warning: Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+    ],
+    "title": "Sign up for KOANO",
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "scrollHeight": 917,
+    "horizontalOverflow": false,
+    "offenders": []
+  }
+]
