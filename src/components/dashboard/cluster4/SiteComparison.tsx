@@ -18,6 +18,7 @@ import CandidatePicker from "@/components/ui/CandidatePicker";
 import { VERDICT_COLORS, type SynthesisResult, type Verdict, type AddressCandidate } from "@/components/ui/verdict";
 import { useVerdictStream, type VerdictStream, type RunDegradation } from "../useVerdictStream";
 import type { RunPayload } from "../useAddressResolver";
+import { useRegisterRun } from "../shell/SubjectProvider";
 import RunDegradationNote from "@/components/ui/RunDegradationNote";
 import SitePanels from "./SitePanels";
 import MultiSiteMap, { type MultiSite } from "./MultiSiteMap";
@@ -179,6 +180,13 @@ export default function SiteComparison() {
     rank: rank + 1,
     verdict: streams[slot].result!.verdict,
   }));
+  // The shell's verdict band shows the top-ranked site once the comparison
+  // finishes, else the first site still running.
+  const bandSlot = ranked[0] ?? activeSlots.find((i) => streams[i].status !== "idle") ?? null;
+  useRegisterRun(bandSlot === null ? null : streams[bandSlot], {
+    resolving: resolving && bandSlot === null ? true : false,
+    subject: bandSlot === null ? addresses.find((a) => a.trim())?.trim() ?? null : addresses[bandSlot].trim() || null,
+  });
   const resolveErrorSlots = Object.keys(resolveErrors).map(Number);
   const anyActivity =
     resolving || hasPending || activeSlots.length > 0 || resolveErrorSlots.length > 0;

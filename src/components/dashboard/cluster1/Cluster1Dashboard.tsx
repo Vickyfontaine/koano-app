@@ -7,18 +7,12 @@
 
 import React, { useState } from "react";
 import AddressInput from "@/components/ui/AddressInput";
-import LoadingState from "@/components/ui/LoadingState";
-import VerdictCard from "@/components/ui/VerdictCard";
-import VerdictMathPanel from "@/components/ui/VerdictMathPanel";
 import LocationConfidenceNote from "@/components/ui/LocationConfidenceNote";
 import CandidatePicker from "@/components/ui/CandidatePicker";
-import RunDegradationNote from "@/components/ui/RunDegradationNote";
-import ProvenanceLedger from "@/components/ui/ProvenanceLedger";
-import CoverageMap from "@/components/ui/CoverageMap";
-import ReasoningChain from "@/components/ui/ReasoningChain";
 import { CLUSTERS } from "../clusters";
 import { useVerdictStream } from "../useVerdictStream";
 import { useAddressResolver, type RunPayload } from "../useAddressResolver";
+import { useRegisterRun } from "../shell/SubjectProvider";
 import VerdictHistory from "../VerdictHistory";
 import PermitHistoryPanel from "../PermitHistoryPanel";
 import DocumentButton from "../DocumentButton";
@@ -76,7 +70,9 @@ export default function Cluster1Dashboard() {
 
   // A new submission clears any prior run and resolves first, so a resolution
   // problem reads as one banner, never a wall of panel errors.
+  const [lastInput, setLastInput] = useState<string | null>(null);
   function analyze(address: string) {
+    setLastInput(address);
     setDetail(null);
     setDetailError(null);
     stream.reset();
@@ -85,6 +81,8 @@ export default function Cluster1Dashboard() {
 
   const { status, result } = stream;
   const resolving = resolver.state.phase === "resolving";
+  // The shell's verdict band and evidence drawer render this run.
+  useRegisterRun(stream, { resolving, subject: lastInput });
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
@@ -166,41 +164,8 @@ export default function Cluster1Dashboard() {
         <PropertyMap detail={detail} detailError={detailError} id="c1-map" />
       )}
 
-      {status === "running" && (
-        <LoadingState
-          phase={stream.phase}
-          agents={stream.agents}
-          startedAt={stream.startedAt}
-          normalizedAddress={stream.normalized}
-        />
-      )}
-
-      {status === "error" && (
-        <div
-          style={{
-            border: "1px solid var(--border)",
-            borderLeft: "3px solid var(--signal-negative)",
-            borderRadius: "0 var(--radius-inner) var(--radius-inner) 0",
-            padding: "16px 24px",
-            maxWidth: "620px",
-          }}
-        >
-          <p style={{ fontSize: "14px", color: "var(--ink-secondary)", margin: 0 }}>
-            Analysis failed: {stream.error}
-          </p>
-          <p style={{ fontSize: "12px", color: "var(--ink-muted)", margin: "6px 0 0" }}>
-            Live NYC data is deepest. Try a New York City street address.
-          </p>
-        </div>
-      )}
-
       {status === "done" && result && (
         <>
-          <VerdictCard verdict={result.verdict} address={result.resolved_address.normalized} />
-
-          <RunDegradationNote degradation={result.degradation} />
-
-          <VerdictMathPanel verdict={result.verdict} />
 
           <div
             style={{
@@ -287,33 +252,6 @@ export default function Cluster1Dashboard() {
               />
             </div>
           </div>
-
-          <ReasoningChain
-            reasoningChain={result.verdict.reasoning_chain}
-            minoritySignals={result.verdict.minority_signals}
-            agentSummaries={result.verdict.agent_summaries}
-          />
-
-          <CoverageMap dataPoints={result.verdict.data_points} />
-
-          <ProvenanceLedger
-            dataPoints={result.verdict.data_points}
-            locationConfidence={result.resolved_address.location_confidence}
-            address={result.resolved_address.normalized}
-          />
-
-          <p
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: "11px",
-              color: "var(--ink-muted)",
-              margin: 0,
-            }}
-          >
-            {result.persisted
-              ? "Recorded to your verdict history (append-only audit trail)"
-              : `Not recorded: ${result.persist_error ?? "persistence unavailable"}`}
-          </p>
         </>
       )}
 

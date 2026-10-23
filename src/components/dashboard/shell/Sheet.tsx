@@ -26,8 +26,9 @@ export default function Sheet({ open, title, onClose, children, id }: SheetProps
     if (!open) return;
     opener.current = document.activeElement as HTMLElement | null;
     const sheet = ref.current;
-    const first = sheet?.querySelector<HTMLElement>(FOCUSABLE);
-    first?.focus();
+    // Focus the first control in the content, not the close button.
+    const all = sheet ? Array.from(sheet.querySelectorAll<HTMLElement>(FOCUSABLE)) : [];
+    (all.find((el) => !el.classList.contains("shell-sheet-close")) ?? all[0])?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.preventDefault();

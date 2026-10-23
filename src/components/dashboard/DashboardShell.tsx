@@ -14,6 +14,9 @@ import TopBar from "./shell/TopBar";
 import BottomTabs, { type ShellTab } from "./shell/BottomTabs";
 import Sheet from "./shell/Sheet";
 import WatchSheet from "./shell/WatchSheet";
+import SubjectProvider from "./shell/SubjectProvider";
+import VerdictBand from "./shell/VerdictBand";
+import EvidenceDrawer from "./shell/EvidenceDrawer";
 import ClusterPlaceholderView from "./ClusterPlaceholderView";
 import Cluster1Dashboard from "./cluster1/Cluster1Dashboard";
 import Cluster2Dashboard from "./cluster2/Cluster2Dashboard";
@@ -119,6 +122,7 @@ export default function DashboardShell({
     // context (a 402 opens the upgrade modal) and the post-checkout
     // "confirming your upgrade" overlay mounts when justUpgraded is set.
     <UpgradeProvider justUpgraded={justUpgraded}>
+      <SubjectProvider>
       <div className="koano-shell">
         <TopBar cluster={cluster} plan={plan} onOpenLens={() => setLensOpen(true)} />
 
@@ -134,6 +138,7 @@ export default function DashboardShell({
 
         <main className="shell-main" id="shell-main">
           <div className="shell-content">
+            <VerdictBand />
             {cluster === "cluster_1" ? (
               <Cluster1Dashboard />
             ) : cluster === "cluster_2" ? (
@@ -181,7 +186,9 @@ export default function DashboardShell({
             changeCluster("cluster_5");
           }}
         />
+        <EvidenceDrawer />
       </div>
+      </SubjectProvider>
     </UpgradeProvider>
   );
 }

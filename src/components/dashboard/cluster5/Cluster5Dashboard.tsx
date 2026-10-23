@@ -7,16 +7,10 @@
 // language throughout.
 
 import React, { useCallback, useEffect, useState } from "react";
-import LoadingState from "@/components/ui/LoadingState";
-import VerdictCard from "@/components/ui/VerdictCard";
-import RunDegradationNote from "@/components/ui/RunDegradationNote";
-import ProvenanceLedger from "@/components/ui/ProvenanceLedger";
-import CoverageMap from "@/components/ui/CoverageMap";
-import VerdictMathPanel from "@/components/ui/VerdictMathPanel";
-import ReasoningChain from "@/components/ui/ReasoningChain";
 import { CLUSTERS } from "../clusters";
 import { useVerdictStream } from "../useVerdictStream";
 import type { RunPayload } from "../useAddressResolver";
+import { useRegisterRun } from "../shell/SubjectProvider";
 import VerdictHistory from "../VerdictHistory";
 import PortfolioOverview from "./PortfolioOverview";
 import PortfolioMap from "./PortfolioMap";
@@ -85,6 +79,7 @@ export default function Cluster5Dashboard() {
   }
 
   const { status, result } = stream;
+  useRegisterRun(stream, { subject: analyzedAddress });
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
@@ -131,48 +126,6 @@ export default function Cluster5Dashboard() {
       />
 
       {/* Active analysis */}
-      {status === "running" && (
-        <LoadingState
-          phase={stream.phase}
-          agents={stream.agents}
-          startedAt={stream.startedAt}
-          normalizedAddress={stream.normalized ?? analyzedAddress}
-        />
-      )}
-      {status === "error" && (
-        <div
-          style={{
-            border: "1px solid var(--border)",
-            borderLeft: "3px solid var(--signal-negative)",
-            borderRadius: "0 var(--radius-inner) var(--radius-inner) 0",
-            padding: "16px 24px",
-            maxWidth: "620px",
-          }}
-        >
-          <p style={{ fontSize: "14px", color: "var(--ink-secondary)", margin: 0 }}>
-            Analysis failed: {stream.error}
-          </p>
-        </div>
-      )}
-      {status === "done" && result && (
-        <>
-          <VerdictCard verdict={result.verdict} address={result.resolved_address.normalized} />
-          <RunDegradationNote degradation={result.degradation} />
-          <VerdictMathPanel verdict={result.verdict} />
-          <ReasoningChain
-            reasoningChain={result.verdict.reasoning_chain}
-            minoritySignals={result.verdict.minority_signals}
-            agentSummaries={result.verdict.agent_summaries}
-          />
-          <CoverageMap dataPoints={result.verdict.data_points} />
-
-          <ProvenanceLedger
-            dataPoints={result.verdict.data_points}
-            locationConfidence={result.resolved_address.location_confidence}
-            address={result.resolved_address.normalized}
-          />
-        </>
-      )}
 
       <MondayBriefing hasProperties={!!properties && properties.length > 0} id="c5-briefing" />
 
