@@ -5,6 +5,7 @@
 // live run. Public-safe: no account controls, no actions.
 
 import React from "react";
+import "@/components/dashboard/shell/shell.css";
 import ProvenanceBadge from "./ProvenanceBadge";
 import VerdictMathPanel from "./VerdictMathPanel";
 import ReasoningChain from "./ReasoningChain";
@@ -106,7 +107,9 @@ export default function SealedVerdict({ row, owner }: { row: SealedRow; owner: b
                   {a.verdict.toUpperCase()} · conf {a.confidence}
                 </span>
                 <span className="sealed-agent-head">{a.headline}</span>
-                <ProvenanceBadge provenance={a.overall_provenance} />
+                <span style={{ gridColumn: "1 / -1", justifySelf: "start" }}>
+                  <ProvenanceBadge provenance={a.overall_provenance} />
+                </span>
               </li>
             ))}
           </ul>

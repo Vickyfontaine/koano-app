@@ -57,6 +57,14 @@ await p.locator('.band-actions button:has-text("Trace")').click(); await p.waitF
 await p.locator('[data-trace="verdict"]').focus(); await p.waitForTimeout(500);
 await shot('trace-verdict-390');
 checks.phoneOverflow = await p.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+// the documents section with the CMA wired (Price lens), phone then desktop
+await p.keyboard.press('t'); await p.waitForTimeout(200);
+await p.locator('#c2-documents').scrollIntoViewIfNeeded(); await p.waitForTimeout(400);
+await shot('documents-price-390');
+checks.cmaButton = (await p.locator('#c2-cma-doc').count()) > 0;
+await p.setViewportSize({ width: 1440, height: 900 }); await p.waitForTimeout(400);
+await p.locator('#c2-documents').scrollIntoViewIfNeeded(); await p.waitForTimeout(400);
+await shot('documents-price-1440');
 await browser.close();
 fs.writeFileSync(path.join(out, 'trace-checks.json'), JSON.stringify(checks, null, 2));
 fs.writeFileSync(path.join(out, 'trace-console.json'), JSON.stringify(errors, null, 2));
