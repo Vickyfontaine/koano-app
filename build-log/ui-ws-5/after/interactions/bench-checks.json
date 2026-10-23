@@ -1,0 +1,9 @@
+{
+  "firstSealAt": 17,
+  "decisionAt": 43,
+  "decisionBeforeDone": true,
+  "decisionText": "hold",
+  "doneAt": 76,
+  "doneWord": "hold",
+  "decisionMatchesDone": true
+}

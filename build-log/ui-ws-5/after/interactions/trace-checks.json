@@ -1,0 +1,14 @@
+{
+  "done": true,
+  "traceOnBody": true,
+  "verdictThreadSegments": 10,
+  "dimmedCount": 0,
+  "agentThreadSegments": 11,
+  "agentFocus": "Thread for agent:risk-volatility",
+  "pointThreadSegments": 4,
+  "ledgerRowFocusable": "0",
+  "traceOffAfterT": true,
+  "typingTDoesNotToggle": true,
+  "phoneOverflow": 0,
+  "cmaButton": true
+}

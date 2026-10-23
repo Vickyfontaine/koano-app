@@ -41,7 +41,17 @@ Before = the pre-sprint capture set (`build-log/ui-ws-1/before/`) unless a later
 
 ## Acceptance criteria
 
-(filled after the final QA pass)
+| Criterion | Status | Evidence |
+|---|---|---|
+| Every marketing page and every cluster dashboard fully usable at 390px: no horizontal scroll, no hidden renders, no blank sections | Met | `ui-ws-6/after/audit.json` (39 marketing and auth captures, no horizontal overflow, no console issue beyond Clerk's development-keys notice); `ui-ws-6/after/dash-audit.json` (every lens in empty, running and done states at the three widths, no horizontal overflow); the 390 full pages in `ui-ws-6/after/` show every render in flow and every section rendered |
+| Every aesthetic problem A1 to A19 closed and listed with before and after screenshots | Met with one stated exception | the A1 to A19 table above; A2 is closed on the code side and waits for the founder's mobile render set |
+| Nothing in the live product claims a capability the backend does not have; future features only on `/vision`, labeled | Met | `ui-ws-6/after/vision-1440.jpg`, `vision-390.jpg` (every concept labeled "Concept preview", the recorded-example stamp, no run control); the CMA, IC memo and portfolio risk report buttons call implemented document types; the sealed record says what is not stored; the independent reviews of WS2 to WS5 each checked the claims |
+| The demo carries its "recorded example" label everywhere it appears | Met | `ui-ws-6/after/home-1440-fold.jpg` (hero card), `home-390.jpg` (verdict math and ledger sections), `intelligence-1440.jpg` (demo video and verdict card), `vision-1440.jpg`; no LIVE badge on the replay (the WS2 review confirmed the single "LIVE" on the site is the /data provider catalog) |
+| Font and logo unchanged; pre-push gate green | Met | Neue Montreal via the unchanged Fontshare link in `layout.tsx`; `/logo.png` untouched since before the sprint (the WS2 review checked the commit); the gate ran before every commit on `ui-sprint` (`build-log/gate.log` holds the last run) |
+
+## Final QA pass
+
+Captured on the finished branch into `build-log/ui-ws-6/after/`: thirteen marketing and auth routes at 390, 768 and 1440 (full page and first viewport), all four lenses in empty, running and done states at the three widths through real analyses, plus the WS2 to WS5 interaction sets re-run in their workstream folders. One whole-sprint independent review follows this section's findings.
 
 ## Open blockers (founder)
 
