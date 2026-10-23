@@ -44,6 +44,11 @@ async function waitForDone(page, timeoutMs = 300000) {
   await p.keyboard.press('Escape');
   await p.waitForTimeout(400);
   checks.lensSheetClosedOnEscape = (await p.locator('#shell-lens-sheet').count()) === 0;
+  await p.click('[data-tab="search"]');
+  await p.waitForTimeout(1200);
+  await shot(p, 'search-sheet-390');
+  await p.keyboard.press('Escape');
+  await p.waitForTimeout(400);
   await p.click('[data-tab="watch"]');
   await p.waitForTimeout(1500);
   await shot(p, 'watch-sheet-390');
@@ -72,8 +77,9 @@ async function waitForDone(page, timeoutMs = 300000) {
   await p.waitForTimeout(2500);
   await p.locator('[data-lens="cluster_1"]').first().click();
   await p.waitForTimeout(1200);
-  await p.locator('input[aria-label="Property address"]').fill(address);
-  await p.locator('button:has-text("Run analysis")').click();
+  await p.locator('.gsearch-bar input').fill(address);
+  await shot(p, 'search-typed-1440');
+  await p.locator('.gsearch-bar input').press('Enter');
   await p.waitForTimeout(4000);
   await shot(p, 'band-resolving-or-running-1440');
   checks.runDone = await waitForDone(p);

@@ -66,8 +66,8 @@ const TABS: { id: DrawerTab; label: string }[] = [
 ];
 
 export default function VerdictBand() {
-  const { run, openDrawer } = useSubject();
-  const status = run?.status ?? "idle";
+  const { run, openDrawer, searching } = useSubject();
+  const status = searching && (!run || run.status === "idle" || run.status === "done" || run.status === "error") ? "resolving" : (run?.status ?? "idle");
 
   return (
     <section className={`verdict-band verdict-band-${status}`} aria-label="Verdict" aria-live="polite" id="verdict-band">
@@ -77,7 +77,7 @@ export default function VerdictBand() {
             <div className="band-eyebrow">Verdict</div>
             <p className="band-title">No subject yet.</p>
             <p className="band-copy">
-              Enter an address below. The five agents read its public record and the verdict lands here, in the same
+              Search an address above. The five agents read its public record and the verdict lands here, in the same
               place in every lens.
             </p>
           </div>
@@ -92,7 +92,8 @@ export default function VerdictBand() {
               <span className="band-pulse" aria-hidden="true" />
               Resolving the address
             </p>
-            {run?.subject && <p className="band-copy band-mono">{run.subject}</p>}
+            {!searching && run?.subject && <p className="band-copy band-mono">{run.subject}</p>}
+            {searching && <p className="band-copy">Matching it to a lot in the public record.</p>}
           </div>
         </div>
       )}

@@ -112,8 +112,14 @@ for (const cluster of CLUSTERS) {
     await page.waitForTimeout(3000);
     await snap(page, `${cluster}-done`);
   } else {
-    await page.locator('input[aria-label="Property address"]').fill(addrs[0]);
-    await page.locator('button:has-text("Run analysis")').click();
+    const bar = page.locator('.gsearch-bar input');
+    if (await bar.count()) {
+      await bar.fill(addrs[0]);
+      await bar.press('Enter');
+    } else {
+      await page.locator('input[aria-label="Property address"]').fill(addrs[0]);
+      await page.locator('button:has-text("Run analysis")').click();
+    }
     await page.waitForTimeout(15000);
     await snap(page, `${cluster}-running`);
     await waitForDone(page);

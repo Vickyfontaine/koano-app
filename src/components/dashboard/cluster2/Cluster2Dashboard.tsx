@@ -8,14 +8,12 @@
 // representative and labeled everywhere — live MLS access is never implied.
 
 import React, { useState } from "react";
-import AddressInput from "@/components/ui/AddressInput";
 import LocationConfidenceNote from "@/components/ui/LocationConfidenceNote";
-import CandidatePicker from "@/components/ui/CandidatePicker";
 import type { AddressCandidate } from "@/components/ui/verdict";
 import { CLUSTERS } from "../clusters";
 import { useVerdictStream } from "../useVerdictStream";
-import { useAddressResolver, type RunPayload } from "../useAddressResolver";
-import { useRegisterRun } from "../shell/SubjectProvider";
+import type { RunPayload } from "../useAddressResolver";
+import { useRegisterRun, usePendingSubject } from "../shell/SubjectProvider";
 import VerdictHistory from "../VerdictHistory";
 import MarketVelocityPanel from "./MarketVelocityPanel";
 import PropertyMap from "../cluster1/PropertyMap";
@@ -63,30 +61,20 @@ export default function Cluster2Dashboard() {
     }
   }
 
-  // Fires only AFTER resolution succeeds (a confident match, or the user's pick).
-  function startRun(payload: RunPayload) {
+  // The subject arrives settled from the shell's global search.
+  const [lastInput, setLastInput] = useState<string | null>(null);
+  usePendingSubject((payload, label) => {
+    setLastInput(label);
+    setDetail(null);
+    setDetailError(null);
+    stream.reset();
     setStarted(true);
     setActivePayload(payload);
     void stream.run(payload);
     void fetchDetail(payload);
-  }
+  });
 
-  const resolver = useAddressResolver(startRun);
-
-  // A new submission hides any prior panels until this address resolves, so a
-  // resolution problem never leaves stale results (or five panel errors) on screen.
-  const [lastInput, setLastInput] = useState<string | null>(null);
-  function analyze(address: string) {
-    setLastInput(address);
-    setStarted(false);
-    setActivePayload(null);
-    setDetail(null);
-    setDetailError(null);
-    stream.reset();
-    void resolver.resolve(address);
-  }
-
-  const { status, result } = stream;
+  const { result } = stream;
   const activeCandidate: AddressCandidate | null =
     activePayload && "candidate" in activePayload ? activePayload.candidate : null;
   const subjectAddress =
@@ -94,8 +82,7 @@ export default function Cluster2Dashboard() {
     detail?.resolved_address.normalized ??
     activeCandidate?.label ??
     null;
-  const resolving = resolver.state.phase === "resolving";
-  useRegisterRun(stream, { resolving, subject: lastInput });
+  useRegisterRun(stream, { subject: lastInput });
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
@@ -125,41 +112,13 @@ export default function Cluster2Dashboard() {
         </p>
       </div>
 
-      <AddressInput onSubmit={analyze} busy={resolving || status === "running"} />
-
       <LocationConfidenceNote confidence={detail?.resolved_address?.location_confidence} />
 
-      {/* Resolution step — a single banner, never five panel errors. */}
-      {resolving && (
-        <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>Resolving address…</p>
-      )}
-      {resolver.state.phase === "ambiguous" && (
-        <CandidatePicker candidates={resolver.state.candidates} onChoose={resolver.choose} />
-      )}
-      {resolver.state.phase === "none" && (
-        <div
-          style={{
-            border: "1px solid var(--border)",
-            borderLeft: "3px solid var(--signal-negative)",
-            borderRadius: "0 var(--radius-inner) var(--radius-inner) 0",
-            padding: "16px 24px",
-            maxWidth: "620px",
-          }}
-        >
-          <p style={{ fontSize: "14px", color: "var(--ink-secondary)", margin: 0 }}>
-            {resolver.state.error}
-          </p>
-          <p style={{ fontSize: "12px", color: "var(--ink-muted)", margin: "6px 0 0" }}>
-            Live NYC data is deepest. Try a New York City street address.
-          </p>
-        </div>
-      )}
-
-      {!started && resolver.state.phase === "idle" && (
+      {!started && (
         /* Empty state — approved copy (KOANO_COPY.md) */
         <div style={{ maxWidth: "620px" }}>
           <h3 style={{ fontSize: "18px", fontWeight: 500, color: "var(--ink-primary)", margin: "0 0 8px" }}>
-            Start with an address or a neighborhood.
+            Start with an address in the search bar.
           </h3>
           <p style={{ fontSize: "14px", lineHeight: 1.6, color: "var(--ink-muted)", margin: 0 }}>
             You will get the market picture first, within a few seconds. The

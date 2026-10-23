@@ -17,6 +17,7 @@ import WatchSheet from "./shell/WatchSheet";
 import SubjectProvider from "./shell/SubjectProvider";
 import VerdictBand from "./shell/VerdictBand";
 import EvidenceDrawer from "./shell/EvidenceDrawer";
+import GlobalSearch from "./shell/GlobalSearch";
 import ClusterPlaceholderView from "./ClusterPlaceholderView";
 import Cluster1Dashboard from "./cluster1/Cluster1Dashboard";
 import Cluster2Dashboard from "./cluster2/Cluster2Dashboard";
@@ -62,6 +63,7 @@ export default function DashboardShell({
   const [tab, setTab] = useState<ShellTab>("home");
   const [lensOpen, setLensOpen] = useState(false);
   const [watchOpen, setWatchOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   const changeCluster = useCallback((c: ClusterId) => {
     setCluster(c);
@@ -94,14 +96,7 @@ export default function DashboardShell({
       if (t === "home") {
         window.scrollTo({ top: 0, behavior: "smooth" });
       } else if (t === "search") {
-        // The lens's own address control (the shell search arrives in slice 3).
-        const el =
-          document.querySelector<HTMLElement>("[data-shell-search]") ??
-          document.querySelector<HTMLElement>('input[aria-label="Property address"], input[aria-label="Site A"]');
-        if (el) {
-          el.scrollIntoView({ behavior: "smooth", block: "center" });
-          el.focus({ preventScroll: true });
-        }
+        setSearchOpen(true);
       } else if (t === "watch") {
         setWatchOpen(true);
       } else if (t === "documents") {
@@ -116,6 +111,10 @@ export default function DashboardShell({
     setTab("home");
   }, []);
   const closeLens = useCallback(() => setLensOpen(false), []);
+  const closeSearch = useCallback(() => {
+    setSearchOpen(false);
+    setTab("home");
+  }, []);
 
   return (
     // UpgradeProvider wraps every lens so useUpgrade() resolves to the real
@@ -124,7 +123,7 @@ export default function DashboardShell({
     <UpgradeProvider justUpgraded={justUpgraded}>
       <SubjectProvider>
       <div className="koano-shell">
-        <TopBar cluster={cluster} plan={plan} onOpenLens={() => setLensOpen(true)} />
+        <TopBar cluster={cluster} plan={plan} onOpenLens={() => setLensOpen(true)} search={<GlobalSearch variant="bar" />} />
 
         <Sidebar
           key={cluster}
@@ -186,6 +185,11 @@ export default function DashboardShell({
             changeCluster("cluster_5");
           }}
         />
+        {/* Phone search sheet */}
+        <Sheet open={searchOpen} title="Search" onClose={closeSearch} id="shell-search-sheet">
+          <GlobalSearch variant="sheet" autoFocus onDone={closeSearch} />
+        </Sheet>
+
         <EvidenceDrawer />
       </div>
       </SubjectProvider>

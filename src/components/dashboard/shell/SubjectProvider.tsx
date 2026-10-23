@@ -7,10 +7,11 @@
 // band and the drawer from it, in the same place in every lens. Registering
 // is a snapshot, so the lens stays the owner of its pipeline state.
 
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import type { AgentProgress, PipelinePhase } from "@/components/ui/LoadingState";
 import type { AgentName } from "@/components/ui/verdict";
 import type { StreamComplete, VerdictStream } from "../useVerdictStream";
+import type { RunPayload } from "../useAddressResolver";
 
 export type ShellRunStatus = "idle" | "resolving" | "running" | "done" | "error";
 
@@ -29,12 +30,24 @@ export interface ShellRun {
 export type DrawerTab = "math" | "reasoning" | "sources" | "coverage";
 export const DRAWER_TABS: DrawerTab[] = ["math", "reasoning", "sources", "coverage"];
 
+/** A subject settled by the global search, handed to the active lens. */
+export interface PendingSubject {
+  payload: RunPayload;
+  label: string;
+  ts: number;
+}
+
 interface SubjectContextValue {
   run: ShellRun | null;
   registerRun: (run: ShellRun | null) => void;
   drawer: DrawerTab | null;
   openDrawer: (tab: DrawerTab) => void;
   closeDrawer: () => void;
+  /** True while the global search is resolving an address. */
+  searching: boolean;
+  setSearching: (v: boolean) => void;
+  pending: PendingSubject | null;
+  dispatchSubject: (payload: RunPayload, label: string) => void;
 }
 
 const SubjectContext = createContext<SubjectContextValue>({
@@ -43,6 +56,10 @@ const SubjectContext = createContext<SubjectContextValue>({
   drawer: null,
   openDrawer: () => {},
   closeDrawer: () => {},
+  searching: false,
+  setSearching: () => {},
+  pending: null,
+  dispatchSubject: () => {},
 });
 
 export function useSubject(): SubjectContextValue {
@@ -77,9 +94,15 @@ export default function SubjectProvider({ children }: { children: React.ReactNod
     if (isDrawerTab(h)) setDrawer(h);
   }, [run?.status]);
 
+  const [searching, setSearching] = useState(false);
+  const [pending, setPending] = useState<PendingSubject | null>(null);
+  const dispatchSubject = useCallback((payload: RunPayload, label: string) => {
+    setPending({ payload, label, ts: Date.now() });
+  }, []);
+
   const value = useMemo(
-    () => ({ run, registerRun, drawer, openDrawer, closeDrawer }),
-    [run, registerRun, drawer, openDrawer, closeDrawer],
+    () => ({ run, registerRun, drawer, openDrawer, closeDrawer, searching, setSearching, pending, dispatchSubject }),
+    [run, registerRun, drawer, openDrawer, closeDrawer, searching, pending, dispatchSubject],
   );
   return <SubjectContext.Provider value={value}>{children}</SubjectContext.Provider>;
 }
@@ -121,4 +144,21 @@ export function useRegisterRun(
     if (!enabled) return;
     return () => registerRun(null);
   }, [enabled, registerRun]);
+}
+
+/**
+ * Run `onSubject` once for each subject the global search hands to the active
+ * lens. The lens decides what the subject means (run it, fill a site slot,
+ * add it to the book).
+ */
+export function usePendingSubject(onSubject: (payload: RunPayload, label: string) => void) {
+  const { pending } = useSubject();
+  const handled = useRef<number>(0);
+  const cb = useRef(onSubject);
+  cb.current = onSubject;
+  useEffect(() => {
+    if (!pending || pending.ts === handled.current) return;
+    handled.current = pending.ts;
+    cb.current(pending.payload, pending.label);
+  }, [pending]);
 }

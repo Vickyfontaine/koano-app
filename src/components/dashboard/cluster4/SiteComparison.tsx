@@ -18,7 +18,7 @@ import CandidatePicker from "@/components/ui/CandidatePicker";
 import { VERDICT_COLORS, type SynthesisResult, type Verdict, type AddressCandidate } from "@/components/ui/verdict";
 import { useVerdictStream, type VerdictStream, type RunDegradation } from "../useVerdictStream";
 import type { RunPayload } from "../useAddressResolver";
-import { useRegisterRun } from "../shell/SubjectProvider";
+import { useRegisterRun, usePendingSubject } from "../shell/SubjectProvider";
 import RunDegradationNote from "@/components/ui/RunDegradationNote";
 import SitePanels from "./SitePanels";
 import MultiSiteMap, { type MultiSite } from "./MultiSiteMap";
@@ -107,6 +107,20 @@ export default function SiteComparison() {
       );
     }
   }
+
+  // A subject from the shell's search fills the first empty site slot and
+  // starts it (or replaces the last slot when all three are taken).
+  usePendingSubject((payload, label) => {
+    const empty = addresses.findIndex((a) => !a.trim());
+    const slot = empty === -1 ? 2 : empty;
+    setAddresses((prev) => prev.map((a, i) => (i === slot ? label : a)));
+    setResolveErrors((prev) => {
+      const next = { ...prev };
+      delete next[slot];
+      return next;
+    });
+    startSlot(slot, payload);
+  });
 
   // A slot begins analysis only AFTER it resolves (confident, or the user's pick).
   function startSlot(slot: number, payload: RunPayload) {

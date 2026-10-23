@@ -10,7 +10,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { CLUSTERS } from "../clusters";
 import { useVerdictStream } from "../useVerdictStream";
 import type { RunPayload } from "../useAddressResolver";
-import { useRegisterRun } from "../shell/SubjectProvider";
+import { useRegisterRun, usePendingSubject } from "../shell/SubjectProvider";
 import VerdictHistory from "../VerdictHistory";
 import PortfolioOverview from "./PortfolioOverview";
 import PortfolioMap from "./PortfolioMap";
@@ -63,6 +63,11 @@ export default function Cluster5Dashboard() {
       return e instanceof Error ? e.message : "Could not add property";
     }
   }
+
+  // A subject from the shell's search is added to the book.
+  usePendingSubject((payload) => {
+    void addProperty(payload);
+  });
 
   async function removeProperty(id: string) {
     await fetch(`/api/properties?id=${encodeURIComponent(id)}`, { method: "DELETE" });

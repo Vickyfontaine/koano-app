@@ -6,13 +6,11 @@
 // reasoning, and alerts derived from real fetched data. No neural map.
 
 import React, { useState } from "react";
-import AddressInput from "@/components/ui/AddressInput";
 import LocationConfidenceNote from "@/components/ui/LocationConfidenceNote";
-import CandidatePicker from "@/components/ui/CandidatePicker";
 import { CLUSTERS } from "../clusters";
 import { useVerdictStream } from "../useVerdictStream";
-import { useAddressResolver, type RunPayload } from "../useAddressResolver";
-import { useRegisterRun } from "../shell/SubjectProvider";
+import type { RunPayload } from "../useAddressResolver";
+import { useRegisterRun, usePendingSubject } from "../shell/SubjectProvider";
 import VerdictHistory from "../VerdictHistory";
 import PermitHistoryPanel from "../PermitHistoryPanel";
 import DocumentButton from "../DocumentButton";
@@ -60,29 +58,22 @@ export default function Cluster1Dashboard() {
     }
   }
 
-  // Fires only AFTER resolution succeeds (a confident match, or the user's pick).
-  function startRun(payload: RunPayload) {
-    void stream.run(payload);
-    void fetchDetail(payload);
-  }
-
-  const resolver = useAddressResolver(startRun);
-
-  // A new submission clears any prior run and resolves first, so a resolution
-  // problem reads as one banner, never a wall of panel errors.
+  // The subject arrives settled from the shell's global search (a confident
+  // match as the raw address, a chosen candidate as the candidate; the server
+  // re-derives the lot either way).
   const [lastInput, setLastInput] = useState<string | null>(null);
-  function analyze(address: string) {
-    setLastInput(address);
+  usePendingSubject((payload, label) => {
+    setLastInput(label);
     setDetail(null);
     setDetailError(null);
     stream.reset();
-    void resolver.resolve(address);
-  }
+    void stream.run(payload);
+    void fetchDetail(payload);
+  });
 
   const { status, result } = stream;
-  const resolving = resolver.state.phase === "resolving";
   // The shell's verdict band and evidence drawer render this run.
-  useRegisterRun(stream, { resolving, subject: lastInput });
+  useRegisterRun(stream, { subject: lastInput });
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
@@ -112,41 +103,13 @@ export default function Cluster1Dashboard() {
         </p>
       </div>
 
-      <AddressInput onSubmit={analyze} busy={resolving || status === "running"} />
-
       <LocationConfidenceNote confidence={detail?.resolved_address?.location_confidence} />
 
-      {/* Resolution step — a single banner, never a wall of panel errors. */}
-      {resolving && (
-        <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>Resolving address…</p>
-      )}
-      {resolver.state.phase === "ambiguous" && (
-        <CandidatePicker candidates={resolver.state.candidates} onChoose={resolver.choose} />
-      )}
-      {resolver.state.phase === "none" && (
-        <div
-          style={{
-            border: "1px solid var(--border)",
-            borderLeft: "3px solid var(--signal-negative)",
-            borderRadius: "0 var(--radius-inner) var(--radius-inner) 0",
-            padding: "16px 24px",
-            maxWidth: "620px",
-          }}
-        >
-          <p style={{ fontSize: "14px", color: "var(--ink-secondary)", margin: 0 }}>
-            {resolver.state.error}
-          </p>
-          <p style={{ fontSize: "12px", color: "var(--ink-muted)", margin: "6px 0 0" }}>
-            Live NYC data is deepest. Try a New York City street address.
-          </p>
-        </div>
-      )}
-
-      {status === "idle" && resolver.state.phase === "idle" && (
+      {status === "idle" && (
         /* Empty state — approved copy (KOANO_COPY.md) */
         <div style={{ maxWidth: "620px" }}>
           <h3 style={{ fontSize: "18px", fontWeight: 500, color: "var(--ink-primary)", margin: "0 0 8px" }}>
-            Start with an address.
+            Start with an address in the search bar.
           </h3>
           <p style={{ fontSize: "14px", lineHeight: 1.6, color: "var(--ink-muted)", margin: 0 }}>
             KOANO will read the zoning, the permit history, and the flood and
