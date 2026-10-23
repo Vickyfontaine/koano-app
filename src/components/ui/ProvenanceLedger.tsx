@@ -13,6 +13,8 @@
 // keyed figure carries the caveat, not just a badge that says "live".
 
 import React, { useState } from "react";
+import { useTrace } from "./trace/TraceProvider";
+import { pointId } from "./trace/graph";
 import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
 import { AGENT_LABELS, type AgentName, type LedgerDataPoint } from "@/components/ui/verdict";
 
@@ -47,6 +49,7 @@ const AGENT_ORDER: AgentName[] = [
 export default function ProvenanceLedger({ dataPoints, locationConfidence, address, id, defaultOpen, recorded = false, collapsible = true }: ProvenanceLedgerProps) {
   const [open, setOpen] = useState(!!defaultOpen);
   const [nonLiveOnly, setNonLiveOnly] = useState(false);
+  const trace = useTrace();
 
   const points = dataPoints ?? [];
   if (points.length === 0) return null;
@@ -142,6 +145,8 @@ export default function ProvenanceLedger({ dataPoints, locationConfidence, addre
                   <div
                     key={`${d.label}-${i}`}
                     className="ledger-row"
+                    data-trace={pointId(g.agent, d.label)}
+                    tabIndex={trace.on ? 0 : undefined}
                     style={{
                       display: "grid",
                       gridTemplateColumns: "minmax(160px, 1.4fr) minmax(80px, 1fr) auto minmax(120px, 1.2fr)",

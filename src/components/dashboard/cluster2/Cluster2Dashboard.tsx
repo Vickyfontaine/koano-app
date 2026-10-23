@@ -76,7 +76,7 @@ export default function Cluster2Dashboard() {
     void fetchDetail(payload);
   });
 
-  const { result } = stream;
+  const { status, result } = stream;
   const activeCandidate: AddressCandidate | null =
     activePayload && "candidate" in activePayload ? activePayload.candidate : null;
   const subjectAddress =
@@ -198,26 +198,14 @@ export default function Cluster2Dashboard() {
                   singleAction={true}
                   id="c2-netsheet-doc"
                 />
-                {/* CMA is a feature gap (listing photos + geocoded comps), not a
-                    data gap — surfaced as a disabled tile, not a broken button. */}
-                <div
-                  style={{
-                    border: "1px dashed var(--border)",
-                    borderRadius: "var(--radius-card)",
-                    padding: "24px",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "8px",
-                  }}
-                >
-                  <h3 style={{ fontSize: "16px", fontWeight: 500, color: "var(--ink-muted)", margin: 0 }}>
-                    Comparative Market Analysis
-                  </h3>
-                  <p style={{ fontSize: "12px", color: "var(--ink-muted)", margin: 0 }}>
-                    Not yet available. The CMA needs listing photos and geocoded comps, which KOANO
-                    does not source today.
-                  </p>
-                </div>
+                <DocumentButton
+                  docType="cma"
+                  title="Comparative Market Analysis"
+                  address={subjectAddress}
+                  formats={["pdf", "docx"]}
+                  hasRecentVerdict={status === "done"}
+                  id="c2-cma-doc"
+                />
               </div>
             </div>
           )}

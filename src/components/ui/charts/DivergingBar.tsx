@@ -37,6 +37,8 @@ export interface DivergingDatum {
 }
 
 interface DivergingBarProps {
+  /** Trace (WS5): rows carry data-trace="<prefix><key>" so a hover follows the vote. */
+  tracePrefix?: string;
   data: DivergingDatum[];
   /** Shared linear domain, e.g. [-2, 2]. */
   domain: [number, number];
@@ -57,6 +59,7 @@ export default function DivergingBar({
   domain,
   barHeight = 22,
   labelWidth = 176,
+  tracePrefix,
 }: DivergingBarProps) {
   // Percent scale — positions are CSS left/width %, so the plot is fully fluid.
   const scale = scaleLinear({ domain, range: [0, 100] });
@@ -73,6 +76,7 @@ export default function DivergingBar({
           <div
             key={d.key}
             className="divbar-row"
+            data-trace={tracePrefix ? `${tracePrefix}${d.key}` : undefined}
             style={{
               display: "grid",
               gridTemplateColumns: `${labelWidth}px 1fr`,
@@ -171,6 +175,7 @@ export default function DivergingBar({
                         bottom: 0,
                         left: `${left}%`,
                         width: `${width}%`,
+                        transition: "width 400ms var(--ease-out), left 400ms var(--ease-out)",
                         background: d.color,
                         backgroundImage: d.muted
                           ? "repeating-linear-gradient(45deg, rgba(255,255,255,0.62) 0 3px, rgba(255,255,255,0) 3px 6px)"

@@ -190,14 +190,13 @@ export default function Cluster5Dashboard() {
               Add properties to your portfolio to generate the Monday Briefing PDF.
             </div>
           )}
-          {status === "done" && result ? (
+          {properties && properties.length > 0 ? (
             <DocumentButton
-              docType="asset_one_pager"
-              title="Asset One-Pager"
-              address={result.resolved_address.normalized || result.resolved_address.input}
+              docType="portfolio_risk_report"
+              title="Portfolio Risk Report"
               formats={["pdf"]}
               singleAction={true}
-              id="c5-onepager-doc"
+              id="c5-risk-doc"
             />
           ) : (
             <div
@@ -209,7 +208,39 @@ export default function Cluster5Dashboard() {
                 color: "var(--ink-muted)",
               }}
             >
-              Analyze a property above to enable its one-pager.
+              Add properties to your portfolio to generate the Portfolio Risk Report.
+            </div>
+          )}
+          {status === "done" && result ? (
+            <>
+              <DocumentButton
+                docType="ic_memo"
+                title="Investment Committee Memo"
+                address={result.resolved_address.normalized || result.resolved_address.input}
+                formats={["pdf", "docx"]}
+                hasRecentVerdict={true}
+                id="c5-icmemo-doc"
+              />
+              <DocumentButton
+                docType="asset_one_pager"
+                title="Asset One-Pager"
+                address={result.resolved_address.normalized || result.resolved_address.input}
+                formats={["pdf"]}
+                singleAction={true}
+                id="c5-onepager-doc"
+              />
+            </>
+          ) : (
+            <div
+              style={{
+                border: "1px dashed var(--border)",
+                borderRadius: "var(--radius-card)",
+                padding: "24px",
+                fontSize: "13px",
+                color: "var(--ink-muted)",
+              }}
+            >
+              Analyze a property above to enable its Investment Committee Memo and one-pager.
             </div>
           )}
         </div>

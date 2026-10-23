@@ -10,7 +10,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import type { AgentProgress, PipelinePhase } from "@/components/ui/LoadingState";
 import type { AgentName } from "@/components/ui/verdict";
-import type { StreamComplete, VerdictStream } from "../useVerdictStream";
+import type { StreamComplete, StreamDecision, VerdictStream } from "../useVerdictStream";
 import type { RunPayload } from "../useAddressResolver";
 
 export type ShellRunStatus = "idle" | "resolving" | "running" | "done" | "error";
@@ -25,6 +25,8 @@ export interface ShellRun {
   subject: string | null;
   result: StreamComplete | null;
   error: string | null;
+  /** The computed decision once it lands (before the narrator finishes). */
+  decision: StreamDecision | null;
 }
 
 export type DrawerTab = "math" | "reasoning" | "sources" | "coverage";
@@ -131,6 +133,7 @@ export function useRegisterRun(
   const normalized = stream?.normalized ?? null;
   const result = stream?.result ?? null;
   const error = stream?.error ?? null;
+  const decision = stream?.decision ?? null;
 
   useEffect(() => {
     if (!enabled) return;
@@ -143,8 +146,9 @@ export function useRegisterRun(
       subject,
       result,
       error,
+      decision,
     });
-  }, [enabled, registerRun, resolving, status, phase, agents, startedAt, normalized, subject, result, error]);
+  }, [enabled, registerRun, resolving, status, phase, agents, startedAt, normalized, subject, result, error, decision]);
 
   useEffect(() => {
     if (!enabled) return;

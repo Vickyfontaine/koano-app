@@ -20,9 +20,13 @@ export interface AgentProgress {
   verdict?: Verdict;
   confidence?: number;
   overall_provenance?: Provenance;
+  /** The Bench: the agent's signed vote and what it read (WS5). */
+  contribution?: number;
+  data_point_count?: number;
+  live_count?: number;
 }
 
-export type PipelinePhase = "geocoding" | "agents" | "synthesis";
+export type PipelinePhase = "geocoding" | "agents" | "synthesis" | "narration";
 
 interface LoadingStateProps {
   phase: PipelinePhase;
@@ -86,7 +90,7 @@ export default function LoadingState({
         <span style={{ fontSize: "15px", fontWeight: 500, color: "var(--ink-primary)" }}>
           {phase === "geocoding"
             ? "Resolving address…"
-            : phase === "synthesis"
+            : phase === "synthesis" || phase === "narration"
               ? "Synthesizing one verdict from five agents…"
               : `Five agents analyzing, ${completed}/5 complete`}
         </span>

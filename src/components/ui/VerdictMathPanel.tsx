@@ -239,7 +239,7 @@ export default function VerdictMathPanel({ verdict, recorded = false }: VerdictM
         <p style={{ fontSize: "13px", lineHeight: 1.55, color: "var(--ink-muted)", margin: "0 0 18px", maxWidth: "660px" }}>
           {findingDetail}
         </p>
-        <DivergingBar data={rows} domain={DOMAIN} />
+        <DivergingBar data={rows} domain={DOMAIN} tracePrefix="agent:" />
       </div>
 
       {/* Structural direction — the deterministic nudge from the facts, and which

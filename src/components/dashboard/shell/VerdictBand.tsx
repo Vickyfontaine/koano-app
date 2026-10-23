@@ -7,44 +7,19 @@
 // counted from the verdict's own data points, or the error.
 
 import React, { useEffect, useState } from "react";
-import {
-  AGENT_LABELS,
-  SPECIALIST_AGENTS,
-  VERDICT_COLORS,
-  PROVENANCE_META,
-  type Provenance,
-  type Verdict,
-} from "@/components/ui/verdict";
+import { VERDICT_COLORS, PROVENANCE_META, type Provenance } from "@/components/ui/verdict";
 import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
 import RunDegradationNote from "@/components/ui/RunDegradationNote";
+import Bench from "./Bench";
+import { useTrace } from "@/components/ui/trace/TraceProvider";
+import TraceThread from "@/components/ui/trace/TraceThread";
 import { useSubject, type DrawerTab } from "./SubjectProvider";
-
-const SHORT_AGENT: Record<string, string> = {
-  "market-timing": "Market",
-  infrastructure: "Pipeline",
-  "demand-sentiment": "Demand",
-  "risk-volatility": "Risk",
-  "regulatory-policy": "Regulatory",
-};
 
 function riskInk(score: number): string {
   return score >= 67 ? "var(--signal-negative-ink)" : score >= 34 ? "var(--signal-warning-ink)" : "var(--signal-positive-ink)";
 }
 function riskFill(score: number): string {
   return score >= 67 ? "var(--signal-negative)" : score >= 34 ? "var(--signal-warning)" : "var(--signal-positive)";
-}
-
-function Elapsed({ since }: { since: number }) {
-  const [s, setS] = useState(0);
-  useEffect(() => {
-    const id = setInterval(() => setS(Math.round((Date.now() - since) / 1000)), 1000);
-    return () => clearInterval(id);
-  }, [since]);
-  return (
-    <span className="band-mono" aria-hidden="true">
-      {s}s · typically about 90 seconds
-    </span>
-  );
 }
 
 const SUMMARY_LABEL: Record<Provenance, string> = {
@@ -69,9 +44,49 @@ const TABS: { id: DrawerTab; label: string }[] = [
   { id: "coverage", label: "Coverage" },
 ];
 
+function ShareButton({ verdictId }: { verdictId: string }) {
+  const [state, setState] = useState<"idle" | "busy" | "copied" | "shown" | "error">("idle");
+  const [url, setUrl] = useState<string | null>(null);
+  async function share() {
+    setState("busy");
+    try {
+      const res = await fetch(`/api/verdicts/${verdictId}/share`);
+      const json = await res.json();
+      if (!res.ok) throw new Error(json?.error || "Could not make a link");
+      setUrl(json.url);
+      try {
+        await navigator.clipboard.writeText(json.url);
+        setState("copied");
+      } catch {
+        setState("shown");
+      }
+    } catch {
+      setState("error");
+    }
+  }
+  return (
+    <span style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-2)", flexWrap: "wrap" }}>
+      <button type="button" className="btn-ghost band-btn" onClick={share} disabled={state === "busy"}>
+        {state === "copied" ? "Link copied" : state === "error" ? "Link failed" : "Share link"}
+      </button>
+      {state === "shown" && url && (
+        <a href={url} className="band-mono" style={{ color: "var(--mid-blue-ink)" }}>
+          Open the record
+        </a>
+      )}
+    </span>
+  );
+}
+
 export default function VerdictBand({ compactOnPhone = false }: { compactOnPhone?: boolean }) {
   const [expanded, setExpanded] = useState(false);
   const { run, openDrawer, searching } = useSubject();
+  const trace = useTrace();
+  const traceSetResult = trace.setResult;
+  const resultVerdict = run?.status === "done" ? (run.result?.verdict ?? null) : null;
+  useEffect(() => {
+    traceSetResult(resultVerdict);
+  }, [traceSetResult, resultVerdict]);
   const status = searching && (!run || run.status === "idle" || run.status === "done" || run.status === "error") ? "resolving" : (run?.status ?? "idle");
   // One short announcement per phase change (never the ticking timer).
   const announcement =
@@ -124,43 +139,7 @@ export default function VerdictBand({ compactOnPhone = false }: { compactOnPhone
         </div>
       )}
 
-      {status === "running" && run && (
-        <div className="band-row">
-          <div style={{ minWidth: 0, flex: "1 1 auto" }}>
-            <div className="band-eyebrow">Verdict</div>
-            <p className="band-title">
-              <span className="band-pulse" aria-hidden="true" />
-              {run.phase === "geocoding"
-                ? "Resolving the address"
-                : run.phase === "synthesis"
-                  ? "Synthesizing one verdict from five agents"
-                  : `Five agents reading the record, ${SPECIALIST_AGENTS.filter((a) => run.agents[a]?.state === "complete").length} of 5 in`}
-            </p>
-            {(run.normalized || run.subject) && <p className="band-copy band-mono">{run.normalized ?? run.subject}</p>}
-            <Elapsed since={run.startedAt} />
-          </div>
-          <ul className="band-agents" aria-label="Agent progress">
-            {SPECIALIST_AGENTS.map((a) => {
-              const p = run.agents[a];
-              const state = p?.state === "complete" ? "complete" : p?.state === "running" ? "running" : "pending";
-              return (
-                <li key={a} className={`band-agent band-agent-${state}`} title={AGENT_LABELS[a]}>
-                  <span className="band-agent-dot" aria-hidden="true" />
-                  <span className="band-agent-name">{SHORT_AGENT[a]}</span>
-                  {p?.state === "complete" && p.verdict && (
-                    <span className="band-agent-verdict" style={{ color: VERDICT_COLORS[p.verdict as Verdict] }}>
-                      {p.verdict}
-                    </span>
-                  )}
-                  <span className="sr-only">
-                    {AGENT_LABELS[a]}: {state}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      )}
+      {status === "running" && run && <Bench run={run} />}
 
       {status === "error" && run && (
         <div className="band-row">
@@ -197,13 +176,18 @@ export default function VerdictBand({ compactOnPhone = false }: { compactOnPhone
                 Verdict
                 <ProvenanceBadge provenance={run.result.verdict.overall_provenance} />
               </div>
-              <div className="band-word" style={{ color: VERDICT_COLORS[run.result.verdict.verdict] }}>
+              <div
+                className="band-word"
+                style={{ color: VERDICT_COLORS[run.result.verdict.verdict] }}
+                data-trace="verdict"
+                tabIndex={trace.on ? 0 : undefined}
+              >
                 {run.result.verdict.verdict}
               </div>
               <p className="band-address">{run.result.resolved_address.normalized}</p>
               <p className="band-headline">{run.result.verdict.headline}</p>
             </div>
-            <dl className="band-metrics">
+            <dl className="band-metrics" data-trace="score" tabIndex={trace.on ? 0 : undefined}>
               <div>
                 <dt>Confidence</dt>
                 <dd>{run.result.verdict.confidence}</dd>
@@ -251,8 +235,22 @@ export default function VerdictBand({ compactOnPhone = false }: { compactOnPhone
                   {t.label}
                 </button>
               ))}
+              {run.result.persisted && run.result.verdict_id && (
+                <ShareButton verdictId={run.result.verdict_id} />
+              )}
+              <button
+                type="button"
+                className="btn-ghost band-btn"
+                aria-pressed={trace.on}
+                onClick={trace.toggle}
+                title="Follow any figure to its sources (T)"
+                style={trace.on ? { background: "var(--deep-navy)", color: "var(--white)", borderColor: "var(--deep-navy)" } : undefined}
+              >
+                Trace
+              </button>
             </div>
           </div>
+          <TraceThread />
           <RunDegradationNote degradation={run.result.degradation} />
         </>
       )}

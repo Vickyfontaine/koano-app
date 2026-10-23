@@ -10,6 +10,8 @@ import type { SynthesisResult } from '../agents/synthesis';
 export interface PersistOutcome {
   persisted: boolean;
   persist_error: string | null;
+  /** The stored row id when persisted (the share link needs it). */
+  verdict_id?: string | null;
 }
 
 export async function persistVerdict(args: {
@@ -46,17 +48,19 @@ export async function persistVerdict(args: {
     // (migration-023) so a rebuilt history verdict reproduces the nudge. Deploy-
     // safe: if the column does not exist yet, retry without it rather than lose
     // the row; the UI then re-derives the agent-vote part and says so.
-    const { error } = await supabaseAdmin()
+    const { data, error } = await supabaseAdmin()
       .from('verdicts')
-      .insert({ ...base, weighting_breakdown: verdict.weighting_breakdown });
-    if (!error) return { persisted: true, persist_error: null };
+      .insert({ ...base, weighting_breakdown: verdict.weighting_breakdown })
+      .select('id')
+      .single();
+    if (!error) return { persisted: true, persist_error: null, verdict_id: (data as { id: string } | null)?.id ?? null };
     if (/weighting_breakdown/.test(error.message)) {
-      const retry = await supabaseAdmin().from('verdicts').insert(base);
-      if (retry.error) return { persisted: false, persist_error: retry.error.message };
-      return { persisted: true, persist_error: null };
+      const retry = await supabaseAdmin().from('verdicts').insert(base).select('id').single();
+      if (retry.error) return { persisted: false, persist_error: retry.error.message, verdict_id: null };
+      return { persisted: true, persist_error: null, verdict_id: (retry.data as { id: string } | null)?.id ?? null };
     }
-    return { persisted: false, persist_error: error.message };
+    return { persisted: false, persist_error: error.message, verdict_id: null };
   } catch (e) {
-    return { persisted: false, persist_error: e instanceof Error ? e.message : 'persist failed' };
+    return { persisted: false, persist_error: e instanceof Error ? e.message : 'persist failed', verdict_id: null };
   }
 }

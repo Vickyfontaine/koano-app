@@ -2,9 +2,13 @@
 // POST { address } → NDJSON stream (one JSON object per line):
 //   { type: "start", agents: [...] }
 //   { type: "geocoded", normalized, bbl }
-//   { type: "agent_complete", agent, verdict, confidence, overall_provenance }   × 5
+//   { type: "agent_complete", agent, verdict, confidence, overall_provenance,
+//     contribution, data_point_count, live_count }                               × 5
 //   { type: "synthesis_start" }
-//   { type: "complete", resolved_address, verdict, persisted, persist_error }
+//   { type: "decision", verdict, confidence, risk_score, signal_window_months,
+//     overall_provenance, breakdown }      the computed decision, before the narrator
+//   { type: "narration_start" }
+//   { type: "complete", resolved_address, verdict, persisted, persist_error, verdict_id }
 //   { type: "error", error }
 // Every event reflects a REAL pipeline completion — the loading UI never
 // simulates progress. Clerk-protected: unauthenticated requests get 401.
@@ -93,7 +97,7 @@ export async function POST(req: Request) {
         const { resolved_address, verdict, degradation } = resolved
           ? await runKoanoPipelineForAddress(resolved, send)
           : await runKoanoPipeline(address, send);
-        const { persisted, persist_error } = await persistVerdict({
+        const { persisted, persist_error, verdict_id } = await persistVerdict({
           clerkUserId: userId,
           addressInput,
           resolvedAddress: resolved_address,
@@ -112,6 +116,7 @@ export async function POST(req: Request) {
           degradation,
           persisted,
           persist_error,
+          verdict_id,
         });
       } catch (e) {
         send({ type: 'error', error: e instanceof Error ? e.message : 'pipeline failed' });

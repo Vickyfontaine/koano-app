@@ -35,6 +35,7 @@ import {
   type AgentContribution,
   type WeightingBreakdown,
   type AgentSummary,
+  agentContribution,
 } from './breakdown';
 // Re-exported so existing server importers of these from './synthesis' keep working.
 export {
@@ -177,10 +178,21 @@ export interface SynthesisResult extends KoanoVerdict {
 
 export async function runSynthesis(
   addr: ResolvedAddress,
-  agents: AgentVerdict[]
+  agents: AgentVerdict[],
+  onEvent?: (e: PipelineProgressEvent) => void,
 ): Promise<SynthesisResult> {
   // --- 1. DETERMINISTIC decision: verdict, confidence, risk, window ---
   const agg = aggregate(agents, addr.normalized || addr.input);
+  // The decision is final here; the narrator below only explains it.
+  onEvent?.({
+    type: 'decision',
+    verdict: agg.verdict,
+    confidence: agg.confidence,
+    risk_score: agg.risk_score,
+    signal_window_months: agg.signal_window_months,
+    overall_provenance: agg.overall_provenance,
+    breakdown: agg.breakdown,
+  });
 
   // --- 2. NARRATOR: the model explains the decision; it cannot change it ---
   const dataPoints = agents.flatMap((a) => {
@@ -225,6 +237,7 @@ export async function runSynthesis(
     }
   );
 
+  onEvent?.({ type: 'narration_start' });
   const llm = await callAgentLLM({
     agent: 'synthesis',
     systemPrompt: NARRATOR_SYSTEM_PROMPT,
@@ -336,8 +349,25 @@ export type PipelineProgressEvent =
       verdict: Verdict;
       confidence: number;
       overall_provenance: Provenance;
+      // UI sprint WS5 (the Bench): derived from the agent's own output, so the
+      // live vote rail shows the real signed vote the moment it lands.
+      contribution: number; // confidence × direction (the same arithmetic as the breakdown)
+      data_point_count: number;
+      live_count: number;
     }
-  | { type: 'synthesis_start' };
+  | { type: 'synthesis_start' }
+  // The deterministic decision, emitted the moment aggregate() returns and
+  // BEFORE the narrator writes: the verdict never waits for prose.
+  | {
+      type: 'decision';
+      verdict: Verdict;
+      confidence: number;
+      risk_score: number;
+      signal_window_months: number;
+      overall_provenance: Provenance;
+      breakdown: WeightingBreakdown;
+    }
+  | { type: 'narration_start' };
 
 export interface PipelineResult {
   resolved_address: ResolvedAddress;
@@ -378,6 +408,9 @@ export async function runKoanoPipelineForAddress(
         verdict: v.verdict,
         confidence: v.confidence,
         overall_provenance: v.overall_provenance,
+        contribution: agentContribution(v.verdict, v.confidence),
+        data_point_count: v.data_points.length,
+        live_count: v.data_points.filter((d) => d.provenance === 'live').length,
       });
       return v;
     });
@@ -393,7 +426,7 @@ export async function runKoanoPipelineForAddress(
       track(runRegulatoryPolicyAgent(addr)),
     ]);
     onEvent?.({ type: 'synthesis_start' });
-    const verdict = await runSynthesis(addr, agents);
+    const verdict = await runSynthesis(addr, agents, onEvent);
     return { agents, verdict };
   });
 

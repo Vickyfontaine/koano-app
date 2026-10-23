@@ -44,6 +44,11 @@ export interface AgentContribution {
   contribution: number; // confidence × direction
 }
 
+/** One agent's signed vote: confidence × direction (the breakdown's own arithmetic). */
+export function agentContribution(verdict: string, confidence: number): number {
+  return confidence * (DIRECTION[verdict as Verdict] ?? 0);
+}
+
 export interface WeightingBreakdown {
   method: string; // AGGREGATION methodology marker (how votes combine) — distinct from inputs_era
   // The verdict-engine INPUTS era (see VERDICT_INPUTS_ERA). Set on a live verdict;

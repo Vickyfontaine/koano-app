@@ -8,6 +8,7 @@
 import { useCallback, useState } from "react";
 import type { AgentProgress, PipelinePhase } from "@/components/ui/LoadingState";
 import type { AgentName, SynthesisResult } from "@/components/ui/verdict";
+import type { WeightingBreakdown } from "../../../lib/agents/breakdown";
 import { useUpgrade, isUpgradeRequired } from "./UpgradeProvider";
 import type { RunPayload } from "./useAddressResolver";
 
@@ -31,6 +32,8 @@ export interface StreamComplete {
   degradation?: RunDegradation;
   persisted: boolean;
   persist_error: string | null;
+  /** The stored record's id (for the share link), when persisted. */
+  verdict_id?: string | null;
 }
 
 type StreamEvent =
@@ -42,10 +45,25 @@ type StreamEvent =
       verdict: AgentProgress["verdict"];
       confidence: number;
       overall_provenance: AgentProgress["overall_provenance"];
+      contribution?: number;
+      data_point_count?: number;
+      live_count?: number;
     }
   | { type: "synthesis_start" }
+  | ({ type: "decision" } & StreamDecision)
+  | { type: "narration_start" }
   | ({ type: "complete" } & StreamComplete)
   | { type: "error"; error: string };
+
+/** The computed decision, received before the narrator writes (WS5, the Bench). */
+export interface StreamDecision {
+  verdict: SynthesisResult["verdict"];
+  confidence: number;
+  risk_score: number;
+  signal_window_months: number;
+  overall_provenance: AgentProgress["overall_provenance"];
+  breakdown: WeightingBreakdown;
+}
 
 export type VerdictStreamStatus = "idle" | "running" | "done" | "error";
 
@@ -57,6 +75,7 @@ export interface VerdictStream {
   startedAt: number;
   result: StreamComplete | null;
   error: string | null;
+  decision: StreamDecision | null;
   // Accepts a raw address (geocoded server-side) OR a chosen disambiguation
   // candidate (BBL re-derived server-side from the selected point).
   run: (input: string | RunPayload) => Promise<void>;
@@ -72,6 +91,7 @@ export function useVerdictStream(): VerdictStream {
   const [startedAt, setStartedAt] = useState(0);
   const [result, setResult] = useState<StreamComplete | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [decision, setDecision] = useState<StreamDecision | null>(null);
 
   const reset = useCallback(() => {
     setStatus("idle");
@@ -80,6 +100,7 @@ export function useVerdictStream(): VerdictStream {
     setNormalized(null);
     setResult(null);
     setError(null);
+    setDecision(null);
   }, []);
 
   const run = useCallback(async (input: string | RunPayload) => {
@@ -90,6 +111,7 @@ export function useVerdictStream(): VerdictStream {
     setNormalized(null);
     setResult(null);
     setError(null);
+    setDecision(null);
     setStartedAt(Date.now());
 
     const handleEvent = (event: StreamEvent) => {
@@ -108,11 +130,27 @@ export function useVerdictStream(): VerdictStream {
               verdict: event.verdict,
               confidence: event.confidence,
               overall_provenance: event.overall_provenance,
+              contribution: event.contribution,
+              data_point_count: event.data_point_count,
+              live_count: event.live_count,
             },
           }));
           break;
         case "synthesis_start":
           setPhase("synthesis");
+          break;
+        case "decision":
+          setDecision({
+            verdict: event.verdict,
+            confidence: event.confidence,
+            risk_score: event.risk_score,
+            signal_window_months: event.signal_window_months,
+            overall_provenance: event.overall_provenance,
+            breakdown: event.breakdown,
+          });
+          break;
+        case "narration_start":
+          setPhase("narration");
           break;
         case "complete":
           setResult(event);
@@ -165,5 +203,5 @@ export function useVerdictStream(): VerdictStream {
     }
   }, [openUpgrade]);
 
-  return { status, phase, agents, normalized, startedAt, result, error, run, reset };
+  return { status, phase, agents, normalized, startedAt, result, error, decision, run, reset };
 }

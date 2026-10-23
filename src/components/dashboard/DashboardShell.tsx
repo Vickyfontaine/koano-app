@@ -17,6 +17,7 @@ import WatchSheet from "./shell/WatchSheet";
 import SubjectProvider from "./shell/SubjectProvider";
 import VerdictBand from "./shell/VerdictBand";
 import EvidenceDrawer from "./shell/EvidenceDrawer";
+import TraceProvider from "@/components/ui/trace/TraceProvider";
 import GlobalSearch from "./shell/GlobalSearch";
 import ClusterPlaceholderView from "./ClusterPlaceholderView";
 import Cluster1Dashboard from "./cluster1/Cluster1Dashboard";
@@ -124,6 +125,7 @@ export default function DashboardShell({
     // "confirming your upgrade" overlay mounts when justUpgraded is set.
     <UpgradeProvider justUpgraded={justUpgraded}>
       <SubjectProvider>
+      <TraceProvider>
       <div className="koano-shell">
         <TopBar cluster={cluster} plan={plan} onOpenLens={() => setLensOpen(true)} search={<GlobalSearch variant="bar" />} />
 
@@ -194,6 +196,7 @@ export default function DashboardShell({
 
         <EvidenceDrawer />
       </div>
+      </TraceProvider>
       </SubjectProvider>
     </UpgradeProvider>
   );

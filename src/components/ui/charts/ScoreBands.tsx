@@ -58,6 +58,7 @@ export default function ScoreBands({
             position: "absolute",
             left: `${scorePct}%`,
             transform: "translateX(-50%)",
+            transition: "left 500ms var(--ease-out)",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
