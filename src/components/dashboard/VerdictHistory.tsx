@@ -68,7 +68,11 @@ export default function VerdictHistory({ id }: { id?: string }) {
     !q || (r.address_normalized ?? r.address_input ?? "").toLowerCase().includes(q);
   const all = rows ?? [];
   const hiddenCount = all.filter((r) => r.hidden).length;
-  const visible = all.filter((r) => matches(r) && (showHidden || !r.hidden));
+  const visibleAll = all.filter((r) => matches(r) && (showHidden || !r.hidden));
+  // Five rows by default; "Show all" opens the rest (a phone page of fifty
+  // repeated rows is not a history, it is a scroll).
+  const [showAll, setShowAll] = useState(false);
+  const visible = showAll ? visibleAll : visibleAll.slice(0, 5);
 
   return (
     <div style={panelStyle} id={id}>
@@ -127,7 +131,7 @@ export default function VerdictHistory({ id }: { id?: string }) {
           No verdicts yet. Run an analysis above.
         </p>
       )}
-      {rows !== null && rows.length > 0 && visible.length === 0 && (
+      {rows !== null && rows.length > 0 && visibleAll.length === 0 && (
         <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
           {q ? `No history rows match "${filter.trim()}".` : "All rows are hidden. Use “Show hidden”."}
         </p>
@@ -242,6 +246,16 @@ export default function VerdictHistory({ id }: { id?: string }) {
               </div>
             );
           })}
+          {visibleAll.length > visible.length && (
+            <button type="button" className="btn-ghost vh-btn" style={{ alignSelf: "flex-start" }} onClick={() => setShowAll(true)}>
+              Show all {visibleAll.length} rows
+            </button>
+          )}
+          {showAll && visibleAll.length > 5 && (
+            <button type="button" className="btn-ghost vh-btn" style={{ alignSelf: "flex-start" }} onClick={() => setShowAll(false)}>
+              Show five
+            </button>
+          )}
         </div>
       )}
     </div>

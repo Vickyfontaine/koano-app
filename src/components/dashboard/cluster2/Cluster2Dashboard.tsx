@@ -180,6 +180,7 @@ export default function Cluster2Dashboard() {
                   title="Client Neighborhood Report"
                   address={subjectAddress}
                   formats={["pdf"]}
+                  hasRecentVerdict={!!result?.verdict}
                   id="c2-neighborhood-doc"
                 />
                 <DocumentButton

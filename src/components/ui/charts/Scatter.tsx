@@ -95,7 +95,7 @@ export default function Scatter({
               style={{
                 ...axisLabel,
                 position: "absolute",
-                right: "2px",
+                left: "4px",
                 top: "-14px", // above the line, clear of points centered on it
                 color: "var(--ink-muted)",
                 background: "rgba(255,255,255,0.92)",

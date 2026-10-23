@@ -761,6 +761,19 @@
   min-width: 0;
   overflow-wrap: anywhere;
 }
+/* Phones: the ledger row stacks (label and value, then badge and source). */
+@media (max-width: 767px) {
+  .evidence-drawer .ledger-row {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) !important;
+    row-gap: var(--space-1) !important;
+  }
+  .evidence-drawer .ledger-row > :nth-child(3) {
+    grid-column: 1;
+  }
+  .evidence-drawer .ledger-row > :nth-child(4) {
+    grid-column: 2;
+  }
+}
 
 /* Watchlist (WatchSheet) */
 .shell-watch-list {

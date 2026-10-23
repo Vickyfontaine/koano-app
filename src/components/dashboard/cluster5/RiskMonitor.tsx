@@ -180,12 +180,12 @@ export default function RiskMonitor({ properties, id }: RiskMonitorProps) {
                         <span style={{ color: "var(--ink-muted)" }}>fetching…</span>
                       ) : flood?.data ? (
                         <span style={{ display: "inline-flex", alignItems: "center", gap: "8px", color: "var(--ink-secondary)" }}>
-                          zone {flood.data.flood_zone ?? "—"}
+                          zone {flood.data.flood_zone ?? "n/a"}
                           {flood.data.in_special_flood_hazard_area ? " · SFHA" : ""}
                           <ProvenanceBadge provenance={flood.provenance} />
                         </span>
                       ) : (
-                        <span style={{ color: "var(--ink-muted)" }}>{r.error ?? "—"}</span>
+                        <span style={{ color: "var(--ink-muted)" }}>{r.error ?? "n/a"}</span>
                       )}
                     </td>
                     <td style={{ padding: "8px 12px", fontSize: "12px", borderBottom: "1px solid var(--border-light)" }}>
@@ -195,11 +195,11 @@ export default function RiskMonitor({ properties, id }: RiskMonitorProps) {
                           <ProvenanceBadge provenance={contamination.provenance} />
                         </span>
                       ) : (
-                        r.loading ? <span style={{ color: "var(--ink-muted)" }}>fetching…</span> : "—"
+                        r.loading ? <span style={{ color: "var(--ink-muted)" }}>fetching…</span> : "n/a"
                       )}
                     </td>
                     <td style={{ padding: "8px 12px", fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--ink-primary)", borderBottom: "1px solid var(--border-light)" }}>
-                      {seismic?.data && seismic.data.pga_g != null ? `${seismic.data.pga_g}g` : "—"}
+                      {seismic?.data && seismic.data.pga_g != null ? `${seismic.data.pga_g}g` : "n/a"}
                     </td>
                     <td style={{ padding: "8px 12px", fontSize: "12px", borderBottom: "1px solid var(--border-light)" }}>
                       {disaster?.data ? (
@@ -208,7 +208,7 @@ export default function RiskMonitor({ properties, id }: RiskMonitorProps) {
                           <ProvenanceBadge provenance={disaster.provenance} />
                         </span>
                       ) : (
-                        "—"
+                        "n/a"
                       )}
                     </td>
                   </tr>

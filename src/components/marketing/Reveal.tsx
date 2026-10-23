@@ -5,8 +5,9 @@
 // JavaScript, for crawlers and link-preview bots, in a headless full-page
 // capture, and under reduced motion. The fade-up only runs when an
 // IntersectionObserver exists, reduced motion is off, and the element is below
-// the fold at mount. A section can never render blank; motion is an
-// enhancement, never a gate on content.
+// the fold at mount, and gives up after 900ms if the observer never fires. A
+// section can never stay blank; motion is an enhancement, never a gate on
+// content.
 //
 // Two ways to use it:
 //   const show = useReveal(ref);          // boolean; pair with `fadeUp`
@@ -43,14 +44,19 @@ export function useReveal(ref: RefObject<Element>, options: { amount?: number; o
   const [armed, setArmed] = useState(false);
   const inView = useInView(ref as RefObject<Element>, { once: true, amount });
 
+  // A time fallback: if the observer has not fired within 900ms (a headless
+  // capture that never scrolls, a throttled tab), the block shows anyway.
+  const [forced, setForced] = useState(false);
   useLayoutEffect(() => {
     if (typeof IntersectionObserver === "undefined" || reduce) return;
     const r = ref.current?.getBoundingClientRect();
     const alreadyVisible = !!r && r.top < window.innerHeight * 0.9 && r.bottom > 0;
     if (!alreadyVisible) setArmed(true);
+    const t = setTimeout(() => setForced(true), 900);
+    return () => clearTimeout(t);
   }, [ref, reduce]);
 
-  return !armed || inView;
+  return !armed || inView || forced;
 }
 
 interface RevealProps {

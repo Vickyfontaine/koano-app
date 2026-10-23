@@ -56,7 +56,7 @@ export default function ViolationsPanel({ violations, error, id }: ViolationsPan
               label="Last 24 months vs prior 24"
               value={`${fmtInt(v.hpd.last_24mo)} vs ${fmtInt(v.hpd.prior_24mo)}${trendRising ? " · rising" : ""}`}
             />
-            <Row label="Most recent inspection" value={v.hpd.most_recent_inspection ?? "—"} />
+            <Row label="Most recent inspection" value={v.hpd.most_recent_inspection ?? "n/a"} />
           </>
         ) : (
           <p style={{ fontSize: "13px", lineHeight: 1.6, color: "var(--ink-muted)", margin: 0 }}>

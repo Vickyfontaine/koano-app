@@ -30,13 +30,13 @@ Before = the pre-sprint capture set (`build-log/ui-ws-1/before/`) unless a later
 | A9 | Stock map labels, tiny lots | Closed (WS4) | `ui-ws-1/before/cluster_5-empty-1440-fold.jpg` | `ui-ws-6/after/cluster_1-done-1440-fold.jpg` (street and neighborhood labels only); `ui-ws-4/after/interactions/property-map-lot-390.jpg` (lot zoom) |
 | A10 | 9px chart labels, three ticks, 180px scatter | Closed (WS1 floor, WS4 ticks and height) | `ui-ws-1/before/cluster_2-done-1440.jpg` | `ui-ws-6/after/cluster_2-done-1440.jpg` (five ticks, 260px scatter) |
 | A11 | Orphan tile, wrapping values | Closed (WS4) | `ui-ws-1/before/cluster_2-done-1440-fold.jpg` | `ui-ws-6/after/cluster_2-done-1440-fold.jpg` (3 by 2), `cluster_2-done-390.jpg` (2 by 3) |
-| A12 | Conflicting radii, 25 paddings, 19 sizes | Closed (WS1 tokens; later workstreams on tokens) | `ui-ws-1/before/*` | `src/app/globals.css` `:root` tokens; `ui-ws-6/after/*` |
+| A12 | Conflicting radii, 25 paddings, 19 sizes | Partly closed: the token layer is built and every rebuilt surface reads it; the sweep of the untouched components is incomplete (the final review counted inline px font sizes, a few off-token chart radii and one-off paddings in components no workstream rebuilt) | `ui-ws-1/before/*` | `src/app/globals.css` `:root` tokens; the rebuilt surfaces in `ui-ws-6/after/*` |
 | A13 | Three numbering systems | Closed (WS3) | `ui-ws-1/before/cluster_2-done-1440-fold.jpg` ("C2 · …", "02", "home cluster C1") | `ui-ws-6/after/cluster_2-empty-1440-fold.jpg` (plain lens names, "home") |
 | A14 | Text wordmark in the sidebar | Closed (WS3) | `ui-ws-1/before/cluster_2-done-1440-fold.jpg` | `ui-ws-6/after/cluster_2-empty-1440-fold.jpg` (the blue logo in the top bar) |
 | A15 | Default Clerk sign-in | Closed (WS3) | `ui-ws-1/before/login-1440-fold.jpg` | `ui-ws-6/after/login-1440-fold.jpg`, `signup-390.jpg` |
-| A16 | Badge and verdict contrast, no focus states | Closed (WS1) | `ui-ws-1/before/cluster_2-done-1440-fold.jpg` | `ui-ws-1/after/cluster_2-done-1440-fold.jpg`; the global focus ring in every later interaction capture (`ui-ws-3/after/interactions/band-done-390.jpg`) |
+| A16 | Badge and verdict contrast, no focus states | Closed (WS1) | `ui-ws-1/before/cluster_2-done-1440-fold.jpg` | `ui-ws-1/after/cluster_2-done-1440-fold.jpg`; the global focus ring in every later interaction capture (`ui-ws-3/after/interactions/band-done-390.jpg`); contrast is verified from the ink tokens in `globals.css` (JPEG captures cannot prove a ratio) |
 | A17 | "Unavailable" while loading | Closed (WS4) | `ui-ws-1/before/cluster_2-running-1440-fold.jpg` | `ui-ws-6/after/cluster_2-running-1440-fold.jpg` (skeleton panels) |
-| A18 | Blank sections in captures | Closed (WS2) | `ui-ws-1/before/intelligence-1440.jpg` | `ui-ws-6/after/intelligence-1440.jpg`, `data-390.jpg` (every section rendered; server HTML carries no hidden sections) |
+| A18 | Blank sections in captures | Closed (WS2, with a time fallback added after the final review) | the pre-sprint code (`useInView` with a hidden initial state in every section; the WS1 harness scrolled, so its captures do not show the blank, and the final review reproduced it with an unscrolled capture) | `ui-ws-6/after/intelligence-1440.jpg`, `data-390.jpg`; server HTML carries no hidden sections; `useReveal` now reveals after 900ms even if the observer never fires |
 | A19 | PDF typography, KOANO mark on white-label documents | Closed (WS1) | the WS1 report's review table (`ui-ws-1-report.md`; the pre-sprint PDFs were rendered during WS1, not kept) | `ui-ws-1/after/docs/*.png` (page 1 of every sample document) |
 
 ## Acceptance criteria
@@ -64,6 +64,30 @@ Captured on the finished branch into `build-log/ui-ws-6/after/`: thirteen market
 - Apply `supabase/migration-023-ui-sprint-integrity.sql` (five-state provenance constraints, `verdicts.weighting_breakdown`, RLS on two cache tables). Until then a non-NYC verdict fails to persist and history verdicts rebuild their math from the stored votes.
 - Supply the 4:5 mobile render set (`public/renders/mobile/<name>.webp`); `node scripts/ui/render-manifest.mjs` lists what is present; flipping `mobile: true` in `renders.ts` serves each one below 768px. Until then the heroes use the temporary stacked layout.
 
+## Final independent review and resolutions
+
+The whole-sprint reviewer (a fresh subagent given the sprint file, every report, CLAUDE.md §10 and §16, the final QA set and the earlier sets, with its own live checks and one analysis) returned "ship the branch for the founder's review", with four material findings and eight minor ones.
+
+| # | Finding | Resolution |
+|---|---|---|
+| 1 | A18 only partly closed: below-fold blocks stayed hidden in an unscrolled headless capture until the observer fired; the cited before did not show the problem | Fixed: `useReveal` reveals after 900ms if the observer never fires; the A18 row now cites the code and the review's reproduction as the before |
+| 2 | The evidence surfaces showed raw engine keys (`hpi_yoy_change_pct`) and broke them mid-word; the drawer's ledger kept four columns on phones | Fixed: `humanizeLabel()` renders words in the ledger and the Trace thread (the key stays in the title attribute); the drawer's ledger rows stack to two columns on phones |
+| 3 | The Price lens's neighborhood-report tile said "Run an analysis first" after a run | Fixed: the tile reads the run's verdict |
+| 4 | The report overstated A12 and A18 and left a placeholder section | Fixed in this report: A12 is "partly closed" with the remaining sweep named; A18 reworded; this section written |
+| 5 | The Develop phone math strip's neutral rows read "no directional s…" | Fixed: the strip's neutral rows read "neutral" |
+| 6 | Verdict history unpaginated on phones (50 rows) | Fixed: five rows with "Show all" |
+| 7 | The scatter's reference label collided with marks and clipped at 390 | Fixed: anchored at the left end of its line |
+| 8 | The homepage ledger shows "Median household income" as a Demand Sentiment input the live engine no longer reads | Fixed: the row's source says "Read in the August run; no longer a verdict input" |
+| 9 | Mono caps carry the hierarchy in the band, tiles and chrome; the product still reads partly generic there | Not changed: these are eyebrows and KPI labels, the house style in CLAUDE.md §10. Recorded below as not fully satisfied for the founder's call |
+| 10 | Acquire on phones: the sticky action covers the bottom of an open map and leaves a band of space; Property Row values wrap one word per line | Not changed in this pass; recorded below |
+| 11 | Placeholder dashes remained in several panels; provider source strings with em dashes print in PDFs | Fixed in the panels (21 placeholders now "n/a"); provider source strings are engine text and stay |
+| 12 | Run-to-run confidence spread of about 12 points on the same address | Engine behavior (§07C explains temp-0 wobble of a point or two; this spread is wider); recorded for the engine owner, outside this sprint |
+
 ## Not fully satisfied
 
-(filled after the final QA pass)
+- **A2** closes only when the founder's 4:5 mobile render set arrives; the temporary stacked layout stands and tablets show the desktop compositions.
+- **A12**: the token layer is built and every surface the sprint rebuilt reads it; components no workstream touched still carry inline px values (the final review's grep), to be migrated component by component as CLAUDE.md §10 says.
+- **A7 in the chrome**: panel titles are sentence case; the band's eyebrows, the KPI tile labels and the plan tag remain uppercase mono, the house eyebrow style. If the founder wants weight-and-spacing hierarchy there too, it is a token-level change in `shell.css` and `panels.tsx`.
+- **Phone polish left open**: the Acquire sticky action overlaps an opened map's bottom edge and leaves a gap above the briefing; Property Row values can wrap a word per line; the sticky action renders at its viewport position in full-page captures.
+- **Engine, not UI**: the narrator's prose can carry em dashes; the same address returned confidence 68 to 80 across the day's runs; the per-figure evidence bundle is not persisted, so sealed records cannot show the ledger; migration-023 is unapplied in the project, so every record shows the rebuilt math.
+- **Draw-the-thread Trace and `provider_result` Bench facts** are follow-ons (WS5 report).

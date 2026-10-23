@@ -176,7 +176,7 @@ export default function PortfolioOverview({
                       {p.address_normalized ?? p.address_input}
                     </td>
                     <td style={{ padding: "8px 12px", fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--ink-muted)", borderBottom: "1px solid var(--border-light)" }}>
-                      {p.bbl ?? "—"}
+                      {p.bbl ?? "n/a"}
                     </td>
                     <td style={{ padding: "8px 12px", borderBottom: "1px solid var(--border-light)" }}>
                       {v ? (
@@ -196,13 +196,13 @@ export default function PortfolioOverview({
                       )}
                     </td>
                     <td style={{ padding: "8px 12px", fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--ink-primary)", borderBottom: "1px solid var(--border-light)" }}>
-                      {v ? `${v.risk_score}/100` : "—"}
+                      {v ? `${v.risk_score}/100` : "n/a"}
                     </td>
                     <td style={{ padding: "8px 12px", borderBottom: "1px solid var(--border-light)" }}>
-                      {v ? <ProvenanceBadge provenance={v.overall_provenance} /> : "—"}
+                      {v ? <ProvenanceBadge provenance={v.overall_provenance} /> : "n/a"}
                     </td>
                     <td style={{ padding: "8px 12px", fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--ink-muted)", borderBottom: "1px solid var(--border-light)" }}>
-                      {v ? new Date(v.created_at).toLocaleDateString() : "—"}
+                      {v ? new Date(v.created_at).toLocaleDateString() : "n/a"}
                     </td>
                     <td style={{ padding: "8px 12px", borderBottom: "1px solid var(--border-light)", whiteSpace: "nowrap" }}>
                       <button

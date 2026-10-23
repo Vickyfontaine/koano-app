@@ -41,6 +41,8 @@ export interface DivergingDatum {
 interface DivergingBarProps {
   /** Trace (WS5): rows carry data-trace="<prefix><key>" so a hover follows the vote. */
   tracePrefix?: string;
+  /** The neutral row's note (default "no directional signal"; the site strip uses "neutral"). */
+  neutralLabel?: string;
   data: DivergingDatum[];
   /** Shared linear domain, e.g. [-2, 2]. */
   domain: [number, number];
@@ -62,6 +64,7 @@ export default function DivergingBar({
   barHeight = 22,
   labelWidth = 176,
   tracePrefix,
+  neutralLabel = "no directional signal",
 }: DivergingBarProps) {
   // Percent scale — positions are CSS left/width %, so the plot is fully fluid.
   const scale = scaleLinear({ domain, range: [0, 100] });
@@ -177,7 +180,7 @@ export default function DivergingBar({
                       textOverflow: "ellipsis",
                     }}
                   >
-                    no directional signal
+                    {neutralLabel}
                   </span>
                 </>
               ) : (

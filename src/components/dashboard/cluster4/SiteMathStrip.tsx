@@ -110,7 +110,7 @@ export default function SiteMathStrip({ sites }: { sites: StripSite[] }) {
                   {s.verdict.verdict}
                 </span>
               </div>
-              <DivergingBar data={rows} domain={DOMAIN} barHeight={16} labelWidth={78} />
+              <DivergingBar data={rows} domain={DOMAIN} barHeight={16} labelWidth={78} neutralLabel="neutral" />
               <div style={{ ...mono, color: "var(--ink-muted)" }}>
                 score {fmtSigned(score)}
               </div>

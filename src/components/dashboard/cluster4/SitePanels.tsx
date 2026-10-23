@@ -129,7 +129,7 @@ export default function SitePanels({ detail, detailError, verdict }: SitePanelsP
             value={
               zoning.data.zoning_district
                 ? `${zoning.data.zoning_district}${zoning.data.commercial_overlay ? ` / ${zoning.data.commercial_overlay}` : ""}`
-                : "—"
+                : "n/a"
             }
           />
           {zoning.data.special_district && (
@@ -137,11 +137,11 @@ export default function SitePanels({ detail, detailError, verdict }: SitePanelsP
           )}
           <Row
             label="Built FAR / max residential FAR"
-            value={`${zoning.data.built_far ?? "—"} / ${zoning.data.max_residential_far ?? "—"}`}
+            value={`${zoning.data.built_far ?? "n/a"} / ${zoning.data.max_residential_far ?? "n/a"}`}
           />
           <Row label="Unused FAR" value={fmtPct(zoning.data.unused_far_pct)} />
           <Row label="Lot area" value={`${fmtInt(zoning.data.lot_area_sqft)} sq ft`} />
-          <Row label="Year built" value={zoning.data.year_built ?? "—"} />
+          <Row label="Year built" value={zoning.data.year_built ?? "n/a"} />
           <Row label="Residential units" value={fmtInt(zoning.data.residential_units)} />
         </div>
       ) : (

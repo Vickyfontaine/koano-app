@@ -27,7 +27,7 @@ export default function OwnershipPanel({ portfolio, error, id }: OwnershipPanelP
 
       {p.hpd_registered ? (
         <>
-          <Row label="Registered owner (HPD)" value={p.registered_owner ?? "—"} />
+          <Row label="Registered owner (HPD)" value={p.registered_owner ?? "n/a"} />
           {p.management_company && <Row label="Managing agent" value={p.management_company} />}
           <Row
             label="Buildings under this entity (exact match, a floor)"

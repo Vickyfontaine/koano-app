@@ -15,6 +15,7 @@
 import React, { useState } from "react";
 import { useTrace } from "./trace/TraceProvider";
 import { pointId } from "./trace/graph";
+import { humanizeLabel } from "./humanize";
 import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
 import { AGENT_LABELS, type AgentName, type LedgerDataPoint } from "@/components/ui/verdict";
 
@@ -156,7 +157,9 @@ export default function ProvenanceLedger({ dataPoints, locationConfidence, addre
                       borderTop: "1px solid var(--border-light)",
                     }}
                   >
-                    <span style={{ fontSize: "13px", color: "var(--ink-secondary)" }}>{d.label}</span>
+                    <span style={{ fontSize: "13px", color: "var(--ink-secondary)" }} title={d.label}>
+                      {humanizeLabel(d.label)}
+                    </span>
                     <span style={{ ...mono, fontSize: "12px", color: "var(--ink-primary)", wordBreak: "break-word" }}>
                       {String(d.value ?? "n/a")}
                     </span>

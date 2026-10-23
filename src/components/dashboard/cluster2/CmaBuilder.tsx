@@ -50,8 +50,8 @@ export default function CmaBuilder({ detail, detailError, id }: CmaBuilderProps)
           >
             <Row label="Building area" value={`${fmtInt(zoning.data.building_area_sqft)} sq ft`} />
             <Row label="Residential units" value={fmtInt(zoning.data.residential_units)} />
-            <Row label="Year built" value={zoning.data.year_built ?? "—"} />
-            <Row label="Zoning" value={zoning.data.zoning_district ?? "—"} />
+            <Row label="Year built" value={zoning.data.year_built ?? "n/a"} />
+            <Row label="Zoning" value={zoning.data.zoning_district ?? "n/a"} />
           </div>
         </div>
       )}

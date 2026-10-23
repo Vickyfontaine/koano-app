@@ -76,7 +76,7 @@ export const EXAMPLE_LEDGER: LedgerDataPoint[] = [
   { agent: "infrastructure", label: "DOB permits in tract (24 mo)", value: 675, provenance: "live", source: "NYC DOB permits (DOB NOW + legacy)" },
   { agent: "infrastructure", label: "New-building permits on lot", value: 0, provenance: "live", source: "NYC DOB permits (DOB NOW + legacy)" },
   // Demand sentiment
-  { agent: "demand-sentiment", label: "Median household income", value: "$165,179", provenance: "live", source: "US Census ACS 2024 5-year" },
+  { agent: "demand-sentiment", label: "Median household income", value: "$165,179", provenance: "live", source: "US Census ACS 2024 5-year. Read in the August run; no longer a verdict input" },
   { agent: "demand-sentiment", label: "Mortgage denial rate (county)", value: "31.9%", provenance: "live", source: "CFPB HMDA (2024)" },
   { agent: "demand-sentiment", label: "Net county migration", value: "−11,517 returns", provenance: "live", source: "IRS SOI migration (2021–2022)" },
   // Risk & volatility

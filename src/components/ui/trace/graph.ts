@@ -5,6 +5,7 @@
 
 import type { Provenance, SynthesisResult } from "../verdict";
 import { AGENT_LABELS } from "../verdict";
+import { humanizeLabel } from "../humanize";
 
 export type TraceNodeId = "verdict" | "score" | `agent:${string}` | `point:${string}`;
 
@@ -66,7 +67,7 @@ export function buildThread(result: SynthesisResult, node: TraceNodeId): TraceSe
       .slice(0, max)
       .map((p) => ({
         id: pointId(agent, p.label),
-        label: `${p.label} = ${String(p.value ?? "n/a")}`,
+        label: `${humanizeLabel(p.label)} = ${String(p.value ?? "n/a")}`,
         op: `read from ${p.source}`,
         provenance: p.provenance,
       }));
@@ -93,7 +94,7 @@ export function buildThread(result: SynthesisResult, node: TraceNodeId): TraceSe
     const p = points.find((x) => x.agent === agent && x.label === label);
     const s = agentSeg(agent);
     const seg: TraceSegment = p
-      ? { id: node, label: `${p.label} = ${String(p.value ?? "n/a")}`, op: p.source, provenance: p.provenance }
+      ? { id: node, label: `${humanizeLabel(p.label)} = ${String(p.value ?? "n/a")}`, op: `read from ${p.source}`, provenance: p.provenance }
       : { id: node, label, op: "not in this run's evidence" };
     // Reverse trace: from the figure up to what it moved.
     return s ? [seg, { ...s, op: `this figure fed the ${AGENT_LABELS[agent as keyof typeof AGENT_LABELS] ?? agent} read; ${s.op}` }, score, head] : [seg, score, head];

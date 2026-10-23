@@ -72,7 +72,7 @@ export default function ValuationPanel({ detail, detailError, id }: ValuationPan
           ) : (
             <>
               Indicative value: trimmed median of {pool.comps.length} nearby recorded sales
-              {psf != null ? ` ${fmtMoney(psf)}` : " —"}/sq ft × {sqft != null ? fmtInt(sqft) : "—"} sq ft
+              {psf != null ? ` ${fmtMoney(psf)}` : " —"}/sq ft × {sqft != null ? fmtInt(sqft) : "n/a"} sq ft
               building area (live PLUTO){pool.subjectExcluded ? ", the subject's own sale excluded" : ""}.
               {comps && comps.provenance !== "live" && (
                 <> Not fetched live this run; the recorded-sales call did not succeed.</>
@@ -111,7 +111,7 @@ export default function ValuationPanel({ detail, detailError, id }: ValuationPan
               label={`Price velocity: ${hpi.data.region} (${hpi.data.region_type}, FHFA HPI)`}
               value={
                 <span style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
-                  {hpi.data.yoy_change_pct != null ? `${hpi.data.yoy_change_pct}% yoy` : "—"}
+                  {hpi.data.yoy_change_pct != null ? `${hpi.data.yoy_change_pct}% yoy` : "n/a"}
                   {hpi.data.five_yr_change_pct != null ? ` · ${hpi.data.five_yr_change_pct}% 5yr` : ""}
                   <ProvenanceBadge provenance={hpi.provenance} />
                 </span>

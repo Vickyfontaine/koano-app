@@ -75,7 +75,7 @@ export default function PropertyMap({
   // Subject — the geocoded point, annotated with its own flood status.
   const flood = detail.flood?.data;
   const floodLine = flood
-    ? `Flood zone ${flood.flood_zone ?? "—"}${flood.in_special_flood_hazard_area ? " (SFHA)" : ""}`
+    ? `Flood zone ${flood.flood_zone ?? "n/a"}${flood.in_special_flood_hazard_area ? " (SFHA)" : ""}`
     : null;
   markers.push({
     id: "subject",

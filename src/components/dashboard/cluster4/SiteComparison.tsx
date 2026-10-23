@@ -473,7 +473,7 @@ export default function SiteComparison() {
                         {v.risk_score}
                       </td>
                       <td style={{ padding: "12px 16px", fontFamily: "var(--font-mono)", fontSize: "13px", color: "var(--ink-primary)", borderBottom: "1px solid var(--border-light)" }}>
-                        {reg ? `${reg.risk_score}/100` : "—"}
+                        {reg ? `${reg.risk_score}/100` : "n/a"}
                       </td>
                       <td style={{ padding: "12px 16px", fontFamily: "var(--font-mono)", fontSize: "13px", color: "var(--ink-primary)", borderBottom: "1px solid var(--border-light)" }}>
                         {v.signal_window_months} mo
