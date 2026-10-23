@@ -1,0 +1,6 @@
+{
+  "firstFocus": "About us",
+  "tabStaysInside": true,
+  "closedOnEscape": true,
+  "focusReturnedTo": "nav-mobile-toggle"
+}
