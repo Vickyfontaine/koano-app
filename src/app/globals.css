@@ -13,10 +13,11 @@
   /* Content width shared by every dashboard lens (UI sprint, A5). */
   --content-max: 1200px;
   /* Marketing site (WS2): one section width, one prose width. */
-  --chart-h: 260px;
   --content-marketing: 1200px;
   --content-reading: 900px;
   --content-prose: 720px;
+  /* Dashboard charts (WS4): plot height, 220px on phones. */
+  --chart-h: 260px;
 
   /* Backgrounds */
   --white: #FFFFFF;

@@ -71,7 +71,7 @@ export default function CmaBuilder({ detail, detailError, id }: CmaBuilderProps)
           >
             Live recorded residential sales from NYC public records. {comps.data.scope_note}
           </div>
-          <CompCards comps={comps.data.comps} provenance={comps.provenance} />
+          <CompCards comps={comps.data.comps} provenance={comps.provenance} inPanel />
           <div className="scroll-x wide-only" style={{ overflowX: "auto", padding: "2px" }}>
             <table style={{ borderCollapse: "collapse", width: "100%", minWidth: "520px" }}>
               <thead>
@@ -122,8 +122,9 @@ export default function CmaBuilder({ detail, detailError, id }: CmaBuilderProps)
           {comps.data.scope_note}
         </p>
       ) : (
-        <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
-          Comparables unavailable{comps?.error ? `: ${comps.error}` : ""}.
+        <p style={{ fontSize: "var(--text-body)", lineHeight: 1.5, color: "var(--ink-secondary)", margin: 0 }}>
+          Comparable sales are not available for this run{comps?.error ? ` (${comps.error})` : ""}. Nothing is estimated in their
+          place.
         </p>
       )}
 

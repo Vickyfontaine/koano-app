@@ -14,7 +14,7 @@ export const mockProformaBenchmark: ProformaBenchmarkProvider = {
 
   async getBenchmarks(addr: ResolvedAddress): Promise<ProviderResult<ProformaBenchmark>> {
     const data: ProformaBenchmark = {
-      submarket: `${addr.borough ?? 'NYC'} — ${addr.zip ?? 'unknown zip'} (representative)`,
+      submarket: `${addr.borough ?? 'NYC'}, ${addr.zip ?? 'unknown zip'} (representative)`,
       land_cost_per_buildable_sf: 210,
       construction_cost_per_sf: 465,
       exit_cap_rate_pct: 5.25,

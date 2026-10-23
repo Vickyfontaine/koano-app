@@ -43,6 +43,10 @@ export default function SiteCards({
         const guardKey = (s.verdict.weighting_breakdown as { structural_guard?: string | null } | undefined)?.structural_guard ?? null;
         const guard = guardKey ? GUARD_LABEL[guardKey] ?? guardKey : null;
         const unused = z?.unused_far_pct;
+        const buildable =
+          z && z.lot_area_sqft != null && z.max_residential_far != null && z.building_area_sqft != null
+            ? Math.max(0, Math.round(z.lot_area_sqft * z.max_residential_far - z.building_area_sqft))
+            : null;
         return (
           <div key={s.slot} role="listitem" style={{ display: "flex", minWidth: 0 }}>
           <button
@@ -66,15 +70,16 @@ export default function SiteCards({
                 <dd style={{ color: riskInk(s.verdict.risk_score) }}>{s.verdict.risk_score}</dd>
               </div>
               <div>
-                <dt>Unused FAR</dt>
-                <dd>{unused != null ? `${unused}%` : "n/a"}</dd>
+                <dt>Buildable</dt>
+                <dd>{buildable != null ? `${fmtInt(buildable)}` : "n/a"}</dd>
               </div>
             </dl>
             {z && (
               <span className="card-note">
+                {buildable != null ? "sq ft of as-of-right room · " : ""}
                 {z.zoning_district ?? "Zoning n/a"}
+                {unused != null ? ` · ${unused}% unused FAR` : ""}
                 {z.building_area_sqft != null ? ` · ${fmtInt(z.building_area_sqft)} sq ft built` : ""}
-                {z.max_residential_far != null ? ` · max FAR ${z.max_residential_far}` : ""}
               </span>
             )}
             {guard && (

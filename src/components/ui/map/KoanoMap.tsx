@@ -261,7 +261,15 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
   const moveHandlerRef = useRef<(() => void) | null>(null);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
+  // The legend starts collapsed on phones (it would cover half a 440px canvas).
+  const lastLotRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (focusLot) lastLotRef.current = focusLot;
+  }, [focusLot]);
   const [collapsed, setCollapsed] = useState(false);
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.matchMedia?.("(max-width: 767px)").matches) setCollapsed(true);
+  }, []);
   const [inView, setInView] = useState<Partial<Record<MarkerKind, number>>>({});
 
   const signature = JSON.stringify({ center, markers, polygons });
@@ -296,7 +304,7 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
         });
         map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), "top-right");
         popupRef.current = new mapboxgl.Popup({ closeButton: false, closeOnClick: false, offset: 12, className: "koano-map-popup" });
-        map.on("load", () => {
+        const brandBase = () => {
           // Branded base (A9): only street names and neighborhood names stay,
           // set in the ink-muted color with a white halo. Points of interest,
           // transit, airports, cities, water and natural labels are off, so a
@@ -344,7 +352,14 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
             ] as unknown as string),
           );
           paint(() => map!.setPaintProperty("landuse", "fill-opacity", 0.6));
+        };
+        map.on("load", () => {
+          brandBase();
           if (!cancelled) setReady(true);
+        });
+        // A style reload would restore the stock labels; re-apply on every style load.
+        map.on("style.load", () => {
+          if (map!.isStyleLoaded()) brandBase();
         });
         // Log runtime errors (a tile 404, a transient) but do NOT hide a working
         // map — only a construction failure or a missing token shows the fallback.
@@ -554,7 +569,11 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
       <div ref={containerRef} style={{ height, width: "100%" }} />
       {onFrameChange && polygons.some((p) => p.kind === "lot") && (
         <div className="map-frame-controls" role="group" aria-label="Map frame">
-          <button type="button" aria-pressed={!!focusLot} onClick={() => onFrameChange(polygons.find((p) => p.kind === "lot")!.id)}>
+          <button
+            type="button"
+            aria-pressed={!!focusLot}
+            onClick={() => onFrameChange(lastLotRef.current ?? polygons.find((p) => p.kind === "lot")!.id)}
+          >
             Lot
           </button>
           <button type="button" aria-pressed={!focusLot} onClick={() => onFrameChange(null)}>

@@ -823,6 +823,12 @@
 .phone-only {
   display: none;
 }
+@media (min-width: 768px) {
+  .phone-only,
+  .swipe-list.phone-only {
+    display: none !important;
+  }
+}
 @media (max-width: 767px) {
   .wide-only {
     display: none !important;
@@ -846,6 +852,12 @@
     margin: 0 calc(-1 * var(--space-4));
     padding: var(--space-1) var(--space-4) var(--space-3);
     -webkit-overflow-scrolling: touch;
+  }
+  /* Inside a 24px panel the list bleeds to the panel edge. */
+  .swipe-list.in-panel {
+    margin: 0 calc(-1 * var(--space-5));
+    padding-left: var(--space-5);
+    padding-right: var(--space-5);
   }
   .swipe-list > * {
     flex: 0 0 84%;
@@ -965,7 +977,7 @@
   background: var(--white);
 }
 .segmented button {
-  min-height: 40px;
+  min-height: 44px;
   padding: 0 var(--space-4);
   border: 0;
   border-radius: var(--radius-pill);
@@ -979,6 +991,10 @@
   background: var(--deep-navy);
   color: var(--white);
   font-weight: 500;
+}
+.segmented button:focus-visible {
+  outline-offset: -3px;
+  outline-color: var(--mid-blue);
 }
 /* Phone orders inside a lens's flex column */
 @media (max-width: 767px) {
@@ -1015,8 +1031,8 @@
   box-shadow: var(--shadow-flat);
 }
 .map-frame-controls button {
-  min-height: 36px;
-  padding: 0 var(--space-3);
+  min-height: 44px;
+  padding: 0 var(--space-4);
   border: 0;
   background: transparent;
   color: var(--ink-muted);
@@ -1028,6 +1044,9 @@
   background: var(--pale-wash);
   color: var(--ink-primary);
   font-weight: 500;
+}
+.map-frame-controls button:focus-visible {
+  outline-offset: -2px;
 }
 .this-week-grid {
   display: grid;
@@ -1078,5 +1097,60 @@
   #c4-history,
   #c5-history {
     order: 6;
+  }
+}
+
+/* Velocity tiles: on phones the unit sits under the value, always. */
+@media (max-width: 767px) {
+  .velocity-value {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 0 !important;
+  }
+}
+/* Verdict history row buttons and chart axis labels on phones */
+@media (max-width: 767px) {
+  .vh-btn {
+    min-height: 44px !important;
+    padding: var(--space-2) var(--space-3) !important;
+  }
+  .axis-odd {
+    display: none;
+  }
+}
+/* Primary and ghost buttons never fall under the 44px floor. */
+.btn-primary,
+.btn-ghost {
+  min-height: 44px;
+}
+
+/* Compact band (Price lens on phones): one line, the rest behind "More". */
+.band-compact-row {
+  display: none;
+}
+@media (max-width: 767px) {
+  .verdict-band-done .band-compact-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+  .band-compact-word {
+    font-size: var(--text-h2);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+  }
+  .band-compact-row .band-btn {
+    margin-left: auto;
+    flex: none;
+  }
+  .verdict-band-compact.verdict-band-done {
+    padding: var(--space-3) var(--space-4);
+    gap: 0;
+  }
+  .verdict-band-compact.verdict-band-done .band-row-done,
+  .verdict-band-compact.verdict-band-done .band-foot {
+    display: none;
   }
 }

@@ -190,6 +190,7 @@ export default function VerdictHistory({ id }: { id?: string }) {
                   </span>
                   {canExpand && (
                     <button
+                    className="vh-btn"
                       onClick={() => setExpandedId(expanded ? null : r.id)}
                       style={{
                         border: "1px solid var(--border)",
@@ -207,6 +208,7 @@ export default function VerdictHistory({ id }: { id?: string }) {
                     </button>
                   )}
                   <button
+                    className="vh-btn"
                     onClick={() => setHidden(r.id, !r.hidden)}
                     disabled={busyId === r.id}
                     title={r.hidden ? "Unhide this row" : "Hide this row from the view (the verdict record is kept)"}

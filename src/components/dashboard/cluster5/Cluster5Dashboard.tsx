@@ -137,7 +137,7 @@ export default function Cluster5Dashboard() {
 
       {/* Active analysis */}
 
-      {!!properties && properties.length > 0 && <StickyAction label="Generate briefing" targetId="c5-briefing" hint="The Monday portfolio briefing" />}
+      {!!properties && properties.length > 0 && <StickyAction label="Monday briefing" targetId="c5-briefing" hint="Jump to the briefing and its Generate button" />}
       <MondayBriefing hasProperties={!!properties && properties.length > 0} id="c5-briefing" />
 
       <MonitoringFeed id="c5-monitoring" />

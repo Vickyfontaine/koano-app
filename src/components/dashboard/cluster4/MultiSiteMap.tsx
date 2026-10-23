@@ -18,6 +18,8 @@ import type { SiteDetailResponse } from "@/app/api/site-detail/route";
 import MapFrame from "@/components/ui/map/MapFrame";
 
 export interface MultiSite {
+  /** The input slot (0..2); lots are keyed by it so a site without coordinates never shifts the index. */
+  slot?: number;
   label: string; // "Site A"
   detail: SiteDetailResponse | null;
   verdict?: string | null;
@@ -36,7 +38,7 @@ function hasCoords(d: SiteDetailResponse | null): d is SiteDetailResponse {
   );
 }
 
-export default function MultiSiteMap({ sites, focusIndex = null, onFocus }: { sites: MultiSite[]; focusIndex?: number | null; onFocus?: (i: number | null) => void }) {
+export default function MultiSiteMap({ sites, focusIndex = null, onFocus, openKey }: { sites: MultiSite[]; focusIndex?: number | null; onFocus?: (i: number | null) => void; openKey?: number }) {
   const withCoords = sites.filter((s) => hasCoords(s.detail));
   if (withCoords.length === 0) return null;
 
@@ -45,7 +47,8 @@ export default function MultiSiteMap({ sites, focusIndex = null, onFocus }: { si
   let anyOz = false;
   let anyLot = false;
 
-  withCoords.forEach((s, i) => {
+  withCoords.forEach((s, idx) => {
+    const i = s.slot ?? idx;
     const d = s.detail as SiteDetailResponse;
     const addr = d.resolved_address;
     const oz = d.opportunity_zone?.data;
@@ -110,6 +113,7 @@ export default function MultiSiteMap({ sites, focusIndex = null, onFocus }: { si
   return (
     <MapFrame
       title="Sites on the map"
+      openKey={openKey}
       summary={`${withCoords.length} site${withCoords.length === 1 ? "" : "s"}${anyOz ? " · Opportunity Zone tract" : ""}${anyLot ? " · subject lots" : ""}`}
     >
       <KoanoMap

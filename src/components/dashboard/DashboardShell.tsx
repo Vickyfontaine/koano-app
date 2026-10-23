@@ -139,7 +139,7 @@ export default function DashboardShell({
 
         <main className="shell-main" id="shell-main">
           <div className="shell-content">
-            <VerdictBand />
+            <VerdictBand compactOnPhone={cluster === "cluster_2"} />
             {cluster === "cluster_1" ? (
               <Cluster1Dashboard />
             ) : cluster === "cluster_2" ? (

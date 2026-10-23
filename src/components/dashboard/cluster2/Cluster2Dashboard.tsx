@@ -141,6 +141,7 @@ export default function Cluster2Dashboard() {
             detail={detail}
             detailError={detailError}
             verdict={result?.verdict ?? null}
+            runStatus={stream.status}
             id="c2-pricing"
           />
           <PermitTrend detail={detail} id="c2-permits" />

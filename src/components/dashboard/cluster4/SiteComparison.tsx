@@ -62,6 +62,7 @@ export default function SiteComparison() {
   const [openSlots, setOpenSlots] = useState(1);
   const visibleSlots = Math.max(openSlots, addresses.reduce((n, a, i) => (a.trim() ? i + 1 : n), 1));
   const [mapFocus, setMapFocus] = useState<number | null>(null);
+  const [mapOpenKey, setMapOpenKey] = useState(0);
   // The site shown in the shell's verdict band (and its evidence drawer).
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
   const { openDrawer } = useSubject();
@@ -187,6 +188,7 @@ export default function SiteComparison() {
     .sort((a, b) => opportunityScore(streams[b].result!.verdict) - opportunityScore(streams[a].result!.verdict));
   const errored = activeSlots.filter((i) => streams[i].status === "error");
   const rankedSites: MultiSite[] = ranked.map((slot, rank) => ({
+    slot,
     label: SLOT_LABELS[slot],
     detail: details[slot].data,
     verdict: streams[slot].result?.verdict.verdict ?? null,
@@ -416,12 +418,15 @@ export default function SiteComparison() {
             selected={bandSlot}
             onSelect={(slot) => {
               setSelectedSlot(slot);
-              setMapFocus(ranked.indexOf(slot));
-              window.scrollTo({ top: 0, behavior: "smooth" });
+              setMapFocus(slot);
+              setMapOpenKey((k) => k + 1);
+              // On a phone the map opens right below the cards; on wider screens
+              // the band at the top carries the selection.
+              if (window.innerWidth >= 768) window.scrollTo({ top: 0, behavior: "smooth" });
             }}
           />
 
-          <MultiSiteMap sites={rankedSites} focusIndex={mapFocus} onFocus={setMapFocus} />
+          <MultiSiteMap sites={rankedSites} focusIndex={mapFocus} onFocus={setMapFocus} openKey={mapOpenKey} />
 
           {/* Summary table (from 768px; the cards above carry it on phones) */}
           <div className="scroll-x wide-only" style={{ overflowX: "auto", padding: "2px" }}>

@@ -7,6 +7,7 @@
 // directly across sites.
 
 import React from "react";
+import { panelHeading } from "../panels";
 import DivergingBar, { type DivergingDatum } from "@/components/ui/charts/DivergingBar";
 import {
   VERDICT_COLORS,
@@ -68,7 +69,7 @@ export default function SiteMathStrip({ sites }: { sites: StripSite[] }) {
   if (sites.length === 0) return null;
   return (
     <div>
-      <div style={{ ...mono, marginBottom: "10px" }}>Verdict math, side by side</div>
+      <h3 style={{ ...panelHeading, margin: "0 0 var(--space-3)" }}>Verdict math, side by side</h3>
       <div
         className="site-math-strip"
         style={{

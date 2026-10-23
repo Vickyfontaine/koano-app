@@ -114,6 +114,7 @@ export default function BarChart({
             i % axisEvery === 0 ? (
               <span
                 key={d.key}
+                className={(i / axisEvery) % 2 === 1 ? "axis-odd" : undefined}
                 style={{
                   ...axisLabel,
                   position: "absolute",

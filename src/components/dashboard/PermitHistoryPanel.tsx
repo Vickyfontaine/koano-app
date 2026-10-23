@@ -73,7 +73,7 @@ export default function PermitHistoryPanel({ permits, error, id }: PermitHistory
                   {p.permit_status ? ` · ${p.permit_status}` : ""}
                 </span>
                 <span style={{ fontFamily: "var(--font-mono)", color: "var(--ink-muted)" }}>
-                  {p.issuance_date.slice(0, 10)}
+                  <span style={{ whiteSpace: "nowrap" }}>{p.issuance_date.slice(0, 10)}</span>
                 </span>
               </div>
             ))}

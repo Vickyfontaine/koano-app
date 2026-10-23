@@ -44,7 +44,7 @@ function StatTile({ tile }: { tile: Tile }) {
       >
         {tile.label}
       </span>
-      <span style={{ display: "flex", alignItems: "baseline", gap: "var(--space-2)", minWidth: 0, flexWrap: "wrap" }}>
+      <span className="velocity-value" style={{ display: "flex", alignItems: "baseline", gap: "var(--space-2)", minWidth: 0 }}>
         <span
           style={{
             fontFamily: "var(--font-mono)",
@@ -125,7 +125,7 @@ export default function MarketVelocityPanel({ detail, detailError, id }: MarketV
       label: "Mortgage demand (HMDA)",
       value: m.originations_yoy_pct != null ? `${m.originations_yoy_pct >= 0 ? "+" : ""}${m.originations_yoy_pct}%` : `${m.originations.toLocaleString("en-US")}`,
       unit: m.originations_yoy_pct != null ? "yoy" : "originations",
-      sub: `${m.originations.toLocaleString("en-US")} originations · ${m.denial_rate_pct ?? "—"}% denied · ${m.year}`,
+      sub: `${m.originations.toLocaleString("en-US")} originations · ${m.denial_rate_pct ?? "n/a"}% denied · ${m.year}`,
       provenance: mortgage_demand.provenance,
     });
   }
@@ -135,7 +135,7 @@ export default function MarketVelocityPanel({ detail, detailError, id }: MarketV
       label: "Employment (QCEW)",
       value: e.employment_yoy_pct != null ? `${e.employment_yoy_pct >= 0 ? "+" : ""}${e.employment_yoy_pct}%` : "n/a",
       unit: e.employment_yoy_pct != null ? "yoy" : undefined,
-      sub: `${e.total_employment?.toLocaleString("en-US") ?? "—"} jobs · wage ${e.avg_weekly_wage_yoy_pct != null ? `${e.avg_weekly_wage_yoy_pct >= 0 ? "+" : ""}${e.avg_weekly_wage_yoy_pct}%` : "—"} · ${e.period}`,
+      sub: `${e.total_employment?.toLocaleString("en-US") ?? "n/a"} jobs · wage ${e.avg_weekly_wage_yoy_pct != null ? `${e.avg_weekly_wage_yoy_pct >= 0 ? "+" : ""}${e.avg_weekly_wage_yoy_pct}%` : "n/a"} · ${e.period}`,
       provenance: employment.provenance,
     });
   }

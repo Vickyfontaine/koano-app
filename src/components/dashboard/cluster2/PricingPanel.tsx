@@ -18,9 +18,11 @@ interface PricingPanelProps {
   detailError: string | null;
   verdict: SynthesisResult | null; // arrives when the pipeline completes
   id?: string;
+  /** The lens's run state, so a failed run never reads as "still running". */
+  runStatus?: "idle" | "running" | "done" | "error";
 }
 
-export default function PricingPanel({ detail, detailError, verdict, id }: PricingPanelProps) {
+export default function PricingPanel({ detail, detailError, verdict, id, runStatus = "running" }: PricingPanelProps) {
   if (!detail) {
     return <BlockError title="Pricing recommendation" error={detailError ?? undefined} />;
   }
@@ -140,7 +142,11 @@ export default function PricingPanel({ detail, detailError, verdict, id }: Prici
           </>
         ) : (
           <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
-            KOANO timing verdict pending. The five-agent pipeline is still running.
+            {runStatus === "error"
+              ? "No verdict for this run. The band above says why."
+              : runStatus === "running"
+                ? "KOANO timing verdict pending. The five agents are still reading the record."
+                : "No verdict yet for this address."}
           </p>
         )}
       </div>

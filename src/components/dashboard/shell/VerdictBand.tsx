@@ -69,7 +69,8 @@ const TABS: { id: DrawerTab; label: string }[] = [
   { id: "coverage", label: "Coverage" },
 ];
 
-export default function VerdictBand() {
+export default function VerdictBand({ compactOnPhone = false }: { compactOnPhone?: boolean }) {
+  const [expanded, setExpanded] = useState(false);
   const { run, openDrawer, searching } = useSubject();
   const status = searching && (!run || run.status === "idle" || run.status === "done" || run.status === "error") ? "resolving" : (run?.status ?? "idle");
   // One short announcement per phase change (never the ticking timer).
@@ -87,7 +88,11 @@ export default function VerdictBand() {
             : "";
 
   return (
-    <section className={`verdict-band verdict-band-${status}`} aria-label="Verdict" id="verdict-band">
+    <section
+      className={`verdict-band verdict-band-${status}${compactOnPhone && !expanded ? " verdict-band-compact" : ""}`}
+      aria-label="Verdict"
+      id="verdict-band"
+    >
       <p className="sr-only" aria-live="polite" aria-atomic="true">
         {announcement}
       </p>
@@ -172,6 +177,20 @@ export default function VerdictBand() {
 
       {status === "done" && run?.result && (
         <>
+          {/* One-line form on phones for lenses whose hero is another figure (Price). */}
+          {compactOnPhone && (
+            <div className="band-compact-row">
+              <span className="band-compact-word" style={{ color: VERDICT_COLORS[run.result.verdict.verdict] }}>
+                {run.result.verdict.verdict}
+              </span>
+              <span className="band-mono">
+                conf {run.result.verdict.confidence} · risk {run.result.verdict.risk_score} · {run.result.verdict.signal_window_months} mo
+              </span>
+              <button type="button" className="btn-ghost band-btn" aria-expanded={expanded} onClick={() => setExpanded((v) => !v)}>
+                {expanded ? "Less" : "More"}
+              </button>
+            </div>
+          )}
           <div className="band-row band-row-done">
             <div className="band-main">
               <div className="band-eyebrow">

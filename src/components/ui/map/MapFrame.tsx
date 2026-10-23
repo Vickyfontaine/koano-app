@@ -14,13 +14,15 @@ interface MapFrameProps {
   summary?: string;
   children: React.ReactNode;
   id?: string;
+  /** Changing this opens the frame (a card tap that zooms the map). */
+  openKey?: number;
 }
 
 function phoneQuery(): MediaQueryList | null {
   return typeof window !== "undefined" && typeof window.matchMedia === "function" ? window.matchMedia("(max-width: 767px)") : null;
 }
 
-export default function MapFrame({ title, summary, children, id }: MapFrameProps) {
+export default function MapFrame({ title, summary, children, id, openKey }: MapFrameProps) {
   const [phone, setPhone] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -32,6 +34,10 @@ export default function MapFrame({ title, summary, children, id }: MapFrameProps
     mq.addEventListener("change", apply);
     return () => mq.removeEventListener("change", apply);
   }, []);
+
+  useEffect(() => {
+    if (openKey !== undefined && openKey > 0) setOpen(true);
+  }, [openKey]);
 
   const show = !phone || open;
   return (

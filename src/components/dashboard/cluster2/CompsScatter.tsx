@@ -76,8 +76,8 @@ export default function CompsScatter({
   });
   // Five rounded ticks; the plot spans the tick range so every tick lands inside it.
   const tickValues = niceTicks(yDomain[0], yDomain[1], 5);
-  yDomain[0] = Math.min(yDomain[0], tickValues[0]);
-  yDomain[1] = Math.max(yDomain[1], tickValues[tickValues.length - 1]);
+  yDomain[0] = tickValues[0];
+  yDomain[1] = tickValues[tickValues.length - 1];
   const yTicks: AxisTick[] = tickValues.map((v) => ({ value: v, label: money(v) }));
 
   return (

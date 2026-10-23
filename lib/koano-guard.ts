@@ -149,7 +149,7 @@ export async function guardSpend(args: {
         status: 503,
         body: {
           error:
-            "KOANO's demo capacity for the day is used up. The engine pauses until the 24-hour window resets — no requests are being sent to the model.",
+            "KOANO's demo capacity for the day is used up. The engine pauses until the 24-hour window resets; no requests are being sent to the model.",
           daily_cap: cap,
         },
       };

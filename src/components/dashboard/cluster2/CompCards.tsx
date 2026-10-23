@@ -18,9 +18,9 @@ interface Comp {
   distance_mi?: number | null;
 }
 
-export default function CompCards({ comps, provenance }: { comps: Comp[]; provenance: Provenance }) {
+export default function CompCards({ comps, provenance, inPanel = false }: { comps: Comp[]; provenance: Provenance; inPanel?: boolean }) {
   return (
-    <div className="swipe-list phone-only" role="list" aria-label="Comparable sales">
+    <div className={`swipe-list phone-only${inPanel ? " in-panel" : ""}`} role="list" aria-label="Comparable sales">
       {comps.map((c, i) => (
         <div key={`${c.address}-${i}`} className="comp-card" role="listitem">
           <span className="card-eyebrow">

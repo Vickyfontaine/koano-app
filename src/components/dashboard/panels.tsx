@@ -9,13 +9,13 @@ import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
 import type { Provenance } from "@/components/ui/verdict";
 
 export function fmtInt(n: number | null | undefined): string {
-  return n == null ? "—" : n.toLocaleString("en-US");
+  return n == null ? "n/a" : n.toLocaleString("en-US");
 }
 export function fmtMoney(n: number | null | undefined): string {
-  return n == null ? "—" : `$${n.toLocaleString("en-US")}`;
+  return n == null ? "n/a" : `$${n.toLocaleString("en-US")}`;
 }
 export function fmtPct(n: number | null | undefined): string {
-  return n == null ? "—" : `${n}%`;
+  return n == null ? "n/a" : `${n}%`;
 }
 
 export const panelStyle: React.CSSProperties = {
@@ -91,6 +91,8 @@ export function Row({ label, value }: { label: string; value: React.ReactNode })
           fontSize: "13px",
           color: "var(--ink-primary)",
           textAlign: "right",
+          maxWidth: "62%",
+          overflowWrap: "anywhere",
         }}
       >
         {value}
