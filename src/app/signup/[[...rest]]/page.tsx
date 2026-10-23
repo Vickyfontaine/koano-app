@@ -20,9 +20,9 @@ export default function SignupPage() {
       />
       <p
         style={{
-          marginTop: "20px",
+          marginTop: "var(--space-5)",
           textAlign: "center",
-          fontSize: "13px",
+          fontSize: "var(--text-data)",
           lineHeight: 1.6,
           color: "var(--ink-muted)",
         }}
