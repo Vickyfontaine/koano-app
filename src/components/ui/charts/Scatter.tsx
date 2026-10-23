@@ -49,7 +49,7 @@ export default function Scatter({
   xTicks,
   yTicks,
   refLine,
-  height = 180,
+  height,
   gutter = 48,
 }: ScatterProps) {
   const xScale = scaleLinear({ domain: xDomain, range: [0, 100] });
@@ -62,7 +62,7 @@ export default function Scatter({
       <div
         style={{
           position: "relative",
-          height: `${height}px`,
+          height: height ? `${height}px` : "var(--chart-h, 260px)",
           marginLeft: `${gutter}px`,
           borderLeft: "1px solid var(--border)",
           borderBottom: "1px solid var(--border)",

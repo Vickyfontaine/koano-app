@@ -9,6 +9,7 @@ import React from "react";
 import Scatter, { type AxisTick, type ScatterPoint } from "@/components/ui/charts/Scatter";
 import { compDivergingColor } from "@/components/ui/map/mapColors";
 import { panelStyle, PanelHeader } from "../panels";
+import { niceTicks } from "@/components/ui/charts/domains";
 import { isTrustedProvenance } from "@/components/ui/verdict";
 import { compPool } from "../../../../lib/documents/valuation-guard";
 import type { SiteDetailResponse } from "@/app/api/site-detail/route";
@@ -73,10 +74,11 @@ export default function CompsScatter({
     const v = xStart + ((now - xStart) * k) / 4;
     return { value: v, label: monthLabel(v) };
   });
-  const yTicks: AxisTick[] = [yDomain[0], (yDomain[0] + yDomain[1]) / 2, yDomain[1]].map((v) => ({
-    value: v,
-    label: money(v),
-  }));
+  // Five rounded ticks; the plot spans the tick range so every tick lands inside it.
+  const tickValues = niceTicks(yDomain[0], yDomain[1], 5);
+  yDomain[0] = Math.min(yDomain[0], tickValues[0]);
+  yDomain[1] = Math.max(yDomain[1], tickValues[tickValues.length - 1]);
+  const yTicks: AxisTick[] = tickValues.map((v) => ({ value: v, label: money(v) }));
 
   return (
     <section id={id} style={panelStyle}>

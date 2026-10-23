@@ -15,6 +15,8 @@ import type { SiteDetailResponse } from "@/app/api/site-detail/route";
 interface Tile {
   label: string;
   value: string;
+  /** The unit, set beside the value in the caption size so the value never wraps. */
+  unit?: string;
   sub?: string;
   provenance: Provenance;
 }
@@ -42,15 +44,24 @@ function StatTile({ tile }: { tile: Tile }) {
       >
         {tile.label}
       </span>
-      <span
-        style={{
-          fontFamily: "var(--font-mono)",
-          fontSize: "22px",
-          fontWeight: 500,
-          color: "var(--ink-primary)",
-        }}
-      >
-        {tile.value}
+      <span style={{ display: "flex", alignItems: "baseline", gap: "var(--space-2)", minWidth: 0, flexWrap: "wrap" }}>
+        <span
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: "var(--text-data-l)",
+            fontWeight: 500,
+            color: "var(--ink-primary)",
+            whiteSpace: "nowrap",
+            lineHeight: 1.1,
+          }}
+        >
+          {tile.value}
+        </span>
+        {tile.unit && (
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-data)", color: "var(--ink-muted)", whiteSpace: "nowrap" }}>
+            {tile.unit}
+          </span>
+        )}
       </span>
       {tile.sub && <span style={{ fontSize: "12px", color: "var(--ink-muted)" }}>{tile.sub}</span>}
       <ProvenanceBadge provenance={tile.provenance} />
@@ -75,7 +86,8 @@ export default function MarketVelocityPanel({ detail, detailError, id }: MarketV
   if (hpi?.data) {
     tiles.push({
       label: "Price velocity (FHFA)",
-      value: hpi.data.yoy_change_pct != null ? `${hpi.data.yoy_change_pct}% yoy` : "—",
+      value: hpi.data.yoy_change_pct != null ? `${hpi.data.yoy_change_pct}%` : "n/a",
+      unit: hpi.data.yoy_change_pct != null ? "yoy" : undefined,
       sub: `${hpi.data.region} · ${hpi.data.latest_period}${hpi.data.five_yr_change_pct != null ? ` · ${hpi.data.five_yr_change_pct}% 5yr` : ""}`,
       provenance: hpi.provenance,
     });
@@ -84,12 +96,14 @@ export default function MarketVelocityPanel({ detail, detailError, id }: MarketV
     tiles.push({
       label: "Recorded sales (ZIP, 12mo)",
       value: `${mls_comps.data.sales_count}`,
+      unit: "sales",
       sub: `price trend: ${mls_comps.data.price_trend}`,
       provenance: mls_comps.provenance,
     });
     tiles.push({
       label: "Area median $/sq ft (12mo)",
       value: `$${mls_comps.data.median_price_per_sqft.toLocaleString("en-US")}`,
+      unit: "/ sq ft",
       sub: "NYC DOF recorded sales",
       provenance: mls_comps.provenance,
     });
@@ -99,7 +113,8 @@ export default function MarketVelocityPanel({ detail, detailError, id }: MarketV
     // gap KOANO does not source).
     tiles.push({
       label: "Recorded sales velocity",
-      value: `${(mls_comps.data.sales_count / 12).toFixed(1)} sales/mo`,
+      value: `${(mls_comps.data.sales_count / 12).toFixed(1)}`,
+      unit: "sales / mo",
       sub: "Trailing 12 mo (DOF) · not absorption / months-of-supply",
       provenance: mls_comps.provenance,
     });
@@ -108,7 +123,8 @@ export default function MarketVelocityPanel({ detail, detailError, id }: MarketV
     const m = mortgage_demand.data;
     tiles.push({
       label: "Mortgage demand (HMDA)",
-      value: m.originations_yoy_pct != null ? `${m.originations_yoy_pct >= 0 ? "+" : ""}${m.originations_yoy_pct}% yoy` : `${m.originations.toLocaleString("en-US")}`,
+      value: m.originations_yoy_pct != null ? `${m.originations_yoy_pct >= 0 ? "+" : ""}${m.originations_yoy_pct}%` : `${m.originations.toLocaleString("en-US")}`,
+      unit: m.originations_yoy_pct != null ? "yoy" : "originations",
       sub: `${m.originations.toLocaleString("en-US")} originations · ${m.denial_rate_pct ?? "—"}% denied · ${m.year}`,
       provenance: mortgage_demand.provenance,
     });
@@ -117,26 +133,21 @@ export default function MarketVelocityPanel({ detail, detailError, id }: MarketV
     const e = employment.data;
     tiles.push({
       label: "Employment (QCEW)",
-      value: e.employment_yoy_pct != null ? `${e.employment_yoy_pct >= 0 ? "+" : ""}${e.employment_yoy_pct}% yoy` : "—",
+      value: e.employment_yoy_pct != null ? `${e.employment_yoy_pct >= 0 ? "+" : ""}${e.employment_yoy_pct}%` : "n/a",
+      unit: e.employment_yoy_pct != null ? "yoy" : undefined,
       sub: `${e.total_employment?.toLocaleString("en-US") ?? "—"} jobs · wage ${e.avg_weekly_wage_yoy_pct != null ? `${e.avg_weekly_wage_yoy_pct >= 0 ? "+" : ""}${e.avg_weekly_wage_yoy_pct}%` : "—"} · ${e.period}`,
       provenance: employment.provenance,
     });
   }
   return (
     <div style={panelStyle} id={id}>
-      <PanelHeader title="Market velocity" />
+      <PanelHeader title="Market velocity" sub="How fast this market is moving, from the public record" />
       {tiles.length === 0 ? (
         <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
           No velocity data available for this area.
         </p>
       ) : (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-            gap: "12px",
-          }}
-        >
+        <div className="velocity-grid">
           {tiles.map((t) => (
             <StatTile key={t.label} tile={t} />
           ))}

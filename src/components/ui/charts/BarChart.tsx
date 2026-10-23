@@ -7,6 +7,7 @@
 
 import React from "react";
 import { scaleLinear } from "@visx/scale";
+import { niceTicks } from "./domains";
 
 export interface BarDatum {
   key: string;
@@ -40,7 +41,7 @@ const axisLabel: React.CSSProperties = {
 
 export default function BarChart({
   data,
-  height = 140,
+  height = 200,
   color = "var(--mid-blue)",
   borderColor,
   axisEvery = 6,
@@ -48,11 +49,13 @@ export default function BarChart({
   valueFormat = (n) => n.toLocaleString("en-US"),
   ariaLabel,
 }: BarChartProps) {
-  const max = Math.max(1, ...data.map((d) => d.value));
+  const dataMax = Math.max(1, ...data.map((d) => d.value));
+  // Five rounded ticks; the axis top is the last tick, so bars never overrun it.
+  const yTicks = yAxis ? niceTicks(0, dataMax, 5) : [];
+  const max = yAxis ? yTicks[yTicks.length - 1] : dataMax;
   const yScale = scaleLinear({ domain: [0, max], range: [0, 100] });
   const n = data.length || 1;
-  const gutter = yAxis ? 34 : 0;
-  const yTicks = yAxis ? [max, max / 2, 0] : [];
+  const gutter = yAxis ? 40 : 0;
 
   return (
     <div>

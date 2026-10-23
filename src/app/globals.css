@@ -13,6 +13,7 @@
   /* Content width shared by every dashboard lens (UI sprint, A5). */
   --content-max: 1200px;
   /* Marketing site (WS2): one section width, one prose width. */
+  --chart-h: 260px;
   --content-marketing: 1200px;
   --content-reading: 900px;
   --content-prose: 720px;
@@ -241,7 +242,6 @@ body {
   justify-content: center;
   gap: 8px;
   cursor: pointer;
-  box-shadow: var(--shadow-raised);
   transition: background 220ms cubic-bezier(0.16, 1, 0.3, 1),
     border-color 220ms cubic-bezier(0.16, 1, 0.3, 1),
     transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
@@ -250,18 +250,15 @@ body {
   white-space: nowrap;
 }
 
+/* Hover is a tint change on the same plane: no lift, no glow (A8). */
 .btn-primary:hover {
   background: var(--sky);
-  border-color: var(--sky);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgba(26, 79, 110, 0.28);
+  border-color: var(--mid-blue);
 }
 
 .btn-primary:active {
-  transform: translateY(0);
   background: var(--brand-blue);
-  border-color: var(--brand-blue);
-  box-shadow: var(--shadow-flat);
+  border-color: var(--deep-navy);
   transition-duration: 100ms;
 }
 
@@ -316,12 +313,11 @@ body {
 .btn-ghost:hover {
   background: var(--pale-wash);
   color: var(--ink-primary);
-  border-color: var(--brand-blue);
-  transform: translateY(-1px);
+  border-color: var(--mid-blue);
 }
 
 .btn-ghost:active {
-  transform: translateY(0);
+  background: var(--sky);
   transition-duration: 100ms;
 }
 
@@ -769,3 +765,18 @@ body {
 }
 
 /* Tablet: two-column marketing grids collapse handled per component. */
+
+/* Dashboard tiles and charts (UI sprint WS4) */
+.velocity-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+@media (max-width: 767px) {
+  :root {
+    --chart-h: 220px;
+  }
+  .velocity-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

@@ -38,6 +38,23 @@ export const panelTitle: React.CSSProperties = {
 
 export const monoLabel = panelTitle;
 
+// Panel heading (UI sprint WS4, A7): sentence case in the UI size, the ink
+// primary. The mono microlabel above stays for SUB-labels inside a panel.
+export const panelHeading: React.CSSProperties = {
+  fontSize: "var(--text-ui)",
+  fontWeight: 500,
+  letterSpacing: "-0.01em",
+  color: "var(--ink-primary)",
+  lineHeight: 1.3,
+};
+
+const panelSub: React.CSSProperties = {
+  fontSize: "var(--text-data)",
+  color: "var(--ink-muted)",
+  lineHeight: 1.5,
+  marginTop: "2px",
+};
+
 // Fill hue for meters, bars and dots.
 export function riskColor(score: number): string {
   return score >= 67
@@ -84,10 +101,13 @@ export function Row({ label, value }: { label: string; value: React.ReactNode })
 
 export function PanelHeader({
   title,
+  sub,
   provenance,
   becomesLiveWith,
 }: {
   title: string;
+  /** One line under the title: what the panel reads and from where. */
+  sub?: string;
   provenance?: Provenance;
   becomesLiveWith?: string | null;
 }) {
@@ -96,25 +116,72 @@ export function PanelHeader({
       style={{
         display: "flex",
         justifyContent: "space-between",
-        alignItems: "center",
-        gap: "8px",
+        alignItems: "flex-start",
+        gap: "var(--space-3)",
       }}
     >
-      <span style={panelTitle}>{title}</span>
-      {provenance && <ProvenanceBadge provenance={provenance} becomesLiveWith={becomesLiveWith} />}
+      <div style={{ minWidth: 0 }}>
+        <h3 style={{ ...panelHeading, margin: 0 }}>{title}</h3>
+        {sub && <p style={{ ...panelSub, margin: 0 }}>{sub}</p>}
+      </div>
+      {provenance && (
+        <span style={{ flex: "none", paddingTop: "2px" }}>
+          <ProvenanceBadge provenance={provenance} becomesLiveWith={becomesLiveWith} />
+        </span>
+      )}
     </div>
   );
 }
 
-export function BlockError({ title, error }: { title: string; error?: string }) {
+/** Skeleton rows while a panel's data is still in flight (never "Unavailable"). */
+export function PanelLoading({ title, rows = 3, id }: { title: string; rows?: number; id?: string }) {
   return (
-    <div style={panelStyle}>
+    <div style={panelStyle} id={id} aria-busy="true">
       <PanelHeader title={title} />
-      <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
-        Unavailable{error ? `: ${error}` : ""}
+      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }} aria-hidden="true">
+        {Array.from({ length: rows }).map((_, i) => (
+          <div
+            key={i}
+            className="koano-pulse"
+            style={{
+              height: "var(--space-3)",
+              width: `${78 - i * 14}%`,
+              borderRadius: "var(--radius-chip)",
+              background: "var(--border-light)",
+            }}
+          />
+        ))}
+      </div>
+      <span className="sr-only">Loading {title}</span>
+    </div>
+  );
+}
+
+/** Nothing to show, by design (no data for this subject, not a failure). */
+export function PanelEmpty({ title, children, id, provenance }: { title: string; children: React.ReactNode; id?: string; provenance?: Provenance }) {
+  return (
+    <div style={panelStyle} id={id}>
+      <PanelHeader title={title} provenance={provenance} />
+      <p style={{ fontSize: "var(--text-body)", lineHeight: 1.5, color: "var(--ink-secondary)", margin: 0 }}>{children}</p>
+    </div>
+  );
+}
+
+/** The block could not be read for this run: the reason, plainly. */
+export function PanelAbsent({ title, reason, id }: { title: string; reason?: string; id?: string }) {
+  return (
+    <div style={{ ...panelStyle, borderLeft: "3px solid var(--signal-warning)" }} id={id}>
+      <PanelHeader title={title} />
+      <p style={{ fontSize: "var(--text-body)", lineHeight: 1.5, color: "var(--ink-secondary)", margin: 0 }}>
+        Not available for this run.{reason ? ` ${reason.replace(/\.$/, "")}.` : ""} Nothing is estimated in its place.
       </p>
     </div>
   );
+}
+
+/** Legacy entry point: no error means the fetch is still in flight. */
+export function BlockError({ title, error, id }: { title: string; error?: string; id?: string }) {
+  return error ? <PanelAbsent title={title} reason={error} id={id} /> : <PanelLoading title={title} id={id} />;
 }
 
 export function Meter({ value, color }: { value: number; color: string }) {
