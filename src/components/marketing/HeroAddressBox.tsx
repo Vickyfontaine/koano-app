@@ -263,8 +263,8 @@ export default function HeroAddressBox() {
           font: inherit;
           background: transparent;
           border: 0;
-          padding: 4px 0;
-          min-height: 28px;
+          padding: 10px 0;
+          min-height: 44px;
           color: var(--white);
           text-decoration: underline;
           text-underline-offset: 3px;

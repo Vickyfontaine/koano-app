@@ -19,7 +19,7 @@ export const maxDuration = 20;
 
 const EXAMPLE_BBL = '3009720058'; // 175 3rd Street, Brooklyn — the recorded example run
 const WINDOW_MS = 60_000;
-const MAX_PER_WINDOW = 12;
+const MAX_PER_WINDOW = 20;
 const hits = new Map<string, number[]>();
 
 function limited(ip: string): boolean {

@@ -221,10 +221,6 @@ export default function Nav() {
         {mobileOpen && (
           <motion.div
             id="nav-mobile-menu"
-            ref={sheetRef}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Menu"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -236,7 +232,16 @@ export default function Nav() {
               overflowY: "auto",
             }}
           >
-            <div className="flex flex-col items-stretch" style={{ padding: "24px 32px 40px" }}>
+            {/* The ref lives on an inner element: AnimatePresence's direct child
+                must not carry one (framer-motion 12 warns and drops it). */}
+            <div
+              ref={sheetRef}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Menu"
+              className="flex flex-col items-stretch"
+              style={{ padding: "24px 32px 40px" }}
+            >
               {NAV_LINKS.map((link, i) => (
                 <motion.a
                   key={link.href}

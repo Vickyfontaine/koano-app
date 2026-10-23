@@ -328,7 +328,7 @@ body {
 .btn-ghost-light {
   background: transparent;
   color: rgba(255, 255, 255, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.6);
   border-radius: 100px;
   padding: 13px 28px;
   font-weight: 400;
@@ -606,6 +606,36 @@ body {
   object-fit: unset;
 }
 
+/* Tablet (768 to 1023): the about render is sized by the viewport height and
+   would sit on the copy column, so it stacks below the copy as on phones. */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .hero-about[data-mobile-render="false"] {
+    min-height: 0 !important;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 0 !important;
+  }
+  .hero-about[data-mobile-render="false"] .hero-copy {
+    order: 1;
+    padding-bottom: var(--space-6);
+  }
+  .hero-about[data-mobile-render="false"] .hero-render-bleed {
+    order: 2;
+    position: static;
+    inset: auto;
+    width: 100%;
+    max-width: 560px;
+    height: auto;
+    max-height: none;
+    margin: var(--space-2) 0 0 auto;
+    display: block;
+  }
+  .about-hero-layout {
+    grid-template-columns: 1fr !important;
+    gap: var(--space-6) !important;
+  }
+}
+
 @media (max-width: 767px) {
   /* Temporary mobile layout (no mobile render yet): the hero becomes an
      in-flow column: copy, then the render below it at full width. */
@@ -621,7 +651,8 @@ body {
   .hero-with-render[data-mobile-render="false"] .hero-copy {
     position: static !important;
     inset: auto !important;
-    padding-bottom: var(--space-6);
+    /* The desktop heroes carry a legacy 210px bottom offset inline. */
+    padding-bottom: var(--space-6) !important;
     order: 1;
   }
   .hero-with-render[data-mobile-render="false"] .hero-render-bleed,

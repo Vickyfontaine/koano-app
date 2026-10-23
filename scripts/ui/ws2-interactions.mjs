@@ -16,7 +16,12 @@ const browser = await chromium.launch();
 async function ctx(width, opts = {}) {
   const c = await browser.newContext({ viewport: { width, height: width < 500 ? 844 : 900 }, deviceScaleFactor: 1, ...opts });
   const p = await c.newPage();
-  p.on('console', (m) => { if (m.type() === 'error' || m.type() === 'warning') errors.push(`[${m.type()}] ${m.text().slice(0, 160)}`); });
+  p.on('console', async (m) => {
+    if (m.type() !== 'error' && m.type() !== 'warning') return;
+    let vals = [];
+    try { vals = await Promise.all(m.args().slice(0, 4).map((a) => a.jsonValue().catch(() => '?'))); } catch {}
+    errors.push(`[${m.type()}] ${m.text().slice(0, 160)} | args: ${JSON.stringify(vals).slice(0, 2500)}`);
+  });
   p.on('pageerror', (e) => errors.push(`[pageerror] ${String(e).slice(0, 160)}`));
   return { c, p };
 }

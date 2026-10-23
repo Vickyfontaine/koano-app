@@ -177,7 +177,7 @@ export default function HeroSection() {
                     <span style={{ fontWeight: 700, marginRight: "6px" }}>
                       {stat.value}
                     </span>
-                    <span style={{ fontWeight: 400, opacity: 0.7 }}>
+                    <span style={{ fontWeight: 400, opacity: 0.85 }}>
                       {stat.label}
                     </span>
                   </span>
@@ -209,6 +209,10 @@ export default function HeroSection() {
             opacity: 1;
             transform: translateY(0);
           }
+        }
+        /* White copy on the navy wash: the focus ring is white here. */
+        #hero-section :global(:focus-visible) {
+          outline-color: var(--white);
         }
         .hero-scrim {
           position: absolute;
