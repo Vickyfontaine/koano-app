@@ -100,7 +100,9 @@ export default function DashboardShell({
       } else if (t === "watch") {
         setWatchOpen(true);
       } else if (t === "documents") {
-        scrollToFirst(SHELL_TARGETS.documents);
+        if (!scrollToFirst(SHELL_TARGETS.documents) && !scrollToFirst(SHELL_TARGETS.history)) {
+          setTab("home");
+        }
       }
     },
     [],
@@ -171,7 +173,7 @@ export default function DashboardShell({
                   {CLUSTERS[id].lens}
                   <span style={{ color: "var(--ink-muted)", fontWeight: 400 }}> · {CLUSTERS[id].label}</span>
                 </span>
-                {id === initialCluster && <span className="shell-item-note">plan</span>}
+                {id === initialCluster && <span className="shell-item-note">home</span>}
               </button>
             ))}
           </div>

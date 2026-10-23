@@ -29,9 +29,9 @@ export default function AuthShell({ children }: { children: React.ReactNode }) {
         <section className="auth-brand" aria-label="About KOANO">
           <p className="auth-eyebrow">The real estate reasoning engine</p>
           <h1 className="auth-title">
-            Smart data.
+            SMART DATA.
             <br />
-            Smarter real estate decisions.
+            SMARTER REAL ESTATE DECISIONS.
           </h1>
           <ul className="auth-promises">
             {PROMISES.map((p) => (

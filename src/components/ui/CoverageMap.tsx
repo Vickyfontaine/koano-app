@@ -21,6 +21,8 @@ interface CoverageMapProps {
   dataPoints?: LedgerDataPoint[];
   id?: string;
   defaultOpen?: boolean;
+  /** False inside the evidence drawer: the panel is always open and has no toggle. */
+  collapsible?: boolean;
 }
 
 const mono: React.CSSProperties = {
@@ -55,7 +57,7 @@ function LayerRow({ l, showUnlock, color }: { l: CoverageLayer; showUnlock: bool
   );
 }
 
-export default function CoverageMap({ dataPoints, id, defaultOpen }: CoverageMapProps) {
+export default function CoverageMap({ dataPoints, id, defaultOpen, collapsible = true }: CoverageMapProps) {
   const [open, setOpen] = useState(!!defaultOpen);
   const points = dataPoints ?? [];
   if (points.length === 0) return null;
@@ -75,14 +77,16 @@ export default function CoverageMap({ dataPoints, id, defaultOpen }: CoverageMap
   return (
     <div style={{ border: "1px solid var(--border)", borderRadius: "var(--radius-card)", background: "var(--white)", padding: "24px" }} id={id}>
       <button
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => collapsible && setOpen((v) => !v)}
+        aria-expanded={collapsible ? open : undefined}
+        disabled={!collapsible}
         style={{ width: "100%", border: "none", background: "transparent", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: "12px", padding: 0 }}
       >
         <span>
           <span style={{ ...mono, textTransform: "uppercase", color: "var(--ink-muted)" }}>Coverage map</span>
           <span style={{ fontSize: "13px", color: "var(--ink-muted)", marginLeft: "10px" }}>{summaryParts.join(" · ")}</span>
         </span>
-        <span style={{ ...mono, color: "var(--mid-blue-ink)" }}>{open ? "Hide" : "Show layers"}</span>
+        {collapsible && <span style={{ ...mono, color: "var(--mid-blue-ink)" }}>{open ? "Hide" : "Show layers"}</span>}
       </button>
 
       {open && (

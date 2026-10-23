@@ -1,0 +1,3746 @@
+diff --git a/scripts/ui/dash-shots.mjs b/scripts/ui/dash-shots.mjs
+index 2cecc74..d3d39cc 100644
+--- a/scripts/ui/dash-shots.mjs
++++ b/scripts/ui/dash-shots.mjs
+@@ -112,8 +112,14 @@ for (const cluster of CLUSTERS) {
+     await page.waitForTimeout(3000);
+     await snap(page, `${cluster}-done`);
+   } else {
+-    await page.locator('input[aria-label="Property address"]').fill(addrs[0]);
+-    await page.locator('button:has-text("Run analysis")').click();
++    const bar = page.locator('.gsearch-bar input');
++    if (await bar.count()) {
++      await bar.fill(addrs[0]);
++      await bar.press('Enter');
++    } else {
++      await page.locator('input[aria-label="Property address"]').fill(addrs[0]);
++      await page.locator('button:has-text("Run analysis")').click();
++    }
+     await page.waitForTimeout(15000);
+     await snap(page, `${cluster}-running`);
+     await waitForDone(page);
+diff --git a/scripts/ui/ws3-interactions.mjs b/scripts/ui/ws3-interactions.mjs
+new file mode 100644
+index 0000000..3b5597d
+--- /dev/null
++++ b/scripts/ui/ws3-interactions.mjs
+@@ -0,0 +1,130 @@
++// WS3 interaction captures: the evidence drawer (desktop + phone), the watch
++// sheet, the phone lens sheet, with focus-trap and deep-link checks.
++// node scripts/ui/ws3-interactions.mjs --state <storageState.json> --out build-log/ui-ws-3/after/interactions
++import { chromium } from 'playwright';
++import fs from 'node:fs';
++import path from 'node:path';
++
++const args = Object.fromEntries(process.argv.slice(2).map((a, i, arr) => a.startsWith('--') ? [a.slice(2), arr[i + 1]] : []).filter(Boolean));
++const out = args.out ?? 'build-log/ui-ws-3/after/interactions';
++const base = args.base ?? 'http://localhost:3000';
++const state = args.state;
++const address = args.address ?? '425 6th Street, Brooklyn, NY 11215';
++fs.mkdirSync(out, { recursive: true });
++const shot = (page, name) => page.screenshot({ path: path.join(out, `${name}.jpg`), type: 'jpeg', quality: 78 });
++const errors = [];
++const checks = {};
++const browser = await chromium.launch();
++async function ctx(width) {
++  const c = await browser.newContext({ viewport: { width, height: width < 500 ? 844 : 900 }, deviceScaleFactor: 1, storageState: state });
++  const p = await c.newPage();
++  p.on('console', (m) => { if ((m.type() === 'error' || m.type() === 'warning') && !/GL Driver|development keys/.test(m.text())) errors.push(`[${m.type()}] ${m.text().slice(0, 200)}`); });
++  p.on('pageerror', (e) => errors.push(`[pageerror] ${String(e).slice(0, 200)}`));
++  return { c, p };
++}
++async function waitForDone(page, timeoutMs = 300000) {
++  const t0 = Date.now();
++  while (Date.now() - t0 < timeoutMs) {
++    const n = await page.locator('.verdict-band-done, .verdict-band-error').count();
++    if (n) return (await page.locator('.verdict-band-done').count()) > 0;
++    await page.waitForTimeout(3000);
++  }
++  return false;
++}
++
++// 1. Sheets that need no run (phone lens sheet, watch sheet desktop + phone)
++{
++  const { c, p } = await ctx(390);
++  await p.goto(base + '/dashboard', { waitUntil: 'load' });
++  await p.waitForTimeout(2500);
++  await p.click('.shell-lens-btn');
++  await p.waitForTimeout(500);
++  await shot(p, 'lens-sheet-390');
++  checks.lensSheetFirstFocus = await p.evaluate(() => document.activeElement?.textContent?.trim().slice(0, 30));
++  await p.keyboard.press('Escape');
++  await p.waitForTimeout(400);
++  checks.lensSheetClosedOnEscape = (await p.locator('#shell-lens-sheet').count()) === 0;
++  await p.click('[data-tab="search"]');
++  await p.waitForTimeout(1200);
++  await shot(p, 'search-sheet-390');
++  await p.keyboard.press('Escape');
++  await p.waitForTimeout(400);
++  await p.click('[data-tab="watch"]');
++  await p.waitForTimeout(1500);
++  await shot(p, 'watch-sheet-390');
++  await p.keyboard.press('Escape');
++  await c.close();
++}
++{
++  const { c, p } = await ctx(1440);
++  await p.goto(base + '/dashboard', { waitUntil: 'load' });
++  await p.waitForTimeout(2500);
++  await p.click('.shell-side button[aria-label="Watchlist"]');
++  await p.waitForTimeout(1500);
++  await shot(p, 'watch-sheet-1440');
++  for (let i = 0; i < 10; i++) await p.keyboard.press('Tab');
++  checks.watchTabStaysInside = await p.evaluate(() => !!document.activeElement?.closest('#shell-watch-sheet'));
++  await p.keyboard.press('Escape');
++  await p.waitForTimeout(400);
++  checks.watchFocusReturned = await p.evaluate(() => document.activeElement?.getAttribute('aria-label'));
++  await c.close();
++}
++
++// 2. A real run in the Property lens, then the drawer
++{
++  const { c, p } = await ctx(1440);
++  await p.goto(base + '/dashboard', { waitUntil: 'load' });
++  await p.waitForTimeout(2500);
++  await p.locator('[data-lens="cluster_1"]').first().click();
++  await p.waitForTimeout(1200);
++  await p.locator('.gsearch-bar input').fill(address);
++  await shot(p, 'search-typed-1440');
++  await p.locator('.gsearch-bar input').press('Enter');
++  await p.waitForTimeout(4000);
++  await shot(p, 'band-resolving-or-running-1440');
++  checks.runDone = await waitForDone(p);
++  await p.waitForTimeout(1500);
++  await shot(p, 'band-done-1440');
++  await p.click('.band-actions button:has-text("Math")');
++  await p.waitForTimeout(800);
++  await shot(p, 'drawer-math-1440');
++  checks.drawerHash = await p.evaluate(() => location.hash);
++  checks.drawerFirstFocus = await p.evaluate(() => document.activeElement?.id);
++  await p.click('#drawer-tab-sources');
++  await p.waitForTimeout(800);
++  await shot(p, 'drawer-sources-1440');
++  await p.click('#drawer-tab-reasoning');
++  await p.waitForTimeout(600);
++  await shot(p, 'drawer-reasoning-1440');
++  await p.click('#drawer-tab-coverage');
++  await p.waitForTimeout(600);
++  await shot(p, 'drawer-coverage-1440');
++  for (let i = 0; i < 15; i++) await p.keyboard.press('Tab');
++  checks.drawerTabStaysInside = await p.evaluate(() => !!document.activeElement?.closest('#evidence-drawer'));
++  await p.keyboard.press('Escape');
++  await p.waitForTimeout(500);
++  checks.drawerClosedOnEscape = (await p.locator('#evidence-drawer').count()) === 0;
++  checks.hashClearedOnClose = await p.evaluate(() => location.hash);
++  // phone: same page resized
++  await p.setViewportSize({ width: 390, height: 844 });
++  await p.waitForTimeout(600);
++  await p.evaluate(() => window.scrollTo(0, 0));
++  await shot(p, 'band-done-390');
++  await p.click('.band-actions button:has-text("Sources")');
++  await p.waitForTimeout(800);
++  await shot(p, 'drawer-sources-390');
++  await p.click('#drawer-tab-math');
++  await p.waitForTimeout(600);
++  await shot(p, 'drawer-math-390');
++  await p.keyboard.press('Escape');
++  await p.setViewportSize({ width: 768, height: 1024 });
++  await p.waitForTimeout(600);
++  await p.click('.band-actions button:has-text("Reasoning")');
++  await p.waitForTimeout(800);
++  await shot(p, 'drawer-reasoning-768');
++  await c.close();
++}
++await browser.close();
++fs.writeFileSync(path.join(out, 'checks.json'), JSON.stringify(checks, null, 2));
++fs.writeFileSync(path.join(out, 'console.json'), JSON.stringify(errors, null, 2));
++console.log('done', JSON.stringify(checks), 'console entries:', errors.length);
+diff --git a/src/app/dashboard/page.tsx b/src/app/dashboard/page.tsx
+index 1ba1796..f38b740 100644
+--- a/src/app/dashboard/page.tsx
++++ b/src/app/dashboard/page.tsx
+@@ -23,13 +23,15 @@ export default async function DashboardPage({
+   if (!userId) redirect("/login");
+ 
+   let cluster: unknown = null;
++  let plan: string | null = null;
+   try {
+     const { data } = await supabaseAdmin()
+       .from("profiles")
+-      .select("cluster")
++      .select("cluster, plan")
+       .eq("clerk_user_id", userId)
+       .maybeSingle();
+     cluster = data?.cluster ?? null;
++    plan = typeof data?.plan === "string" ? data.plan : null;
+   } catch {
+     cluster = null;
+   }
+@@ -37,6 +39,6 @@ export default async function DashboardPage({
+   if (!isClusterId(cluster)) redirect("/onboarding");
+ 
+   return (
+-    <DashboardShell initialCluster={cluster} justUpgraded={searchParams.upgraded === "1"} />
++    <DashboardShell initialCluster={cluster} plan={plan} justUpgraded={searchParams.upgraded === "1"} />
+   );
+ }
+diff --git a/src/app/signup/[[...rest]]/page.tsx b/src/app/signup/[[...rest]]/page.tsx
+index fb5f69e..b2963a1 100644
+--- a/src/app/signup/[[...rest]]/page.tsx
++++ b/src/app/signup/[[...rest]]/page.tsx
+@@ -20,9 +20,9 @@ export default function SignupPage() {
+       />
+       <p
+         style={{
+-          marginTop: "20px",
++          marginTop: "var(--space-5)",
+           textAlign: "center",
+-          fontSize: "13px",
++          fontSize: "var(--text-data)",
+           lineHeight: 1.6,
+           color: "var(--ink-muted)",
+         }}
+diff --git a/src/components/dashboard/ClusterPlaceholderView.tsx b/src/components/dashboard/ClusterPlaceholderView.tsx
+index ec86653..06a2640 100644
+--- a/src/components/dashboard/ClusterPlaceholderView.tsx
++++ b/src/components/dashboard/ClusterPlaceholderView.tsx
+@@ -21,7 +21,6 @@ export default function ClusterPlaceholderView({
+   return (
+     <div style={{ maxWidth: "860px", display: "flex", flexDirection: "column", gap: "24px" }}>
+       <div>
+-        <span className="section-number">{c.number}</span>
+         <h1
+           style={{
+             fontSize: "32px",
+diff --git a/src/components/dashboard/DashboardShell.tsx b/src/components/dashboard/DashboardShell.tsx
+index 8e75814..aa54434 100644
+--- a/src/components/dashboard/DashboardShell.tsx
++++ b/src/components/dashboard/DashboardShell.tsx
+@@ -1,80 +1,198 @@
+ "use client";
+ 
+-// Dashboard shell — Checkpoints 1–4 (Phase B).
+-// Holds the active cluster view and routes sidebar navigation to real
+-// sections. The initial cluster comes from the user's profile (server-side);
+-// the Sidebar switcher flips the VIEW on the fly for demos and multi-hat
+-// users without changing the saved profile cluster.
++// Dashboard shell (UI sprint WS3). One grid for every lens: a top bar (logo,
++// search slot, plan tag, account), the lens navigation (full sidebar at 1280
++// and up, a 64px icon rail from 768, a bottom tab bar below 768), and one
++// content column at --content-max. The active lens comes from the user's
++// profile; switching the lens flips the VIEW on the fly for demos and
++// multi-hat users without changing the saved plan.
+ 
+-import React, { useEffect, useState } from "react";
++import React, { useCallback, useEffect, useState } from "react";
++import "./shell/shell.css";
+ import Sidebar from "./Sidebar";
++import TopBar from "./shell/TopBar";
++import BottomTabs, { type ShellTab } from "./shell/BottomTabs";
++import Sheet from "./shell/Sheet";
++import WatchSheet from "./shell/WatchSheet";
++import SubjectProvider from "./shell/SubjectProvider";
++import VerdictBand from "./shell/VerdictBand";
++import EvidenceDrawer from "./shell/EvidenceDrawer";
++import GlobalSearch from "./shell/GlobalSearch";
+ import ClusterPlaceholderView from "./ClusterPlaceholderView";
+ import Cluster1Dashboard from "./cluster1/Cluster1Dashboard";
+ import Cluster2Dashboard from "./cluster2/Cluster2Dashboard";
+ import Cluster4Dashboard from "./cluster4/Cluster4Dashboard";
+ import Cluster5Dashboard from "./cluster5/Cluster5Dashboard";
+ import UpgradeProvider from "./UpgradeProvider";
+-import type { ClusterId } from "./clusters";
++import { CLUSTERS, LENS_ORDER, type ClusterId } from "./clusters";
+ 
+ export interface NavTarget {
+   id: string;
+   ts: number; // repeat clicks on the same item still navigate
+ }
+ 
++// Shell-level targets resolve to whichever section the active lens exposes.
++const SHELL_TARGETS: Record<string, string[]> = {
++  documents: ["c1-documents", "c2-documents", "c4-comparison-brief", "c5-documents"],
++  history: ["c1-history", "c2-history", "c4-history", "c5-history"],
++};
++
++function scrollToFirst(ids: string[]) {
++  for (const id of ids) {
++    const el = document.getElementById(id);
++    if (el) {
++      el.scrollIntoView({ behavior: "smooth", block: "start" });
++      return true;
++    }
++  }
++  return false;
++}
++
+ export default function DashboardShell({
+   initialCluster,
++  plan = null,
+   justUpgraded = false,
+ }: {
+   initialCluster: ClusterId;
++  plan?: string | null;
+   justUpgraded?: boolean;
+ }) {
+   const [cluster, setCluster] = useState<ClusterId>(initialCluster);
+   const [navTarget, setNavTarget] = useState<NavTarget | null>(null);
++  const [activeTarget, setActiveTarget] = useState<string | null>(null);
++  const [tab, setTab] = useState<ShellTab>("home");
++  const [lensOpen, setLensOpen] = useState(false);
++  const [watchOpen, setWatchOpen] = useState(false);
++  const [searchOpen, setSearchOpen] = useState(false);
+ 
+-  // Generic scroll navigation. Cluster 4 handles its own targets (tabs).
++  const changeCluster = useCallback((c: ClusterId) => {
++    setCluster(c);
++    setNavTarget(null);
++    setActiveTarget(null);
++    setLensOpen(false);
++    window.scrollTo({ top: 0 });
++  }, []);
++
++  // Scroll navigation for the section links. Cluster 4 handles its own targets.
+   useEffect(() => {
+-    if (!navTarget || cluster === "cluster_4") return;
++    if (!navTarget) return;
++    const shellIds = SHELL_TARGETS[navTarget.id];
++    if (shellIds) {
++      scrollToFirst(shellIds);
++      return;
++    }
++    if (cluster === "cluster_4") return;
+     document.getElementById(navTarget.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+   }, [navTarget, cluster]);
+ 
++  const navigate = useCallback((id: string) => {
++    setActiveTarget(id);
++    setNavTarget({ id, ts: Date.now() });
++  }, []);
++
++  const selectTab = useCallback(
++    (t: ShellTab) => {
++      setTab(t);
++      if (t === "home") {
++        window.scrollTo({ top: 0, behavior: "smooth" });
++      } else if (t === "search") {
++        setSearchOpen(true);
++      } else if (t === "watch") {
++        setWatchOpen(true);
++      } else if (t === "documents") {
++        scrollToFirst(SHELL_TARGETS.documents);
++      }
++    },
++    [],
++  );
++
++  const closeWatch = useCallback(() => {
++    setWatchOpen(false);
++    setTab("home");
++  }, []);
++  const closeLens = useCallback(() => setLensOpen(false), []);
++  const closeSearch = useCallback(() => {
++    setSearchOpen(false);
++    setTab("home");
++  }, []);
++
+   return (
+-    // UpgradeProvider wraps every cluster view so useUpgrade() resolves to the
+-    // real context (a 402 opens the upgrade modal) and the post-checkout
++    // UpgradeProvider wraps every lens so useUpgrade() resolves to the real
++    // context (a 402 opens the upgrade modal) and the post-checkout
+     // "confirming your upgrade" overlay mounts when justUpgraded is set.
+     <UpgradeProvider justUpgraded={justUpgraded}>
+-      <div style={{ display: "flex", minHeight: "100vh", background: "var(--white)" }}>
++      <SubjectProvider>
++      <div className="koano-shell">
++        <TopBar cluster={cluster} plan={plan} onOpenLens={() => setLensOpen(true)} search={<GlobalSearch variant="bar" />} />
++
+         <Sidebar
+           key={cluster}
+           cluster={cluster}
+           homeCluster={initialCluster}
+-          onClusterChange={(c) => {
+-            setCluster(c);
+-            setNavTarget(null);
+-          }}
+-          onNavigate={(id) => setNavTarget({ id, ts: Date.now() })}
++          activeTarget={activeTarget}
++          onClusterChange={changeCluster}
++          onNavigate={navigate}
++          onOpenWatch={() => setWatchOpen(true)}
+         />
+ 
+-        <main
+-          style={{
+-            marginLeft: "240px",
+-            flex: 1,
+-            padding: "32px",
+-            maxWidth: "calc(100vw - 240px)",
+-          }}
+-        >
+-          {cluster === "cluster_1" ? (
+-            <Cluster1Dashboard />
+-          ) : cluster === "cluster_2" ? (
+-            <Cluster2Dashboard />
+-          ) : cluster === "cluster_4" ? (
+-            <Cluster4Dashboard navTarget={navTarget} />
+-          ) : cluster === "cluster_5" ? (
+-            <Cluster5Dashboard />
+-          ) : (
+-            <ClusterPlaceholderView cluster={cluster} />
+-          )}
++        <main className="shell-main" id="shell-main">
++          <div className="shell-content">
++            <VerdictBand />
++            {cluster === "cluster_1" ? (
++              <Cluster1Dashboard />
++            ) : cluster === "cluster_2" ? (
++              <Cluster2Dashboard />
++            ) : cluster === "cluster_4" ? (
++              <Cluster4Dashboard navTarget={navTarget} />
++            ) : cluster === "cluster_5" ? (
++              <Cluster5Dashboard />
++            ) : (
++              <ClusterPlaceholderView cluster={cluster} />
++            )}
++          </div>
+         </main>
++
++        <BottomTabs active={tab} onSelect={selectTab} />
++
++        {/* Phone lens picker */}
++        <Sheet open={lensOpen} title="Lens" onClose={closeLens} id="shell-lens-sheet">
++          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
++            {LENS_ORDER.map((id) => (
++              <button
++                key={id}
++                type="button"
++                className="shell-item"
++                data-lens={id}
++                aria-current={id === cluster ? "true" : undefined}
++                onClick={() => changeCluster(id)}
++                style={{ minHeight: "48px" }}
++              >
++                <span className="shell-item-label">
++                  {CLUSTERS[id].lens}
++                  <span style={{ color: "var(--ink-muted)", fontWeight: 400 }}> · {CLUSTERS[id].label}</span>
++                </span>
++                {id === initialCluster && <span className="shell-item-note">plan</span>}
++              </button>
++            ))}
++          </div>
++        </Sheet>
++
++        <WatchSheet
++          open={watchOpen}
++          onClose={closeWatch}
++          onGoToPortfolio={() => {
++            closeWatch();
++            changeCluster("cluster_5");
++          }}
++        />
++        {/* Phone search sheet */}
++        <Sheet open={searchOpen} title="Search" onClose={closeSearch} id="shell-search-sheet">
++          <GlobalSearch variant="sheet" autoFocus onDone={closeSearch} />
++        </Sheet>
++
++        <EvidenceDrawer />
+       </div>
++      </SubjectProvider>
+     </UpgradeProvider>
+   );
+ }
+diff --git a/src/components/dashboard/OnboardingClusters.tsx b/src/components/dashboard/OnboardingClusters.tsx
+index e1fafd4..1949aa6 100644
+--- a/src/components/dashboard/OnboardingClusters.tsx
++++ b/src/components/dashboard/OnboardingClusters.tsx
+@@ -157,7 +157,6 @@ export default function OnboardingClusters() {
+                   transition: "border-color 0.15s ease, background 0.15s ease",
+                 }}
+               >
+-                <span className="section-number">{c.number}</span>
+                 <span
+                   style={{
+                     fontSize: "22px",
+diff --git a/src/components/dashboard/Sidebar.tsx b/src/components/dashboard/Sidebar.tsx
+index e014740..d22b548 100644
+--- a/src/components/dashboard/Sidebar.tsx
++++ b/src/components/dashboard/Sidebar.tsx
+@@ -1,195 +1,123 @@
+ "use client";
+ 
+-// Dashboard sidebar — Checkpoint 1 (Phase B).
+-// Includes the CLUSTER SWITCHER: any user can flip between all four cluster
+-// views on the fly (demos, multi-hat users). Switching the view does NOT
+-// change the saved profile cluster — the "home" badge marks that one.
++// Sidebar (UI sprint WS3). Plain lens names, the lens's section links, then
++// Watchlist, Documents, History and Settings. The same markup renders as the
++// 240px sidebar at 1280 and up and as the 64px icon rail below it (shell.css
++// hides the labels; every item keeps an aria-label and a title). Switching
++// the lens changes the VIEW only, never the saved plan (the home lens carries
++// a "your plan" note).
+ 
+-import React, { useState } from "react";
+-import { UserButton } from "@clerk/nextjs";
+-import { CLUSTERS, CLUSTER_IDS, CLUSTER_NAV, type ClusterId } from "./clusters";
++import React from "react";
++import { CLUSTERS, CLUSTER_NAV, LENS_ORDER, type ClusterId } from "./clusters";
++import {
++  DevelopIcon,
++  PriceIcon,
++  AcquireIcon,
++  PropertyIcon,
++  WatchIcon,
++  DocumentsIcon,
++  HistoryIcon,
++  SettingsIcon,
++} from "./shell/icons";
++
++const LENS_ICON: Record<ClusterId, (p: { size?: number }) => React.JSX.Element> = {
++  cluster_4: DevelopIcon,
++  cluster_5: AcquireIcon,
++  cluster_2: PriceIcon,
++  cluster_1: PropertyIcon,
++};
+ 
+ interface SidebarProps {
+   cluster: ClusterId;
+   homeCluster: ClusterId;
++  activeTarget: string | null;
+   onClusterChange: (cluster: ClusterId) => void;
+   onNavigate: (target: string) => void;
++  onOpenWatch: () => void;
+ }
+ 
+ export default function Sidebar({
+   cluster,
+   homeCluster,
++  activeTarget,
+   onClusterChange,
+   onNavigate,
++  onOpenWatch,
+ }: SidebarProps) {
+   const items = CLUSTER_NAV[cluster];
+-  const [activeTarget, setActiveTarget] = useState<string | null>(null);
+-
+   return (
+-    <aside
+-      style={{
+-        width: "240px",
+-        minHeight: "100vh",
+-        background: "var(--pale-wash)",
+-        borderRight: "1px solid var(--border)",
+-        padding: "24px 0",
+-        display: "flex",
+-        flexDirection: "column",
+-        position: "fixed",
+-        left: 0,
+-        top: 0,
+-        bottom: 0,
+-        zIndex: 20,
+-      }}
+-    >
+-      {/* Logo */}
+-      <a
+-        href="/"
+-        style={{
+-          padding: "0 24px 24px",
+-          fontWeight: 500,
+-          fontSize: "15px",
+-          color: "var(--near-black)",
+-          letterSpacing: "2px",
+-          textDecoration: "none",
+-          display: "block",
+-        }}
+-      >
+-        KOANO
+-      </a>
++    <aside className="shell-side" aria-label="Lens and sections">
++      <div className="shell-side-heading">Lens</div>
++      {LENS_ORDER.map((id) => {
++        const Icon = LENS_ICON[id];
++        const meta = CLUSTERS[id];
++        const active = id === cluster;
++        return (
++          <button
++            key={id}
++            type="button"
++            className="shell-item"
++            data-lens={id}
++            aria-current={active ? "true" : undefined}
++            aria-label={`${meta.lens} lens${id === homeCluster ? " (your plan)" : ""}`}
++            title={`${meta.lens}: ${meta.label}`}
++            onClick={() => onClusterChange(id)}
++          >
++            <Icon size={20} />
++            <span className="shell-item-label">{meta.lens}</span>
++            {id === homeCluster && <span className="shell-item-note">plan</span>}
++          </button>
++        );
++      })}
+ 
+-      {/* Cluster switcher */}
+-      <div style={{ padding: "0 16px 8px" }}>
+-        <label
+-          htmlFor="cluster-switcher"
+-          style={{
+-            display: "block",
+-            fontFamily: "var(--font-mono)",
+-            fontSize: "11px",
+-            letterSpacing: "0.1em",
+-            textTransform: "uppercase",
+-            color: "var(--ink-muted)",
+-            padding: "0 4px 6px",
+-          }}
+-        >
+-          Cluster view
+-        </label>
+-        <select
+-          id="cluster-switcher"
+-          value={cluster}
+-          onChange={(e) => onClusterChange(e.target.value as ClusterId)}
+-          style={{
+-            width: "100%",
+-            padding: "8px 12px",
+-            borderRadius: "var(--radius-inner)",
+-            border: "1px solid var(--border)",
+-            background: "var(--white)",
+-            fontFamily: "inherit",
+-            fontSize: "13px",
+-            fontWeight: 500,
+-            color: "var(--ink-primary)",
+-            cursor: "pointer",
+-          }}
+-        >
+-          {CLUSTER_IDS.map((id) => (
+-            <option key={id} value={id}>
+-              {CLUSTERS[id].badge} · {CLUSTERS[id].label}
+-              {id === homeCluster ? " (home)" : ""}
+-            </option>
+-          ))}
+-        </select>
+-      </div>
++      <div className="shell-side-divider" />
+ 
+-      {/* Home-cluster note when viewing another cluster */}
+-      {cluster !== homeCluster && (
+-        <p
+-          style={{
+-            padding: "0 20px 8px",
+-            margin: 0,
+-            fontSize: "11px",
+-            color: "var(--ink-muted)",
+-            lineHeight: 1.5,
+-          }}
+-        >
+-          Viewing {CLUSTERS[cluster].badge}. Your home cluster is {CLUSTERS[homeCluster].badge}.
+-        </p>
+-      )}
++      <div className="shell-side-sections">
++        <div className="shell-side-heading">In this lens</div>
++        {items.map((item) => (
++          <button
++            key={item.target}
++            type="button"
++            className="shell-item"
++            aria-current={activeTarget === item.target ? "true" : undefined}
++            onClick={() => onNavigate(item.target)}
++          >
++            <span className="shell-item-label">{item.label}</span>
++          </button>
++        ))}
++      </div>
+ 
+-      {/* Nav items — each targets a real section in the active cluster view */}
+-      <nav style={{ flex: 1, padding: "16px 12px 0" }}>
+-        {items.map((item) => {
+-          const active = activeTarget === item.target;
+-          return (
+-            <button
+-              key={item.target}
+-              onClick={() => {
+-                setActiveTarget(item.target);
+-                onNavigate(item.target);
+-              }}
+-              style={{
+-                display: "block",
+-                width: "100%",
+-                textAlign: "left",
+-                padding: "8px 12px",
+-                borderRadius: "var(--radius-chip)",
+-                border: "none",
+-                background: active ? "var(--white)" : "transparent",
+-                color: active ? "var(--ink-primary)" : "var(--ink-muted)",
+-                fontSize: "14px",
+-                fontWeight: active ? 500 : 400,
+-                fontFamily: "inherit",
+-                cursor: "pointer",
+-                marginBottom: "2px",
+-                boxShadow: active ? "0 1px 3px rgba(168,196,212,0.15)" : "none",
+-                transition: "background 0.15s ease",
+-              }}
+-            >
+-              {item.label}
+-            </button>
+-          );
+-        })}
+-      </nav>
++      <div className="shell-side-spacer" />
++      <div className="shell-side-divider" />
+ 
+-      {/* Settings — leaves the cluster SPA for the standalone settings route */}
+-      <a
+-        href="/dashboard/settings"
+-        style={{
+-          margin: "0 12px 4px",
+-          padding: "8px 12px",
+-          borderRadius: "var(--radius-chip)",
+-          color: "var(--ink-muted)",
+-          fontSize: "14px",
+-          textDecoration: "none",
+-          display: "block",
+-        }}
++      <button type="button" className="shell-item" onClick={onOpenWatch} aria-label="Watchlist" title="Watchlist">
++        <WatchIcon size={20} />
++        <span className="shell-item-label">Watchlist</span>
++      </button>
++      <button
++        type="button"
++        className="shell-item"
++        onClick={() => onNavigate("documents")}
++        aria-label="Documents"
++        title="Documents"
+       >
+-        Settings
+-      </a>
+-
+-      {/* Account */}
+-      <div
+-        style={{
+-          padding: "16px 24px",
+-          borderTop: "1px solid var(--border)",
+-          marginTop: "auto",
+-          display: "flex",
+-          alignItems: "center",
+-          gap: "12px",
+-        }}
++        <DocumentsIcon size={20} />
++        <span className="shell-item-label">Documents</span>
++      </button>
++      <button
++        type="button"
++        className="shell-item"
++        onClick={() => onNavigate("history")}
++        aria-label="History"
++        title="History"
+       >
+-        <UserButton />
+-        <span
+-          style={{
+-            fontFamily: "var(--font-mono)",
+-            fontSize: "11px",
+-            color: "var(--ink-muted)",
+-            letterSpacing: "0.1em",
+-            textTransform: "uppercase",
+-          }}
+-        >
+-          Account
+-        </span>
+-      </div>
++        <HistoryIcon size={20} />
++        <span className="shell-item-label">History</span>
++      </button>
++      <a href="/dashboard/settings" className="shell-item" aria-label="Settings" title="Settings">
++        <SettingsIcon size={20} />
++        <span className="shell-item-label">Settings</span>
++      </a>
+     </aside>
+   );
+ }
+diff --git a/src/components/dashboard/UpgradeScreen.tsx b/src/components/dashboard/UpgradeScreen.tsx
+index f6b1ad3..2afcdf4 100644
+--- a/src/components/dashboard/UpgradeScreen.tsx
++++ b/src/components/dashboard/UpgradeScreen.tsx
+@@ -146,7 +146,6 @@ export default function UpgradeScreen({
+                   opacity: busyTier !== null && !busy ? 0.55 : 1,
+                 }}
+               >
+-                <span className="section-number">{c.number}</span>
+                 <span style={{ fontSize: "17px", fontWeight: 500, color: "var(--ink-primary)" }}>
+                   {c.label}
+                 </span>
+diff --git a/src/components/dashboard/cluster1/Cluster1Dashboard.tsx b/src/components/dashboard/cluster1/Cluster1Dashboard.tsx
+index bd75032..9bddb71 100644
+--- a/src/components/dashboard/cluster1/Cluster1Dashboard.tsx
++++ b/src/components/dashboard/cluster1/Cluster1Dashboard.tsx
+@@ -6,19 +6,11 @@
+ // reasoning, and alerts derived from real fetched data. No neural map.
+ 
+ import React, { useState } from "react";
+-import AddressInput from "@/components/ui/AddressInput";
+-import LoadingState from "@/components/ui/LoadingState";
+-import VerdictCard from "@/components/ui/VerdictCard";
+-import VerdictMathPanel from "@/components/ui/VerdictMathPanel";
+ import LocationConfidenceNote from "@/components/ui/LocationConfidenceNote";
+-import CandidatePicker from "@/components/ui/CandidatePicker";
+-import RunDegradationNote from "@/components/ui/RunDegradationNote";
+-import ProvenanceLedger from "@/components/ui/ProvenanceLedger";
+-import CoverageMap from "@/components/ui/CoverageMap";
+-import ReasoningChain from "@/components/ui/ReasoningChain";
+ import { CLUSTERS } from "../clusters";
+ import { useVerdictStream } from "../useVerdictStream";
+-import { useAddressResolver, type RunPayload } from "../useAddressResolver";
++import type { RunPayload } from "../useAddressResolver";
++import { useRegisterRun, usePendingSubject } from "../shell/SubjectProvider";
+ import VerdictHistory from "../VerdictHistory";
+ import PermitHistoryPanel from "../PermitHistoryPanel";
+ import DocumentButton from "../DocumentButton";
+@@ -66,37 +58,33 @@ export default function Cluster1Dashboard() {
+     }
+   }
+ 
+-  // Fires only AFTER resolution succeeds (a confident match, or the user's pick).
+-  function startRun(payload: RunPayload) {
+-    void stream.run(payload);
+-    void fetchDetail(payload);
+-  }
+-
+-  const resolver = useAddressResolver(startRun);
+-
+-  // A new submission clears any prior run and resolves first, so a resolution
+-  // problem reads as one banner, never a wall of panel errors.
+-  function analyze(address: string) {
++  // The subject arrives settled from the shell's global search (a confident
++  // match as the raw address, a chosen candidate as the candidate; the server
++  // re-derives the lot either way).
++  const [lastInput, setLastInput] = useState<string | null>(null);
++  usePendingSubject((payload, label) => {
++    setLastInput(label);
+     setDetail(null);
+     setDetailError(null);
+     stream.reset();
+-    void resolver.resolve(address);
+-  }
++    void stream.run(payload);
++    void fetchDetail(payload);
++  });
+ 
+   const { status, result } = stream;
+-  const resolving = resolver.state.phase === "resolving";
++  // The shell's verdict band and evidence drawer render this run.
++  useRegisterRun(stream, { subject: lastInput });
+ 
+   return (
+-    <div style={{ display: "flex", flexDirection: "column", gap: "24px", maxWidth: "980px" }}>
++    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+       <div id="c1-property">
+-        <span className="section-number">{c.number}</span>
+         <h1
+           style={{
+             fontSize: "32px",
+             fontWeight: 700,
+             letterSpacing: "-0.02em",
+             color: "var(--ink-primary)",
+-            margin: "12px 0 8px",
++            margin: "0 0 8px",
+           }}
+         >
+           {c.label}
+@@ -115,41 +103,13 @@ export default function Cluster1Dashboard() {
+         </p>
+       </div>
+ 
+-      <AddressInput onSubmit={analyze} busy={resolving || status === "running"} />
+-
+       <LocationConfidenceNote confidence={detail?.resolved_address?.location_confidence} />
+ 
+-      {/* Resolution step — a single banner, never a wall of panel errors. */}
+-      {resolving && (
+-        <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>Resolving address…</p>
+-      )}
+-      {resolver.state.phase === "ambiguous" && (
+-        <CandidatePicker candidates={resolver.state.candidates} onChoose={resolver.choose} />
+-      )}
+-      {resolver.state.phase === "none" && (
+-        <div
+-          style={{
+-            border: "1px solid var(--border)",
+-            borderLeft: "3px solid var(--signal-negative)",
+-            borderRadius: "0 var(--radius-inner) var(--radius-inner) 0",
+-            padding: "16px 24px",
+-            maxWidth: "620px",
+-          }}
+-        >
+-          <p style={{ fontSize: "14px", color: "var(--ink-secondary)", margin: 0 }}>
+-            {resolver.state.error}
+-          </p>
+-          <p style={{ fontSize: "12px", color: "var(--ink-muted)", margin: "6px 0 0" }}>
+-            Live NYC data is deepest. Try a New York City street address.
+-          </p>
+-        </div>
+-      )}
+-
+-      {status === "idle" && resolver.state.phase === "idle" && (
++      {status === "idle" && (
+         /* Empty state — approved copy (KOANO_COPY.md) */
+         <div style={{ maxWidth: "620px" }}>
+           <h3 style={{ fontSize: "18px", fontWeight: 500, color: "var(--ink-primary)", margin: "0 0 8px" }}>
+-            Start with an address.
++            Start with an address in the search bar.
+           </h3>
+           <p style={{ fontSize: "14px", lineHeight: 1.6, color: "var(--ink-muted)", margin: 0 }}>
+             KOANO will read the zoning, the permit history, and the flood and
+@@ -167,41 +127,8 @@ export default function Cluster1Dashboard() {
+         <PropertyMap detail={detail} detailError={detailError} id="c1-map" />
+       )}
+ 
+-      {status === "running" && (
+-        <LoadingState
+-          phase={stream.phase}
+-          agents={stream.agents}
+-          startedAt={stream.startedAt}
+-          normalizedAddress={stream.normalized}
+-        />
+-      )}
+-
+-      {status === "error" && (
+-        <div
+-          style={{
+-            border: "1px solid var(--border)",
+-            borderLeft: "3px solid var(--signal-negative)",
+-            borderRadius: "0 var(--radius-inner) var(--radius-inner) 0",
+-            padding: "16px 24px",
+-            maxWidth: "620px",
+-          }}
+-        >
+-          <p style={{ fontSize: "14px", color: "var(--ink-secondary)", margin: 0 }}>
+-            Analysis failed: {stream.error}
+-          </p>
+-          <p style={{ fontSize: "12px", color: "var(--ink-muted)", margin: "6px 0 0" }}>
+-            Live NYC data is deepest. Try a New York City street address.
+-          </p>
+-        </div>
+-      )}
+-
+       {status === "done" && result && (
+         <>
+-          <VerdictCard verdict={result.verdict} address={result.resolved_address.normalized} />
+-
+-          <RunDegradationNote degradation={result.degradation} />
+-
+-          <VerdictMathPanel verdict={result.verdict} />
+ 
+           <div
+             style={{
+@@ -230,7 +157,6 @@ export default function Cluster1Dashboard() {
+               from the analyzed address on live NYC public data. */}
+           <div id="c1-documents" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+             <div>
+-              <span className="section-number">{c.number}.D</span>
+               <h2
+                 style={{
+                   fontSize: "22px",
+@@ -289,33 +215,6 @@ export default function Cluster1Dashboard() {
+               />
+             </div>
+           </div>
+-
+-          <ReasoningChain
+-            reasoningChain={result.verdict.reasoning_chain}
+-            minoritySignals={result.verdict.minority_signals}
+-            agentSummaries={result.verdict.agent_summaries}
+-          />
+-
+-          <CoverageMap dataPoints={result.verdict.data_points} />
+-
+-          <ProvenanceLedger
+-            dataPoints={result.verdict.data_points}
+-            locationConfidence={result.resolved_address.location_confidence}
+-            address={result.resolved_address.normalized}
+-          />
+-
+-          <p
+-            style={{
+-              fontFamily: "var(--font-mono)",
+-              fontSize: "11px",
+-              color: "var(--ink-muted)",
+-              margin: 0,
+-            }}
+-          >
+-            {result.persisted
+-              ? "Recorded to your verdict history (append-only audit trail)"
+-              : `Not recorded: ${result.persist_error ?? "persistence unavailable"}`}
+-          </p>
+         </>
+       )}
+ 
+diff --git a/src/components/dashboard/cluster2/Cluster2Dashboard.tsx b/src/components/dashboard/cluster2/Cluster2Dashboard.tsx
+index 48055ec..dd01250 100644
+--- a/src/components/dashboard/cluster2/Cluster2Dashboard.tsx
++++ b/src/components/dashboard/cluster2/Cluster2Dashboard.tsx
+@@ -8,20 +8,12 @@
+ // representative and labeled everywhere — live MLS access is never implied.
+ 
+ import React, { useState } from "react";
+-import AddressInput from "@/components/ui/AddressInput";
+-import LoadingState from "@/components/ui/LoadingState";
+-import VerdictCard from "@/components/ui/VerdictCard";
+-import VerdictMathPanel from "@/components/ui/VerdictMathPanel";
+ import LocationConfidenceNote from "@/components/ui/LocationConfidenceNote";
+-import CandidatePicker from "@/components/ui/CandidatePicker";
+-import RunDegradationNote from "@/components/ui/RunDegradationNote";
+-import ProvenanceLedger from "@/components/ui/ProvenanceLedger";
+-import CoverageMap from "@/components/ui/CoverageMap";
+-import ReasoningChain from "@/components/ui/ReasoningChain";
+ import type { AddressCandidate } from "@/components/ui/verdict";
+ import { CLUSTERS } from "../clusters";
+ import { useVerdictStream } from "../useVerdictStream";
+-import { useAddressResolver, type RunPayload } from "../useAddressResolver";
++import type { RunPayload } from "../useAddressResolver";
++import { useRegisterRun, usePendingSubject } from "../shell/SubjectProvider";
+ import VerdictHistory from "../VerdictHistory";
+ import MarketVelocityPanel from "./MarketVelocityPanel";
+ import PropertyMap from "../cluster1/PropertyMap";
+@@ -69,28 +61,20 @@ export default function Cluster2Dashboard() {
+     }
+   }
+ 
+-  // Fires only AFTER resolution succeeds (a confident match, or the user's pick).
+-  function startRun(payload: RunPayload) {
++  // The subject arrives settled from the shell's global search.
++  const [lastInput, setLastInput] = useState<string | null>(null);
++  usePendingSubject((payload, label) => {
++    setLastInput(label);
++    setDetail(null);
++    setDetailError(null);
++    stream.reset();
+     setStarted(true);
+     setActivePayload(payload);
+     void stream.run(payload);
+     void fetchDetail(payload);
+-  }
++  });
+ 
+-  const resolver = useAddressResolver(startRun);
+-
+-  // A new submission hides any prior panels until this address resolves, so a
+-  // resolution problem never leaves stale results (or five panel errors) on screen.
+-  function analyze(address: string) {
+-    setStarted(false);
+-    setActivePayload(null);
+-    setDetail(null);
+-    setDetailError(null);
+-    stream.reset();
+-    void resolver.resolve(address);
+-  }
+-
+-  const { status, result } = stream;
++  const { result } = stream;
+   const activeCandidate: AddressCandidate | null =
+     activePayload && "candidate" in activePayload ? activePayload.candidate : null;
+   const subjectAddress =
+@@ -98,19 +82,18 @@ export default function Cluster2Dashboard() {
+     detail?.resolved_address.normalized ??
+     activeCandidate?.label ??
+     null;
+-  const resolving = resolver.state.phase === "resolving";
++  useRegisterRun(stream, { subject: lastInput });
+ 
+   return (
+-    <div style={{ display: "flex", flexDirection: "column", gap: "24px", maxWidth: "1080px" }}>
++    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+       <div>
+-        <span className="section-number">{c.number}</span>
+         <h1
+           style={{
+             fontSize: "32px",
+             fontWeight: 700,
+             letterSpacing: "-0.02em",
+             color: "var(--ink-primary)",
+-            margin: "12px 0 8px",
++            margin: "0 0 8px",
+           }}
+         >
+           {c.label}
+@@ -129,41 +112,13 @@ export default function Cluster2Dashboard() {
+         </p>
+       </div>
+ 
+-      <AddressInput onSubmit={analyze} busy={resolving || status === "running"} />
+-
+       <LocationConfidenceNote confidence={detail?.resolved_address?.location_confidence} />
+ 
+-      {/* Resolution step — a single banner, never five panel errors. */}
+-      {resolving && (
+-        <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>Resolving address…</p>
+-      )}
+-      {resolver.state.phase === "ambiguous" && (
+-        <CandidatePicker candidates={resolver.state.candidates} onChoose={resolver.choose} />
+-      )}
+-      {resolver.state.phase === "none" && (
+-        <div
+-          style={{
+-            border: "1px solid var(--border)",
+-            borderLeft: "3px solid var(--signal-negative)",
+-            borderRadius: "0 var(--radius-inner) var(--radius-inner) 0",
+-            padding: "16px 24px",
+-            maxWidth: "620px",
+-          }}
+-        >
+-          <p style={{ fontSize: "14px", color: "var(--ink-secondary)", margin: 0 }}>
+-            {resolver.state.error}
+-          </p>
+-          <p style={{ fontSize: "12px", color: "var(--ink-muted)", margin: "6px 0 0" }}>
+-            Live NYC data is deepest. Try a New York City street address.
+-          </p>
+-        </div>
+-      )}
+-
+-      {!started && resolver.state.phase === "idle" && (
++      {!started && (
+         /* Empty state — approved copy (KOANO_COPY.md) */
+         <div style={{ maxWidth: "620px" }}>
+           <h3 style={{ fontSize: "18px", fontWeight: 500, color: "var(--ink-primary)", margin: "0 0 8px" }}>
+-            Start with an address or a neighborhood.
++            Start with an address in the search bar.
+           </h3>
+           <p style={{ fontSize: "14px", lineHeight: 1.6, color: "var(--ink-muted)", margin: 0 }}>
+             You will get the market picture first, within a few seconds. The
+@@ -193,7 +148,6 @@ export default function Cluster2Dashboard() {
+           {subjectAddress && (
+             <div id="c2-documents" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+               <div>
+-                <span className="section-number">{c.number}.D</span>
+                 <h2
+                   style={{
+                     fontSize: "22px",
+@@ -265,63 +219,6 @@ export default function Cluster2Dashboard() {
+           )}
+ 
+           {/* Verdict pipeline */}
+-          {status === "running" && (
+-            <LoadingState
+-              phase={stream.phase}
+-              agents={stream.agents}
+-              startedAt={stream.startedAt}
+-              normalizedAddress={stream.normalized}
+-            />
+-          )}
+-          {status === "error" && (
+-            <div
+-              style={{
+-                border: "1px solid var(--border)",
+-                borderLeft: "3px solid var(--signal-negative)",
+-                borderRadius: "0 var(--radius-inner) var(--radius-inner) 0",
+-                padding: "16px 24px",
+-                maxWidth: "620px",
+-              }}
+-            >
+-              <p style={{ fontSize: "14px", color: "var(--ink-secondary)", margin: 0 }}>
+-                Verdict pipeline failed: {stream.error}
+-              </p>
+-              <p style={{ fontSize: "12px", color: "var(--ink-muted)", margin: "6px 0 0" }}>
+-                Live NYC data is deepest. Try a New York City street address.
+-              </p>
+-            </div>
+-          )}
+-          {status === "done" && result && (
+-            <>
+-              <VerdictCard verdict={result.verdict} address={result.resolved_address.normalized} />
+-              <RunDegradationNote degradation={result.degradation} />
+-              <VerdictMathPanel verdict={result.verdict} />
+-              <ReasoningChain
+-                reasoningChain={result.verdict.reasoning_chain}
+-                minoritySignals={result.verdict.minority_signals}
+-                agentSummaries={result.verdict.agent_summaries}
+-              />
+-              <CoverageMap dataPoints={result.verdict.data_points} />
+-
+-              <ProvenanceLedger
+-                dataPoints={result.verdict.data_points}
+-                locationConfidence={result.resolved_address.location_confidence}
+-                address={result.resolved_address.normalized}
+-              />
+-              <p
+-                style={{
+-                  fontFamily: "var(--font-mono)",
+-                  fontSize: "11px",
+-                  color: "var(--ink-muted)",
+-                  margin: 0,
+-                }}
+-              >
+-                {result.persisted
+-                  ? "Recorded to your verdict history (append-only audit trail)"
+-                  : `Not recorded: ${result.persist_error ?? "persistence unavailable"}`}
+-              </p>
+-            </>
+-          )}
+         </>
+       )}
+ 
+diff --git a/src/components/dashboard/cluster4/Cluster4Dashboard.tsx b/src/components/dashboard/cluster4/Cluster4Dashboard.tsx
+index ee634e6..daaed07 100644
+--- a/src/components/dashboard/cluster4/Cluster4Dashboard.tsx
++++ b/src/components/dashboard/cluster4/Cluster4Dashboard.tsx
+@@ -26,16 +26,15 @@ export default function Cluster4Dashboard({ navTarget }: { navTarget?: NavTarget
+   }, [navTarget]);
+ 
+   return (
+-    <div style={{ display: "flex", flexDirection: "column", gap: "24px", maxWidth: "1160px" }}>
++    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+       <div>
+-        <span className="section-number">{c.number}</span>
+         <h1
+           style={{
+             fontSize: "32px",
+             fontWeight: 700,
+             letterSpacing: "-0.02em",
+             color: "var(--ink-primary)",
+-            margin: "12px 0 8px",
++            margin: "0 0 8px",
+           }}
+         >
+           {c.label}
+diff --git a/src/components/dashboard/cluster4/SiteComparison.tsx b/src/components/dashboard/cluster4/SiteComparison.tsx
+index 09b87b7..20a8656 100644
+--- a/src/components/dashboard/cluster4/SiteComparison.tsx
++++ b/src/components/dashboard/cluster4/SiteComparison.tsx
+@@ -18,6 +18,7 @@ import CandidatePicker from "@/components/ui/CandidatePicker";
+ import { VERDICT_COLORS, type SynthesisResult, type Verdict, type AddressCandidate } from "@/components/ui/verdict";
+ import { useVerdictStream, type VerdictStream, type RunDegradation } from "../useVerdictStream";
+ import type { RunPayload } from "../useAddressResolver";
++import { useRegisterRun, usePendingSubject } from "../shell/SubjectProvider";
+ import RunDegradationNote from "@/components/ui/RunDegradationNote";
+ import SitePanels from "./SitePanels";
+ import MultiSiteMap, { type MultiSite } from "./MultiSiteMap";
+@@ -107,6 +108,20 @@ export default function SiteComparison() {
+     }
+   }
+ 
++  // A subject from the shell's search fills the first empty site slot and
++  // starts it (or replaces the last slot when all three are taken).
++  usePendingSubject((payload, label) => {
++    const empty = addresses.findIndex((a) => !a.trim());
++    const slot = empty === -1 ? 2 : empty;
++    setAddresses((prev) => prev.map((a, i) => (i === slot ? label : a)));
++    setResolveErrors((prev) => {
++      const next = { ...prev };
++      delete next[slot];
++      return next;
++    });
++    startSlot(slot, payload);
++  });
++
+   // A slot begins analysis only AFTER it resolves (confident, or the user's pick).
+   function startSlot(slot: number, payload: RunPayload) {
+     setActiveSlots((prev) => (prev.includes(slot) ? prev : [...prev, slot].sort((a, b) => a - b)));
+@@ -179,6 +194,13 @@ export default function SiteComparison() {
+     rank: rank + 1,
+     verdict: streams[slot].result!.verdict,
+   }));
++  // The shell's verdict band shows the top-ranked site once the comparison
++  // finishes, else the first site still running.
++  const bandSlot = ranked[0] ?? activeSlots.find((i) => streams[i].status !== "idle") ?? null;
++  useRegisterRun(bandSlot === null ? null : streams[bandSlot], {
++    resolving: resolving && bandSlot === null ? true : false,
++    subject: bandSlot === null ? addresses.find((a) => a.trim())?.trim() ?? null : addresses[bandSlot].trim() || null,
++  });
+   const resolveErrorSlots = Object.keys(resolveErrors).map(Number);
+   const anyActivity =
+     resolving || hasPending || activeSlots.length > 0 || resolveErrorSlots.length > 0;
+diff --git a/src/components/dashboard/cluster5/Cluster5Dashboard.tsx b/src/components/dashboard/cluster5/Cluster5Dashboard.tsx
+index 889aad1..7c1cc15 100644
+--- a/src/components/dashboard/cluster5/Cluster5Dashboard.tsx
++++ b/src/components/dashboard/cluster5/Cluster5Dashboard.tsx
+@@ -7,16 +7,10 @@
+ // language throughout.
+ 
+ import React, { useCallback, useEffect, useState } from "react";
+-import LoadingState from "@/components/ui/LoadingState";
+-import VerdictCard from "@/components/ui/VerdictCard";
+-import RunDegradationNote from "@/components/ui/RunDegradationNote";
+-import ProvenanceLedger from "@/components/ui/ProvenanceLedger";
+-import CoverageMap from "@/components/ui/CoverageMap";
+-import VerdictMathPanel from "@/components/ui/VerdictMathPanel";
+-import ReasoningChain from "@/components/ui/ReasoningChain";
+ import { CLUSTERS } from "../clusters";
+ import { useVerdictStream } from "../useVerdictStream";
+ import type { RunPayload } from "../useAddressResolver";
++import { useRegisterRun, usePendingSubject } from "../shell/SubjectProvider";
+ import VerdictHistory from "../VerdictHistory";
+ import PortfolioOverview from "./PortfolioOverview";
+ import PortfolioMap from "./PortfolioMap";
+@@ -70,6 +64,11 @@ export default function Cluster5Dashboard() {
+     }
+   }
+ 
++  // A subject from the shell's search is added to the book.
++  usePendingSubject((payload) => {
++    void addProperty(payload);
++  });
++
+   async function removeProperty(id: string) {
+     await fetch(`/api/properties?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+     await loadProperties();
+@@ -85,21 +84,21 @@ export default function Cluster5Dashboard() {
+   }
+ 
+   const { status, result } = stream;
++  useRegisterRun(stream, { subject: analyzedAddress });
+ 
+   return (
+-    <div style={{ display: "flex", flexDirection: "column", gap: "24px", maxWidth: "1160px" }}>
++    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+       {/* Hero: geographic portfolio risk map. (The neural "System view" was
+           removed — decoration, not a decision surface.) */}
+       <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+         <div>
+-          <span className="section-number">{c.number}</span>
+           <h1
+             style={{
+               fontSize: "32px",
+               fontWeight: 700,
+               letterSpacing: "-0.02em",
+               color: "var(--ink-primary)",
+-              margin: "12px 0 8px",
++              margin: "0 0 8px",
+             }}
+           >
+             {c.label}
+@@ -132,48 +131,6 @@ export default function Cluster5Dashboard() {
+       />
+ 
+       {/* Active analysis */}
+-      {status === "running" && (
+-        <LoadingState
+-          phase={stream.phase}
+-          agents={stream.agents}
+-          startedAt={stream.startedAt}
+-          normalizedAddress={stream.normalized ?? analyzedAddress}
+-        />
+-      )}
+-      {status === "error" && (
+-        <div
+-          style={{
+-            border: "1px solid var(--border)",
+-            borderLeft: "3px solid var(--signal-negative)",
+-            borderRadius: "0 var(--radius-inner) var(--radius-inner) 0",
+-            padding: "16px 24px",
+-            maxWidth: "620px",
+-          }}
+-        >
+-          <p style={{ fontSize: "14px", color: "var(--ink-secondary)", margin: 0 }}>
+-            Analysis failed: {stream.error}
+-          </p>
+-        </div>
+-      )}
+-      {status === "done" && result && (
+-        <>
+-          <VerdictCard verdict={result.verdict} address={result.resolved_address.normalized} />
+-          <RunDegradationNote degradation={result.degradation} />
+-          <VerdictMathPanel verdict={result.verdict} />
+-          <ReasoningChain
+-            reasoningChain={result.verdict.reasoning_chain}
+-            minoritySignals={result.verdict.minority_signals}
+-            agentSummaries={result.verdict.agent_summaries}
+-          />
+-          <CoverageMap dataPoints={result.verdict.data_points} />
+-
+-          <ProvenanceLedger
+-            dataPoints={result.verdict.data_points}
+-            locationConfidence={result.resolved_address.location_confidence}
+-            address={result.resolved_address.normalized}
+-          />
+-        </>
+-      )}
+ 
+       <MondayBriefing hasProperties={!!properties && properties.length > 0} id="c5-briefing" />
+ 
+@@ -183,7 +140,6 @@ export default function Cluster5Dashboard() {
+           matching the Cluster 1 grouped pattern. */}
+       <div id="c5-documents" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+         <div>
+-          <span className="section-number">{c.number}.D</span>
+           <h2
+             style={{
+               fontSize: "22px",
+diff --git a/src/components/dashboard/clusters.ts b/src/components/dashboard/clusters.ts
+index 9b63bba..497b936 100644
+--- a/src/components/dashboard/clusters.ts
++++ b/src/components/dashboard/clusters.ts
+@@ -20,9 +20,10 @@ export const CLUSTER_IDS: ClusterId[] = [
+ 
+ export interface ClusterMeta {
+   id: ClusterId;
+-  number: string; // section-number eyebrow, e.g. "01"
+-  badge: string; // display index C1–C4 by positioning order (decoupled from id)
++  number: string; // DOM-id prefix only ("01".."05"); never shown to the user since WS3
++  badge: string; // marketing display index C1–C4 (hero pages, pricing); never shown in the app
+   label: string; // approved product name
++  lens: string; // plain lens name shown in the app shell (UI sprint WS3)
+   audience: string; // who it serves (Section 08)
+   tagline: string; // approved verbatim card copy (Section 13)
+   price: string; // approved price line (Section 13)
+@@ -31,6 +32,7 @@ export interface ClusterMeta {
+ export const CLUSTERS: Record<ClusterId, ClusterMeta> = {
+   cluster_1: {
+     id: "cluster_1",
++    lens: "Property",
+     number: "01",
+     badge: "C4",
+     label: "Property intelligence",
+@@ -41,6 +43,7 @@ export const CLUSTERS: Record<ClusterId, ClusterMeta> = {
+   },
+   cluster_2: {
+     id: "cluster_2",
++    lens: "Price",
+     number: "02",
+     badge: "C2",
+     label: "Transaction intelligence",
+@@ -51,6 +54,7 @@ export const CLUSTERS: Record<ClusterId, ClusterMeta> = {
+   },
+   cluster_4: {
+     id: "cluster_4",
++    lens: "Develop",
+     number: "04",
+     badge: "C1",
+     label: "Development intelligence",
+@@ -61,6 +65,7 @@ export const CLUSTERS: Record<ClusterId, ClusterMeta> = {
+   },
+   cluster_5: {
+     id: "cluster_5",
++    lens: "Acquire",
+     number: "05",
+     badge: "C3",
+     label: "Portfolio intelligence",
+@@ -71,6 +76,18 @@ export const CLUSTERS: Record<ClusterId, ClusterMeta> = {
+   },
+ };
+ 
++// Lens order in the app shell (redesign spec §3): the wedge first.
++export const LENS_ORDER: ClusterId[] = ["cluster_4", "cluster_5", "cluster_2", "cluster_1"];
++
++// Plan tag shown in the shell (the plan is the pricing tier; the lens is the view).
++export const PLAN_LABELS: Record<string, string> = {
++  free: "Free",
++  community: "Community",
++  transaction: "Transaction",
++  development: "Development",
++  portfolio: "Portfolio",
++};
++
+ export function isClusterId(value: unknown): value is ClusterId {
+   return (
+     typeof value === "string" && (CLUSTER_IDS as string[]).includes(value)
+diff --git a/src/components/dashboard/shell/BottomTabs.tsx b/src/components/dashboard/shell/BottomTabs.tsx
+new file mode 100644
+index 0000000..7096087
+--- /dev/null
++++ b/src/components/dashboard/shell/BottomTabs.tsx
+@@ -0,0 +1,41 @@
++"use client";
++
++// BottomTabs (UI sprint WS3): the phone navigation. Home, Search, Watch,
++// Documents, 48px targets, safe-area padding. Hidden from 768px up (shell.css).
++
++import React from "react";
++import { HomeIcon, SearchIcon, WatchIcon, DocumentsIcon } from "./icons";
++
++export type ShellTab = "home" | "search" | "watch" | "documents";
++
++interface BottomTabsProps {
++  active: ShellTab;
++  onSelect: (tab: ShellTab) => void;
++}
++
++const TABS: { id: ShellTab; label: string; Icon: (p: { size?: number }) => React.JSX.Element }[] = [
++  { id: "home", label: "Home", Icon: HomeIcon },
++  { id: "search", label: "Search", Icon: SearchIcon },
++  { id: "watch", label: "Watch", Icon: WatchIcon },
++  { id: "documents", label: "Documents", Icon: DocumentsIcon },
++];
++
++export default function BottomTabs({ active, onSelect }: BottomTabsProps) {
++  return (
++    <nav className="shell-tabs" aria-label="Primary">
++      {TABS.map(({ id, label, Icon }) => (
++        <button
++          key={id}
++          type="button"
++          className="shell-tab"
++          aria-current={active === id ? "true" : undefined}
++          onClick={() => onSelect(id)}
++          data-tab={id}
++        >
++          <Icon size={22} />
++          <span>{label}</span>
++        </button>
++      ))}
++    </nav>
++  );
++}
+diff --git a/src/components/dashboard/shell/EvidenceDrawer.tsx b/src/components/dashboard/shell/EvidenceDrawer.tsx
+new file mode 100644
+index 0000000..231808c
+--- /dev/null
++++ b/src/components/dashboard/shell/EvidenceDrawer.tsx
+@@ -0,0 +1,108 @@
++"use client";
++
++// EvidenceDrawer (UI sprint WS3, slice 2). The verdict's evidence, out of the
++// scroll: Math, Reasoning, Sources and Coverage as tabs in a right-anchored
++// panel (a full-screen sheet below 768px), collapsed by default, deep-linkable
++// by hash, focus-trapped, closed by Escape.
++
++import React, { useEffect, useRef } from "react";
++import VerdictMathPanel from "@/components/ui/VerdictMathPanel";
++import ReasoningChain from "@/components/ui/ReasoningChain";
++import ProvenanceLedger from "@/components/ui/ProvenanceLedger";
++import CoverageMap from "@/components/ui/CoverageMap";
++import { CloseIcon } from "./icons";
++import { useSubject, DRAWER_TABS, type DrawerTab } from "./SubjectProvider";
++
++const LABEL: Record<DrawerTab, string> = { math: "Math", reasoning: "Reasoning", sources: "Sources", coverage: "Coverage" };
++const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
++
++export default function EvidenceDrawer() {
++  const { run, drawer, openDrawer, closeDrawer } = useSubject();
++  const ref = useRef<HTMLDivElement>(null);
++  const opener = useRef<HTMLElement | null>(null);
++  const open = drawer !== null && run?.status === "done" && !!run.result;
++
++  useEffect(() => {
++    if (!open) return;
++    opener.current = document.activeElement as HTMLElement | null;
++    const el = ref.current;
++    el?.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]')?.focus();
++    const onKey = (e: KeyboardEvent) => {
++      if (e.key === "Escape") {
++        e.preventDefault();
++        closeDrawer();
++        return;
++      }
++      if (e.key !== "Tab" || !el) return;
++      const items = Array.from(el.querySelectorAll<HTMLElement>(FOCUSABLE)).filter((x) => x.offsetParent !== null);
++      if (items.length === 0) return;
++      const i = items.indexOf(document.activeElement as HTMLElement);
++      e.preventDefault();
++      items[i === -1 ? 0 : (i + (e.shiftKey ? -1 : 1) + items.length) % items.length].focus();
++    };
++    document.addEventListener("keydown", onKey);
++    const prev = document.body.style.overflow;
++    if (window.innerWidth < 768) document.body.style.overflow = "hidden";
++    return () => {
++      document.removeEventListener("keydown", onKey);
++      document.body.style.overflow = prev;
++      opener.current?.focus();
++    };
++  }, [open, closeDrawer]);
++
++  if (!open || !run?.result) return null;
++  const r = run.result;
++  const tab = drawer as DrawerTab;
++
++  return (
++    <>
++      <div className="drawer-backdrop" onClick={closeDrawer} aria-hidden="true" />
++      <aside ref={ref} className="evidence-drawer" role="dialog" aria-modal="true" aria-label="Verdict evidence" id="evidence-drawer">
++        <div className="drawer-head">
++          <div>
++            <div className="band-eyebrow">Evidence</div>
++            <p className="drawer-address">{r.resolved_address.normalized}</p>
++          </div>
++          <button type="button" className="shell-sheet-close" onClick={closeDrawer} aria-label="Close evidence">
++            <CloseIcon size={18} />
++          </button>
++        </div>
++        <div className="drawer-tabs" role="tablist" aria-label="Evidence sections">
++          {DRAWER_TABS.map((t) => (
++            <button
++              key={t}
++              type="button"
++              role="tab"
++              id={`drawer-tab-${t}`}
++              aria-selected={t === tab}
++              aria-controls={`drawer-panel-${t}`}
++              className="drawer-tab"
++              onClick={() => openDrawer(t)}
++            >
++              {LABEL[t]}
++            </button>
++          ))}
++        </div>
++        <div className="drawer-body" role="tabpanel" id={`drawer-panel-${tab}`} aria-labelledby={`drawer-tab-${tab}`}>
++          {tab === "math" && <VerdictMathPanel verdict={r.verdict} />}
++          {tab === "reasoning" && (
++            <ReasoningChain
++              reasoningChain={r.verdict.reasoning_chain}
++              minoritySignals={r.verdict.minority_signals}
++              agentSummaries={r.verdict.agent_summaries}
++            />
++          )}
++          {tab === "sources" && (
++            <ProvenanceLedger
++              dataPoints={r.verdict.data_points}
++              locationConfidence={r.resolved_address.location_confidence}
++              address={r.resolved_address.normalized}
++              defaultOpen
++            />
++          )}
++          {tab === "coverage" && <CoverageMap dataPoints={r.verdict.data_points} defaultOpen />}
++        </div>
++      </aside>
++    </>
++  );
++}
+diff --git a/src/components/dashboard/shell/GlobalSearch.tsx b/src/components/dashboard/shell/GlobalSearch.tsx
+new file mode 100644
+index 0000000..d932f4f
+--- /dev/null
++++ b/src/components/dashboard/shell/GlobalSearch.tsx
+@@ -0,0 +1,258 @@
++"use client";
++
++// GlobalSearch (UI sprint WS3, slice 3). One address control for the whole
++// app, in the top bar (and as a sheet on phones). It resolves through
++// /api/resolve-address (the same disambiguation path the lenses used), lists
++// recent subjects from the verdict history, and hands the settled subject to
++// the active lens through the SubjectProvider. The BBL is never supplied by
++// the browser: a confident match is passed as the raw address, a chosen
++// candidate as the candidate, and the endpoints re-derive the lot.
++
++import React, { useCallback, useEffect, useId, useRef, useState } from "react";
++import type { AddressCandidate } from "@/components/ui/verdict";
++import { useUpgrade, isUpgradeRequired } from "../UpgradeProvider";
++import { useSubject } from "./SubjectProvider";
++import { SearchIcon } from "./icons";
++
++interface GlobalSearchProps {
++  variant: "bar" | "sheet";
++  /** Called after a subject is dispatched (the sheet closes itself). */
++  onDone?: () => void;
++  autoFocus?: boolean;
++}
++
++type Phase =
++  | { kind: "idle" }
++  | { kind: "resolving" }
++  | { kind: "ambiguous"; candidates: AddressCandidate[] }
++  | { kind: "none"; error: string };
++
++interface Recent {
++  address: string;
++  verdict: string;
++  when: string;
++}
++
++export default function GlobalSearch({ variant, onDone, autoFocus = false }: GlobalSearchProps) {
++  const id = useId();
++  const { openUpgrade } = useUpgrade();
++  const { dispatchSubject, setSearching } = useSubject();
++  const [value, setValue] = useState("");
++  const [phase, setPhase] = useState<Phase>({ kind: "idle" });
++  const [open, setOpen] = useState(false);
++  const [recents, setRecents] = useState<Recent[] | null>(null);
++  const inputRef = useRef<HTMLInputElement>(null);
++  const rootRef = useRef<HTMLDivElement>(null);
++
++  // ⌘K / Ctrl+K focuses the bar.
++  useEffect(() => {
++    if (variant !== "bar") return;
++    const onKey = (e: KeyboardEvent) => {
++      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
++        e.preventDefault();
++        inputRef.current?.focus();
++        setOpen(true);
++      }
++    };
++    document.addEventListener("keydown", onKey);
++    return () => document.removeEventListener("keydown", onKey);
++  }, [variant]);
++
++  useEffect(() => {
++    if (autoFocus) inputRef.current?.focus();
++  }, [autoFocus]);
++
++  // Close the dropdown on an outside click.
++  useEffect(() => {
++    if (!open || variant !== "bar") return;
++    const onDown = (e: MouseEvent) => {
++      if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
++    };
++    document.addEventListener("mousedown", onDown);
++    return () => document.removeEventListener("mousedown", onDown);
++  }, [open, variant]);
++
++  const loadRecents = useCallback(async () => {
++    if (recents !== null) return;
++    try {
++      const res = await fetch("/api/verdicts?limit=12");
++      const json = await res.json();
++      if (!res.ok) throw new Error();
++      const seen = new Set<string>();
++      const rows: Recent[] = [];
++      for (const v of (json.verdicts ?? []) as { address_normalized: string | null; address_input: string; verdict: string; created_at: string; hidden: boolean }[]) {
++        const a = v.address_normalized ?? v.address_input;
++        if (v.hidden || seen.has(a)) continue;
++        seen.add(a);
++        rows.push({ address: a, verdict: v.verdict, when: new Date(v.created_at).toLocaleDateString() });
++        if (rows.length >= 5) break;
++      }
++      setRecents(rows);
++    } catch {
++      setRecents([]);
++    }
++  }, [recents]);
++
++  function settle(payload: { address: string } | { candidate: AddressCandidate }, label: string) {
++    setPhase({ kind: "idle" });
++    setOpen(false);
++    setValue("");
++    dispatchSubject(payload, label);
++    onDone?.();
++  }
++
++  async function resolve(address: string) {
++    const q = address.trim();
++    if (!q) return;
++    setPhase({ kind: "resolving" });
++    setSearching(true);
++    try {
++      const res = await fetch("/api/resolve-address", {
++        method: "POST",
++        headers: { "Content-Type": "application/json" },
++        body: JSON.stringify({ address: q }),
++      });
++      const json = await res.json().catch(() => null);
++      if (isUpgradeRequired(res.status, json)) {
++        openUpgrade({ plan: json.plan, kind: json.kind, limit: json.limit });
++        setPhase({ kind: "idle" });
++        return;
++      }
++      if (!res.ok) {
++        setPhase({ kind: "none", error: json?.error || `Request failed (${res.status})` });
++        return;
++      }
++      if (json?.status === "ambiguous" && Array.isArray(json.candidates) && json.candidates.length > 0) {
++        setPhase({ kind: "ambiguous", candidates: json.candidates as AddressCandidate[] });
++        setOpen(true);
++        return;
++      }
++      if (json?.status === "resolved") {
++        settle({ address: q }, (json.address?.normalized as string) ?? q);
++        return;
++      }
++      setPhase({ kind: "none", error: json?.error || "No lot matched that address. Try adding the borough or ZIP." });
++      setOpen(true);
++    } catch (e) {
++      setPhase({ kind: "none", error: e instanceof Error ? e.message : "Could not resolve the address" });
++      setOpen(true);
++    } finally {
++      setSearching(false);
++    }
++  }
++
++  const listId = `${id}-list`;
++  const showList = open || variant === "sheet";
++
++  return (
++    <div ref={rootRef} className={`gsearch gsearch-${variant}`} data-shell-search>
++      <form
++        role="search"
++        aria-label="Search an address"
++        onSubmit={(e) => {
++          e.preventDefault();
++          void resolve(value);
++        }}
++      >
++        <label htmlFor={`${id}-input`} className="sr-only">
++          Address, BBL or lot
++        </label>
++        <div className="gsearch-field">
++          <SearchIcon size={18} />
++          <input
++            ref={inputRef}
++            id={`${id}-input`}
++            className="gsearch-input"
++            type="text"
++            autoComplete="street-address"
++            enterKeyHint="search"
++            placeholder="Search an address or BBL"
++            value={value}
++            onChange={(e) => setValue(e.target.value)}
++            onFocus={() => {
++              setOpen(true);
++              void loadRecents();
++            }}
++            role="combobox"
++            aria-expanded={showList}
++            aria-controls={listId}
++            aria-autocomplete="list"
++            aria-busy={phase.kind === "resolving"}
++          />
++          {variant === "bar" && (
++            <kbd className="gsearch-kbd" aria-hidden="true">
++              ⌘K
++            </kbd>
++          )}
++          {variant === "sheet" && (
++            <button type="submit" className="btn-primary gsearch-go" disabled={phase.kind === "resolving"}>
++              Run
++            </button>
++          )}
++        </div>
++      </form>
++
++      {showList && (
++        <div className={`gsearch-panel gsearch-panel-${variant}`} id={listId}>
++          {phase.kind === "resolving" && (
++            <div className="gsearch-row gsearch-quiet">
++              <span className="band-pulse" aria-hidden="true" />
++              Resolving the address
++            </div>
++          )}
++          {phase.kind === "none" && (
++            <div className="gsearch-row gsearch-quiet" role="status">
++              {phase.error}
++            </div>
++          )}
++          {phase.kind === "ambiguous" && (
++            <div className="gsearch-group">
++              <div className="gsearch-heading">More than one building matches. Choose the one you meant.</div>
++              {phase.candidates.map((c, i) => (
++                <button
++                  key={c.id}
++                  type="button"
++                  className="gsearch-row gsearch-option"
++                  onClick={() => settle({ candidate: c }, c.label)}
++                >
++                  <span className="gsearch-row-main">{c.label}</span>
++                  <span className="gsearch-row-meta">
++                    {i === 0 && c.match_reason === "Exact street match" ? "best match · " : ""}
++                    {[c.borough, c.zip].filter(Boolean).join(" · ")}
++                  </span>
++                </button>
++              ))}
++            </div>
++          )}
++          {phase.kind === "idle" && (
++            <div className="gsearch-group">
++              <div className="gsearch-heading">Recent subjects</div>
++              {recents === null && (
++                <div className="gsearch-row gsearch-quiet" aria-busy="true">
++                  <span className="band-pulse" aria-hidden="true" />
++                  Loading your history
++                </div>
++              )}
++              {recents && recents.length === 0 && (
++                <div className="gsearch-row gsearch-quiet">No runs yet. Type an address and press Enter.</div>
++              )}
++              {recents?.map((r) => (
++                <button
++                  key={r.address}
++                  type="button"
++                  className="gsearch-row gsearch-option"
++                  onClick={() => settle({ address: r.address }, r.address)}
++                >
++                  <span className="gsearch-row-main">{r.address}</span>
++                  <span className="gsearch-row-meta">
++                    {r.verdict.toUpperCase()} · {r.when}
++                  </span>
++                </button>
++              ))}
++            </div>
++          )}
++        </div>
++      )}
++    </div>
++  );
++}
+diff --git a/src/components/dashboard/shell/Sheet.tsx b/src/components/dashboard/shell/Sheet.tsx
+new file mode 100644
+index 0000000..c626888
+--- /dev/null
++++ b/src/components/dashboard/shell/Sheet.tsx
+@@ -0,0 +1,71 @@
++"use client";
++
++// Sheet — the shell's one modal surface (UI sprint WS3): a bottom sheet on
++// phones, a right-anchored panel from 768px. Focus moves in on open, Tab
++// cycles inside, Escape and the backdrop close it, and focus returns to the
++// control that opened it.
++
++import React, { useEffect, useRef } from "react";
++import { CloseIcon } from "./icons";
++
++const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
++
++interface SheetProps {
++  open: boolean;
++  title: string;
++  onClose: () => void;
++  children: React.ReactNode;
++  id?: string;
++}
++
++export default function Sheet({ open, title, onClose, children, id }: SheetProps) {
++  const ref = useRef<HTMLDivElement>(null);
++  const opener = useRef<HTMLElement | null>(null);
++
++  useEffect(() => {
++    if (!open) return;
++    opener.current = document.activeElement as HTMLElement | null;
++    const sheet = ref.current;
++    // Focus the first control in the content, not the close button.
++    const all = sheet ? Array.from(sheet.querySelectorAll<HTMLElement>(FOCUSABLE)) : [];
++    (all.find((el) => !el.classList.contains("shell-sheet-close")) ?? all[0])?.focus();
++    const onKey = (e: KeyboardEvent) => {
++      if (e.key === "Escape") {
++        e.preventDefault();
++        onClose();
++        return;
++      }
++      if (e.key !== "Tab" || !sheet) return;
++      const items = Array.from(sheet.querySelectorAll<HTMLElement>(FOCUSABLE)).filter((el) => el.offsetParent !== null);
++      if (items.length === 0) return;
++      const i = items.indexOf(document.activeElement as HTMLElement);
++      e.preventDefault();
++      const next = i === -1 ? 0 : (i + (e.shiftKey ? -1 : 1) + items.length) % items.length;
++      items[next].focus();
++    };
++    document.addEventListener("keydown", onKey);
++    const prevOverflow = document.body.style.overflow;
++    document.body.style.overflow = "hidden";
++    return () => {
++      document.removeEventListener("keydown", onKey);
++      document.body.style.overflow = prevOverflow;
++      opener.current?.focus();
++    };
++  }, [open, onClose]);
++
++  if (!open) return null;
++  return (
++    <>
++      <div className="shell-sheet-backdrop" onClick={onClose} aria-hidden="true" />
++      <div ref={ref} id={id} className="shell-sheet" role="dialog" aria-modal="true" aria-label={title}>
++        <div className="shell-sheet-head">
++          <h2 className="shell-sheet-title">{title}</h2>
++          <button type="button" className="shell-sheet-close" onClick={onClose} aria-label="Close">
++            <CloseIcon size={18} />
++          </button>
++        </div>
++        {children}
++      </div>
++    </>
++  );
++}
+diff --git a/src/components/dashboard/shell/SubjectProvider.tsx b/src/components/dashboard/shell/SubjectProvider.tsx
+new file mode 100644
+index 0000000..7c11296
+--- /dev/null
++++ b/src/components/dashboard/shell/SubjectProvider.tsx
+@@ -0,0 +1,164 @@
++"use client";
++
++// SubjectProvider (UI sprint WS3, slice 2). The shell-level home for the
++// active verdict run and the evidence drawer. Each lens registers the stream
++// it is driving (Property and Price their one run, Acquire the property being
++// analyzed, Develop the top-ranked site), and the shell renders the verdict
++// band and the drawer from it, in the same place in every lens. Registering
++// is a snapshot, so the lens stays the owner of its pipeline state.
++
++import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
++import type { AgentProgress, PipelinePhase } from "@/components/ui/LoadingState";
++import type { AgentName } from "@/components/ui/verdict";
++import type { StreamComplete, VerdictStream } from "../useVerdictStream";
++import type { RunPayload } from "../useAddressResolver";
++
++export type ShellRunStatus = "idle" | "resolving" | "running" | "done" | "error";
++
++export interface ShellRun {
++  status: ShellRunStatus;
++  phase: PipelinePhase;
++  agents: Partial<Record<AgentName, AgentProgress>>;
++  startedAt: number;
++  normalized: string | null;
++  /** The address typed or chosen, before the geocoder has named the lot. */
++  subject: string | null;
++  result: StreamComplete | null;
++  error: string | null;
++}
++
++export type DrawerTab = "math" | "reasoning" | "sources" | "coverage";
++export const DRAWER_TABS: DrawerTab[] = ["math", "reasoning", "sources", "coverage"];
++
++/** A subject settled by the global search, handed to the active lens. */
++export interface PendingSubject {
++  payload: RunPayload;
++  label: string;
++  ts: number;
++}
++
++interface SubjectContextValue {
++  run: ShellRun | null;
++  registerRun: (run: ShellRun | null) => void;
++  drawer: DrawerTab | null;
++  openDrawer: (tab: DrawerTab) => void;
++  closeDrawer: () => void;
++  /** True while the global search is resolving an address. */
++  searching: boolean;
++  setSearching: (v: boolean) => void;
++  pending: PendingSubject | null;
++  dispatchSubject: (payload: RunPayload, label: string) => void;
++}
++
++const SubjectContext = createContext<SubjectContextValue>({
++  run: null,
++  registerRun: () => {},
++  drawer: null,
++  openDrawer: () => {},
++  closeDrawer: () => {},
++  searching: false,
++  setSearching: () => {},
++  pending: null,
++  dispatchSubject: () => {},
++});
++
++export function useSubject(): SubjectContextValue {
++  return useContext(SubjectContext);
++}
++
++function isDrawerTab(v: string): v is DrawerTab {
++  return (DRAWER_TABS as string[]).includes(v);
++}
++
++export default function SubjectProvider({ children }: { children: React.ReactNode }) {
++  const [run, setRun] = useState<ShellRun | null>(null);
++  const [drawer, setDrawer] = useState<DrawerTab | null>(null);
++
++  const registerRun = useCallback((r: ShellRun | null) => setRun(r), []);
++
++  // Deep links: #math, #reasoning, #sources, #coverage open the drawer once a
++  // result exists (and the hash follows the drawer while it is open).
++  const openDrawer = useCallback((tab: DrawerTab) => {
++    setDrawer(tab);
++    if (typeof window !== "undefined") window.history.replaceState(null, "", `#${tab}`);
++  }, []);
++  const closeDrawer = useCallback(() => {
++    setDrawer(null);
++    if (typeof window !== "undefined" && isDrawerTab(window.location.hash.slice(1))) {
++      window.history.replaceState(null, "", window.location.pathname + window.location.search);
++    }
++  }, []);
++  useEffect(() => {
++    if (run?.status !== "done") return;
++    const h = window.location.hash.slice(1);
++    if (isDrawerTab(h)) setDrawer(h);
++  }, [run?.status]);
++
++  const [searching, setSearching] = useState(false);
++  const [pending, setPending] = useState<PendingSubject | null>(null);
++  const dispatchSubject = useCallback((payload: RunPayload, label: string) => {
++    setPending({ payload, label, ts: Date.now() });
++  }, []);
++
++  const value = useMemo(
++    () => ({ run, registerRun, drawer, openDrawer, closeDrawer, searching, setSearching, pending, dispatchSubject }),
++    [run, registerRun, drawer, openDrawer, closeDrawer, searching, pending, dispatchSubject],
++  );
++  return <SubjectContext.Provider value={value}>{children}</SubjectContext.Provider>;
++}
++
++/**
++ * Register a lens's verdict stream with the shell. `resolving` is the lens's
++ * address-resolution step (before the stream starts); `subject` is the typed
++ * or chosen address so the band can name it while the geocoder works.
++ */
++export function useRegisterRun(
++  stream: VerdictStream | null,
++  opts: { resolving?: boolean; subject?: string | null; enabled?: boolean } = {},
++) {
++  const { registerRun } = useSubject();
++  const { resolving = false, subject = null, enabled = true } = opts;
++  const status = stream?.status ?? "idle";
++  const phase = stream?.phase ?? "geocoding";
++  const agents = stream?.agents;
++  const startedAt = stream?.startedAt ?? 0;
++  const normalized = stream?.normalized ?? null;
++  const result = stream?.result ?? null;
++  const error = stream?.error ?? null;
++
++  useEffect(() => {
++    if (!enabled) return;
++    registerRun({
++      status: resolving ? "resolving" : status,
++      phase,
++      agents: agents ?? {},
++      startedAt,
++      normalized,
++      subject,
++      result,
++      error,
++    });
++  }, [enabled, registerRun, resolving, status, phase, agents, startedAt, normalized, subject, result, error]);
++
++  useEffect(() => {
++    if (!enabled) return;
++    return () => registerRun(null);
++  }, [enabled, registerRun]);
++}
++
++/**
++ * Run `onSubject` once for each subject the global search hands to the active
++ * lens. The lens decides what the subject means (run it, fill a site slot,
++ * add it to the book).
++ */
++export function usePendingSubject(onSubject: (payload: RunPayload, label: string) => void) {
++  const { pending } = useSubject();
++  const handled = useRef<number>(0);
++  const cb = useRef(onSubject);
++  cb.current = onSubject;
++  useEffect(() => {
++    if (!pending || pending.ts === handled.current) return;
++    handled.current = pending.ts;
++    cb.current(pending.payload, pending.label);
++  }, [pending]);
++}
+diff --git a/src/components/dashboard/shell/TopBar.tsx b/src/components/dashboard/shell/TopBar.tsx
+new file mode 100644
+index 0000000..db3a709
+--- /dev/null
++++ b/src/components/dashboard/shell/TopBar.tsx
+@@ -0,0 +1,51 @@
++"use client";
++
++// TopBar (UI sprint WS3): the blue logo, the global-search slot, the plan tag
++// and the account button. On phones the search slot gives way to the lens
++// button (the lens sheet) because the rail and sidebar are gone.
++
++import React from "react";
++import { UserButton } from "@clerk/nextjs";
++import { CLUSTERS, PLAN_LABELS, type ClusterId } from "../clusters";
++import { ChevronIcon } from "./icons";
++
++interface TopBarProps {
++  cluster: ClusterId;
++  plan: string | null;
++  onOpenLens: () => void;
++  search?: React.ReactNode;
++}
++
++export default function TopBar({ cluster, plan, onOpenLens, search }: TopBarProps) {
++  const planLabel = plan ? (PLAN_LABELS[plan] ?? plan) : null;
++  return (
++    <header className="shell-topbar">
++      <a href="/" className="shell-topbar-logo" aria-label="KOANO home">
++        {/* eslint-disable-next-line @next/next/no-img-element */}
++        <img src="/logo.png" alt="KOANO" width={40} height={40} />
++      </a>
++
++      <div className="shell-topbar-search">{search}</div>
++
++      <button
++        type="button"
++        className="shell-lens-btn"
++        onClick={onOpenLens}
++        aria-haspopup="dialog"
++        aria-label={`Lens: ${CLUSTERS[cluster].lens}. Change lens`}
++      >
++        {CLUSTERS[cluster].lens}
++        <ChevronIcon size={16} />
++      </button>
++
++      <div className="shell-topbar-right">
++        {planLabel && (
++          <span className="shell-plan-tag" title="Your plan">
++            Plan: {planLabel}
++          </span>
++        )}
++        <UserButton />
++      </div>
++    </header>
++  );
++}
+diff --git a/src/components/dashboard/shell/VerdictBand.tsx b/src/components/dashboard/shell/VerdictBand.tsx
+new file mode 100644
+index 0000000..60ac3b7
+--- /dev/null
++++ b/src/components/dashboard/shell/VerdictBand.tsx
+@@ -0,0 +1,221 @@
++"use client";
++
++// VerdictBand (UI sprint WS3, slice 2; A6). The verdict's one home: the first
++// block of the workspace in every lens, at most 40vh. It shows the engine's
++// actual state, never a placeholder verdict: empty, resolving, the five
++// agents reporting in, the verdict with its figures and a provenance summary
++// counted from the verdict's own data points, or the error.
++
++import React, { useEffect, useState } from "react";
++import {
++  AGENT_LABELS,
++  SPECIALIST_AGENTS,
++  VERDICT_COLORS,
++  PROVENANCE_META,
++  type Provenance,
++  type Verdict,
++} from "@/components/ui/verdict";
++import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
++import RunDegradationNote from "@/components/ui/RunDegradationNote";
++import { useSubject, type DrawerTab } from "./SubjectProvider";
++
++const SHORT_AGENT: Record<string, string> = {
++  "market-timing": "Market",
++  infrastructure: "Pipeline",
++  "demand-sentiment": "Demand",
++  "risk-volatility": "Risk",
++  "regulatory-policy": "Regulatory",
++};
++
++function riskInk(score: number): string {
++  return score >= 67 ? "var(--signal-negative-ink)" : score >= 34 ? "var(--signal-warning-ink)" : "var(--signal-positive-ink)";
++}
++function riskFill(score: number): string {
++  return score >= 67 ? "var(--signal-negative)" : score >= 34 ? "var(--signal-warning)" : "var(--signal-positive)";
++}
++
++function Elapsed({ since }: { since: number }) {
++  const [s, setS] = useState(0);
++  useEffect(() => {
++    const id = setInterval(() => setS(Math.round((Date.now() - since) / 1000)), 1000);
++    return () => clearInterval(id);
++  }, [since]);
++  return <span className="band-mono">{s}s · typically about 60s</span>;
++}
++
++const SUMMARY_LABEL: Record<Provenance, string> = {
++  live: "live",
++  partner: "partner",
++  representative: "representative",
++  fetch_failed: "failed to fetch",
++  coverage_absent: "not covered",
++};
++
++export function provenanceSummary(points: { provenance: Provenance }[]): { state: Provenance; n: number }[] {
++  const order: Provenance[] = ["live", "partner", "representative", "fetch_failed", "coverage_absent"];
++  const counts = new Map<Provenance, number>();
++  for (const p of points) counts.set(p.provenance, (counts.get(p.provenance) ?? 0) + 1);
++  return order.filter((s) => counts.has(s)).map((s) => ({ state: s, n: counts.get(s)! }));
++}
++
++const TABS: { id: DrawerTab; label: string }[] = [
++  { id: "math", label: "Math" },
++  { id: "reasoning", label: "Reasoning" },
++  { id: "sources", label: "Sources" },
++  { id: "coverage", label: "Coverage" },
++];
++
++export default function VerdictBand() {
++  const { run, openDrawer, searching } = useSubject();
++  const status = searching && (!run || run.status === "idle" || run.status === "done" || run.status === "error") ? "resolving" : (run?.status ?? "idle");
++
++  return (
++    <section className={`verdict-band verdict-band-${status}`} aria-label="Verdict" aria-live="polite" id="verdict-band">
++      {status === "idle" && (
++        <div className="band-row">
++          <div>
++            <div className="band-eyebrow">Verdict</div>
++            <p className="band-title">No subject yet.</p>
++            <p className="band-copy">
++              Search an address above. The five agents read its public record and the verdict lands here, in the same
++              place in every lens.
++            </p>
++          </div>
++        </div>
++      )}
++
++      {status === "resolving" && (
++        <div className="band-row">
++          <div>
++            <div className="band-eyebrow">Verdict</div>
++            <p className="band-title">
++              <span className="band-pulse" aria-hidden="true" />
++              Resolving the address
++            </p>
++            {!searching && run?.subject && <p className="band-copy band-mono">{run.subject}</p>}
++            {searching && <p className="band-copy">Matching it to a lot in the public record.</p>}
++          </div>
++        </div>
++      )}
++
++      {status === "running" && run && (
++        <div className="band-row">
++          <div style={{ minWidth: 0, flex: "1 1 auto" }}>
++            <div className="band-eyebrow">Verdict</div>
++            <p className="band-title">
++              <span className="band-pulse" aria-hidden="true" />
++              {run.phase === "geocoding"
++                ? "Resolving the address"
++                : run.phase === "synthesis"
++                  ? "Synthesizing one verdict from five agents"
++                  : `Five agents reading the record, ${SPECIALIST_AGENTS.filter((a) => run.agents[a]?.state === "complete").length} of 5 in`}
++            </p>
++            {(run.normalized || run.subject) && <p className="band-copy band-mono">{run.normalized ?? run.subject}</p>}
++            <Elapsed since={run.startedAt} />
++          </div>
++          <ul className="band-agents" aria-label="Agent progress">
++            {SPECIALIST_AGENTS.map((a) => {
++              const p = run.agents[a];
++              const state = p?.state === "complete" ? "complete" : p?.state === "running" ? "running" : "pending";
++              return (
++                <li key={a} className={`band-agent band-agent-${state}`} title={AGENT_LABELS[a]}>
++                  <span className="band-agent-dot" aria-hidden="true" />
++                  <span className="band-agent-name">{SHORT_AGENT[a]}</span>
++                  {p?.state === "complete" && p.verdict && (
++                    <span className="band-agent-verdict" style={{ color: VERDICT_COLORS[p.verdict as Verdict] }}>
++                      {p.verdict}
++                    </span>
++                  )}
++                  <span className="sr-only">
++                    {AGENT_LABELS[a]}: {state}
++                  </span>
++                </li>
++              );
++            })}
++          </ul>
++        </div>
++      )}
++
++      {status === "error" && run && (
++        <div className="band-row">
++          <div>
++            <div className="band-eyebrow">Verdict</div>
++            <p className="band-title" style={{ color: "var(--signal-negative-ink)" }}>
++              The run did not complete.
++            </p>
++            <p className="band-copy">{run.error}</p>
++            <p className="band-copy band-mono">Live NYC data is deepest. Try a New York City street address.</p>
++          </div>
++        </div>
++      )}
++
++      {status === "done" && run?.result && (
++        <>
++          <div className="band-row band-row-done">
++            <div className="band-main">
++              <div className="band-eyebrow">
++                Verdict
++                <ProvenanceBadge provenance={run.result.verdict.overall_provenance} />
++              </div>
++              <div className="band-word" style={{ color: VERDICT_COLORS[run.result.verdict.verdict] }}>
++                {run.result.verdict.verdict}
++              </div>
++              <p className="band-address">{run.result.resolved_address.normalized}</p>
++              <p className="band-headline">{run.result.verdict.headline}</p>
++            </div>
++            <dl className="band-metrics">
++              <div>
++                <dt>Confidence</dt>
++                <dd>{run.result.verdict.confidence}</dd>
++                <span className="band-meter" aria-hidden="true">
++                  <span style={{ width: `${run.result.verdict.confidence}%`, background: "var(--mid-blue)" }} />
++                </span>
++              </div>
++              <div>
++                <dt>Risk</dt>
++                <dd style={{ color: riskInk(run.result.verdict.risk_score) }}>{run.result.verdict.risk_score}</dd>
++                <span className="band-meter" aria-hidden="true">
++                  <span
++                    style={{ width: `${run.result.verdict.risk_score}%`, background: riskFill(run.result.verdict.risk_score) }}
++                  />
++                </span>
++              </div>
++              <div>
++                <dt>Window</dt>
++                <dd>
++                  {run.result.verdict.signal_window_months}
++                  <span className="band-unit">mo</span>
++                </dd>
++              </div>
++            </dl>
++          </div>
++          <div className="band-foot">
++            <p className="band-summary band-mono">
++              {provenanceSummary(run.result.verdict.data_points ?? []).map(({ state, n }, i) => (
++                <span key={state}>
++                  {i > 0 && " · "}
++                  <span style={{ color: PROVENANCE_META[state].color }}>
++                    {n} {SUMMARY_LABEL[state]}
++                  </span>
++                </span>
++              ))}
++              {run.result.resolved_address.location_confidence === "unconfirmed" && (
++                <span style={{ color: "var(--signal-warning-ink)" }}> · location unconfirmed</span>
++              )}
++              {" · "}
++              {run.result.persisted ? "recorded to your history" : `not recorded: ${run.result.persist_error ?? "persistence unavailable"}`}
++            </p>
++            <div className="band-actions">
++              {TABS.map((t) => (
++                <button key={t.id} type="button" className="btn-ghost band-btn" onClick={() => openDrawer(t.id)}>
++                  {t.label}
++                </button>
++              ))}
++            </div>
++          </div>
++          <RunDegradationNote degradation={run.result.degradation} />
++        </>
++      )}
++    </section>
++  );
++}
+diff --git a/src/components/dashboard/shell/WatchSheet.tsx b/src/components/dashboard/shell/WatchSheet.tsx
+new file mode 100644
+index 0000000..c237195
+--- /dev/null
++++ b/src/components/dashboard/shell/WatchSheet.tsx
+@@ -0,0 +1,152 @@
++"use client";
++
++// WatchSheet (UI sprint WS3): the watchlist, reachable from every lens. Lists
++// the properties KOANO monitors for this account (the same rows the Portfolio
++// lens manages), with each one's latest verdict. Adding and removing stay in
++// the Portfolio lens; this sheet is the cross-lens view of what is watched.
++
++import React, { useEffect, useState } from "react";
++import Sheet from "./Sheet";
++import { VERDICT_COLORS, type Verdict } from "@/components/ui/verdict";
++import type { PortfolioProperty } from "@/app/api/properties/route";
++
++interface WatchSheetProps {
++  open: boolean;
++  onClose: () => void;
++  onGoToPortfolio: () => void;
++}
++
++export default function WatchSheet({ open, onClose, onGoToPortfolio }: WatchSheetProps) {
++  const [rows, setRows] = useState<PortfolioProperty[] | null>(null);
++  const [error, setError] = useState<string | null>(null);
++
++  useEffect(() => {
++    if (!open) return;
++    let cancelled = false;
++    setRows(null);
++    setError(null);
++    fetch("/api/properties")
++      .then(async (r) => {
++        const j = await r.json();
++        if (!r.ok) throw new Error(j?.error || `Request failed (${r.status})`);
++        if (!cancelled) setRows(j.properties as PortfolioProperty[]);
++      })
++      .catch((e) => {
++        if (!cancelled) setError(e instanceof Error ? e.message : "Could not load the watchlist");
++      });
++    return () => {
++      cancelled = true;
++    };
++  }, [open]);
++
++  return (
++    <Sheet open={open} title="Watchlist" onClose={onClose} id="shell-watch-sheet">
++      <p style={{ margin: 0, fontSize: "var(--text-body)", lineHeight: 1.5, color: "var(--ink-secondary)" }}>
++        KOANO checks each watched property&apos;s public record every week and reports what changed.
++      </p>
++
++      {rows === null && !error && (
++        <ul className="shell-watch-list" aria-busy="true" aria-label="Loading the watchlist">
++          {[0, 1, 2].map((i) => (
++            <li key={i} className="shell-watch-row shell-watch-skeleton" aria-hidden="true">
++              <span style={{ width: `${62 - i * 10}%` }} />
++              <span style={{ width: "28%" }} />
++            </li>
++          ))}
++        </ul>
++      )}
++      {error && (
++        <p style={{ margin: 0, fontSize: "var(--text-body)", color: "var(--signal-negative-ink)" }}>{error}</p>
++      )}
++      {rows && rows.length === 0 && (
++        <div className="shell-watch-empty">
++          <p style={{ margin: 0, fontSize: "var(--text-ui)", fontWeight: 500, color: "var(--ink-primary)" }}>
++            Nothing watched yet.
++          </p>
++          <p style={{ margin: "4px 0 0", fontSize: "var(--text-body)", color: "var(--ink-muted)", lineHeight: 1.5 }}>
++            Add a property in the Acquire lens and it appears here with its weekly changes.
++          </p>
++        </div>
++      )}
++      {rows && rows.length > 0 && (
++        <ul className="shell-watch-list">
++          {rows.map((p) => {
++            const v = p.latest_verdict;
++            return (
++              <li key={p.id} className="shell-watch-row">
++                <span className="shell-watch-address">{p.address_normalized ?? p.address_input}</span>
++                {v ? (
++                  <span
++                    className="shell-watch-verdict"
++                    style={{ color: VERDICT_COLORS[v.verdict as Verdict] ?? "var(--ink-primary)" }}
++                  >
++                    {v.verdict.toUpperCase()} · {v.confidence}
++                  </span>
++                ) : (
++                  <span className="shell-watch-verdict" style={{ color: "var(--ink-muted)" }}>
++                    not analyzed
++                  </span>
++                )}
++              </li>
++            );
++          })}
++        </ul>
++      )}
++
++      <button type="button" className="btn-ghost" onClick={onGoToPortfolio} style={{ alignSelf: "flex-start" }}>
++        Manage in the Acquire lens
++      </button>
++
++      <style jsx global>{`
++        .shell-watch-list {
++          list-style: none;
++          margin: 0;
++          padding: 0;
++          display: flex;
++          flex-direction: column;
++          border: 1px solid var(--border);
++          border-radius: var(--radius-inner);
++          overflow: hidden;
++        }
++        .shell-watch-row {
++          display: flex;
++          align-items: center;
++          justify-content: space-between;
++          gap: var(--space-3);
++          min-height: 48px;
++          padding: var(--space-2) var(--space-4);
++          border-bottom: 1px solid var(--border-light);
++        }
++        .shell-watch-row:last-child {
++          border-bottom: 0;
++        }
++        .shell-watch-address {
++          font-size: var(--text-body);
++          color: var(--ink-primary);
++          min-width: 0;
++          overflow: hidden;
++          text-overflow: ellipsis;
++          white-space: nowrap;
++        }
++        .shell-watch-verdict {
++          font-family: var(--font-mono);
++          font-size: var(--text-micro);
++          letter-spacing: 0.06em;
++          white-space: nowrap;
++        }
++        .shell-watch-skeleton span {
++          display: block;
++          height: 12px;
++          border-radius: var(--radius-chip);
++          background: var(--border-light);
++          animation: koano-pulse 1.6s ease-in-out infinite;
++        }
++        .shell-watch-empty {
++          padding: var(--space-4);
++          border: 1px dashed var(--border);
++          border-radius: var(--radius-inner);
++        }
++      `}</style>
++    </Sheet>
++  );
++}
+diff --git a/src/components/dashboard/shell/icons.tsx b/src/components/dashboard/shell/icons.tsx
+new file mode 100644
+index 0000000..98dc2b4
+--- /dev/null
++++ b/src/components/dashboard/shell/icons.tsx
+@@ -0,0 +1,113 @@
++// Shell icons (UI sprint WS3). Hand-drawn 20px line icons on a 24 grid, 1.5px
++// strokes, currentColor, so they take the ink tokens and read on pale-wash and
++// white. Decorative: every use carries its own text or aria-label.
++
++import React from "react";
++
++type IconProps = { size?: number; className?: string };
++
++function Svg({ size = 20, className, children }: IconProps & { children: React.ReactNode }) {
++  return (
++    <svg
++      width={size}
++      height={size}
++      viewBox="0 0 24 24"
++      fill="none"
++      stroke="currentColor"
++      strokeWidth="1.5"
++      strokeLinecap="round"
++      strokeLinejoin="round"
++      aria-hidden="true"
++      focusable="false"
++      className={className}
++    >
++      {children}
++    </svg>
++  );
++}
++
++export const HomeIcon = (p: IconProps) => (
++  <Svg {...p}>
++    <path d="M4 10.5 12 4l8 6.5V20h-5.5v-5h-5v5H4z" />
++  </Svg>
++);
++export const SearchIcon = (p: IconProps) => (
++  <Svg {...p}>
++    <circle cx="11" cy="11" r="6.5" />
++    <path d="m20 20-4.2-4.2" />
++  </Svg>
++);
++export const WatchIcon = (p: IconProps) => (
++  <Svg {...p}>
++    <path d="M2.5 12s3.5-6.5 9.5-6.5S21.5 12 21.5 12s-3.5 6.5-9.5 6.5S2.5 12 2.5 12z" />
++    <circle cx="12" cy="12" r="2.75" />
++  </Svg>
++);
++export const DocumentsIcon = (p: IconProps) => (
++  <Svg {...p}>
++    <path d="M7 3.5h7l4 4V20a.5.5 0 0 1-.5.5h-10A.5.5 0 0 1 7 20z" />
++    <path d="M14 3.5v4h4M10 12h5M10 15.5h5" />
++  </Svg>
++);
++export const HistoryIcon = (p: IconProps) => (
++  <Svg {...p}>
++    <path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1" />
++    <path d="M3.5 4.5v4.2h4.2M12 8v4.5l3 1.8" />
++  </Svg>
++);
++export const SettingsIcon = (p: IconProps) => (
++  <Svg {...p}>
++    <circle cx="12" cy="12" r="3" />
++    <path d="M12 3.5v2.2M12 18.3v2.2M3.5 12h2.2M18.3 12h2.2M6 6l1.6 1.6M16.4 16.4 18 18M6 18l1.6-1.6M16.4 7.6 18 6" />
++  </Svg>
++);
++export const CompareIcon = (p: IconProps) => (
++  <Svg {...p}>
++    <rect x="3.5" y="5" width="7" height="14" rx="1" />
++    <rect x="13.5" y="5" width="7" height="14" rx="1" />
++  </Svg>
++);
++export const MenuIcon = (p: IconProps) => (
++  <Svg {...p}>
++    <path d="M4 7h16M4 12h16M4 17h16" />
++  </Svg>
++);
++export const CloseIcon = (p: IconProps) => (
++  <Svg {...p}>
++    <path d="m6 6 12 12M18 6 6 18" />
++  </Svg>
++);
++export const ChevronIcon = (p: IconProps) => (
++  <Svg {...p}>
++    <path d="m9 6 6 6-6 6" />
++  </Svg>
++);
++
++// Lens marks: a site plan (Develop), a price tag (Price), a book grid
++// (Acquire), a house (Property).
++export const DevelopIcon = (p: IconProps) => (
++  <Svg {...p}>
++    <path d="M4 20h16M6 20V9l6-4 6 4v11" />
++    <path d="M10 20v-5h4v5" />
++  </Svg>
++);
++export const PriceIcon = (p: IconProps) => (
++  <Svg {...p}>
++    <path d="M3.5 12.5V5a1.5 1.5 0 0 1 1.5-1.5h7.5L20.5 11.5l-8 8z" />
++    <circle cx="8" cy="8" r="1.25" />
++  </Svg>
++);
++export const AcquireIcon = (p: IconProps) => (
++  <Svg {...p}>
++    <rect x="3.5" y="3.5" width="7" height="7" rx="1" />
++    <rect x="13.5" y="3.5" width="7" height="7" rx="1" />
++    <rect x="3.5" y="13.5" width="7" height="7" rx="1" />
++    <rect x="13.5" y="13.5" width="7" height="7" rx="1" />
++  </Svg>
++);
++export const PropertyIcon = (p: IconProps) => (
++  <Svg {...p}>
++    <path d="M3.5 11 12 4l8.5 7" />
++    <path d="M6 9.5V20h12V9.5M10 20v-5.5h4V20" />
++  </Svg>
++);
+diff --git a/src/components/dashboard/shell/shell.css b/src/components/dashboard/shell/shell.css
+new file mode 100644
+index 0000000..7db89a4
+--- /dev/null
++++ b/src/components/dashboard/shell/shell.css
+@@ -0,0 +1,748 @@
++/* App shell (UI sprint WS3). One grid, three navigation forms by width:
++   the full sidebar at 1280 and up, a 64px icon rail from 768 to 1279, a top
++   bar plus bottom tab bar below 768. One content width (--content-max). */
++
++.koano-shell {
++  display: grid;
++  grid-template-columns: 240px minmax(0, 1fr);
++  grid-template-rows: var(--nav-h) minmax(0, 1fr);
++  min-height: 100vh;
++  background: var(--white);
++}
++.shell-topbar {
++  grid-column: 1 / -1;
++  position: sticky;
++  top: 0;
++  z-index: 30;
++  height: var(--nav-h);
++  display: flex;
++  align-items: center;
++  gap: var(--space-4);
++  padding: 0 var(--space-5);
++  background: var(--white);
++  border-bottom: 1px solid var(--border-light);
++}
++.shell-topbar-logo {
++  display: inline-flex;
++  align-items: center;
++  min-height: 44px;
++  text-decoration: none;
++  border-radius: var(--radius-chip);
++}
++.shell-topbar-logo img {
++  height: 40px;
++  width: auto;
++  display: block;
++}
++.shell-topbar-search {
++  flex: 1 1 auto;
++  min-width: 0;
++  display: flex;
++  justify-content: center;
++}
++.shell-topbar-right {
++  display: flex;
++  align-items: center;
++  gap: var(--space-3);
++  margin-left: auto;
++}
++.shell-plan-tag {
++  font-family: var(--font-mono);
++  font-size: var(--text-micro);
++  letter-spacing: 0.08em;
++  text-transform: uppercase;
++  color: var(--ink-muted);
++  background: var(--pale-wash);
++  border: 1px solid var(--border);
++  border-radius: var(--radius-pill);
++  padding: 6px 10px;
++  white-space: nowrap;
++}
++.shell-lens-btn {
++  display: none;
++  align-items: center;
++  gap: 6px;
++  min-height: 44px;
++  padding: 0 var(--space-3);
++  border: 1px solid var(--border);
++  border-radius: var(--radius-pill);
++  background: var(--white);
++  color: var(--ink-primary);
++  font: inherit;
++  font-size: var(--text-body);
++  font-weight: 500;
++  cursor: pointer;
++}
++
++/* Sidebar / rail ------------------------------------------------------- */
++.shell-side {
++  grid-row: 2;
++  position: sticky;
++  top: var(--nav-h);
++  height: calc(100vh - var(--nav-h));
++  overflow-y: auto;
++  background: var(--pale-wash);
++  border-right: 1px solid var(--border);
++  display: flex;
++  flex-direction: column;
++  padding: var(--space-4) var(--space-3);
++  gap: var(--space-2);
++}
++.shell-side-heading {
++  font-family: var(--font-mono);
++  font-size: var(--text-micro);
++  letter-spacing: 0.1em;
++  text-transform: uppercase;
++  color: var(--ink-muted);
++  padding: var(--space-2) var(--space-3) var(--space-1);
++}
++.shell-item {
++  display: flex;
++  align-items: center;
++  gap: var(--space-3);
++  width: 100%;
++  min-height: 40px;
++  padding: 0 var(--space-3);
++  border: 0;
++  border-radius: var(--radius-chip);
++  background: transparent;
++  color: var(--ink-muted);
++  font: inherit;
++  font-size: var(--text-body);
++  text-align: left;
++  text-decoration: none;
++  cursor: pointer;
++  transition: background var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out);
++}
++.shell-item:hover {
++  color: var(--ink-primary);
++  background: rgba(255, 255, 255, 0.6);
++}
++.shell-item[aria-current="true"],
++.shell-item[aria-current="page"] {
++  color: var(--ink-primary);
++  background: var(--white);
++  font-weight: 500;
++  box-shadow: var(--shadow-flat);
++}
++.shell-item svg {
++  flex: none;
++  color: var(--ink-muted);
++}
++.shell-item[aria-current="true"] svg,
++.shell-item[aria-current="page"] svg {
++  color: var(--deep-navy);
++}
++.shell-item-label {
++  flex: 1 1 auto;
++  min-width: 0;
++  white-space: nowrap;
++  overflow: hidden;
++  text-overflow: ellipsis;
++}
++.shell-item-note {
++  font-family: var(--font-mono);
++  font-size: var(--text-micro);
++  letter-spacing: 0.06em;
++  color: var(--ink-muted);
++}
++.shell-side-sections .shell-item {
++  min-height: 36px;
++  font-size: var(--text-body);
++}
++.shell-side-spacer {
++  flex: 1 1 auto;
++}
++.shell-side-divider {
++  height: 1px;
++  background: var(--border);
++  margin: var(--space-2) var(--space-3);
++}
++
++/* Main --------------------------------------------------------------- */
++.shell-main {
++  grid-row: 2;
++  min-width: 0;
++  padding: var(--space-6) var(--space-6) var(--space-8);
++}
++.shell-content {
++  max-width: var(--content-max);
++  margin: 0 auto;
++  display: flex;
++  flex-direction: column;
++  gap: var(--space-5);
++}
++
++/* Bottom tabs (phones) ------------------------------------------------ */
++.shell-tabs {
++  display: none;
++  position: fixed;
++  left: 0;
++  right: 0;
++  bottom: 0;
++  z-index: 30;
++  background: var(--white);
++  border-top: 1px solid var(--border);
++  padding: 6px var(--space-2) calc(6px + env(safe-area-inset-bottom, 0px));
++}
++.shell-tab {
++  flex: 1 1 0;
++  display: flex;
++  flex-direction: column;
++  align-items: center;
++  justify-content: center;
++  gap: 2px;
++  min-height: 48px;
++  border: 0;
++  border-radius: var(--radius-chip);
++  background: transparent;
++  color: var(--ink-muted);
++  font: inherit;
++  font-size: var(--text-micro);
++  letter-spacing: 0.02em;
++  cursor: pointer;
++}
++.shell-tab[aria-current="true"] {
++  color: var(--deep-navy);
++}
++.shell-tab svg {
++  width: 22px;
++  height: 22px;
++}
++
++/* Sheets (phone lens picker, watchlist) ------------------------------- */
++.shell-sheet-backdrop {
++  position: fixed;
++  inset: 0;
++  z-index: 40;
++  background: rgba(13, 43, 62, 0.4);
++}
++.shell-sheet {
++  position: fixed;
++  z-index: 41;
++  background: var(--white);
++  display: flex;
++  flex-direction: column;
++  gap: var(--space-4);
++  padding: var(--space-5);
++  overflow-y: auto;
++  left: 0;
++  right: 0;
++  bottom: 0;
++  max-height: 86vh;
++  border-radius: var(--radius-deep) var(--radius-deep) 0 0;
++  box-shadow: var(--shadow-hover);
++  padding-bottom: calc(var(--space-5) + env(safe-area-inset-bottom, 0px));
++}
++.shell-sheet-head {
++  display: flex;
++  align-items: center;
++  justify-content: space-between;
++  gap: var(--space-3);
++}
++.shell-sheet-title {
++  font-size: var(--text-h3);
++  font-weight: 500;
++  color: var(--ink-primary);
++  margin: 0;
++}
++.shell-sheet-close {
++  width: 44px;
++  height: 44px;
++  display: inline-flex;
++  align-items: center;
++  justify-content: center;
++  border: 1px solid var(--border);
++  border-radius: 50%;
++  background: var(--white);
++  color: var(--ink-primary);
++  cursor: pointer;
++}
++@media (min-width: 768px) {
++  .shell-sheet {
++    left: auto;
++    top: var(--nav-h);
++    bottom: auto;
++    right: var(--space-5);
++    width: 420px;
++    max-height: calc(100vh - var(--nav-h) - var(--space-5));
++    border-radius: var(--radius-card);
++    margin-top: var(--space-2);
++  }
++}
++
++/* Responsive ----------------------------------------------------------- */
++@media (max-width: 1279px) {
++  .koano-shell {
++    grid-template-columns: 64px minmax(0, 1fr);
++  }
++  .shell-side {
++    padding: var(--space-3) var(--space-2);
++    align-items: center;
++  }
++  /* Rail mode applies to the sidebar only; the sheets keep their labels. */
++  .shell-side .shell-side-heading,
++  .shell-side .shell-item-label,
++  .shell-side .shell-item-note,
++  .shell-side .shell-side-sections {
++    display: none;
++  }
++  .shell-side .shell-item {
++    width: 44px;
++    height: 44px;
++    min-height: 44px;
++    padding: 0;
++    justify-content: center;
++  }
++  .shell-side-divider {
++    width: 32px;
++    margin: var(--space-2) 0;
++  }
++  .shell-main {
++    padding: var(--space-5) var(--space-5) var(--space-8);
++  }
++}
++@media (max-width: 767px) {
++  .koano-shell {
++    grid-template-columns: minmax(0, 1fr);
++  }
++  .shell-side {
++    display: none;
++  }
++  .shell-topbar {
++    padding: 0 var(--space-4);
++    gap: var(--space-3);
++  }
++  .shell-topbar-search {
++    display: none;
++  }
++  .shell-lens-btn {
++    display: inline-flex;
++  }
++  .shell-plan-tag {
++    display: none;
++  }
++  .shell-main {
++    padding: var(--space-4) var(--space-4) calc(var(--space-8) + 64px);
++  }
++  .shell-tabs {
++    display: flex;
++  }
++}
++
++/* Verdict band ---------------------------------------------------------- */
++.verdict-band {
++  background: var(--white);
++  border: 1px solid var(--border);
++  border-radius: var(--radius-card);
++  padding: var(--space-5);
++  display: flex;
++  flex-direction: column;
++  gap: var(--space-4);
++  max-height: 40vh;
++  overflow: auto;
++}
++.verdict-band-idle,
++.verdict-band-resolving {
++  background: var(--pale-wash);
++}
++.band-row {
++  display: flex;
++  justify-content: space-between;
++  align-items: flex-start;
++  gap: var(--space-5);
++  flex-wrap: wrap;
++}
++.band-eyebrow {
++  display: flex;
++  align-items: center;
++  gap: var(--space-3);
++  font-family: var(--font-mono);
++  font-size: var(--text-micro);
++  letter-spacing: 0.1em;
++  text-transform: uppercase;
++  color: var(--ink-muted);
++  margin-bottom: var(--space-2);
++}
++.band-title {
++  display: flex;
++  align-items: center;
++  gap: var(--space-2);
++  font-size: var(--text-h3);
++  font-weight: 500;
++  color: var(--ink-primary);
++  margin: 0;
++}
++.band-copy {
++  font-size: var(--text-body);
++  line-height: 1.5;
++  color: var(--ink-secondary);
++  margin: var(--space-1) 0 0;
++  max-width: 560px;
++}
++.band-mono {
++  font-family: var(--font-mono);
++  font-size: var(--text-caption);
++  color: var(--ink-muted);
++  letter-spacing: 0.02em;
++}
++.band-pulse {
++  width: 8px;
++  height: 8px;
++  border-radius: 50%;
++  background: var(--mid-blue);
++  animation: koano-pulse 1.6s ease-in-out infinite;
++  flex: none;
++}
++.band-agents {
++  list-style: none;
++  margin: 0;
++  padding: 0;
++  display: grid;
++  grid-template-columns: repeat(5, minmax(0, 1fr));
++  gap: var(--space-2);
++  flex: 0 1 560px;
++}
++.band-agent {
++  display: flex;
++  flex-direction: column;
++  gap: 4px;
++  padding: var(--space-2);
++  border: 1px solid var(--border-light);
++  border-radius: var(--radius-chip);
++  min-width: 0;
++}
++.band-agent-dot {
++  width: 8px;
++  height: 8px;
++  border-radius: 50%;
++  background: var(--border);
++}
++.band-agent-running .band-agent-dot {
++  background: var(--mid-blue);
++  animation: koano-pulse 1.6s ease-in-out infinite;
++}
++.band-agent-complete .band-agent-dot {
++  background: var(--signal-positive);
++}
++.band-agent-name {
++  font-size: var(--text-caption);
++  color: var(--ink-secondary);
++  white-space: nowrap;
++  overflow: hidden;
++  text-overflow: ellipsis;
++}
++.band-agent-verdict {
++  font-family: var(--font-mono);
++  font-size: var(--text-micro);
++  letter-spacing: 0.06em;
++  text-transform: uppercase;
++}
++.band-main {
++  flex: 1 1 320px;
++  min-width: 0;
++}
++.band-word {
++  font-size: var(--text-verdict);
++  font-weight: 700;
++  letter-spacing: -0.02em;
++  line-height: 1;
++  text-transform: uppercase;
++}
++.band-address {
++  font-size: var(--text-ui);
++  color: var(--ink-secondary);
++  margin: var(--space-2) 0 0;
++}
++.band-headline {
++  font-size: var(--text-lead);
++  line-height: 1.5;
++  color: var(--ink-primary);
++  margin: var(--space-2) 0 0;
++  max-width: 640px;
++  display: -webkit-box;
++  -webkit-line-clamp: 2;
++  -webkit-box-orient: vertical;
++  overflow: hidden;
++}
++.band-metrics {
++  display: grid;
++  grid-template-columns: repeat(3, minmax(96px, 1fr));
++  gap: var(--space-4);
++  margin: 0;
++  flex: 0 1 360px;
++}
++.band-metrics dt {
++  font-family: var(--font-mono);
++  font-size: var(--text-micro);
++  letter-spacing: 0.08em;
++  text-transform: uppercase;
++  color: var(--ink-muted);
++}
++.band-metrics dd {
++  font-family: var(--font-mono);
++  font-size: var(--text-data-l);
++  font-weight: 500;
++  color: var(--ink-primary);
++  margin: var(--space-1) 0 0;
++  white-space: nowrap;
++}
++.band-unit {
++  font-size: var(--text-data);
++  color: var(--ink-muted);
++  margin-left: 4px;
++}
++.band-meter {
++  display: block;
++  height: 4px;
++  border-radius: 2px;
++  background: var(--border-light);
++  overflow: hidden;
++  margin-top: var(--space-2);
++}
++.band-meter span {
++  display: block;
++  height: 100%;
++}
++.band-foot {
++  display: flex;
++  justify-content: space-between;
++  align-items: center;
++  gap: var(--space-4);
++  flex-wrap: wrap;
++  border-top: 1px solid var(--border-light);
++  padding-top: var(--space-4);
++}
++.band-summary {
++  margin: 0;
++}
++.band-actions {
++  display: flex;
++  gap: var(--space-2);
++  flex-wrap: wrap;
++}
++.band-btn {
++  padding: 9px 16px;
++  min-height: 40px;
++}
++@media (max-width: 767px) {
++  .verdict-band {
++    padding: var(--space-4);
++    max-height: none;
++  }
++  .band-agents {
++    grid-template-columns: repeat(2, minmax(0, 1fr));
++    flex-basis: 100%;
++  }
++  .band-metrics {
++    flex-basis: 100%;
++  }
++  .band-word {
++    font-size: 40px;
++  }
++  .band-btn {
++    min-height: 44px;
++    flex: 1 1 calc(50% - var(--space-2));
++  }
++}
++
++/* Evidence drawer --------------------------------------------------------- */
++.drawer-backdrop {
++  position: fixed;
++  inset: 0;
++  z-index: 40;
++  background: rgba(13, 43, 62, 0.28);
++}
++.evidence-drawer {
++  position: fixed;
++  z-index: 41;
++  top: var(--nav-h);
++  right: 0;
++  bottom: 0;
++  width: min(600px, 100vw);
++  background: var(--white);
++  border-left: 1px solid var(--border);
++  box-shadow: var(--shadow-hover);
++  display: flex;
++  flex-direction: column;
++}
++.drawer-head {
++  display: flex;
++  align-items: flex-start;
++  justify-content: space-between;
++  gap: var(--space-3);
++  padding: var(--space-5) var(--space-5) var(--space-3);
++}
++.drawer-address {
++  font-size: var(--text-ui);
++  font-weight: 500;
++  color: var(--ink-primary);
++  margin: 0;
++}
++.drawer-tabs {
++  display: flex;
++  gap: var(--space-1);
++  padding: 0 var(--space-5);
++  border-bottom: 1px solid var(--border);
++}
++.drawer-tab {
++  min-height: 44px;
++  padding: 0 var(--space-3);
++  border: 0;
++  border-bottom: 2px solid transparent;
++  background: transparent;
++  color: var(--ink-muted);
++  font: inherit;
++  font-size: var(--text-body);
++  cursor: pointer;
++  margin-bottom: -1px;
++}
++.drawer-tab[aria-selected="true"] {
++  color: var(--ink-primary);
++  font-weight: 500;
++  border-bottom-color: var(--deep-navy);
++}
++.drawer-body {
++  flex: 1 1 auto;
++  overflow-y: auto;
++  padding: var(--space-5);
++  display: flex;
++  flex-direction: column;
++  gap: var(--space-4);
++}
++@media (max-width: 767px) {
++  .evidence-drawer {
++    top: 0;
++    width: 100vw;
++    border-left: 0;
++  }
++  .drawer-head,
++  .drawer-body {
++    padding-left: var(--space-4);
++    padding-right: var(--space-4);
++  }
++  .drawer-tabs {
++    padding: 0 var(--space-4);
++    overflow-x: auto;
++  }
++}
++
++/* Global search ---------------------------------------------------------- */
++.gsearch {
++  position: relative;
++  width: 100%;
++}
++.gsearch-bar {
++  max-width: 560px;
++}
++.gsearch-field {
++  display: flex;
++  align-items: center;
++  gap: var(--space-2);
++  min-height: 44px;
++  padding: 0 var(--space-2) 0 var(--space-4);
++  border: 1px solid var(--border-input);
++  border-radius: var(--radius-pill);
++  background: var(--white);
++  color: var(--ink-muted);
++}
++.gsearch-field:focus-within {
++  border-color: var(--deep-navy);
++}
++.gsearch-input {
++  flex: 1 1 auto;
++  min-width: 0;
++  border: 0;
++  background: transparent;
++  font: inherit;
++  font-size: var(--text-ui);
++  color: var(--ink-primary);
++  min-height: 42px;
++}
++.gsearch-input::placeholder {
++  color: var(--ink-muted);
++}
++.gsearch-input:focus-visible {
++  outline: 2px solid var(--deep-navy);
++  outline-offset: -2px;
++  border-radius: var(--radius-pill);
++}
++.gsearch-kbd {
++  font-family: var(--font-mono);
++  font-size: var(--text-micro);
++  letter-spacing: 0.04em;
++  color: var(--ink-muted);
++  border: 1px solid var(--border);
++  border-radius: var(--radius-chip);
++  padding: 2px 6px;
++  background: var(--pale-wash);
++}
++.gsearch-go {
++  padding: 9px 18px;
++  min-height: 40px;
++}
++.gsearch-panel-bar {
++  position: absolute;
++  top: calc(100% + var(--space-2));
++  left: 0;
++  right: 0;
++  z-index: 35;
++  background: var(--white);
++  border: 1px solid var(--border);
++  border-radius: var(--radius-card);
++  box-shadow: var(--shadow-hover);
++  padding: var(--space-2);
++  max-height: 60vh;
++  overflow-y: auto;
++}
++.gsearch-panel-sheet {
++  margin-top: var(--space-3);
++}
++.gsearch-group {
++  display: flex;
++  flex-direction: column;
++}
++.gsearch-heading {
++  font-family: var(--font-mono);
++  font-size: var(--text-micro);
++  letter-spacing: 0.08em;
++  text-transform: uppercase;
++  color: var(--ink-muted);
++  padding: var(--space-2) var(--space-3);
++}
++.gsearch-row {
++  display: flex;
++  flex-direction: column;
++  gap: 2px;
++  width: 100%;
++  min-height: 44px;
++  padding: var(--space-2) var(--space-3);
++  border: 0;
++  border-radius: var(--radius-chip);
++  background: transparent;
++  text-align: left;
++  font: inherit;
++  color: var(--ink-primary);
++}
++.gsearch-option {
++  cursor: pointer;
++}
++.gsearch-option:hover {
++  background: var(--pale-wash);
++}
++.gsearch-quiet {
++  flex-direction: row;
++  align-items: center;
++  gap: var(--space-2);
++  color: var(--ink-secondary);
++  font-size: var(--text-body);
++}
++.gsearch-row-main {
++  font-size: var(--text-body);
++}
++.gsearch-row-meta {
++  font-family: var(--font-mono);
++  font-size: var(--text-micro);
++  letter-spacing: 0.06em;
++  color: var(--ink-muted);
++}
+diff --git a/src/components/ui/AuthShell.tsx b/src/components/ui/AuthShell.tsx
+index bf3f358..48cabbe 100644
+--- a/src/components/ui/AuthShell.tsx
++++ b/src/components/ui/AuthShell.tsx
+@@ -1,64 +1,170 @@
+-// Shared layout for /login and /signup — pale-wash page, KOANO wordmark,
+-// centered Clerk card. White/pale backgrounds only (Section 10).
++// AuthShell (UI sprint WS3, A15): the shared layout for /login and /signup.
++// The original blue logo, a KOANO panel with the approved tagline and the
++// three promises beside the form at 1024 and up, stacked on phones. The Clerk
++// card inside is restyled through koanoClerkAppearance. White and pale-wash
++// only (§10); no copy invented beyond the approved lines.
+ 
+ import Link from "next/link";
+ 
++const PROMISES = [
++  { lead: "Every figure", rest: "data-sourced" },
++  { lead: "Every verdict", rest: "reproducible" },
++  { lead: "Every step", rest: "auditable" },
++];
++
+ export default function AuthShell({ children }: { children: React.ReactNode }) {
+   return (
+-    <div
+-      style={{
+-        minHeight: "100vh",
+-        background: "var(--pale-wash)",
+-        display: "flex",
+-        flexDirection: "column",
+-      }}
+-    >
+-      <header style={{ padding: "24px 32px" }}>
+-        <Link
+-          href="/"
+-          style={{
+-            fontWeight: 500,
+-            fontSize: "15px",
+-            color: "var(--near-black)",
+-            letterSpacing: "2px",
+-            textDecoration: "none",
+-          }}
+-        >
+-          KOANO
++    <div className="auth-shell">
++      <header className="auth-head">
++        <Link href="/" className="auth-logo" aria-label="KOANO home">
++          {/* eslint-disable-next-line @next/next/no-img-element */}
++          <img src="/logo.png" alt="KOANO" width={44} height={44} />
++        </Link>
++        <Link href="/" className="auth-back">
++          Back to the site
+         </Link>
+       </header>
+ 
+-      <main
+-        style={{
+-          flex: 1,
+-          display: "flex",
+-          flexDirection: "column",
+-          alignItems: "center",
+-          justifyContent: "center",
+-          padding: "24px",
+-          gap: "24px",
+-        }}
+-      >
+-        <p
+-          style={{
+-            fontFamily: "var(--font-mono)",
+-            fontSize: "11px",
+-            letterSpacing: "1.5px",
+-            textTransform: "uppercase",
+-            color: "var(--ink-muted)",
+-            margin: 0,
+-          }}
+-        >
+-          The real estate reasoning engine
+-        </p>
+-        <div style={{ width: "100%", maxWidth: "420px" }}>{children}</div>
++      <main className="auth-main">
++        <section className="auth-brand" aria-label="About KOANO">
++          <p className="auth-eyebrow">The real estate reasoning engine</p>
++          <h1 className="auth-title">
++            Smart data.
++            <br />
++            Smarter real estate decisions.
++          </h1>
++          <ul className="auth-promises">
++            {PROMISES.map((p) => (
++              <li key={p.lead}>
++                <span className="auth-promise-lead">{p.lead}</span> {p.rest}
++              </li>
++            ))}
++          </ul>
++        </section>
++
++        <section className="auth-form" aria-label="Account">
++          {children}
++        </section>
+       </main>
+ 
+-      <footer style={{ padding: "24px 32px", textAlign: "center" }}>
+-        <span style={{ fontSize: "12px", color: "var(--ink-muted)" }}>
+-          © 2026 KOANO Inc. All rights reserved.
+-        </span>
+-      </footer>
++      <footer className="auth-foot">© 2026 KOANO Inc. All rights reserved.</footer>
++
++      <style>{`
++        .auth-shell {
++          min-height: 100vh;
++          display: flex;
++          flex-direction: column;
++          background: var(--pale-wash);
++        }
++        .auth-head {
++          display: flex;
++          align-items: center;
++          justify-content: space-between;
++          padding: var(--space-3) var(--space-6);
++          min-height: var(--nav-h);
++        }
++        .auth-logo {
++          display: inline-flex;
++          align-items: center;
++          min-height: 44px;
++          border-radius: var(--radius-chip);
++        }
++        .auth-logo img {
++          height: 44px;
++          width: auto;
++          display: block;
++        }
++        .auth-back {
++          display: inline-flex;
++          align-items: center;
++          min-height: 44px;
++          font-size: var(--text-body);
++          color: var(--ink-muted);
++          text-decoration: none;
++          border-radius: var(--radius-chip);
++        }
++        .auth-back:hover {
++          color: var(--ink-primary);
++        }
++        .auth-main {
++          flex: 1 1 auto;
++          display: grid;
++          grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
++          align-items: center;
++          gap: var(--space-8);
++          max-width: var(--content-max);
++          width: 100%;
++          margin: 0 auto;
++          padding: var(--space-6) var(--space-6) var(--space-8);
++        }
++        .auth-brand {
++          max-width: 480px;
++        }
++        .auth-eyebrow {
++          font-family: var(--font-mono);
++          font-size: var(--text-micro);
++          letter-spacing: 1.5px;
++          text-transform: uppercase;
++          color: var(--ink-muted);
++          margin: 0 0 var(--space-4);
++        }
++        .auth-title {
++          font-size: var(--text-h1);
++          font-weight: 700;
++          letter-spacing: -0.02em;
++          line-height: 1.1;
++          color: var(--ink-primary);
++          margin: 0 0 var(--space-5);
++        }
++        .auth-promises {
++          list-style: none;
++          margin: 0;
++          padding: 0;
++          display: flex;
++          flex-direction: column;
++          gap: var(--space-2);
++          font-family: var(--font-mono);
++          font-size: var(--text-data);
++          letter-spacing: 0.04em;
++          color: var(--ink-muted);
++        }
++        .auth-promise-lead {
++          font-weight: 700;
++          color: var(--ink-primary);
++        }
++        .auth-form {
++          width: 100%;
++          max-width: 440px;
++          justify-self: center;
++        }
++        .auth-foot {
++          padding: var(--space-5) var(--space-6);
++          text-align: center;
++          font-size: var(--text-caption);
++          color: var(--ink-muted);
++        }
++        @media (max-width: 1023px) {
++          .auth-main {
++            grid-template-columns: minmax(0, 1fr);
++            align-items: start;
++            gap: var(--space-6);
++            padding: var(--space-5) var(--space-4) var(--space-7);
++          }
++          .auth-brand {
++            max-width: 560px;
++          }
++          .auth-title {
++            font-size: var(--text-h2);
++          }
++          .auth-form {
++            justify-self: stretch;
++            max-width: none;
++          }
++          .auth-head {
++            padding: var(--space-2) var(--space-4);
++          }
++        }
++      `}</style>
+     </div>
+   );
+ }
+diff --git a/src/components/ui/clerkAppearance.ts b/src/components/ui/clerkAppearance.ts
+index 463eb77..0f46c42 100644
+--- a/src/components/ui/clerkAppearance.ts
++++ b/src/components/ui/clerkAppearance.ts
+@@ -1,55 +1,77 @@
+-// KOANO appearance for Clerk components (Section 10 design system).
+-// Coastal Intelligence palette, Neue Montreal, pill buttons.
++// KOANO appearance for Clerk components (UI sprint WS3, A15; §10 tokens).
++// Coastal Intelligence palette, Neue Montreal, pill buttons, the card radius,
++// AA ink everywhere. Colors are literal because Clerk's variables do not read
++// CSS custom properties; the values are the §10 tokens.
+ 
+ export const koanoClerkAppearance = {
+   variables: {
+-    colorPrimary: "#A8C4D4",
++    colorPrimary: "#1A4F6E",
+     colorText: "#0D2B3E",
+     colorTextSecondary: "#3D5A6E",
+-    colorTextOnPrimaryBackground: "#0D2B3E",
++    colorTextOnPrimaryBackground: "#FFFFFF",
+     colorBackground: "#FFFFFF",
+     colorInputBackground: "#FFFFFF",
+     colorInputText: "#0D2B3E",
+     colorNeutral: "#0D2B3E",
+-    colorDanger: "#EF4444",
+-    colorSuccess: "#22C55E",
+-    colorWarning: "#F59E0B",
++    colorDanger: "#B91C1C",
++    colorSuccess: "#15803D",
++    colorWarning: "#B45309",
+     borderRadius: "12px",
+     fontFamily: "'Neue Montreal', 'DM Sans', system-ui, sans-serif",
+     fontSize: "15px",
++    spacingUnit: "1rem",
+   },
+   elements: {
+     rootBox: { width: "100%" },
+     cardBox: {
+       boxShadow: "0 2px 16px rgba(13, 43, 62, 0.06)",
+       border: "1px solid #D6EBF7",
+-      borderRadius: "var(--radius-card)",
++      borderRadius: "16px",
+       width: "100%",
+     },
+-    card: { boxShadow: "none" },
++    card: { boxShadow: "none", padding: "32px 32px 24px", gap: "24px" },
++    headerTitle: { fontWeight: 700, letterSpacing: "-0.02em", color: "#0D2B3E", fontSize: "22px" },
++    headerSubtitle: { color: "#3D5A6E", fontSize: "14px" },
+     formButtonPrimary: {
+       borderRadius: "100px",
+       backgroundColor: "#A8C4D4",
+       color: "#0D2B3E",
+       fontWeight: 500,
+       fontSize: "14px",
++      minHeight: "44px",
+       textTransform: "none" as const,
+       boxShadow: "none",
+       border: "1px solid #A8C4D4",
+-      "&:hover": { backgroundColor: "#5A9BBE", borderColor: "#5A9BBE", color: "#FFFFFF" },
++      "&:hover": { backgroundColor: "#D6EBF7", borderColor: "#D6EBF7", color: "#0D2B3E" },
++      "&:focus-visible": { outline: "2px solid #1A4F6E", outlineOffset: "2px", boxShadow: "none" },
+     },
+     socialButtonsBlockButton: {
+       borderRadius: "100px",
++      minHeight: "44px",
+       border: "1px solid #D6EBF7",
++      color: "#0D2B3E",
+       "&:hover": { backgroundColor: "#F0F7FC" },
+     },
++    socialButtonsBlockButtonText: { fontWeight: 500, fontSize: "14px" },
++    dividerLine: { backgroundColor: "#E8F3FA" },
++    dividerText: { color: "#527082", fontSize: "12px" },
++    formFieldLabel: { color: "#0D2B3E", fontSize: "14px", fontWeight: 500 },
+     formFieldInput: {
+-      borderRadius: "var(--radius-inner)",
+-      border: "1px solid #D6EBF7",
+-      "&:focus": { borderColor: "#5A9BBE", boxShadow: "0 0 0 3px rgba(90, 155, 190, 0.12)" },
++      borderRadius: "12px",
++      minHeight: "44px",
++      border: "1px solid #8AABB8",
++      boxShadow: "none",
++      "&:focus": { borderColor: "#1A4F6E", boxShadow: "0 0 0 2px rgba(26, 79, 110, 0.2)" },
+     },
+-    footerActionLink: { color: "#5A9BBE", "&:hover": { color: "#1A4F6E" } },
+-    headerTitle: { fontWeight: 700, letterSpacing: "-0.02em", color: "#0D2B3E" },
+-    headerSubtitle: { color: "#3D5A6E" },
++    formFieldInputShowPasswordButton: { color: "#527082" },
++    footer: { background: "#F0F7FC" },
++    footerActionText: { color: "#3D5A6E", fontSize: "14px" },
++    footerActionLink: { color: "#2F6F94", fontWeight: 500, "&:hover": { color: "#1A4F6E" } },
++    identityPreviewText: { color: "#0D2B3E" },
++    identityPreviewEditButton: { color: "#2F6F94" },
++    formResendCodeLink: { color: "#2F6F94" },
++    otpCodeFieldInput: { borderColor: "#8AABB8" },
++    alertText: { color: "#0D2B3E" },
++    formFieldErrorText: { color: "#B91C1C" },
+   },
+ };

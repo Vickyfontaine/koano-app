@@ -148,10 +148,13 @@ export default function DivergingBar({
                       position: "absolute",
                       top: "50%",
                       left: `calc(${zeroPct}% + 12px)`,
+                      maxWidth: `calc(${100 - zeroPct}% - 12px)`,
                       transform: "translateY(-50%)",
                       fontSize: "11px",
                       color: "var(--ink-muted)",
                       whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
                     }}
                   >
                     no directional signal

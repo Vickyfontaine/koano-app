@@ -6,6 +6,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import ProfileSettingsForm from "@/components/dashboard/ProfileSettingsForm";
 import MonitoringSettings from "@/components/dashboard/MonitoringSettings";
+import SimpleTopBar from "@/components/dashboard/shell/SimpleTopBar";
 
 export const dynamic = "force-dynamic";
 
@@ -15,27 +16,15 @@ export default async function SettingsPage() {
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--white)" }}>
-      <div style={{ maxWidth: "720px", margin: "0 auto", padding: "48px 32px" }}>
-        <a
-          href="/dashboard"
-          style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: "11px",
-            letterSpacing: "0.08em",
-            textTransform: "uppercase",
-            color: "var(--ink-muted)",
-            textDecoration: "none",
-          }}
-        >
-          ← Back to dashboard
-        </a>
+      <SimpleTopBar />
+      <div style={{ maxWidth: "var(--content-prose)", margin: "0 auto", padding: "var(--space-6) var(--space-4) var(--space-8)" }}>
         <h1
           style={{
             fontSize: "32px",
             fontWeight: 700,
             letterSpacing: "-0.02em",
             color: "var(--ink-primary)",
-            margin: "16px 0 24px",
+            margin: "0 0 var(--space-5)",
           }}
         >
           Settings

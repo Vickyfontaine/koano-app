@@ -70,6 +70,15 @@ async function waitForDone(page, timeoutMs = 300000) {
   await c.close();
 }
 
+// 1b. Settings inside the shell frame
+for (const w of [1440, 390]) {
+  const { c, p } = await ctx(w);
+  await p.goto(base + '/dashboard/settings', { waitUntil: 'load' });
+  await p.waitForTimeout(2000);
+  await shot(p, `settings-${w}`);
+  await c.close();
+}
+
 // 2. A real run in the Property lens, then the drawer
 {
   const { c, p } = await ctx(1440);
@@ -122,6 +131,17 @@ async function waitForDone(page, timeoutMs = 300000) {
   await p.click('.band-actions button:has-text("Reasoning")');
   await p.waitForTimeout(800);
   await shot(p, 'drawer-reasoning-768');
+  await p.keyboard.press('Escape');
+  await p.setViewportSize({ width: 1440, height: 900 });
+  await p.waitForTimeout(500);
+  // A6/blocker check: switching lenses after a search must not start new runs or writes.
+  let fired = 0;
+  p.on('request', (rq) => { if (/\/api\/(agents|properties)/.test(rq.url()) && rq.method() === 'POST') fired += 1; });
+  await p.locator('[data-lens="cluster_2"]').first().click(); await p.waitForTimeout(1500);
+  await p.locator('[data-lens="cluster_5"]').first().click(); await p.waitForTimeout(1500);
+  await p.locator('[data-lens="cluster_4"]').first().click(); await p.waitForTimeout(1500);
+  checks.postsAfterLensSwitches = fired;
+  checks.siteAFilledAfterSwitch = await p.inputValue('#site-0');
   await c.close();
 }
 await browser.close();

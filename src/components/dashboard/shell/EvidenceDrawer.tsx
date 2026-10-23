@@ -98,9 +98,10 @@ export default function EvidenceDrawer() {
               locationConfidence={r.resolved_address.location_confidence}
               address={r.resolved_address.normalized}
               defaultOpen
+              collapsible={false}
             />
           )}
-          {tab === "coverage" && <CoverageMap dataPoints={r.verdict.data_points} defaultOpen />}
+          {tab === "coverage" && <CoverageMap dataPoints={r.verdict.data_points} defaultOpen collapsible={false} />}
         </div>
       </aside>
     </>

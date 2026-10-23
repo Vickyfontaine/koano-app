@@ -131,7 +131,7 @@ export default function GlobalSearch({ variant, onDone, autoFocus = false }: Glo
         settle({ address: q }, (json.address?.normalized as string) ?? q);
         return;
       }
-      setPhase({ kind: "none", error: json?.error || "No lot matched that address. Try adding the borough or ZIP." });
+      setPhase({ kind: "none", error: "No lot matched that address. Try adding the borough or ZIP." });
       setOpen(true);
     } catch (e) {
       setPhase({ kind: "none", error: e instanceof Error ? e.message : "Could not resolve the address" });
@@ -173,10 +173,7 @@ export default function GlobalSearch({ variant, onDone, autoFocus = false }: Glo
               setOpen(true);
               void loadRecents();
             }}
-            role="combobox"
-            aria-expanded={showList}
-            aria-controls={listId}
-            aria-autocomplete="list"
+            aria-describedby={listId}
             aria-busy={phase.kind === "resolving"}
           />
           {variant === "bar" && (

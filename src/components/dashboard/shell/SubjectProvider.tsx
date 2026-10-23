@@ -48,6 +48,8 @@ interface SubjectContextValue {
   setSearching: (v: boolean) => void;
   pending: PendingSubject | null;
   dispatchSubject: (payload: RunPayload, label: string) => void;
+  /** The lens that handled a subject consumes it, so it never re-fires. */
+  consumeSubject: (ts: number) => void;
 }
 
 const SubjectContext = createContext<SubjectContextValue>({
@@ -60,6 +62,7 @@ const SubjectContext = createContext<SubjectContextValue>({
   setSearching: () => {},
   pending: null,
   dispatchSubject: () => {},
+  consumeSubject: () => {},
 });
 
 export function useSubject(): SubjectContextValue {
@@ -99,10 +102,13 @@ export default function SubjectProvider({ children }: { children: React.ReactNod
   const dispatchSubject = useCallback((payload: RunPayload, label: string) => {
     setPending({ payload, label, ts: Date.now() });
   }, []);
+  const consumeSubject = useCallback((ts: number) => {
+    setPending((cur) => (cur && cur.ts === ts ? null : cur));
+  }, []);
 
   const value = useMemo(
-    () => ({ run, registerRun, drawer, openDrawer, closeDrawer, searching, setSearching, pending, dispatchSubject }),
-    [run, registerRun, drawer, openDrawer, closeDrawer, searching, pending, dispatchSubject],
+    () => ({ run, registerRun, drawer, openDrawer, closeDrawer, searching, setSearching, pending, dispatchSubject, consumeSubject }),
+    [run, registerRun, drawer, openDrawer, closeDrawer, searching, pending, dispatchSubject, consumeSubject],
   );
   return <SubjectContext.Provider value={value}>{children}</SubjectContext.Provider>;
 }
@@ -152,13 +158,16 @@ export function useRegisterRun(
  * add it to the book).
  */
 export function usePendingSubject(onSubject: (payload: RunPayload, label: string) => void) {
-  const { pending } = useSubject();
+  const { pending, consumeSubject } = useSubject();
   const handled = useRef<number>(0);
   const cb = useRef(onSubject);
   cb.current = onSubject;
   useEffect(() => {
     if (!pending || pending.ts === handled.current) return;
     handled.current = pending.ts;
+    // Consumed in the provider as well, so a lens switch never re-runs it
+    // (a run costs money and an Acquire add mutates the book).
+    consumeSubject(pending.ts);
     cb.current(pending.payload, pending.label);
-  }, [pending]);
+  }, [pending, consumeSubject]);
 }

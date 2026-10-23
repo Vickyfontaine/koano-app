@@ -54,7 +54,6 @@ export default function MonitoringFeed({ id }: { id?: string }) {
     <div style={panelStyle} id={id}>
       <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: "12px" }}>
         <div>
-          <span className="section-number">05.M</span>
           <h2 style={{ fontSize: "22px", fontWeight: 700, letterSpacing: "-0.02em", color: "var(--ink-primary)", margin: "8px 0 2px" }}>
             Portfolio monitoring
           </h2>

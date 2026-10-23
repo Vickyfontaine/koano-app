@@ -109,7 +109,7 @@ export default function Cluster1Dashboard() {
         /* Empty state — approved copy (KOANO_COPY.md) */
         <div style={{ maxWidth: "620px" }}>
           <h3 style={{ fontSize: "18px", fontWeight: 500, color: "var(--ink-primary)", margin: "0 0 8px" }}>
-            Start with an address in the search bar.
+            Start with an address: search above, or from the Search tab on a phone.
           </h3>
           <p style={{ fontSize: "14px", lineHeight: 1.6, color: "var(--ink-muted)", margin: 0 }}>
             KOANO will read the zoning, the permit history, and the flood and

@@ -44,7 +44,9 @@ export default function TopBar({ cluster, plan, onOpenLens, search }: TopBarProp
             Plan: {planLabel}
           </span>
         )}
-        <UserButton />
+        <span className="shell-account">
+          <UserButton appearance={{ elements: { avatarBox: { width: "36px", height: "36px" } } }} />
+        </span>
       </div>
     </header>
   );

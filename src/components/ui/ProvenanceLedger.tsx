@@ -22,6 +22,8 @@ interface ProvenanceLedgerProps {
   address?: string | null;
   id?: string;
   defaultOpen?: boolean;
+  /** False inside the evidence drawer: the panel is always open and has no toggle. */
+  collapsible?: boolean;
   /** A replay of a frozen run (the marketing example): badges read "Recorded"
    *  and the live/non-live filter is hidden, so a recording never claims live. */
   recorded?: boolean;
@@ -42,7 +44,7 @@ const AGENT_ORDER: AgentName[] = [
   "synthesis",
 ];
 
-export default function ProvenanceLedger({ dataPoints, locationConfidence, address, id, defaultOpen, recorded = false }: ProvenanceLedgerProps) {
+export default function ProvenanceLedger({ dataPoints, locationConfidence, address, id, defaultOpen, recorded = false, collapsible = true }: ProvenanceLedgerProps) {
   const [open, setOpen] = useState(!!defaultOpen);
   const [nonLiveOnly, setNonLiveOnly] = useState(false);
 
@@ -65,7 +67,9 @@ export default function ProvenanceLedger({ dataPoints, locationConfidence, addre
   return (
     <div style={{ border: "1px solid var(--border)", borderRadius: "var(--radius-card)", background: "var(--white)", padding: "24px" }} id={id}>
       <button
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => collapsible && setOpen((v) => !v)}
+        aria-expanded={collapsible ? open : undefined}
+        disabled={!collapsible}
         style={{
           width: "100%",
           border: "none",
@@ -87,7 +91,7 @@ export default function ProvenanceLedger({ dataPoints, locationConfidence, addre
               : `${points.length} figures · ${liveCount} live${nonLiveCount > 0 ? ` · ${nonLiveCount} non-live` : ""}`}
           </span>
         </span>
-        <span style={{ ...mono, color: "var(--mid-blue-ink)" }}>{open ? "Hide" : "Show every source"}</span>
+        {collapsible && <span style={{ ...mono, color: "var(--mid-blue-ink)" }}>{open ? "Hide" : "Show every source"}</span>}
       </button>
 
       {open && (

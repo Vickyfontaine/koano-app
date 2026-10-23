@@ -31,7 +31,7 @@ export const koanoClerkAppearance = {
     },
     card: { boxShadow: "none", padding: "32px 32px 24px", gap: "24px" },
     headerTitle: { fontWeight: 700, letterSpacing: "-0.02em", color: "#0D2B3E", fontSize: "22px" },
-    headerSubtitle: { color: "#3D5A6E", fontSize: "14px" },
+    headerSubtitle: { display: "none" },
     formButtonPrimary: {
       borderRadius: "100px",
       backgroundColor: "#A8C4D4",

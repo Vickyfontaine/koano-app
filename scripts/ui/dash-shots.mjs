@@ -99,7 +99,11 @@ for (const cluster of CLUSTERS) {
     await page.waitForTimeout(3000);
     await snap(page, `${cluster}-done`);
   } else if (cluster === "cluster_5") {
+    // Track only what the book does not already hold (a re-add returns 409).
+    const bodyText = await page.innerText("body");
     for (const a of addrs) {
+      const streetKey = a.split(",")[0].replace(/(\d+)(st|nd|rd|th)\b/i, "$1").toUpperCase();
+      if (bodyText.toUpperCase().includes(streetKey)) continue;
       await page.locator('input[aria-label="Property address to track"]').fill(a);
       await page.locator('button:has-text("Track property")').click();
       await page.waitForTimeout(9000);

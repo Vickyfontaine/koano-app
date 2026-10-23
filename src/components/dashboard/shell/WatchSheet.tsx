@@ -42,7 +42,8 @@ export default function WatchSheet({ open, onClose, onGoToPortfolio }: WatchShee
   return (
     <Sheet open={open} title="Watchlist" onClose={onClose} id="shell-watch-sheet">
       <p style={{ margin: 0, fontSize: "var(--text-body)", lineHeight: 1.5, color: "var(--ink-secondary)" }}>
-        KOANO checks each watched property&apos;s public record every week and reports what changed.
+        The properties in your book. KOANO checks each one&apos;s public record every week and reports what changed in the
+        Acquire lens and the Monday digest.
       </p>
 
       {rows === null && !error && (
@@ -80,7 +81,7 @@ export default function WatchSheet({ open, onClose, onGoToPortfolio }: WatchShee
                     className="shell-watch-verdict"
                     style={{ color: VERDICT_COLORS[v.verdict as Verdict] ?? "var(--ink-primary)" }}
                   >
-                    {v.verdict.toUpperCase()} · {v.confidence}
+                    {v.verdict.toUpperCase()} · conf {v.confidence}
                   </span>
                 ) : (
                   <span className="shell-watch-verdict" style={{ color: "var(--ink-muted)" }}>
@@ -97,56 +98,6 @@ export default function WatchSheet({ open, onClose, onGoToPortfolio }: WatchShee
         Manage in the Acquire lens
       </button>
 
-      <style jsx global>{`
-        .shell-watch-list {
-          list-style: none;
-          margin: 0;
-          padding: 0;
-          display: flex;
-          flex-direction: column;
-          border: 1px solid var(--border);
-          border-radius: var(--radius-inner);
-          overflow: hidden;
-        }
-        .shell-watch-row {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: var(--space-3);
-          min-height: 48px;
-          padding: var(--space-2) var(--space-4);
-          border-bottom: 1px solid var(--border-light);
-        }
-        .shell-watch-row:last-child {
-          border-bottom: 0;
-        }
-        .shell-watch-address {
-          font-size: var(--text-body);
-          color: var(--ink-primary);
-          min-width: 0;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-        }
-        .shell-watch-verdict {
-          font-family: var(--font-mono);
-          font-size: var(--text-micro);
-          letter-spacing: 0.06em;
-          white-space: nowrap;
-        }
-        .shell-watch-skeleton span {
-          display: block;
-          height: 12px;
-          border-radius: var(--radius-chip);
-          background: var(--border-light);
-          animation: koano-pulse 1.6s ease-in-out infinite;
-        }
-        .shell-watch-empty {
-          padding: var(--space-4);
-          border: 1px dashed var(--border);
-          border-radius: var(--radius-inner);
-        }
-      `}</style>
     </Sheet>
   );
 }

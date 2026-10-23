@@ -9,16 +9,12 @@
 import React, { useState } from "react";
 import LoadingState from "@/components/ui/LoadingState";
 import VerdictCard from "@/components/ui/VerdictCard";
-import VerdictMathPanel from "@/components/ui/VerdictMathPanel";
-import ReasoningChain from "@/components/ui/ReasoningChain";
-import ProvenanceLedger from "@/components/ui/ProvenanceLedger";
-import CoverageMap from "@/components/ui/CoverageMap";
 import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
 import CandidatePicker from "@/components/ui/CandidatePicker";
 import { VERDICT_COLORS, type SynthesisResult, type Verdict, type AddressCandidate } from "@/components/ui/verdict";
 import { useVerdictStream, type VerdictStream, type RunDegradation } from "../useVerdictStream";
 import type { RunPayload } from "../useAddressResolver";
-import { useRegisterRun, usePendingSubject } from "../shell/SubjectProvider";
+import { useRegisterRun, usePendingSubject, useSubject } from "../shell/SubjectProvider";
 import RunDegradationNote from "@/components/ui/RunDegradationNote";
 import SitePanels from "./SitePanels";
 import MultiSiteMap, { type MultiSite } from "./MultiSiteMap";
@@ -60,6 +56,9 @@ const monoLabel: React.CSSProperties = {
 
 export default function SiteComparison() {
   const [addresses, setAddresses] = useState<string[]>(["", "", ""]);
+  // The site shown in the shell's verdict band (and its evidence drawer).
+  const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
+  const { openDrawer } = useSubject();
   const [activeSlots, setActiveSlots] = useState<number[]>([]);
   const [details, setDetails] = useState<DetailState[]>([idleDetail, idleDetail, idleDetail]);
 
@@ -144,6 +143,7 @@ export default function SiteComparison() {
 
     // Fresh run — clear prior state on every slot.
     streams.forEach((s) => s.reset());
+    setSelectedSlot(null);
     setActiveSlots([]);
     setDetails([idleDetail, idleDetail, idleDetail]);
     setPendingQueue([]);
@@ -196,7 +196,11 @@ export default function SiteComparison() {
   }));
   // The shell's verdict band shows the top-ranked site once the comparison
   // finishes, else the first site still running.
-  const bandSlot = ranked[0] ?? activeSlots.find((i) => streams[i].status !== "idle") ?? null;
+  const bandSlot =
+    (selectedSlot !== null && streams[selectedSlot].status === "done" ? selectedSlot : null) ??
+    ranked[0] ??
+    activeSlots.find((i) => streams[i].status !== "idle") ??
+    null;
   useRegisterRun(bandSlot === null ? null : streams[bandSlot], {
     resolving: resolving && bandSlot === null ? true : false,
     subject: bandSlot === null ? addresses.find((a) => a.trim())?.trim() ?? null : addresses[bandSlot].trim() || null,
@@ -392,7 +396,7 @@ export default function SiteComparison() {
             <table style={{ borderCollapse: "collapse", width: "100%", minWidth: "560px" }}>
               <thead>
                 <tr>
-                  {["Rank", "Site", "Verdict", "Confidence", "Risk", "Entitlement risk", "Window", "Provenance"].map(
+                  {["Rank", "Site", "Verdict", "Confidence", "Risk", "Entitlement risk", "Window", "Provenance", "Evidence"].map(
                     (h) => (
                       <th
                         key={h}
@@ -440,6 +444,21 @@ export default function SiteComparison() {
                       <td style={{ padding: "12px 16px", borderBottom: "1px solid var(--border-light)" }}>
                         <ProvenanceBadge provenance={v.overall_provenance} />
                       </td>
+                      <td style={{ padding: "8px 16px", borderBottom: "1px solid var(--border-light)", whiteSpace: "nowrap" }}>
+                        <button
+                          type="button"
+                          className="btn-ghost"
+                          style={{ padding: "8px 14px", minHeight: "40px" }}
+                          aria-pressed={bandSlot === slot}
+                          onClick={() => {
+                            setSelectedSlot(slot);
+                            openDrawer("math");
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                          }}
+                        >
+                          {bandSlot === slot ? "In the band" : "Show math"}
+                        </button>
+                      </td>
                     </tr>
                   );
                 })}
@@ -484,24 +503,25 @@ export default function SiteComparison() {
                   )}
                 </div>
                 <VerdictCard verdict={r.verdict} />
-                <VerdictMathPanel verdict={r.verdict} />
                 <SitePanels
                   detail={details[slot].data}
                   detailError={details[slot].error}
                   verdict={r.verdict}
                 />
-                <ReasoningChain
-                  reasoningChain={r.verdict.reasoning_chain}
-                  minoritySignals={r.verdict.minority_signals}
-                  agentSummaries={r.verdict.agent_summaries}
-                />
-                <CoverageMap dataPoints={r.verdict.data_points} />
-
-                <ProvenanceLedger
-                  dataPoints={r.verdict.data_points}
-                  locationConfidence={r.resolved_address.location_confidence}
-                  address={r.resolved_address.normalized}
-                />
+                {/* The math, reasoning, sources and coverage live in the shell's
+                    evidence drawer for the site shown in the band. */}
+                <button
+                  type="button"
+                  className="btn-ghost"
+                  style={{ alignSelf: "flex-start" }}
+                  onClick={() => {
+                    setSelectedSlot(slot);
+                    openDrawer("math");
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                >
+                  Open this site&apos;s evidence
+                </button>
                 <div
                   style={{
                     display: "grid",

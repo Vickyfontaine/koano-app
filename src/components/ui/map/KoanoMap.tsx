@@ -250,6 +250,16 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
     if (!TOKEN || !containerRef.current) return;
     let cancelled = false;
     let map: MapboxMap | null = null;
+    // Follow the container, not only the window: the shell's grid re-lays the
+    // workspace at each breakpoint and a map that keeps its old canvas size
+    // positions its markers past the edge (a horizontal overflow at 768).
+    const ro =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(() => {
+            map?.resize();
+          })
+        : null;
+    ro?.observe(containerRef.current);
     (async () => {
       try {
         const mapboxgl = (await import("mapbox-gl")).default;
@@ -314,6 +324,7 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
     })();
     return () => {
       cancelled = true;
+      ro?.disconnect();
       markerObjs.current.forEach((m) => m.remove());
       markerObjs.current = [];
       popupRef.current?.remove();

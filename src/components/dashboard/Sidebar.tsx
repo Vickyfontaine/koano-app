@@ -59,13 +59,13 @@ export default function Sidebar({
             className="shell-item"
             data-lens={id}
             aria-current={active ? "true" : undefined}
-            aria-label={`${meta.lens} lens${id === homeCluster ? " (your plan)" : ""}`}
+            aria-label={`${meta.lens} lens${id === homeCluster ? " (home lens)" : ""}`}
             title={`${meta.lens}: ${meta.label}`}
             onClick={() => onClusterChange(id)}
           >
             <Icon size={20} />
             <span className="shell-item-label">{meta.lens}</span>
-            {id === homeCluster && <span className="shell-item-note">plan</span>}
+            {id === homeCluster && <span className="shell-item-note">home</span>}
           </button>
         );
       })}

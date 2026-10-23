@@ -40,7 +40,11 @@ function Elapsed({ since }: { since: number }) {
     const id = setInterval(() => setS(Math.round((Date.now() - since) / 1000)), 1000);
     return () => clearInterval(id);
   }, [since]);
-  return <span className="band-mono">{s}s · typically about 60s</span>;
+  return (
+    <span className="band-mono" aria-hidden="true">
+      {s}s · typically about 90 seconds
+    </span>
+  );
 }
 
 const SUMMARY_LABEL: Record<Provenance, string> = {
@@ -68,17 +72,34 @@ const TABS: { id: DrawerTab; label: string }[] = [
 export default function VerdictBand() {
   const { run, openDrawer, searching } = useSubject();
   const status = searching && (!run || run.status === "idle" || run.status === "done" || run.status === "error") ? "resolving" : (run?.status ?? "idle");
+  // One short announcement per phase change (never the ticking timer).
+  const announcement =
+    status === "resolving"
+      ? "Resolving the address"
+      : status === "running"
+        ? run?.phase === "synthesis"
+          ? "Synthesizing the verdict"
+          : "Five agents reading the record"
+        : status === "done" && run?.result
+          ? `Verdict ready: ${run.result.verdict.verdict}, confidence ${run.result.verdict.confidence}`
+          : status === "error"
+            ? "The run did not complete"
+            : "";
 
   return (
-    <section className={`verdict-band verdict-band-${status}`} aria-label="Verdict" aria-live="polite" id="verdict-band">
+    <section className={`verdict-band verdict-band-${status}`} aria-label="Verdict" id="verdict-band">
+      <p className="sr-only" aria-live="polite" aria-atomic="true">
+        {announcement}
+      </p>
       {status === "idle" && (
         <div className="band-row">
           <div>
             <div className="band-eyebrow">Verdict</div>
             <p className="band-title">No subject yet.</p>
             <p className="band-copy">
-              Search an address above. The five agents read its public record and the verdict lands here, in the same
-              place in every lens.
+              <span className="band-wide-only">Search an address above. </span>
+              <span className="band-narrow-only">Search an address from the Search tab below. </span>
+              The five agents read its public record and the verdict lands here, in the same place in every lens.
             </p>
           </div>
         </div>
