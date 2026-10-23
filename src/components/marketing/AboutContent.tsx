@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
+import { useReveal, fadeUp } from "./Reveal";
 import SectionNumber from "@/components/ui/SectionNumber";
 import Button from "@/components/ui/Button";
 import { HERO_PADDING_TOP } from "@/components/marketing/heroLayout";
@@ -9,20 +10,6 @@ import CtaBackground from "@/components/marketing/CtaBackground";
 import HeroRender from "@/components/marketing/HeroRender";
 import { RENDERS } from "@/components/marketing/renders";
 
-const EASE = [0.16, 1, 0.3, 1] as const;
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      delay: i * 0.08,
-      duration: 0.5,
-      ease: EASE,
-    },
-  }),
-};
 
 const WHAT_WE_ARE_NOT = [
   {
@@ -81,11 +68,11 @@ export default function AboutContent() {
   const teamRef = useRef<HTMLElement>(null);
   const ctaRef = useRef<HTMLElement>(null);
 
-  const heroInView = useInView(heroRef, { once: true, amount: 0.15 });
-  const principlesInView = useInView(principlesRef, { once: true, amount: 0.1 });
-  const notInView = useInView(notRef, { once: true, amount: 0.1 });
-  const teamInView = useInView(teamRef, { once: true, amount: 0.15 });
-  const ctaInView = useInView(ctaRef, { once: true, amount: 0.15 });
+  const heroInView = useReveal(heroRef, { once: true, amount: 0.15 });
+  const principlesInView = useReveal(principlesRef, { once: true, amount: 0.1 });
+  const notInView = useReveal(notRef, { once: true, amount: 0.1 });
+  const teamInView = useReveal(teamRef, { once: true, amount: 0.15 });
+  const ctaInView = useReveal(ctaRef, { once: true, amount: 0.15 });
 
   return (
     <>
@@ -109,7 +96,7 @@ export default function AboutContent() {
           minHeight: "calc(100svh - var(--nav-h))",
         }}
       >
-        <div className="hero-copy" style={{ maxWidth: "1280px", margin: "0 auto", position: "relative", zIndex: 1 }}>
+        <div className="hero-copy" style={{ maxWidth: "var(--content-marketing)", margin: "0 auto", position: "relative", zIndex: 1 }}>
           <div
             className="about-hero-layout"
             style={{
@@ -121,7 +108,7 @@ export default function AboutContent() {
           >
             <div>
               <motion.div
-                initial="hidden"
+                initial={false}
                 animate={heroInView ? "visible" : "hidden"}
                 variants={fadeUp}
                 custom={0}
@@ -131,7 +118,7 @@ export default function AboutContent() {
 
               {/* Hero — approved copy (KOANO_COPY.md) */}
               <motion.h1
-                initial="hidden"
+                initial={false}
                 animate={heroInView ? "visible" : "hidden"}
                 variants={fadeUp}
                 custom={1}
@@ -148,7 +135,7 @@ export default function AboutContent() {
                 intelligence.
               </motion.h1>
               <motion.p
-                initial="hidden"
+                initial={false}
                 animate={heroInView ? "visible" : "hidden"}
                 variants={fadeUp}
                 custom={1.5}
@@ -166,7 +153,7 @@ export default function AboutContent() {
               </motion.p>
 
               <motion.div
-                initial="hidden"
+                initial={false}
                 animate={heroInView ? "visible" : "hidden"}
                 variants={fadeUp}
                 custom={2}
@@ -191,7 +178,7 @@ export default function AboutContent() {
 
               {/* Founding promise — restored under the CTAs */}
               <motion.div
-                initial="hidden"
+                initial={false}
                 animate={heroInView ? "visible" : "hidden"}
                 variants={fadeUp}
                 custom={3}
@@ -244,9 +231,9 @@ export default function AboutContent() {
         ref={principlesRef}
         style={{ background: "var(--pale-wash)", padding: "120px 32px" }}
       >
-        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
           <motion.div
-            initial="hidden"
+            initial={false}
             animate={principlesInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={0}
@@ -277,7 +264,7 @@ export default function AboutContent() {
               <motion.div
                 key={item.title}
                 custom={i + 1}
-                initial="hidden"
+                initial={false}
                 animate={principlesInView ? "visible" : "hidden"}
                 variants={fadeUp}
                 className="card"
@@ -321,9 +308,9 @@ export default function AboutContent() {
         ref={notRef}
         style={{ background: "var(--white)", padding: "120px 32px" }}
       >
-        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
           <motion.div
-            initial="hidden"
+            initial={false}
             animate={notInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={0}
@@ -365,7 +352,7 @@ export default function AboutContent() {
               <motion.div
                 key={item.label}
                 custom={i + 1}
-                initial="hidden"
+                initial={false}
                 animate={notInView ? "visible" : "hidden"}
                 variants={fadeUp}
                 className="card"
@@ -420,9 +407,9 @@ export default function AboutContent() {
         ref={teamRef}
         style={{ background: "var(--pale-wash)", padding: "120px 32px" }}
       >
-        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
           <motion.div
-            initial="hidden"
+            initial={false}
             animate={teamInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={0}
@@ -443,12 +430,12 @@ export default function AboutContent() {
 
           {/* Founding story — approved copy (KOANO_COPY.md) */}
           <motion.div
-            initial="hidden"
+            initial={false}
             animate={teamInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={1}
             style={{
-              maxWidth: "720px",
+              maxWidth: "var(--content-prose)",
               display: "flex",
               flexDirection: "column",
               gap: "16px",
@@ -549,7 +536,7 @@ export default function AboutContent() {
           }}
         >
           <motion.div
-            initial="hidden"
+            initial={false}
             animate={ctaInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={0}

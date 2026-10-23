@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
+import { useReveal, fadeUp } from "./Reveal";
 import SectionNumber from "../ui/SectionNumber";
 import VerdictMathPanel from "../ui/VerdictMathPanel";
 import { VERDICT_COLORS } from "../ui/verdict";
@@ -44,24 +45,10 @@ const AGENTS = [
   },
 ];
 
-const EASE = [0.16, 1, 0.3, 1] as const;
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      delay: i * 0.1,
-      duration: 0.5,
-      ease: EASE,
-    },
-  }),
-};
 
 export default function AgentsSection() {
   const ref = useRef<HTMLElement>(null);
-  const isInView = useInView(ref, { once: true, amount: 0.1 });
+  const isInView = useReveal(ref, { once: true, amount: 0.1 });
 
   return (
     <section
@@ -89,10 +76,10 @@ export default function AgentsSection() {
         }}
       />
 
-      <div style={{ maxWidth: "1280px", margin: "0 auto", position: "relative" }}>
+      <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto", position: "relative" }}>
         {/* Section header */}
         <motion.div
-          initial="hidden"
+          initial={false}
           animate={isInView ? "visible" : "hidden"}
           variants={fadeUp}
           custom={0}
@@ -141,7 +128,7 @@ export default function AgentsSection() {
               <motion.div
                 key={agent.number}
                 custom={i + 1}
-                initial="hidden"
+                initial={false}
                 animate={isInView ? "visible" : "hidden"}
                 variants={fadeUp}
                 style={{
@@ -230,7 +217,7 @@ export default function AgentsSection() {
           {/* Synthesis node */}
           <motion.div
             custom={6}
-            initial="hidden"
+            initial={false}
             animate={isInView ? "visible" : "hidden"}
             variants={fadeUp}
             style={{
@@ -272,7 +259,7 @@ export default function AgentsSection() {
               renders, fed a frozen real run. Not a mock, not a demo card. */}
           <motion.div
             custom={7}
-            initial="hidden"
+            initial={false}
             animate={isInView ? "visible" : "hidden"}
             variants={fadeUp}
             style={{ display: "flex", flexDirection: "column", gap: "18px" }}

@@ -7,19 +7,10 @@
 // engine's own arrows and the sale-vs-re-registration caveat that leads by design.
 
 import React, { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
+import { useReveal, fadeUp } from "./Reveal";
 import SectionNumber from "../ui/SectionNumber";
 
-const EASE = [0.16, 1, 0.3, 1] as const;
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.08, duration: 0.5, ease: EASE },
-  }),
-};
 
 // Verbatim KOANO notification templates, filled with illustrative values.
 const EXAMPLE_ALERTS = [
@@ -41,13 +32,13 @@ const EXAMPLE_ALERTS = [
 
 export default function MonitoringSection() {
   const ref = useRef<HTMLElement>(null);
-  const isInView = useInView(ref, { once: true, amount: 0.1 });
+  const isInView = useReveal(ref, { once: true, amount: 0.1 });
 
   return (
     <section ref={ref} style={{ background: "var(--pale-wash)", padding: "120px 32px" }}>
       <div style={{ maxWidth: "900px", margin: "0 auto" }}>
         <motion.div
-          initial="hidden"
+          initial={false}
           animate={isInView ? "visible" : "hidden"}
           variants={fadeUp}
           custom={0}
@@ -74,7 +65,7 @@ export default function MonitoringSection() {
         </motion.div>
 
         <motion.div
-          initial="hidden"
+          initial={false}
           animate={isInView ? "visible" : "hidden"}
           variants={fadeUp}
           custom={1}
@@ -132,7 +123,7 @@ export default function MonitoringSection() {
         </motion.div>
 
         <motion.p
-          initial="hidden"
+          initial={false}
           animate={isInView ? "visible" : "hidden"}
           variants={fadeUp}
           custom={2}

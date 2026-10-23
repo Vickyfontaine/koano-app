@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
+import { useReveal, fadeUp } from "./Reveal";
 import SectionNumber from "@/components/ui/SectionNumber";
 import Button from "@/components/ui/Button";
 import CtaBackground from "@/components/marketing/CtaBackground";
@@ -11,20 +12,6 @@ import {
   type ProviderCatalogEntry,
 } from "../../../lib/providers/catalog";
 
-const EASE = [0.16, 1, 0.3, 1] as const;
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      delay: i * 0.08,
-      duration: 0.5,
-      ease: EASE,
-    },
-  }),
-};
 
 // Non-staling replacements for the old source counts. These describe the system,
 // so they never go out of date as the underlying list grows.
@@ -134,12 +121,12 @@ export default function DataContent() {
   const pipelineRef = useRef<HTMLElement>(null);
   const ctaRef = useRef<HTMLElement>(null);
 
-  const heroInView = useInView(heroRef, { once: true, amount: 0.15 });
-  const liveInView = useInView(liveRef, { once: true, amount: 0.05 });
-  const repInView = useInView(repRef, { once: true, amount: 0.1 });
-  const provInView = useInView(provRef, { once: true, amount: 0.1 });
-  const pipelineInView = useInView(pipelineRef, { once: true, amount: 0.1 });
-  const ctaInView = useInView(ctaRef, { once: true, amount: 0.15 });
+  const heroInView = useReveal(heroRef, { once: true, amount: 0.15 });
+  const liveInView = useReveal(liveRef, { once: true, amount: 0.05 });
+  const repInView = useReveal(repRef, { once: true, amount: 0.1 });
+  const provInView = useReveal(provRef, { once: true, amount: 0.1 });
+  const pipelineInView = useReveal(pipelineRef, { once: true, amount: 0.1 });
+  const ctaInView = useReveal(ctaRef, { once: true, amount: 0.15 });
 
   return (
     <>
@@ -155,7 +142,7 @@ export default function DataContent() {
       >
         <div style={{ maxWidth: "800px", margin: "0 auto" }}>
           <motion.div
-            initial="hidden"
+            initial={false}
             animate={heroInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={0}
@@ -164,7 +151,7 @@ export default function DataContent() {
           </motion.div>
 
           <motion.h1
-            initial="hidden"
+            initial={false}
             animate={heroInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={1}
@@ -179,7 +166,7 @@ export default function DataContent() {
           </motion.h1>
 
           <motion.p
-            initial="hidden"
+            initial={false}
             animate={heroInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={2}
@@ -198,7 +185,7 @@ export default function DataContent() {
           </motion.p>
 
           <motion.div
-            initial="hidden"
+            initial={false}
             animate={heroInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={3}
@@ -254,9 +241,9 @@ export default function DataContent() {
         ref={liveRef}
         style={{ background: "var(--pale-wash)", padding: "120px 32px" }}
       >
-        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
           <motion.div
-            initial="hidden"
+            initial={false}
             animate={liveInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={0}
@@ -302,7 +289,7 @@ export default function DataContent() {
               <motion.div
                 key={family.group}
                 custom={gi + 1}
-                initial="hidden"
+                initial={false}
                 animate={liveInView ? "visible" : "hidden"}
                 variants={fadeUp}
               >
@@ -384,9 +371,9 @@ export default function DataContent() {
         ref={repRef}
         style={{ background: "var(--white)", padding: "120px 32px" }}
       >
-        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
           <motion.div
-            initial="hidden"
+            initial={false}
             animate={repInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={0}
@@ -420,7 +407,7 @@ export default function DataContent() {
           </motion.div>
 
           <motion.div
-            initial="hidden"
+            initial={false}
             animate={repInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={1}
@@ -522,9 +509,9 @@ export default function DataContent() {
         ref={provRef}
         style={{ background: "var(--pale-wash)", padding: "120px 32px" }}
       >
-        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
           <motion.div
-            initial="hidden"
+            initial={false}
             animate={provInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={0}
@@ -568,7 +555,7 @@ export default function DataContent() {
               <motion.div
                 key={state.key}
                 custom={i + 1}
-                initial="hidden"
+                initial={false}
                 animate={provInView ? "visible" : "hidden"}
                 variants={fadeUp}
                 className="card"
@@ -609,9 +596,9 @@ export default function DataContent() {
         ref={pipelineRef}
         style={{ background: "var(--white)", padding: "120px 32px" }}
       >
-        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
           <motion.div
-            initial="hidden"
+            initial={false}
             animate={pipelineInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={0}
@@ -633,7 +620,7 @@ export default function DataContent() {
           <div
             style={{
               position: "relative",
-              maxWidth: "720px",
+              maxWidth: "var(--content-prose)",
               margin: "0 auto",
             }}
           >
@@ -660,7 +647,7 @@ export default function DataContent() {
                 <motion.div
                   key={step.number}
                   custom={i + 1}
-                  initial="hidden"
+                  initial={false}
                   animate={pipelineInView ? "visible" : "hidden"}
                   variants={fadeUp}
                   style={{
@@ -745,7 +732,7 @@ export default function DataContent() {
           }}
         >
           <motion.div
-            initial="hidden"
+            initial={false}
             animate={ctaInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={0}

@@ -32,6 +32,7 @@ interface HeroRenderProps {
 export default function HeroRender({ slot, variant = "bleed", priority = false, className = "", style }: HeroRenderProps) {
   const mobile = mobileSrc(slot);
   const img = (
+    // eslint-disable-next-line @next/next/no-img-element
     <img
       src={slot.src}
       width={slot.width}

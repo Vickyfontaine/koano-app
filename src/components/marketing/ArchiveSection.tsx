@@ -7,19 +7,10 @@
 // per-week coverage view lives in the dashboards, behind auth.
 
 import React, { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
+import { useReveal, fadeUp } from "./Reveal";
 import SectionNumber from "../ui/SectionNumber";
 
-const EASE = [0.16, 1, 0.3, 1] as const;
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.08, duration: 0.5, ease: EASE },
-  }),
-};
 
 const DATASETS = ["Permits", "Violations", "Zoning", "Ownership"];
 // Capture status per week. Honest current picture: two captures, one gap.
@@ -51,14 +42,14 @@ function Cell({ status }: { status: "captured" | "gap" | "upcoming" }) {
 
 export default function ArchiveSection() {
   const ref = useRef<HTMLElement>(null);
-  const isInView = useInView(ref, { once: true, amount: 0.15 });
+  const isInView = useReveal(ref, { once: true, amount: 0.15 });
 
   return (
     <section ref={ref} style={{ background: "var(--white)", padding: "120px 32px" }}>
       <div
         className="archive-layout"
         style={{
-          maxWidth: "1080px",
+          maxWidth: "var(--content-marketing)",
           margin: "0 auto",
           display: "grid",
           gridTemplateColumns: "1.1fr 0.9fr",
@@ -68,7 +59,7 @@ export default function ArchiveSection() {
       >
         {/* Words carry the weight */}
         <motion.div
-          initial="hidden"
+          initial={false}
           animate={isInView ? "visible" : "hidden"}
           variants={fadeUp}
           custom={0}
@@ -107,7 +98,7 @@ export default function ArchiveSection() {
 
         {/* The thin, honest coverage strip */}
         <motion.div
-          initial="hidden"
+          initial={false}
           animate={isInView ? "visible" : "hidden"}
           variants={fadeUp}
           custom={1}

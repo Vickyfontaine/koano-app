@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
+import { useReveal, fadeUp, EASE } from "./Reveal";
 import SectionNumber from "../ui/SectionNumber";
 
 // Ordered by KOANO's positioning priority (CLAUDE.md Section 01):
@@ -33,24 +34,10 @@ const CLUSTERS = [
   },
 ];
 
-const EASE = [0.16, 1, 0.3, 1] as const;
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      delay: i * 0.08,
-      duration: 0.5,
-      ease: EASE,
-    },
-  }),
-};
 
 export default function ClustersSection() {
   const ref = useRef<HTMLElement>(null);
-  const isInView = useInView(ref, { once: true, amount: 0.15 });
+  const isInView = useReveal(ref, { once: true, amount: 0.15 });
 
   return (
     <section
@@ -61,10 +48,10 @@ export default function ClustersSection() {
         padding: "120px 32px",
       }}
     >
-      <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
+      <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
         {/* Section header */}
         <motion.div
-          initial="hidden"
+          initial={false}
           animate={isInView ? "visible" : "hidden"}
           variants={fadeUp}
           custom={0}
@@ -98,7 +85,7 @@ export default function ClustersSection() {
               href={cluster.href}
               id={`cluster-card-${i + 1}`}
               custom={i + 1}
-              initial="hidden"
+              initial={false}
               animate={isInView ? "visible" : "hidden"}
               variants={fadeUp}
               whileHover={{ y: -3, transition: { duration: 0.26, ease: EASE } }}

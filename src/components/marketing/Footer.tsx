@@ -12,7 +12,7 @@ const COLUMN_1 = [
 // professional and institutional first, homeowners last.
 const COLUMN_2 = [
   { label: "For developers", href: "/for/developers" },
-  { label: "For agents", href: "/for/agents" },
+  { label: "For professionals", href: "/for/agents" },
   { label: "For institutions", href: "/for/institutions" },
   { label: "For communities", href: "/for/community" },
 ];
@@ -29,7 +29,7 @@ export default function Footer() {
       <div
         className="mx-auto flex flex-col md:flex-row items-start justify-between"
         style={{
-          maxWidth: "1280px",
+          maxWidth: "var(--content-marketing)",
           padding: "48px 32px",
           gap: "48px",
         }}
@@ -40,6 +40,9 @@ export default function Footer() {
             href="/"
             id="footer-logo"
             style={{
+              display: "inline-flex",
+              alignItems: "center",
+              minHeight: "44px",
               fontWeight: 500,
               fontSize: "15px",
               color: "var(--near-black)",
@@ -61,23 +64,26 @@ export default function Footer() {
         </div>
 
         {/* Right — link columns */}
-        <div className="flex" style={{ gap: "80px" }}>
+        <div className="flex flex-wrap" style={{ gap: "16px 64px" }}>
           {/* Column 1 */}
-          <div className="flex flex-col" style={{ gap: "14px" }}>
+          <div className="flex flex-col" style={{ gap: "0" }}>
             {COLUMN_1.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
                 id={`footer-link-${link.href.replace(/\//g, "-").slice(1)}`}
                 style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  minHeight: "44px",
                   fontSize: "14px",
                   color: "var(--ink-muted)",
                   textDecoration: "none",
                   fontWeight: 400,
-                  transition: "color 0.2s ease",
+                  transition: "color var(--dur-2) var(--ease-out)",
                 }}
                 onMouseEnter={(e) =>
-                  (e.currentTarget.style.color = "var(--brand-blue)")
+                  (e.currentTarget.style.color = "var(--ink-primary)")
                 }
                 onMouseLeave={(e) =>
                   (e.currentTarget.style.color = "var(--ink-muted)")
@@ -89,21 +95,24 @@ export default function Footer() {
           </div>
 
           {/* Column 2 */}
-          <div className="flex flex-col" style={{ gap: "14px" }}>
+          <div className="flex flex-col" style={{ gap: "0" }}>
             {COLUMN_2.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
                 id={`footer-link-${link.href.replace(/\//g, "-").slice(1)}`}
                 style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  minHeight: "44px",
                   fontSize: "14px",
                   color: "var(--ink-muted)",
                   textDecoration: "none",
                   fontWeight: 400,
-                  transition: "color 0.2s ease",
+                  transition: "color var(--dur-2) var(--ease-out)",
                 }}
                 onMouseEnter={(e) =>
-                  (e.currentTarget.style.color = "var(--brand-blue)")
+                  (e.currentTarget.style.color = "var(--ink-primary)")
                 }
                 onMouseLeave={(e) =>
                   (e.currentTarget.style.color = "var(--ink-muted)")

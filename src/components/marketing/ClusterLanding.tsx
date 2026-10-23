@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
+import { useReveal, fadeUp } from "./Reveal";
 import SectionNumber from "@/components/ui/SectionNumber";
 import Button from "@/components/ui/Button";
 import {
@@ -14,20 +15,6 @@ import CtaBackground from "@/components/marketing/CtaBackground";
 import HeroRender from "@/components/marketing/HeroRender";
 import { RENDERS, type RenderName } from "@/components/marketing/renders";
 
-const EASE = [0.16, 1, 0.3, 1] as const;
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      delay: i * 0.08,
-      duration: 0.5,
-      ease: EASE,
-    },
-  }),
-};
 
 interface Feature {
   title: string;
@@ -75,9 +62,9 @@ export default function ClusterLanding({
   const heroRef = useRef<HTMLElement>(null);
   const featuresRef = useRef<HTMLElement>(null);
   const pricingRef = useRef<HTMLElement>(null);
-  const heroInView = useInView(heroRef, { once: true, amount: 0.15 });
-  const featuresInView = useInView(featuresRef, { once: true, amount: 0.1 });
-  const pricingInView = useInView(pricingRef, { once: true, amount: 0.15 });
+  const heroInView = useReveal(heroRef, { once: true, amount: 0.15 });
+  const featuresInView = useReveal(featuresRef, { once: true, amount: 0.1 });
+  const pricingInView = useReveal(pricingRef, { once: true, amount: 0.15 });
 
   return (
     <>
@@ -120,7 +107,7 @@ export default function ClusterLanding({
           }}
         >
           <motion.div
-            initial="hidden"
+            initial={false}
             animate={heroInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={0}
@@ -130,7 +117,7 @@ export default function ClusterLanding({
 
           {/* Headline + subhead — approved copy (KOANO_COPY.md) */}
           <motion.h1
-            initial="hidden"
+            initial={false}
             animate={heroInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={1}
@@ -147,7 +134,7 @@ export default function ClusterLanding({
             {headline}
           </motion.h1>
           <motion.p
-            initial="hidden"
+            initial={false}
             animate={heroInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={2}
@@ -165,7 +152,7 @@ export default function ClusterLanding({
 
           {stanceLine && (
             <motion.p
-              initial="hidden"
+              initial={false}
               animate={heroInView ? "visible" : "hidden"}
               variants={fadeUp}
               custom={2}
@@ -185,7 +172,7 @@ export default function ClusterLanding({
 
           {/* Approved tagline from Section 10 */}
           <motion.p
-            initial="hidden"
+            initial={false}
             animate={heroInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={2}
@@ -203,7 +190,7 @@ export default function ClusterLanding({
 
           {/* Users label */}
           <motion.p
-            initial="hidden"
+            initial={false}
             animate={heroInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={3}
@@ -222,7 +209,7 @@ export default function ClusterLanding({
 
           {/* CTAs */}
           <motion.div
-            initial="hidden"
+            initial={false}
             animate={heroInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={4}
@@ -247,9 +234,9 @@ export default function ClusterLanding({
           padding: "120px 32px",
         }}
       >
-        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
           <motion.div
-            initial="hidden"
+            initial={false}
             animate={featuresInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={0}
@@ -281,7 +268,7 @@ export default function ClusterLanding({
               <motion.div
                 key={feature.title}
                 custom={i + 1}
-                initial="hidden"
+                initial={false}
                 animate={featuresInView ? "visible" : "hidden"}
                 variants={fadeUp}
                 className="card"
@@ -323,7 +310,7 @@ export default function ClusterLanding({
             padding: "120px 32px",
           }}
         >
-          <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
+          <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
             <div style={{ marginBottom: "64px" }}>
               <SectionNumber number="02" label={secondaryFeatures.title} />
               <h2
@@ -406,7 +393,7 @@ export default function ClusterLanding({
           }}
         >
           <motion.div
-            initial="hidden"
+            initial={false}
             animate={pricingInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={0}

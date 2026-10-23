@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
+import { useReveal, fadeUp } from "./Reveal";
 import SectionNumber from "@/components/ui/SectionNumber";
 import Button from "@/components/ui/Button";
 import {
@@ -20,20 +21,6 @@ import {
   EXAMPLE_VERDICT_LABEL_SHORT,
 } from "@/components/marketing/exampleVerdict";
 
-const EASE = [0.16, 1, 0.3, 1] as const;
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      delay: i * 0.08,
-      duration: 0.5,
-      ease: EASE,
-    },
-  }),
-};
 
 const AGENTS_DETAIL = [
   {
@@ -128,12 +115,12 @@ export default function IntelligenceContent() {
   const verdictRef = useRef<HTMLElement>(null);
   const ctaRef = useRef<HTMLElement>(null);
 
-  const heroInView = useInView(heroRef, { once: true, amount: 0.15 });
-  const architectureInView = useInView(architectureRef, { once: true, amount: 0.1 });
-  const agentsInView = useInView(agentsRef, { once: true, amount: 0.05 });
-  const synthesisInView = useInView(synthesisRef, { once: true, amount: 0.1 });
-  const verdictInView = useInView(verdictRef, { once: true, amount: 0.15 });
-  const ctaInView = useInView(ctaRef, { once: true, amount: 0.15 });
+  const heroInView = useReveal(heroRef, { once: true, amount: 0.15 });
+  const architectureInView = useReveal(architectureRef, { once: true, amount: 0.1 });
+  const agentsInView = useReveal(agentsRef, { once: true, amount: 0.05 });
+  const synthesisInView = useReveal(synthesisRef, { once: true, amount: 0.1 });
+  const verdictInView = useReveal(verdictRef, { once: true, amount: 0.15 });
+  const ctaInView = useReveal(ctaRef, { once: true, amount: 0.15 });
 
   return (
     <>
@@ -180,7 +167,7 @@ export default function IntelligenceContent() {
         >
           <div style={{ maxWidth: HERO_CONTAINER_MAX, width: "100%" }}>
           <motion.div
-            initial="hidden"
+            initial={false}
             animate={heroInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={0}
@@ -190,7 +177,7 @@ export default function IntelligenceContent() {
 
           {/* Headline + body — approved copy (KOANO_COPY.md) */}
           <motion.h1
-            initial="hidden"
+            initial={false}
             animate={heroInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={1}
@@ -208,7 +195,7 @@ export default function IntelligenceContent() {
           </motion.h1>
 
           <motion.div
-            initial="hidden"
+            initial={false}
             animate={heroInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={2}
@@ -230,9 +217,8 @@ export default function IntelligenceContent() {
       <section style={{ background: "var(--white)", padding: "120px 32px" }}>
         <div style={{ maxWidth: "1000px", margin: "0 auto", textAlign: "center" }}>
           <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
+            initial={false}
+            animate="visible"
             variants={fadeUp}
             custom={0}
             style={{ marginBottom: "40px" }}
@@ -256,9 +242,8 @@ export default function IntelligenceContent() {
 
           {/* Demo video slot — 16:9. */}
           <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.15 }}
+            initial={false}
+            animate="visible"
             variants={fadeUp}
             custom={1}
             style={{
@@ -287,9 +272,9 @@ export default function IntelligenceContent() {
         ref={architectureRef}
         style={{ background: "var(--pale-wash)", padding: "120px 32px" }}
       >
-        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
           <motion.div
-            initial="hidden"
+            initial={false}
             animate={architectureInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={0}
@@ -319,11 +304,11 @@ export default function IntelligenceContent() {
 
           {/* Russian doll nested visual */}
           <motion.div
-            initial="hidden"
+            initial={false}
             animate={architectureInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={1}
-            style={{ maxWidth: "720px", margin: "0 auto" }}
+            style={{ maxWidth: "var(--content-prose)", margin: "0 auto" }}
           >
             {/* Layer 1 — outer */}
             <div
@@ -478,13 +463,13 @@ export default function IntelligenceContent() {
 
         <div
           style={{
-            maxWidth: "1280px",
+            maxWidth: "var(--content-marketing)",
             margin: "0 auto",
             position: "relative",
           }}
         >
           <motion.div
-            initial="hidden"
+            initial={false}
             animate={agentsInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={0}
@@ -513,7 +498,7 @@ export default function IntelligenceContent() {
               <motion.div
                 key={agent.number}
                 custom={i + 1}
-                initial="hidden"
+                initial={false}
                 animate={agentsInView ? "visible" : "hidden"}
                 variants={fadeUp}
                 className="card"
@@ -619,9 +604,9 @@ export default function IntelligenceContent() {
         ref={synthesisRef}
         style={{ background: "var(--pale-wash)", padding: "120px 32px" }}
       >
-        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
           <motion.div
-            initial="hidden"
+            initial={false}
             animate={synthesisInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={0}
@@ -665,7 +650,7 @@ export default function IntelligenceContent() {
               <motion.div
                 key={item.title}
                 custom={i + 1}
-                initial="hidden"
+                initial={false}
                 animate={synthesisInView ? "visible" : "hidden"}
                 variants={fadeUp}
                 className="card"
@@ -711,7 +696,7 @@ export default function IntelligenceContent() {
       >
         <div style={{ maxWidth: "960px", margin: "0 auto" }}>
           <motion.div
-            initial="hidden"
+            initial={false}
             animate={verdictInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={0}
@@ -739,7 +724,7 @@ export default function IntelligenceContent() {
           </motion.div>
 
           <motion.div
-            initial="hidden"
+            initial={false}
             animate={verdictInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={1}
@@ -900,7 +885,7 @@ export default function IntelligenceContent() {
           }}
         >
           <motion.div
-            initial="hidden"
+            initial={false}
             animate={ctaInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={0}

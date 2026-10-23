@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
+import { useReveal, fadeUp, EASE } from "./Reveal";
 import SectionNumber from "@/components/ui/SectionNumber";
 import Button from "@/components/ui/Button";
 import {
@@ -14,20 +15,6 @@ import CtaBackground from "@/components/marketing/CtaBackground";
 import HeroRender from "@/components/marketing/HeroRender";
 import { RENDERS } from "@/components/marketing/renders";
 
-const EASE = [0.16, 1, 0.3, 1] as const;
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      delay: i * 0.08,
-      duration: 0.5,
-      ease: EASE,
-    },
-  }),
-};
 
 // Ordered C1–C4 by KOANO's positioning priority (developers, professionals,
 // institutions, communities), matching the nav and homepage cluster order.
@@ -116,10 +103,10 @@ export default function PricingContent() {
   const faqRef = useRef<HTMLElement>(null);
   const ctaRef = useRef<HTMLElement>(null);
 
-  const heroInView = useInView(heroRef, { once: true, amount: 0.15 });
-  const tiersInView = useInView(tiersRef, { once: true, amount: 0.05 });
-  const faqInView = useInView(faqRef, { once: true, amount: 0.1 });
-  const ctaInView = useInView(ctaRef, { once: true, amount: 0.15 });
+  const heroInView = useReveal(heroRef, { once: true, amount: 0.15 });
+  const tiersInView = useReveal(tiersRef, { once: true, amount: 0.05 });
+  const faqInView = useReveal(faqRef, { once: true, amount: 0.1 });
+  const ctaInView = useReveal(ctaRef, { once: true, amount: 0.15 });
 
   return (
     <>
@@ -160,7 +147,7 @@ export default function PricingContent() {
         >
           <div style={{ maxWidth: HERO_CONTAINER_MAX, width: "100%" }}>
           <motion.div
-            initial="hidden"
+            initial={false}
             animate={heroInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={0}
@@ -170,7 +157,7 @@ export default function PricingContent() {
 
           {/* Headline + framing — approved copy (KOANO_COPY.md) */}
           <motion.h1
-            initial="hidden"
+            initial={false}
             animate={heroInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={1}
@@ -187,7 +174,7 @@ export default function PricingContent() {
             Start free. Upgrade when you hit the limit.
           </motion.h1>
           <motion.p
-            initial="hidden"
+            initial={false}
             animate={heroInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={1.5}
@@ -204,7 +191,7 @@ export default function PricingContent() {
             actually requires.
           </motion.p>
           <motion.p
-            initial="hidden"
+            initial={false}
             animate={heroInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={2}
@@ -222,7 +209,7 @@ export default function PricingContent() {
           </motion.p>
 
           <motion.p
-            initial="hidden"
+            initial={false}
             animate={heroInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={2}
@@ -245,7 +232,7 @@ export default function PricingContent() {
         ref={tiersRef}
         style={{ background: "var(--pale-wash)", padding: "80px 32px 120px" }}
       >
-        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
           <div
             className="pricing-grid"
             style={{
@@ -259,7 +246,7 @@ export default function PricingContent() {
               <motion.div
                 key={tier.cluster}
                 custom={i}
-                initial="hidden"
+                initial={false}
                 animate={tiersInView ? "visible" : "hidden"}
                 variants={fadeUp}
                 whileHover={{ y: -3, transition: { duration: 0.26, ease: EASE } }}
@@ -432,7 +419,7 @@ export default function PricingContent() {
       >
         <div style={{ maxWidth: "800px", margin: "0 auto" }}>
           <motion.div
-            initial="hidden"
+            initial={false}
             animate={faqInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={0}
@@ -452,7 +439,7 @@ export default function PricingContent() {
           </motion.div>
 
           <motion.div
-            initial="hidden"
+            initial={false}
             animate={faqInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={1}
@@ -551,7 +538,7 @@ export default function PricingContent() {
           }}
         >
           <motion.div
-            initial="hidden"
+            initial={false}
             animate={ctaInView ? "visible" : "hidden"}
             variants={fadeUp}
             custom={0}

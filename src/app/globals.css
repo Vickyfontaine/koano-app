@@ -12,6 +12,9 @@
   --nav-h: 64px;
   /* Content width shared by every dashboard lens (UI sprint, A5). */
   --content-max: 1200px;
+  /* Marketing site (WS2): one section width, one prose width. */
+  --content-marketing: 1200px;
+  --content-prose: 720px;
 
   /* Backgrounds */
   --white: #FFFFFF;
@@ -736,7 +739,10 @@ body {
   .divbar-neutral-note {
     left: 0 !important;
   }
-  .divbar-node {
+  /* The note sits at the left edge on phones, so the zero line would cut
+     through it: the neutral rows drop the line and the node. */
+  .divbar-node,
+  .divbar-zero-neutral {
     display: none !important;
   }
 

@@ -1,29 +1,16 @@
 "use client";
 
 import React, { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
+import { useReveal, fadeUp } from "./Reveal";
 import SectionNumber from "../ui/SectionNumber";
 import Button from "../ui/Button";
 import CtaBackground from "./CtaBackground";
 
-const EASE = [0.16, 1, 0.3, 1] as const;
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      delay: i * 0.08,
-      duration: 0.5,
-      ease: EASE,
-    },
-  }),
-};
 
 export default function EarlyAccessSection() {
   const ref = useRef<HTMLElement>(null);
-  const isInView = useInView(ref, { once: true, amount: 0.15 });
+  const isInView = useReveal(ref, { once: true, amount: 0.15 });
 
   return (
     <section
@@ -48,7 +35,7 @@ export default function EarlyAccessSection() {
       >
         {/* Section number */}
         <motion.div
-          initial="hidden"
+          initial={false}
           animate={isInView ? "visible" : "hidden"}
           variants={fadeUp}
           custom={0}
@@ -58,7 +45,7 @@ export default function EarlyAccessSection() {
 
         {/* Headline + subhead — approved copy (KOANO_COPY.md) */}
         <motion.h2
-          initial="hidden"
+          initial={false}
           animate={isInView ? "visible" : "hidden"}
           variants={fadeUp}
           custom={1}
@@ -73,7 +60,7 @@ export default function EarlyAccessSection() {
         </motion.h2>
 
         <motion.p
-          initial="hidden"
+          initial={false}
           animate={isInView ? "visible" : "hidden"}
           variants={fadeUp}
           custom={2}
@@ -91,7 +78,7 @@ export default function EarlyAccessSection() {
 
         {/* Self-serve signup CTA (replaced the retired waitlist email form) */}
         <motion.div
-          initial="hidden"
+          initial={false}
           animate={isInView ? "visible" : "hidden"}
           variants={fadeUp}
           custom={3}

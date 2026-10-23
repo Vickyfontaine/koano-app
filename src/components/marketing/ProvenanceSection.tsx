@@ -1,25 +1,16 @@
 "use client";
 
 import React, { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
+import { useReveal, fadeUp } from "./Reveal";
 import SectionNumber from "../ui/SectionNumber";
 import ProvenanceLedger from "../ui/ProvenanceLedger";
 import { EXAMPLE_LEDGER, EXAMPLE_VERDICT_ADDRESS, EXAMPLE_VERDICT_LABEL } from "./exampleVerdict";
 
-const EASE = [0.16, 1, 0.3, 1] as const;
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.08, duration: 0.5, ease: EASE },
-  }),
-};
 
 export default function ProvenanceSection() {
   const ref = useRef<HTMLElement>(null);
-  const isInView = useInView(ref, { once: true, amount: 0.1 });
+  const isInView = useReveal(ref, { once: true, amount: 0.1 });
 
   return (
     <section
@@ -28,7 +19,7 @@ export default function ProvenanceSection() {
     >
       <div style={{ maxWidth: "900px", margin: "0 auto" }}>
         <motion.div
-          initial="hidden"
+          initial={false}
           animate={isInView ? "visible" : "hidden"}
           variants={fadeUp}
           custom={0}
@@ -67,7 +58,7 @@ export default function ProvenanceSection() {
         </motion.div>
 
         <motion.div
-          initial="hidden"
+          initial={false}
           animate={isInView ? "visible" : "hidden"}
           variants={fadeUp}
           custom={1}
@@ -82,7 +73,7 @@ export default function ProvenanceSection() {
         </motion.div>
 
         <motion.p
-          initial="hidden"
+          initial={false}
           animate={isInView ? "visible" : "hidden"}
           variants={fadeUp}
           custom={2}

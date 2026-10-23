@@ -112,6 +112,7 @@ export default function DivergingBar({
               {/* Zero baseline — full opacity for neutral rows (it's the whole point) */}
               <div
                 aria-hidden="true"
+                className={d.neutral ? "divbar-zero divbar-zero-neutral" : "divbar-zero"}
                 style={{
                   position: "absolute",
                   top: "-3px",
