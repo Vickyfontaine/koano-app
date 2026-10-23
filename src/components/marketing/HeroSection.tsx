@@ -1,26 +1,11 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
 import Button from "../ui/Button";
 import HeroDashboard from "./HeroDashboard";
+import HeroAddressBox from "./HeroAddressBox";
 import HeroRender from "./HeroRender";
 import { RENDERS } from "./renders";
-
-const EASE = [0.16, 1, 0.3, 1] as const;
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      delay: 0.3 + i * 0.08,
-      duration: 0.5,
-      ease: EASE,
-    },
-  }),
-};
 
 const STATS = [
   { value: "Every figure", label: "Data-Sourced" },
@@ -35,8 +20,9 @@ export default function HeroSection() {
       style={{
         position: "relative",
         width: "100%",
-        height: "100vh",
-        minHeight: "700px",
+        // Fills the viewport and GROWS with its content (the address box can
+        // open a result card), so the copy never slides under the nav.
+        minHeight: "max(700px, 100vh)",
         overflow: "hidden",
         // Sky colour sampled from the hero image, so the area above the
         // contained (uncropped) image blends into its sky seamlessly.
@@ -65,10 +51,10 @@ export default function HeroSection() {
         style={{
           position: "relative",
           zIndex: 1,
-          maxWidth: "1280px",
+          maxWidth: "var(--content-marketing)",
           margin: "0 auto",
-          padding: "0 32px",
-          height: "100%",
+          padding: "calc(var(--nav-h) + 32px) 32px 56px",
+          minHeight: "max(700px, 100vh)",
           display: "flex",
           alignItems: "center",
         }}
@@ -86,12 +72,10 @@ export default function HeroSection() {
           {/* Left — copy */}
           <div>
             {/* Eyebrow tag */}
-            <motion.span
-              custom={0}
-              initial="hidden"
-              animate="visible"
-              variants={fadeUp}
+            <span
+              className="hero-enter"
               style={{
+                animationDelay: "0.30s",
                 display: "block",
                 fontFamily: "var(--font-mono)",
                 fontSize: "11px",
@@ -103,15 +87,13 @@ export default function HeroSection() {
               }}
             >
               Real estate reasoning engine
-            </motion.span>
+            </span>
 
             {/* Headline */}
-            <motion.h1
-              custom={1}
-              initial="hidden"
-              animate="visible"
-              variants={fadeUp}
+            <h1
+              className="hero-enter"
               style={{
+                animationDelay: "0.38s",
                 fontSize: "clamp(34px, 3.8vw, 58px)",
                 fontWeight: 700,
                 letterSpacing: "-0.02em",
@@ -124,38 +106,37 @@ export default function HeroSection() {
               SMART DATA.
               <br />
               SMARTER REAL ESTATE DECISIONS.
-            </motion.h1>
+            </h1>
 
             {/* Subhead */}
-            <motion.p
-              custom={2}
-              initial="hidden"
-              animate="visible"
-              variants={fadeUp}
+            <p
+              className="hero-enter"
               style={{
+                animationDelay: "0.46s",
                 fontSize: "18px",
                 fontWeight: 500,
                 lineHeight: 1.6,
                 color: "#FFFFFF",
                 maxWidth: "520px",
                 marginTop: "24px",
-                marginBottom: "36px",
+                marginBottom: "28px",
               }}
             >
               KOANO deploys five specialist agents that read every public record
               touching a property, scattered across federal, state and city
               agencies. Each weighs its own evidence, and the verdict they
               produce shows its arithmetic figure by figure.
-            </motion.p>
+            </p>
+
+            {/* Address box: resolve a lot against the public record, no account needed */}
+            <div className="hero-enter" style={{ animationDelay: "0.54s" }}>
+              <HeroAddressBox />
+            </div>
 
             {/* CTA row */}
-            <motion.div
-              custom={3}
-              initial="hidden"
-              animate="visible"
-              variants={fadeUp}
-              className="flex flex-wrap items-center"
-              style={{ gap: "16px", marginBottom: "40px" }}
+            <div
+              className="hero-enter flex flex-wrap items-center"
+              style={{ animationDelay: "0.62s", gap: "16px", marginBottom: "32px" }}
             >
               <Button variant="primary" href="/signup" id="hero-cta-primary">
                 Sign up
@@ -163,16 +144,12 @@ export default function HeroSection() {
               <Button variant="ghost-light" href="/intelligence" id="hero-cta-secondary">
                 See how it works
               </Button>
-            </motion.div>
+            </div>
 
             {/* Stats row */}
-            <motion.div
-              custom={4}
-              initial="hidden"
-              animate="visible"
-              variants={fadeUp}
-              className="hero-stats flex flex-wrap items-center"
-              style={{ gap: "0" }}
+            <div
+              className="hero-enter hero-stats flex flex-wrap items-center"
+              style={{ animationDelay: "0.70s", gap: "0" }}
             >
               {STATS.map((stat, i) => (
                 <React.Fragment key={stat.label}>
@@ -206,24 +183,33 @@ export default function HeroSection() {
                   </span>
                 </React.Fragment>
               ))}
-            </motion.div>
+            </div>
           </div>
 
           {/* Right — animated dashboard demonstrating a real KOANO run */}
-          <motion.div
-            className="hero-dashboard-col"
-            custom={2}
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
-            style={{ display: "flex", justifyContent: "flex-end" }}
+          <div
+            className="hero-enter hero-dashboard-col"
+            style={{ animationDelay: "0.46s", display: "flex", justifyContent: "flex-end" }}
           >
             <HeroDashboard />
-          </motion.div>
+          </div>
         </div>
       </div>
 
       <style jsx>{`
+        .hero-enter {
+          animation: hero-enter 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        @keyframes hero-enter {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
         .hero-scrim {
           position: absolute;
           inset: 0;

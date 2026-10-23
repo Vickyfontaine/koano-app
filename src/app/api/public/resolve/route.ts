@@ -69,5 +69,7 @@ export async function POST(req: Request) {
       candidates: r.candidates.slice(0, 4).map((c) => ({ id: c.id, label: c.label, borough: c.borough, zip: c.zip })),
     });
   }
-  return NextResponse.json({ status: 'none', error: r.error });
+  // The geocoder's reason is logged server-side; the visitor gets a plain next step.
+  console.info('[public/resolve] no match:', r.error);
+  return NextResponse.json({ status: 'none', error: 'No lot matched that address. Try adding the borough or ZIP.' });
 }
