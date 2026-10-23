@@ -87,16 +87,15 @@ export default function Cluster1Dashboard() {
   const resolving = resolver.state.phase === "resolving";
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "24px", maxWidth: "980px" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
       <div id="c1-property">
-        <span className="section-number">{c.number}</span>
         <h1
           style={{
             fontSize: "32px",
             fontWeight: 700,
             letterSpacing: "-0.02em",
             color: "var(--ink-primary)",
-            margin: "12px 0 8px",
+            margin: "0 0 8px",
           }}
         >
           {c.label}
@@ -230,7 +229,6 @@ export default function Cluster1Dashboard() {
               from the analyzed address on live NYC public data. */}
           <div id="c1-documents" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
             <div>
-              <span className="section-number">{c.number}.D</span>
               <h2
                 style={{
                   fontSize: "22px",

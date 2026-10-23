@@ -1,0 +1,330 @@
+/* App shell (UI sprint WS3). One grid, three navigation forms by width:
+   the full sidebar at 1280 and up, a 64px icon rail from 768 to 1279, a top
+   bar plus bottom tab bar below 768. One content width (--content-max). */
+
+.koano-shell {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  grid-template-rows: var(--nav-h) minmax(0, 1fr);
+  min-height: 100vh;
+  background: var(--white);
+}
+.shell-topbar {
+  grid-column: 1 / -1;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  height: var(--nav-h);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 0 var(--space-5);
+  background: var(--white);
+  border-bottom: 1px solid var(--border-light);
+}
+.shell-topbar-logo {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  text-decoration: none;
+  border-radius: var(--radius-chip);
+}
+.shell-topbar-logo img {
+  height: 40px;
+  width: auto;
+  display: block;
+}
+.shell-topbar-search {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+}
+.shell-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-left: auto;
+}
+.shell-plan-tag {
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  background: var(--pale-wash);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: 6px 10px;
+  white-space: nowrap;
+}
+.shell-lens-btn {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--white);
+  color: var(--ink-primary);
+  font: inherit;
+  font-size: var(--text-body);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* Sidebar / rail ------------------------------------------------------- */
+.shell-side {
+  grid-row: 2;
+  position: sticky;
+  top: var(--nav-h);
+  height: calc(100vh - var(--nav-h));
+  overflow-y: auto;
+  background: var(--pale-wash);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4) var(--space-3);
+  gap: var(--space-2);
+}
+.shell-side-heading {
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  padding: var(--space-2) var(--space-3) var(--space-1);
+}
+.shell-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 40px;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-chip);
+  background: transparent;
+  color: var(--ink-muted);
+  font: inherit;
+  font-size: var(--text-body);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out);
+}
+.shell-item:hover {
+  color: var(--ink-primary);
+  background: rgba(255, 255, 255, 0.6);
+}
+.shell-item[aria-current="true"],
+.shell-item[aria-current="page"] {
+  color: var(--ink-primary);
+  background: var(--white);
+  font-weight: 500;
+  box-shadow: var(--shadow-flat);
+}
+.shell-item svg {
+  flex: none;
+  color: var(--ink-muted);
+}
+.shell-item[aria-current="true"] svg,
+.shell-item[aria-current="page"] svg {
+  color: var(--deep-navy);
+}
+.shell-item-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.shell-item-note {
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  letter-spacing: 0.06em;
+  color: var(--ink-muted);
+}
+.shell-side-sections .shell-item {
+  min-height: 36px;
+  font-size: var(--text-body);
+}
+.shell-side-spacer {
+  flex: 1 1 auto;
+}
+.shell-side-divider {
+  height: 1px;
+  background: var(--border);
+  margin: var(--space-2) var(--space-3);
+}
+
+/* Main --------------------------------------------------------------- */
+.shell-main {
+  grid-row: 2;
+  min-width: 0;
+  padding: var(--space-6) var(--space-6) var(--space-8);
+}
+.shell-content {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* Bottom tabs (phones) ------------------------------------------------ */
+.shell-tabs {
+  display: none;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  background: var(--white);
+  border-top: 1px solid var(--border);
+  padding: 6px var(--space-2) calc(6px + env(safe-area-inset-bottom, 0px));
+}
+.shell-tab {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 48px;
+  border: 0;
+  border-radius: var(--radius-chip);
+  background: transparent;
+  color: var(--ink-muted);
+  font: inherit;
+  font-size: var(--text-micro);
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+.shell-tab[aria-current="true"] {
+  color: var(--deep-navy);
+}
+.shell-tab svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* Sheets (phone lens picker, watchlist) ------------------------------- */
+.shell-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(13, 43, 62, 0.4);
+}
+.shell-sheet {
+  position: fixed;
+  z-index: 41;
+  background: var(--white);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  overflow-y: auto;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 86vh;
+  border-radius: var(--radius-deep) var(--radius-deep) 0 0;
+  box-shadow: var(--shadow-hover);
+  padding-bottom: calc(var(--space-5) + env(safe-area-inset-bottom, 0px));
+}
+.shell-sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.shell-sheet-title {
+  font-size: var(--text-h3);
+  font-weight: 500;
+  color: var(--ink-primary);
+  margin: 0;
+}
+.shell-sheet-close {
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--white);
+  color: var(--ink-primary);
+  cursor: pointer;
+}
+@media (min-width: 768px) {
+  .shell-sheet {
+    left: auto;
+    top: var(--nav-h);
+    bottom: auto;
+    right: var(--space-5);
+    width: 420px;
+    max-height: calc(100vh - var(--nav-h) - var(--space-5));
+    border-radius: var(--radius-card);
+    margin-top: var(--space-2);
+  }
+}
+
+/* Responsive ----------------------------------------------------------- */
+@media (max-width: 1279px) {
+  .koano-shell {
+    grid-template-columns: 64px minmax(0, 1fr);
+  }
+  .shell-side {
+    padding: var(--space-3) var(--space-2);
+    align-items: center;
+  }
+  .shell-side-heading,
+  .shell-item-label,
+  .shell-item-note,
+  .shell-side-sections {
+    display: none;
+  }
+  .shell-item {
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+    padding: 0;
+    justify-content: center;
+  }
+  .shell-side-divider {
+    width: 32px;
+    margin: var(--space-2) 0;
+  }
+  .shell-main {
+    padding: var(--space-5) var(--space-5) var(--space-8);
+  }
+}
+@media (max-width: 767px) {
+  .koano-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .shell-side {
+    display: none;
+  }
+  .shell-topbar {
+    padding: 0 var(--space-4);
+    gap: var(--space-3);
+  }
+  .shell-topbar-search {
+    display: none;
+  }
+  .shell-lens-btn {
+    display: inline-flex;
+  }
+  .shell-plan-tag {
+    display: none;
+  }
+  .shell-main {
+    padding: var(--space-4) var(--space-4) calc(var(--space-8) + 64px);
+  }
+  .shell-tabs {
+    display: flex;
+  }
+}

@@ -87,19 +87,18 @@ export default function Cluster5Dashboard() {
   const { status, result } = stream;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "24px", maxWidth: "1160px" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
       {/* Hero: geographic portfolio risk map. (The neural "System view" was
           removed — decoration, not a decision surface.) */}
       <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
         <div>
-          <span className="section-number">{c.number}</span>
           <h1
             style={{
               fontSize: "32px",
               fontWeight: 700,
               letterSpacing: "-0.02em",
               color: "var(--ink-primary)",
-              margin: "12px 0 8px",
+              margin: "0 0 8px",
             }}
           >
             {c.label}
@@ -183,7 +182,6 @@ export default function Cluster5Dashboard() {
           matching the Cluster 1 grouped pattern. */}
       <div id="c5-documents" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
         <div>
-          <span className="section-number">{c.number}.D</span>
           <h2
             style={{
               fontSize: "22px",

@@ -21,7 +21,6 @@ export default function ClusterPlaceholderView({
   return (
     <div style={{ maxWidth: "860px", display: "flex", flexDirection: "column", gap: "24px" }}>
       <div>
-        <span className="section-number">{c.number}</span>
         <h1
           style={{
             fontSize: "32px",

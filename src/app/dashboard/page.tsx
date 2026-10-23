@@ -23,13 +23,15 @@ export default async function DashboardPage({
   if (!userId) redirect("/login");
 
   let cluster: unknown = null;
+  let plan: string | null = null;
   try {
     const { data } = await supabaseAdmin()
       .from("profiles")
-      .select("cluster")
+      .select("cluster, plan")
       .eq("clerk_user_id", userId)
       .maybeSingle();
     cluster = data?.cluster ?? null;
+    plan = typeof data?.plan === "string" ? data.plan : null;
   } catch {
     cluster = null;
   }
@@ -37,6 +39,6 @@ export default async function DashboardPage({
   if (!isClusterId(cluster)) redirect("/onboarding");
 
   return (
-    <DashboardShell initialCluster={cluster} justUpgraded={searchParams.upgraded === "1"} />
+    <DashboardShell initialCluster={cluster} plan={plan} justUpgraded={searchParams.upgraded === "1"} />
   );
 }

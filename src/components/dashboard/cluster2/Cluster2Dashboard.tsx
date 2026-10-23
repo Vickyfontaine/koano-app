@@ -101,16 +101,15 @@ export default function Cluster2Dashboard() {
   const resolving = resolver.state.phase === "resolving";
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "24px", maxWidth: "1080px" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
       <div>
-        <span className="section-number">{c.number}</span>
         <h1
           style={{
             fontSize: "32px",
             fontWeight: 700,
             letterSpacing: "-0.02em",
             color: "var(--ink-primary)",
-            margin: "12px 0 8px",
+            margin: "0 0 8px",
           }}
         >
           {c.label}
@@ -193,7 +192,6 @@ export default function Cluster2Dashboard() {
           {subjectAddress && (
             <div id="c2-documents" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
               <div>
-                <span className="section-number">{c.number}.D</span>
                 <h2
                   style={{
                     fontSize: "22px",

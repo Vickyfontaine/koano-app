@@ -1,195 +1,123 @@
 "use client";
 
-// Dashboard sidebar — Checkpoint 1 (Phase B).
-// Includes the CLUSTER SWITCHER: any user can flip between all four cluster
-// views on the fly (demos, multi-hat users). Switching the view does NOT
-// change the saved profile cluster — the "home" badge marks that one.
+// Sidebar (UI sprint WS3). Plain lens names, the lens's section links, then
+// Watchlist, Documents, History and Settings. The same markup renders as the
+// 240px sidebar at 1280 and up and as the 64px icon rail below it (shell.css
+// hides the labels; every item keeps an aria-label and a title). Switching
+// the lens changes the VIEW only, never the saved plan (the home lens carries
+// a "your plan" note).
 
-import React, { useState } from "react";
-import { UserButton } from "@clerk/nextjs";
-import { CLUSTERS, CLUSTER_IDS, CLUSTER_NAV, type ClusterId } from "./clusters";
+import React from "react";
+import { CLUSTERS, CLUSTER_NAV, LENS_ORDER, type ClusterId } from "./clusters";
+import {
+  DevelopIcon,
+  PriceIcon,
+  AcquireIcon,
+  PropertyIcon,
+  WatchIcon,
+  DocumentsIcon,
+  HistoryIcon,
+  SettingsIcon,
+} from "./shell/icons";
+
+const LENS_ICON: Record<ClusterId, (p: { size?: number }) => React.JSX.Element> = {
+  cluster_4: DevelopIcon,
+  cluster_5: AcquireIcon,
+  cluster_2: PriceIcon,
+  cluster_1: PropertyIcon,
+};
 
 interface SidebarProps {
   cluster: ClusterId;
   homeCluster: ClusterId;
+  activeTarget: string | null;
   onClusterChange: (cluster: ClusterId) => void;
   onNavigate: (target: string) => void;
+  onOpenWatch: () => void;
 }
 
 export default function Sidebar({
   cluster,
   homeCluster,
+  activeTarget,
   onClusterChange,
   onNavigate,
+  onOpenWatch,
 }: SidebarProps) {
   const items = CLUSTER_NAV[cluster];
-  const [activeTarget, setActiveTarget] = useState<string | null>(null);
-
   return (
-    <aside
-      style={{
-        width: "240px",
-        minHeight: "100vh",
-        background: "var(--pale-wash)",
-        borderRight: "1px solid var(--border)",
-        padding: "24px 0",
-        display: "flex",
-        flexDirection: "column",
-        position: "fixed",
-        left: 0,
-        top: 0,
-        bottom: 0,
-        zIndex: 20,
-      }}
-    >
-      {/* Logo */}
-      <a
-        href="/"
-        style={{
-          padding: "0 24px 24px",
-          fontWeight: 500,
-          fontSize: "15px",
-          color: "var(--near-black)",
-          letterSpacing: "2px",
-          textDecoration: "none",
-          display: "block",
-        }}
-      >
-        KOANO
-      </a>
+    <aside className="shell-side" aria-label="Lens and sections">
+      <div className="shell-side-heading">Lens</div>
+      {LENS_ORDER.map((id) => {
+        const Icon = LENS_ICON[id];
+        const meta = CLUSTERS[id];
+        const active = id === cluster;
+        return (
+          <button
+            key={id}
+            type="button"
+            className="shell-item"
+            data-lens={id}
+            aria-current={active ? "true" : undefined}
+            aria-label={`${meta.lens} lens${id === homeCluster ? " (your plan)" : ""}`}
+            title={`${meta.lens}: ${meta.label}`}
+            onClick={() => onClusterChange(id)}
+          >
+            <Icon size={20} />
+            <span className="shell-item-label">{meta.lens}</span>
+            {id === homeCluster && <span className="shell-item-note">plan</span>}
+          </button>
+        );
+      })}
 
-      {/* Cluster switcher */}
-      <div style={{ padding: "0 16px 8px" }}>
-        <label
-          htmlFor="cluster-switcher"
-          style={{
-            display: "block",
-            fontFamily: "var(--font-mono)",
-            fontSize: "11px",
-            letterSpacing: "0.1em",
-            textTransform: "uppercase",
-            color: "var(--ink-muted)",
-            padding: "0 4px 6px",
-          }}
-        >
-          Cluster view
-        </label>
-        <select
-          id="cluster-switcher"
-          value={cluster}
-          onChange={(e) => onClusterChange(e.target.value as ClusterId)}
-          style={{
-            width: "100%",
-            padding: "8px 12px",
-            borderRadius: "var(--radius-inner)",
-            border: "1px solid var(--border)",
-            background: "var(--white)",
-            fontFamily: "inherit",
-            fontSize: "13px",
-            fontWeight: 500,
-            color: "var(--ink-primary)",
-            cursor: "pointer",
-          }}
-        >
-          {CLUSTER_IDS.map((id) => (
-            <option key={id} value={id}>
-              {CLUSTERS[id].badge} · {CLUSTERS[id].label}
-              {id === homeCluster ? " (home)" : ""}
-            </option>
-          ))}
-        </select>
+      <div className="shell-side-divider" />
+
+      <div className="shell-side-sections">
+        <div className="shell-side-heading">In this lens</div>
+        {items.map((item) => (
+          <button
+            key={item.target}
+            type="button"
+            className="shell-item"
+            aria-current={activeTarget === item.target ? "true" : undefined}
+            onClick={() => onNavigate(item.target)}
+          >
+            <span className="shell-item-label">{item.label}</span>
+          </button>
+        ))}
       </div>
 
-      {/* Home-cluster note when viewing another cluster */}
-      {cluster !== homeCluster && (
-        <p
-          style={{
-            padding: "0 20px 8px",
-            margin: 0,
-            fontSize: "11px",
-            color: "var(--ink-muted)",
-            lineHeight: 1.5,
-          }}
-        >
-          Viewing {CLUSTERS[cluster].badge}. Your home cluster is {CLUSTERS[homeCluster].badge}.
-        </p>
-      )}
+      <div className="shell-side-spacer" />
+      <div className="shell-side-divider" />
 
-      {/* Nav items — each targets a real section in the active cluster view */}
-      <nav style={{ flex: 1, padding: "16px 12px 0" }}>
-        {items.map((item) => {
-          const active = activeTarget === item.target;
-          return (
-            <button
-              key={item.target}
-              onClick={() => {
-                setActiveTarget(item.target);
-                onNavigate(item.target);
-              }}
-              style={{
-                display: "block",
-                width: "100%",
-                textAlign: "left",
-                padding: "8px 12px",
-                borderRadius: "var(--radius-chip)",
-                border: "none",
-                background: active ? "var(--white)" : "transparent",
-                color: active ? "var(--ink-primary)" : "var(--ink-muted)",
-                fontSize: "14px",
-                fontWeight: active ? 500 : 400,
-                fontFamily: "inherit",
-                cursor: "pointer",
-                marginBottom: "2px",
-                boxShadow: active ? "0 1px 3px rgba(168,196,212,0.15)" : "none",
-                transition: "background 0.15s ease",
-              }}
-            >
-              {item.label}
-            </button>
-          );
-        })}
-      </nav>
-
-      {/* Settings — leaves the cluster SPA for the standalone settings route */}
-      <a
-        href="/dashboard/settings"
-        style={{
-          margin: "0 12px 4px",
-          padding: "8px 12px",
-          borderRadius: "var(--radius-chip)",
-          color: "var(--ink-muted)",
-          fontSize: "14px",
-          textDecoration: "none",
-          display: "block",
-        }}
+      <button type="button" className="shell-item" onClick={onOpenWatch} aria-label="Watchlist" title="Watchlist">
+        <WatchIcon size={20} />
+        <span className="shell-item-label">Watchlist</span>
+      </button>
+      <button
+        type="button"
+        className="shell-item"
+        onClick={() => onNavigate("documents")}
+        aria-label="Documents"
+        title="Documents"
       >
-        Settings
+        <DocumentsIcon size={20} />
+        <span className="shell-item-label">Documents</span>
+      </button>
+      <button
+        type="button"
+        className="shell-item"
+        onClick={() => onNavigate("history")}
+        aria-label="History"
+        title="History"
+      >
+        <HistoryIcon size={20} />
+        <span className="shell-item-label">History</span>
+      </button>
+      <a href="/dashboard/settings" className="shell-item" aria-label="Settings" title="Settings">
+        <SettingsIcon size={20} />
+        <span className="shell-item-label">Settings</span>
       </a>
-
-      {/* Account */}
-      <div
-        style={{
-          padding: "16px 24px",
-          borderTop: "1px solid var(--border)",
-          marginTop: "auto",
-          display: "flex",
-          alignItems: "center",
-          gap: "12px",
-        }}
-      >
-        <UserButton />
-        <span
-          style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: "11px",
-            color: "var(--ink-muted)",
-            letterSpacing: "0.1em",
-            textTransform: "uppercase",
-          }}
-        >
-          Account
-        </span>
-      </div>
     </aside>
   );
 }

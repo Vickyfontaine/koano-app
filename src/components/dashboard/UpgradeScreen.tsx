@@ -146,7 +146,6 @@ export default function UpgradeScreen({
                   opacity: busyTier !== null && !busy ? 0.55 : 1,
                 }}
               >
-                <span className="section-number">{c.number}</span>
                 <span style={{ fontSize: "17px", fontWeight: 500, color: "var(--ink-primary)" }}>
                   {c.label}
                 </span>

@@ -26,16 +26,15 @@ export default function Cluster4Dashboard({ navTarget }: { navTarget?: NavTarget
   }, [navTarget]);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "24px", maxWidth: "1160px" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
       <div>
-        <span className="section-number">{c.number}</span>
         <h1
           style={{
             fontSize: "32px",
             fontWeight: 700,
             letterSpacing: "-0.02em",
             color: "var(--ink-primary)",
-            margin: "12px 0 8px",
+            margin: "0 0 8px",
           }}
         >
           {c.label}

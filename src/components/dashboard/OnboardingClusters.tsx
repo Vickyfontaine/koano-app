@@ -157,7 +157,6 @@ export default function OnboardingClusters() {
                   transition: "border-color 0.15s ease, background 0.15s ease",
                 }}
               >
-                <span className="section-number">{c.number}</span>
                 <span
                   style={{
                     fontSize: "22px",

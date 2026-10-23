@@ -20,9 +20,10 @@ export const CLUSTER_IDS: ClusterId[] = [
 
 export interface ClusterMeta {
   id: ClusterId;
-  number: string; // section-number eyebrow, e.g. "01"
-  badge: string; // display index C1–C4 by positioning order (decoupled from id)
+  number: string; // DOM-id prefix only ("01".."05"); never shown to the user since WS3
+  badge: string; // marketing display index C1–C4 (hero pages, pricing); never shown in the app
   label: string; // approved product name
+  lens: string; // plain lens name shown in the app shell (UI sprint WS3)
   audience: string; // who it serves (Section 08)
   tagline: string; // approved verbatim card copy (Section 13)
   price: string; // approved price line (Section 13)
@@ -31,6 +32,7 @@ export interface ClusterMeta {
 export const CLUSTERS: Record<ClusterId, ClusterMeta> = {
   cluster_1: {
     id: "cluster_1",
+    lens: "Property",
     number: "01",
     badge: "C4",
     label: "Property intelligence",
@@ -41,6 +43,7 @@ export const CLUSTERS: Record<ClusterId, ClusterMeta> = {
   },
   cluster_2: {
     id: "cluster_2",
+    lens: "Price",
     number: "02",
     badge: "C2",
     label: "Transaction intelligence",
@@ -51,6 +54,7 @@ export const CLUSTERS: Record<ClusterId, ClusterMeta> = {
   },
   cluster_4: {
     id: "cluster_4",
+    lens: "Develop",
     number: "04",
     badge: "C1",
     label: "Development intelligence",
@@ -61,6 +65,7 @@ export const CLUSTERS: Record<ClusterId, ClusterMeta> = {
   },
   cluster_5: {
     id: "cluster_5",
+    lens: "Acquire",
     number: "05",
     badge: "C3",
     label: "Portfolio intelligence",
@@ -69,6 +74,18 @@ export const CLUSTERS: Record<ClusterId, ClusterMeta> = {
       "Monitor everything. Miss nothing. Make institutional decisions with intelligence infrastructure that was previously available only to the world's largest firms.",
     price: "From 1,499 / month",
   },
+};
+
+// Lens order in the app shell (redesign spec §3): the wedge first.
+export const LENS_ORDER: ClusterId[] = ["cluster_4", "cluster_5", "cluster_2", "cluster_1"];
+
+// Plan tag shown in the shell (the plan is the pricing tier; the lens is the view).
+export const PLAN_LABELS: Record<string, string> = {
+  free: "Free",
+  community: "Community",
+  transaction: "Transaction",
+  development: "Development",
+  portfolio: "Portfolio",
 };
 
 export function isClusterId(value: unknown): value is ClusterId {
