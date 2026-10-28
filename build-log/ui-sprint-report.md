@@ -61,7 +61,6 @@ Captured on the finished branch into `build-log/ui-ws-6/after/`: thirteen market
 
 ## Open blockers (founder)
 
-- Apply `supabase/migration-023-ui-sprint-integrity.sql` (five-state provenance constraints, `verdicts.weighting_breakdown`, RLS on two cache tables). Until then a non-NYC verdict fails to persist and history verdicts rebuild their math from the stored votes.
 - Supply the 4:5 mobile render set (`public/renders/mobile/<name>.webp`); `node scripts/ui/render-manifest.mjs` lists what is present; flipping `mobile: true` in `renders.ts` serves each one below 768px. Until then the heroes use the temporary stacked layout.
 
 ## Final independent review and resolutions
@@ -91,5 +90,5 @@ Evidence note: the fixes for findings 1, 2, 3, 5, 6, 7, 8 and 11 were typechecke
 - **A12**: the token layer is built and every surface the sprint rebuilt reads it; components no workstream touched still carry inline px values (the final review's grep), to be migrated component by component as CLAUDE.md §10 says.
 - **A7 in the chrome**: panel titles are sentence case; the band's eyebrows, the KPI tile labels and the plan tag remain uppercase mono, the house eyebrow style. If the founder wants weight-and-spacing hierarchy there too, it is a token-level change in `shell.css` and `panels.tsx`.
 - **Phone polish left open**: the Acquire sticky action overlaps an opened map's bottom edge and leaves a gap above the briefing; Property Row values can wrap a word per line; the sticky action renders at its viewport position in full-page captures.
-- **Engine, not UI**: the narrator's prose can carry em dashes; the same address returned confidence 68 to 80 across the day's runs; the per-figure evidence bundle is not persisted, so sealed records cannot show the ledger; migration-023 is unapplied in the project, so every record shows the rebuilt math.
+- **Engine, not UI**: the narrator's prose can carry em dashes; the same address returned confidence 68 to 80 across the day's runs; the per-figure evidence bundle is not persisted, so sealed records cannot show the ledger.
 - **Draw-the-thread Trace and `provider_result` Bench facts** are follow-ons (WS5 report).

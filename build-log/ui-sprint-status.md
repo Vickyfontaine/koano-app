@@ -7,7 +7,6 @@ All six workstreams are built, reviewed and committed on `ui-sprint` (never push
 - `build-log/ui-ws-*/wip/` folders are working captures and are intentionally not committed.
 
 ## Founder items (blockers.md)
-- Apply `supabase/migration-023-ui-sprint-integrity.sql`.
 - Supply the 4:5 mobile render set (`public/renders/mobile/<name>.webp`); `node scripts/ui/render-manifest.mjs` lists what is present; flip `mobile: true` per entry in `src/components/marketing/renders.ts`.
 - Set `KOANO_SHARE_SECRET` in Vercel (sealed-record share links).
 
