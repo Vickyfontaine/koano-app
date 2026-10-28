@@ -8,6 +8,7 @@
 
 ## Rules for every sprint session
 
+- **STANDING RULE (founder, 2026-10-28): no unrequested visual or copy decisions.** Do not make any visual or copy decision the founder did not explicitly ask for: colour, imagery, glass and blur, copy, layout, hiding sections. If a fix seems to need one, stop and propose options with screenshots. Contrast, spacing and overflow bugs may be fixed without asking only if the fix does not change how the design looks. When a requested change fails a check (for example WCAG AA), report it with the measurement and do not change the design to fix it.
 - **Locked decisions:** the site font stays exactly as it is. The KOANO logo always appears in its original blue. Provenance honesty is non-negotiable. Decision math stays deterministic. Landlords and flippers are not an audience. White-label documents carry no KOANO branding. Marketing renders keep the architectural diorama house style.
 - **Plan first** in `/build-log/`, then ship one slice per commit with the pre-push gate green.
 - **No em dashes** in user-facing copy.
