@@ -21,6 +21,7 @@ const DATASET = 'https://data.cityofnewyork.us/resource/rbx6-tga4.json';
 const LEGACY_DATASET = 'https://data.cityofnewyork.us/resource/ipu4-2q9a.json';
 
 interface DobNowPermit {
+  bbl?: string;
   work_type?: string;
   filing_reason?: string;
   permit_status?: string;
@@ -196,13 +197,17 @@ export const nycPermits: PermitsProvider = {
         throw new Error('Neither BBL nor census tract resolved. Nothing to query');
       }
 
-      const scope = tractRows.length > 0 ? tractRows : subjectRows;
+      // The neighbourhood pipeline never counts the subject lot's own permits
+      // (Phase 0): a site's own redevelopment is a subject fact, read from
+      // recent_permits and the DOB NOW job filings, not tract activity.
+      const neighbourhood = tractRows.filter((p) => !p.bbl || p.bbl !== addr.bbl);
+      const scope = tractRows.length > 0 ? neighbourhood : subjectRows;
       const data: PermitsSummary = {
         bin: addr.bin,
         scope_note:
           tractRows.length > 0
-            ? `Census tract ${dobTract}, ${addr.borough} — permits issued last 24 months (${tractRows.length} in tract; ${subjectRows.length} on subject BBL ${addr.bbl})`
-            : `Subject BBL ${addr.bbl} — permits issued last 24 months`,
+            ? `Census tract ${dobTract}, ${addr.borough}: permits issued in the last 24 months, the subject lot excluded (${neighbourhood.length} in the tract; ${subjectRows.length} more on subject BBL ${addr.bbl})`
+            : `Subject BBL ${addr.bbl}: permits issued in the last 24 months`,
         total_permits_24mo: scope.length,
         new_building_permits: countBy(scope, (wt) => wt.includes('new building')),
         demolition_permits: countBy(scope, (wt) => wt.includes('demolition')),
@@ -211,7 +216,7 @@ export const nycPermits: PermitsProvider = {
           (wt) => wt.includes('alteration') || wt.includes('general construction') || wt.includes('plumbing')
         ),
         monthly_permits: monthlySeries(scope),
-        recent_permits: [...subjectRows.slice(0, 5), ...tractRows.slice(0, 5)].map(toRecord),
+        recent_permits: [...subjectRows.slice(0, 5), ...neighbourhood.slice(0, 5)].map(toRecord),
         all_permits: allPermits,
         all_permits_note: DOB_NOW_COVERAGE_NOTE,
       };

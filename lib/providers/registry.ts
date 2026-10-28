@@ -31,11 +31,13 @@ import type {
   SeismicProvider,
   ProformaBenchmarkProvider,
   ZoningProvider,
+  JobFilingsProvider,
 } from './types';
 
 import { nycGeoSearch } from './real/geocode';
 import { nycLandlord } from './real/nyc-landlord';
 import { nycPermits } from './real/nyc-permits';
+import { nycDobNowJobs } from './real/nyc-dob-now-jobs';
 import { nycViolations } from './real/nyc-violations';
 import { nycZoning } from './real/nyc-zoning';
 import { nycAssemblage } from './real/nyc-assemblage';
@@ -66,6 +68,7 @@ export interface ProviderRegistry {
   // live (free) providers
   geocode: GeocodeProvider;
   permits: PermitsProvider;
+  jobFilings: JobFilingsProvider;
   buildingViolations: BuildingViolationsProvider;
   landlordPortfolio: LandlordPortfolioProvider;
   zoning: ZoningProvider;
@@ -103,6 +106,7 @@ export interface ProviderRegistry {
 export const registry: ProviderRegistry = {
   geocode: nycGeoSearch,
   permits: nycPermits,
+  jobFilings: nycDobNowJobs,
   buildingViolations: nycViolations,
   landlordPortfolio: nycLandlord,
   zoning: nycZoning,

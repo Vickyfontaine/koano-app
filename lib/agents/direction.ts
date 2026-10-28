@@ -103,6 +103,14 @@ export function extractStructuralFacts(agents: AgentVerdict[], subjectAddress?: 
       subjectActiveConstruction.push(`${kind} permit${date ? ` issued ${date}` : ''}`);
     }
   }
+  // DOB NOW job filings (Phase 0): a New Building or Full Demolition job still in
+  // progress on the subject lot, matched by BBL in the provider, so no address
+  // match is needed. "New Building job B00123456-I1, Permit Entire, filed 2025-06-02"
+  for (const [label, value] of Array.from(byLabel)) {
+    if (!/^subject_active_job_\d+$/.test(label) || typeof value !== 'string') continue;
+    const m = value.match(/^(.+?) job (\S+), (.+?), filed (\d{4}-\d{2}-\d{2})$/);
+    subjectActiveConstruction.push(m ? `${m[1]} job ${m[2]} (${m[3]}, filed ${m[4]})` : value);
+  }
 
   return {
     unusedFarPct: num(find(/^unused_far_pct/)),

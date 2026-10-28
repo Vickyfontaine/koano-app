@@ -1,5 +1,7 @@
 // KOANO Infrastructure Pipeline agent — Step 4b.
-// LIVE input: nyc-permits (DOB NOW approved permits — subject BBL + census tract).
+// LIVE inputs: nyc-permits (DOB NOW approved permits, subject BBL + census tract,
+// the subject excluded from the tract counts) and nyc-dob-now-jobs (DOB NOW job
+// filings: active ground-up jobs on the subject, tract counts without it).
 // Depends ONLY on the provider registry. Output: AgentVerdict (KoanoVerdict schema).
 
 import { registry } from '../providers/registry';
@@ -17,10 +19,11 @@ How to reason:
 - Near-zero permit activity = static area; verdict should be neutral, not negative.
 - Your verdict is about the infrastructure/construction pipeline: "buy" = strong committed pipeline lifting the area, "hold" = steady activity, "wait" = early/unclear signals, "drop" = pipeline signals decline (e.g., only demolitions, no rebuilds).
 - risk_score reflects execution/disruption risk from the pipeline (construction disruption, oversupply).
-- Note the scope_note: it tells you what geography the counts cover.`;
+- Note the scope_note: it tells you what geography the counts cover. Tract counts exclude the subject lot's own permits and jobs.
+- DOB NOW job filings: subject_active_job_* are New Building or Full Demolition jobs still in progress on the subject lot (cite them like a permit); tract_new_building_jobs_24mo and tract_demolition_jobs_24mo count ground-up jobs filed in the tract, the subject lot excluded.`;
 
 export async function runInfrastructureAgent(addr: ResolvedAddress): Promise<AgentVerdict> {
-  const permitsRes = await registry.permits.getPermits(addr);
+  const [permitsRes, jobsRes] = await Promise.all([registry.permits.getPermits(addr), registry.jobFilings.getJobFilings(addr)]);
 
   const dataPoints: DataPoint[] = [];
 
@@ -50,6 +53,36 @@ export async function runInfrastructureAgent(addr: ResolvedAddress): Promise<Age
       provenance: permitsRes.provenance,
       source: permitsRes.source,
     });
+  }
+
+  if (jobsRes.data) {
+    const j = jobsRes.data;
+    const prov = jobsRes.provenance;
+    const s = jobsRes.source;
+    dataPoints.push(
+      { label: 'job_filings_scope_note', value: j.scope_note, provenance: prov, source: s },
+      { label: 'subject_active_new_building_jobs', value: j.subject_active_new_building, provenance: prov, source: s },
+      { label: 'subject_active_demolition_jobs', value: j.subject_active_demolition, provenance: prov, source: s },
+    );
+    j.subject_jobs
+      .filter((x) => x.active && x.kind !== 'other')
+      .slice(0, 3)
+      .forEach((x, i) => {
+        dataPoints.push({
+          label: `subject_active_job_${i + 1}`,
+          value: `${x.job_type} job ${x.job_filing_number}, ${x.filing_status}, filed ${x.filing_date}`,
+          provenance: prov,
+          source: s,
+        });
+      });
+    if (j.tract_new_building_jobs_24mo != null) {
+      dataPoints.push(
+        { label: 'tract_new_building_jobs_24mo', value: j.tract_new_building_jobs_24mo, provenance: prov, source: s },
+        { label: 'tract_demolition_jobs_24mo', value: j.tract_demolition_jobs_24mo ?? 0, provenance: prov, source: s },
+      );
+    }
+  } else {
+    dataPoints.push({ label: 'job_filings_unavailable', value: jobsRes.error ?? 'no data', provenance: jobsRes.provenance, source: jobsRes.source });
   }
 
   const llm = await callAgentLLM({

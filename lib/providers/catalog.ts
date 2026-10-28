@@ -79,6 +79,14 @@ export const PROVIDER_CATALOG: Record<keyof ProviderRegistry, ProviderCatalogEnt
     provenance: 'live',
     usedBy: 'Infrastructure pipeline agent',
   },
+  jobFilings: {
+    source: 'NYC DOB NOW Job Application Filings',
+    category: 'New building and demolition jobs',
+    group: 'Municipal building records',
+    coverage: 'nyc',
+    provenance: 'live',
+    usedBy: 'Infrastructure pipeline agent',
+  },
   buildingViolations: {
     source: 'NYC HPD / ECB / DOB violations',
     category: 'Building violations',

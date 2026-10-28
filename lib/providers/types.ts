@@ -167,6 +167,32 @@ export interface PermitsProvider {
   getPermits(addr: ResolvedAddress): Promise<ProviderResult<PermitsSummary>>;
 }
 
+// DOB NOW job application filings (w9ak-ipjd), Phase 0: ground-up jobs by DOB's
+// own job type, on the subject lot and in its tract (subject excluded).
+export interface JobFiling {
+  job_filing_number: string;
+  job_type: string; // as DOB prints it, e.g. "New Building", "Full Demolition"
+  kind: 'new_building' | 'demolition' | 'other';
+  filing_status: string;
+  active: boolean; // not yet completed, withdrawn or denied
+  filing_date: string; // yyyy-mm-dd
+  address: string;
+}
+
+export interface JobFilingsSummary {
+  subject_jobs: JobFiling[];
+  subject_active_new_building: number;
+  subject_active_demolition: number;
+  tract_new_building_jobs_24mo: number | null; // the subject lot excluded
+  tract_demolition_jobs_24mo: number | null; // the subject lot excluded
+  scope_note: string;
+}
+
+export interface JobFilingsProvider {
+  name: string;
+  getJobFilings(addr: ResolvedAddress): Promise<ProviderResult<JobFilingsSummary>>;
+}
+
 export interface ZoningInfo {
   bbl: string;
   zoning_district: string | null;
