@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import Button from "../ui/Button";
 import HeroDashboard from "./HeroDashboard";
 import HeroAddressBox from "./HeroAddressBox";
@@ -75,7 +76,7 @@ export default function HeroSection() {
                 fontFamily: "var(--font-mono)",
                 fontSize: "11px",
                 fontWeight: 500,
-                color: "var(--ink-primary)",
+                color: "rgba(255, 255, 255, 0.85)",
                 letterSpacing: "1.5px",
                 textTransform: "uppercase",
                 marginBottom: "24px",
@@ -93,7 +94,7 @@ export default function HeroSection() {
                 fontWeight: 700,
                 letterSpacing: "-0.02em",
                 lineHeight: 1.05,
-                color: "var(--near-black)",
+                color: "#FFFFFF",
                 margin: 0,
                 maxWidth: "560px",
               }}
@@ -111,7 +112,7 @@ export default function HeroSection() {
                 fontSize: "18px",
                 fontWeight: 500,
                 lineHeight: 1.6,
-                color: "var(--near-black)",
+                color: "#FFFFFF",
                 maxWidth: "520px",
                 marginTop: "24px",
                 marginBottom: "28px",
@@ -145,33 +146,47 @@ export default function HeroSection() {
               <Button variant="primary" href="/signup" id="hero-cta-primary">
                 Sign up
               </Button>
-              <Button variant="ghost" href="/intelligence" id="hero-cta-secondary">
+              <Button variant="ghost-light" href="/intelligence" id="hero-cta-secondary">
                 See how it works
               </Button>
             </div>
 
-            {/* Stats row: frosted pills like the replay card, because the
-                row lands on the render's cast shadow at desktop widths. */}
+            {/* Stats row (as on main) */}
             <div
               className="hero-enter hero-stats m-drop flex flex-wrap items-center"
-              style={{ animationDelay: "0.70s", gap: "var(--space-2)" }}
+              style={{ animationDelay: "0.70s", gap: "0" }}
             >
-              {STATS.map((stat) => (
-                <span
-                  key={stat.label}
-                  className="hero-stat"
-                  style={{
-                    fontFamily: "var(--font-mono)",
-                    fontSize: "13px",
-                    color: "var(--near-black)",
-                    letterSpacing: "0.08em",
-                  }}
-                >
-                  <span style={{ fontWeight: 700, marginRight: "6px" }}>
-                    {stat.value}
+              {STATS.map((stat, i) => (
+                <React.Fragment key={stat.label}>
+                  {i > 0 && (
+                    <span
+                      className="hero-stat-sep"
+                      style={{
+                        color: "rgba(255, 255, 255, 0.3)",
+                        margin: "0 20px",
+                        fontSize: "13px",
+                        userSelect: "none",
+                      }}
+                    >
+                      ·
+                    </span>
+                  )}
+                  <span
+                    style={{
+                      fontFamily: "var(--font-mono)",
+                      fontSize: "13px",
+                      color: "rgba(255, 255, 255, 0.85)",
+                      letterSpacing: "0.08em",
+                    }}
+                  >
+                    <span style={{ fontWeight: 700, marginRight: "6px" }}>
+                      {stat.value}
+                    </span>
+                    <span style={{ fontWeight: 400, opacity: 0.7 }}>
+                      {stat.label}
+                    </span>
                   </span>
-                  <span style={{ fontWeight: 400 }}>{stat.label}</span>
-                </span>
+                </React.Fragment>
               ))}
             </div>
           </div>
@@ -188,7 +203,7 @@ export default function HeroSection() {
 
       <style jsx>{`
         /* backwards, not both: a finished entrance must hold no opacity
-           animation, or the column becomes the frosted card's backdrop root
+           animation, or the column becomes the glass card's backdrop root
            and the card blurs nothing. */
         .hero-enter {
           animation: hero-enter 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
@@ -203,24 +218,10 @@ export default function HeroSection() {
             transform: translateY(0);
           }
         }
-        /* No scrim over the render (founder decision): the copy is near-black
-           ink straight on the sky and the cast shadow, and the ghost button
-           takes the same ink so it reads AA there too. */
-        #hero-section :global(.btn-ghost) {
-          color: var(--ink-primary);
-          border-color: rgba(13, 43, 62, 0.55);
-        }
-        .hero-stat {
-          background: var(--hero-frost-fill);
-          backdrop-filter: var(--hero-frost-blur);
-          -webkit-backdrop-filter: var(--hero-frost-blur);
-          border: 1px solid rgba(255, 255, 255, 0.7);
-          border-radius: var(--radius-pill);
-          padding: var(--space-1) var(--space-3);
-        }
-        #hero-section :global(.btn-ghost:hover) {
-          background: rgba(255, 255, 255, 0.35);
-          border-color: var(--ink-primary);
+        /* White copy on the render, no scrim (founder decision): the focus
+           ring is white here. */
+        #hero-section :global(:focus-visible) {
+          outline-color: var(--white);
         }
         @media (max-width: 900px) {
           .hero-grid {
@@ -235,6 +236,10 @@ export default function HeroSection() {
           .hero-stats {
             flex-direction: column;
             align-items: flex-start !important;
+            gap: 6px !important;
+          }
+          .hero-stat-sep {
+            display: none;
           }
         }
       `}</style>

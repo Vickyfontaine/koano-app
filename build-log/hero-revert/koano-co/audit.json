@@ -1,0 +1,41 @@
+[
+  {
+    "name": "home",
+    "width": 390,
+    "url": "https://www.koano.co/",
+    "file": "build-log/hero-revert/koano-co/home-390.jpg",
+    "console": [],
+    "title": "KOANO: The Real Estate Reasoning Engine",
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "scrollHeight": 12588,
+    "horizontalOverflow": false,
+    "offenders": []
+  },
+  {
+    "name": "home",
+    "width": 768,
+    "url": "https://www.koano.co/",
+    "file": "build-log/hero-revert/koano-co/home-768.jpg",
+    "console": [],
+    "title": "KOANO: The Real Estate Reasoning Engine",
+    "scrollWidth": 768,
+    "clientWidth": 768,
+    "scrollHeight": 9720,
+    "horizontalOverflow": false,
+    "offenders": []
+  },
+  {
+    "name": "home",
+    "width": 1440,
+    "url": "https://www.koano.co/",
+    "file": "build-log/hero-revert/koano-co/home-1440.jpg",
+    "console": [],
+    "title": "KOANO: The Real Estate Reasoning Engine",
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "scrollHeight": 8912,
+    "horizontalOverflow": false,
+    "offenders": []
+  }
+]

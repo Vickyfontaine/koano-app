@@ -269,7 +269,7 @@ export default function HeroAddressBox() {
           font-family: var(--font-mono);
           font-size: var(--text-micro);
           letter-spacing: 0.04em;
-          color: var(--ink-primary);
+          color: rgba(255, 255, 255, 0.85);
           margin-top: var(--space-3);
         }
         .hero-address-example {
@@ -278,10 +278,13 @@ export default function HeroAddressBox() {
           border: 0;
           padding: var(--space-3) 0;
           min-height: 44px;
-          color: var(--ink-primary);
+          color: var(--white);
           text-decoration: underline;
           text-underline-offset: 3px;
           cursor: pointer;
+        }
+        .hero-address-example:focus-visible {
+          outline-color: var(--white);
         }
         .hero-address-card {
           margin-top: var(--space-3);
