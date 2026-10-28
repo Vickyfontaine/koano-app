@@ -33,6 +33,7 @@ export default function HeroSection() {
       <HeroRender
         slot={RENDERS["menu-hero"]}
         priority
+        className="m-drop"
         // Contain (not cover) so the image keeps its native proportions and
         // isn't zoomed/cropped; grounded at the bottom so the buildings sit on
         // the fold and only sky extends above (into the matching section bg).
@@ -104,7 +105,7 @@ export default function HeroSection() {
 
             {/* Subhead */}
             <p
-              className="hero-enter"
+              className="hero-enter m-drop"
               style={{
                 animationDelay: "0.46s",
                 fontSize: "18px",
@@ -121,6 +122,15 @@ export default function HeroSection() {
               agencies. Each weighs its own evidence, and the verdict they
               produce shows its arithmetic figure by figure.
             </p>
+
+            {/* Phones (mobile proposal): one line, then the render full width
+                as the screen's image, then the address box and buttons. */}
+            <p className="m-only m-lead hero-m-lead">
+              Five specialist agents read every public record touching a property.
+            </p>
+            <div className="m-only hero-m-render" aria-hidden="true">
+              <HeroRender slot={RENDERS["menu-hero"]} variant="block" priority />
+            </div>
 
             {/* Address box: resolve a lot against the public record, no account needed */}
             <div className="hero-enter" style={{ animationDelay: "0.54s" }}>
@@ -143,7 +153,7 @@ export default function HeroSection() {
             {/* Stats row: frosted pills like the replay card, because the
                 row lands on the render's cast shadow at desktop widths. */}
             <div
-              className="hero-enter hero-stats flex flex-wrap items-center"
+              className="hero-enter hero-stats m-drop flex flex-wrap items-center"
               style={{ animationDelay: "0.70s", gap: "var(--space-2)" }}
             >
               {STATS.map((stat) => (

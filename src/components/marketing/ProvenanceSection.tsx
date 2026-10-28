@@ -32,8 +32,11 @@ export default function ProvenanceSection() {
           >
             Every figure, sourced.
           </h2>
+          <p className="m-only m-lead">
+            Every number KOANO used carries its value, its provenance, and the exact public source it came from.
+          </p>
           <p
-            className="text-body-lg"
+            className="text-body-lg m-drop"
             style={{
               color: "var(--ink-secondary)",
               maxWidth: "640px",
@@ -47,6 +50,7 @@ export default function ProvenanceSection() {
             live, KOANO labels it distinctly rather than quietly averaging it in.
           </p>
           <p
+            className="m-drop"
             style={{
               fontSize: "13px",
               color: "var(--ink-muted)",
@@ -58,6 +62,7 @@ export default function ProvenanceSection() {
         </motion.div>
 
         <motion.div
+          className="m-drop"
           initial={false}
           animate={isInView ? "visible" : "hidden"}
           variants={fadeUp}

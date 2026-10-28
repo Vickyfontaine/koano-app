@@ -95,6 +95,9 @@ export default function AgentsSection() {
           >
             Five agents. One verdict. Every step auditable.
           </h2>
+          <p className="m-only m-lead">
+            Each weighs its own evidence, and the verdict shows its arithmetic figure by figure.
+          </p>
         </motion.div>
 
         {/* Agent timeline */}
@@ -184,6 +187,7 @@ export default function AgentsSection() {
                     {agent.name}
                   </h3>
                   <p
+                    className="m-drop"
                     style={{
                       fontSize: "15px",
                       fontWeight: 400,
@@ -197,7 +201,7 @@ export default function AgentsSection() {
                   {/* whiteSpace override: .data-chip is nowrap by default,
                       which overflowed the card on longer outputs. */}
                   <span
-                    className="data-chip"
+                    className="data-chip m-drop"
                     style={{
                       whiteSpace: "normal",
                       maxWidth: "100%",
@@ -216,6 +220,7 @@ export default function AgentsSection() {
 
           {/* Synthesis node */}
           <motion.div
+            className="m-drop"
             custom={6}
             initial={false}
             animate={isInView ? "visible" : "hidden"}
@@ -258,6 +263,7 @@ export default function AgentsSection() {
           {/* Real recorded verdict — the actual VerdictMathPanel the dashboard
               renders, fed a frozen real run. Not a mock, not a demo card. */}
           <motion.div
+            className="m-drop"
             custom={7}
             initial={false}
             animate={isInView ? "visible" : "hidden"}

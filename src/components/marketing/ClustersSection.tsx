@@ -113,6 +113,7 @@ export default function ClustersSection() {
                   {cluster.name}
                 </h3>
                 <p
+                  className="m-drop"
                   style={{
                     fontSize: "15px",
                     fontWeight: 400,

@@ -98,6 +98,17 @@
      the Coastal palette rather than a generic grey drop. */
   --shadow-flat: 0 1px 2px rgba(13, 43, 62, 0.04), 0 2px 6px rgba(13, 43, 62, 0.04);
   --shadow-raised: 0 1px 2px rgba(13, 43, 62, 0.05), 0 6px 20px rgba(13, 43, 62, 0.07);
+  /* Mobile type scale (below 768px; families unchanged). The mobile
+     proposal, build-log/mobile-proposal.md §2. Homepage only until approved. */
+  --m-display: 44px;
+  --m-h2: 30px;
+  --m-h3: 20px;
+  --m-lead: 17px;
+  --m-body: 16px;
+  --m-ui: 15px;
+  --m-label: 13px;
+  --m-micro: 11px;
+
   /* The homepage hero frost (the replay card and the stat pills). Measured
      by scripts/ui/hero-contrast.mjs over every frame of the replay at 390,
      768 and 1440: 0.88 is the lightest fill that holds the card's 11px
@@ -787,5 +798,136 @@ body {
   }
   .velocity-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ===== Phone layout, homepage only (mobile proposal, awaiting approval) =====
+   .m-only shows only below 768px; .m-drop hides below 768px. Everything from
+   768px up is untouched: the long copy is still in the page there. */
+.m-only {
+  display: none;
+}
+@media (max-width: 767px) {
+  .m-only {
+    display: block;
+  }
+  .m-drop {
+    display: none !important;
+  }
+  .m-lead {
+    font-size: var(--m-lead);
+    line-height: 1.45;
+    color: var(--ink-secondary);
+    margin: var(--space-4) 0 0;
+  }
+
+  .home-mobile section:not(#hero-section) {
+    padding: var(--space-8) var(--space-4) !important;
+  }
+  .home-mobile h2.text-h2 {
+    font-size: var(--m-h2) !important;
+    line-height: 1.08 !important;
+  }
+  .home-mobile section h3 {
+    font-size: var(--m-h3) !important;
+    line-height: 1.25 !important;
+    margin-bottom: 0 !important;
+  }
+  .home-mobile .text-body-lg {
+    font-size: var(--m-lead) !important;
+    line-height: 1.45 !important;
+  }
+  /* Section headers sit left on phones, like the hero, and tighter. */
+  .home-mobile section:not(#hero-section) > div > div:first-child {
+    text-align: left !important;
+    margin-bottom: var(--space-6) !important;
+  }
+
+  /* Hero: headline and one line in the clear sky, then the render as the
+     screen's image (full bleed, cropped onto the brownstones of the desktop
+     stand-in), then the address box and the buttons. */
+  .home-mobile #hero-section > .hero-inner {
+    padding: calc(var(--nav-h) + var(--space-6)) var(--space-4) var(--space-7) !important;
+  }
+  .home-mobile #hero-section h1 {
+    font-size: var(--m-display) !important;
+    line-height: 1 !important;
+  }
+  .home-mobile .hero-m-lead {
+    color: var(--near-black);
+    margin-bottom: var(--space-5);
+  }
+  .home-mobile .hero-m-render {
+    margin: 0 calc(-1 * var(--space-4)) var(--space-6);
+    height: min(52svh, 440px);
+    overflow: hidden;
+  }
+  .home-mobile .hero-m-render img {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    object-fit: cover;
+    object-position: 77% 92%;
+    display: block;
+  }
+
+  /* Agents: names only, as a compact list of cards. */
+  .home-mobile #agents-section .card {
+    padding: var(--space-4) var(--space-5) !important;
+  }
+  .home-mobile #agents-section .card .section-number {
+    margin-bottom: var(--space-1) !important;
+  }
+  .home-mobile #agents-section [style*="padding-bottom: 40px"] {
+    padding-bottom: var(--space-2) !important;
+  }
+
+  /* Monitoring follows provenance on the same pale wash once the archive
+     drops, so it starts without a second full top padding. */
+  .home-mobile section.home-monitoring {
+    padding-top: var(--space-4) !important;
+  }
+
+  /* Clusters: lens names and their price chips. */
+  .home-mobile #clusters-section .card {
+    min-height: 0 !important;
+    flex-direction: row !important;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5) !important;
+  }
+  .home-mobile #clusters-section .card > div:last-child {
+    margin-top: 0 !important;
+    flex: none;
+  }
+  .home-mobile .clusters-grid {
+    gap: var(--space-2) !important;
+  }
+
+  /* Closing CTA: copy first, then the render filling half a screen. */
+  .home-mobile #early-access-section {
+    padding-bottom: 0 !important;
+    text-align: left;
+  }
+  .home-mobile #early-access-section > div {
+    text-align: left !important;
+  }
+  .home-mobile #early-access-section .text-body-lg {
+    margin: 0 0 var(--space-6) !important;
+  }
+  .home-mobile #early-access-section .flex {
+    justify-content: flex-start !important;
+  }
+  .home-mobile #early-access-section > div {
+    order: 1;
+  }
+  .home-mobile #early-access-section .cta-render {
+    order: 2;
+    height: min(48svh, 400px) !important;
+    margin: var(--space-6) calc(-1 * var(--space-4)) 0 !important;
+    width: calc(100% + 2 * var(--space-4)) !important;
+    max-width: none;
+    object-fit: cover !important;
+    object-position: 0% 100% !important;
   }
 }

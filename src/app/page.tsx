@@ -11,7 +11,8 @@ import Footer from "@/components/marketing/Footer";
 
 export default function Home() {
   return (
-    <>
+    // .home-mobile scopes the phone layout (globals.css, below 768px only).
+    <div className="home-mobile">
       {/* NAV */}
       <Nav />
 
@@ -41,6 +42,6 @@ export default function Home() {
 
       {/* FOOTER */}
       <Footer />
-    </>
+    </div>
   );
 }

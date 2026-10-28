@@ -45,7 +45,8 @@ export default function ArchiveSection() {
   const isInView = useReveal(ref, { once: true, amount: 0.15 });
 
   return (
-    <section ref={ref} style={{ background: "var(--white)", padding: "120px 32px" }}>
+    // Phones: merged into the monitoring section's one line (mobile proposal).
+    <section ref={ref} className="m-drop" style={{ background: "var(--white)", padding: "120px 32px" }}>
       <div
         className="archive-layout"
         style={{

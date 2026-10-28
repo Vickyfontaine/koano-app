@@ -71,9 +71,11 @@ export default function EarlyAccessSection() {
             margin: "0 auto 40px",
           }}
         >
-          Sign up and run three full analyses at no cost. Every verdict
-          arrives with its reasoning and its sources, so you can check the
-          work against what you already know about the address.
+          Sign up and run three full analyses at no cost.
+          <span className="m-drop">
+            {" "}Every verdict arrives with its reasoning and its sources, so you
+            can check the work against what you already know about the address.
+          </span>
         </motion.p>
 
         {/* Self-serve signup CTA (replaced the retired waitlist email form) */}

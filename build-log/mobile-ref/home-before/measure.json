@@ -1,0 +1,384 @@
+[
+  {
+    "name": "home",
+    "url": "http://localhost:3000/",
+    "pageHeight": 13710,
+    "screens": 17,
+    "wordsTotal": 1438,
+    "wordsPerScreen": 85,
+    "imageryPctMean": 2,
+    "screensWithImagery": 2,
+    "perScreen": [
+      {
+        "screen": 1,
+        "imageryPct": 0,
+        "imgTop": null,
+        "imgBottom": null,
+        "words": 73,
+        "headline": 34,
+        "body": 18,
+        "sizes": {
+          "11": 12,
+          "13": 6,
+          "14": 11,
+          "16": 2,
+          "18": 36,
+          "34": 6
+        },
+        "place": {
+          "over": 0,
+          "above": 0,
+          "below": 0,
+          "none": 73
+        }
+      },
+      {
+        "screen": 2,
+        "imageryPct": 9,
+        "imgTop": 773,
+        "imgBottom": 844,
+        "words": 99,
+        "headline": 32,
+        "body": 11,
+        "sizes": {
+          "11": 64,
+          "13": 18,
+          "14": 12,
+          "15": 4,
+          "32": 1
+        },
+        "place": {
+          "over": 0,
+          "above": 99,
+          "below": 0,
+          "none": 0
+        }
+      },
+      {
+        "screen": 3,
+        "imageryPct": 15,
+        "imgTop": 0,
+        "imgBottom": 121,
+        "words": 38,
+        "headline": 32,
+        "body": 15,
+        "sizes": {
+          "11": 11,
+          "15": 18,
+          "20": 2,
+          "32": 7
+        },
+        "place": {
+          "over": 0,
+          "above": 0,
+          "below": 38,
+          "none": 0
+        }
+      },
+      {
+        "screen": 4,
+        "imageryPct": 0,
+        "imgTop": null,
+        "imgBottom": null,
+        "words": 77,
+        "headline": 20,
+        "body": 15,
+        "sizes": {
+          "11": 22,
+          "15": 48,
+          "20": 7
+        },
+        "place": {
+          "over": 0,
+          "above": 0,
+          "below": 0,
+          "none": 77
+        }
+      },
+      {
+        "screen": 5,
+        "imageryPct": 0,
+        "imgTop": null,
+        "imgBottom": null,
+        "words": 98,
+        "headline": 34,
+        "body": 14,
+        "sizes": {
+          "11": 17,
+          "12": 2,
+          "13": 20,
+          "14": 38,
+          "15": 17,
+          "20": 3,
+          "34": 1
+        },
+        "place": {
+          "over": 0,
+          "above": 0,
+          "below": 0,
+          "none": 98
+        }
+      },
+      {
+        "screen": 6,
+        "imageryPct": 0,
+        "imgTop": null,
+        "imgBottom": null,
+        "words": 127,
+        "headline": 15,
+        "body": 11,
+        "sizes": {
+          "11": 62,
+          "13": 53,
+          "14": 6,
+          "15": 6
+        },
+        "place": {
+          "over": 0,
+          "above": 0,
+          "below": 0,
+          "none": 127
+        }
+      },
+      {
+        "screen": 7,
+        "imageryPct": 0,
+        "imgTop": null,
+        "imgBottom": null,
+        "words": 115,
+        "headline": 32,
+        "body": 12,
+        "sizes": {
+          "11": 3,
+          "12": 36,
+          "13": 34,
+          "14": 10,
+          "16": 1,
+          "18": 28,
+          "32": 3
+        },
+        "place": {
+          "over": 0,
+          "above": 0,
+          "below": 0,
+          "none": 115
+        }
+      },
+      {
+        "screen": 8,
+        "imageryPct": 0,
+        "imgTop": null,
+        "imgBottom": null,
+        "words": 126,
+        "headline": 18,
+        "body": 11,
+        "sizes": {
+          "11": 42,
+          "12": 10,
+          "13": 40,
+          "18": 34
+        },
+        "place": {
+          "over": 0,
+          "above": 0,
+          "below": 0,
+          "none": 126
+        }
+      },
+      {
+        "screen": 9,
+        "imageryPct": 0,
+        "imgTop": null,
+        "imgBottom": null,
+        "words": 112,
+        "headline": 13,
+        "body": 11,
+        "sizes": {
+          "11": 62,
+          "12": 17,
+          "13": 33
+        },
+        "place": {
+          "over": 0,
+          "above": 0,
+          "below": 0,
+          "none": 112
+        }
+      },
+      {
+        "screen": 10,
+        "imageryPct": 0,
+        "imgTop": null,
+        "imgBottom": null,
+        "words": 62,
+        "headline": 32,
+        "body": 11,
+        "sizes": {
+          "11": 29,
+          "12": 9,
+          "13": 13,
+          "14": 9,
+          "32": 2
+        },
+        "place": {
+          "over": 0,
+          "above": 0,
+          "below": 0,
+          "none": 62
+        }
+      },
+      {
+        "screen": 11,
+        "imageryPct": 0,
+        "imgTop": null,
+        "imgBottom": null,
+        "words": 114,
+        "headline": 32,
+        "body": 16,
+        "sizes": {
+          "11": 10,
+          "13": 4,
+          "16": 94,
+          "32": 6
+        },
+        "place": {
+          "over": 0,
+          "above": 0,
+          "below": 0,
+          "none": 114
+        }
+      },
+      {
+        "screen": 12,
+        "imageryPct": 0,
+        "imgTop": null,
+        "imgBottom": null,
+        "words": 108,
+        "headline": 32,
+        "body": 18,
+        "sizes": {
+          "11": 9,
+          "14": 35,
+          "15": 3,
+          "18": 54,
+          "32": 7
+        },
+        "place": {
+          "over": 0,
+          "above": 0,
+          "below": 0,
+          "none": 108
+        }
+      },
+      {
+        "screen": 13,
+        "imageryPct": 0,
+        "imgTop": null,
+        "imgBottom": null,
+        "words": 79,
+        "headline": 32,
+        "body": 13,
+        "sizes": {
+          "11": 1,
+          "13": 32,
+          "14": 29,
+          "15": 9,
+          "22": 2,
+          "32": 6
+        },
+        "place": {
+          "over": 0,
+          "above": 0,
+          "below": 0,
+          "none": 79
+        }
+      },
+      {
+        "screen": 14,
+        "imageryPct": 0,
+        "imgTop": null,
+        "imgBottom": null,
+        "words": 64,
+        "headline": 22,
+        "body": 15,
+        "sizes": {
+          "11": 12,
+          "15": 48,
+          "22": 4
+        },
+        "place": {
+          "over": 0,
+          "above": 0,
+          "below": 0,
+          "none": 64
+        }
+      },
+      {
+        "screen": 15,
+        "imageryPct": 12,
+        "imgTop": 711,
+        "imgBottom": 823,
+        "words": 39,
+        "headline": 22,
+        "body": 15,
+        "sizes": {
+          "11": 5,
+          "12": 8,
+          "13": 6,
+          "15": 18,
+          "22": 2
+        },
+        "place": {
+          "over": 0,
+          "above": 38,
+          "below": 1,
+          "none": 0
+        }
+      },
+      {
+        "screen": 16,
+        "imageryPct": 0,
+        "imgTop": null,
+        "imgBottom": null,
+        "words": 65,
+        "headline": 32,
+        "body": 18,
+        "sizes": {
+          "11": 1,
+          "13": 7,
+          "14": 15,
+          "15": 1,
+          "18": 33,
+          "32": 8
+        },
+        "place": {
+          "over": 0,
+          "above": 0,
+          "below": 0,
+          "none": 65
+        }
+      },
+      {
+        "screen": 17,
+        "imageryPct": 0,
+        "imgTop": null,
+        "imgBottom": null,
+        "words": 42,
+        "headline": 18,
+        "body": 14,
+        "sizes": {
+          "13": 7,
+          "14": 21,
+          "15": 1,
+          "18": 13
+        },
+        "place": {
+          "over": 0,
+          "above": 0,
+          "below": 0,
+          "none": 42
+        }
+      }
+    ]
+  }
+]

@@ -14,6 +14,7 @@ export default function DataTickerSection() {
   return (
     <section
       id="data-ticker-section"
+      className="m-drop"
       style={{
         background: "var(--pale-wash)",
         padding: "48px 0",

@@ -35,7 +35,7 @@ export default function MonitoringSection() {
   const isInView = useReveal(ref, { once: true, amount: 0.1 });
 
   return (
-    <section ref={ref} style={{ background: "var(--pale-wash)", padding: "120px 32px" }}>
+    <section ref={ref} className="home-monitoring" style={{ background: "var(--pale-wash)", padding: "120px 32px" }}>
       <div style={{ maxWidth: "var(--content-reading)", margin: "0 auto" }}>
         <motion.div
           initial={false}
@@ -48,8 +48,11 @@ export default function MonitoringSection() {
           <h2 className="text-h2" style={{ color: "var(--ink-primary)", marginTop: "16px" }}>
             It watches the buildings you are watching.
           </h2>
+          <p className="m-only m-lead">
+            Every week, KOANO snapshots the free public record and tells you only what actually changed.
+          </p>
           <p
-            className="text-body-lg"
+            className="text-body-lg m-drop"
             style={{
               color: "var(--ink-secondary)",
               maxWidth: "660px",
@@ -65,6 +68,7 @@ export default function MonitoringSection() {
         </motion.div>
 
         <motion.div
+          className="m-drop"
           initial={false}
           animate={isInView ? "visible" : "hidden"}
           variants={fadeUp}
@@ -123,6 +127,7 @@ export default function MonitoringSection() {
         </motion.div>
 
         <motion.p
+          className="m-drop"
           initial={false}
           animate={isInView ? "visible" : "hidden"}
           variants={fadeUp}
