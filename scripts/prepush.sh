@@ -36,5 +36,14 @@ if [ "$fx" -ne 0 ]; then
   echo "[prepush]   If the change is intended, review the diff and re-record (CLAUDE.md §07C). Otherwise fix the regression."
   exit "$fx"
 fi
-echo "[prepush] ✓ build clean + verdict fixture byte-identical — push may proceed."
+# Phase 0: identical inputs give an identical decision (completion memo), proved
+# offline against a deliberately wobbling stand-in model.
+echo "[prepush] determinism proof (offline) …"
+npx tsx scripts/test-determinism.ts > /dev/null 2>&1
+dt=$?
+if [ "$dt" -ne 0 ]; then
+  echo "[prepush] ✗ DETERMINISM PROOF FAILED — push blocked. Run: npx tsx scripts/test-determinism.ts"
+  exit "$dt"
+fi
+echo "[prepush] ✓ build clean + verdict fixture byte-identical + determinism proof — push may proceed."
 exit 0

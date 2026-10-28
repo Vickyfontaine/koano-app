@@ -13,4 +13,7 @@ if [ "$status" -ne 0 ]; then echo "GATE: build FAILED"; grep -n "error\|Error" b
 npx tsx scripts/test-fixture.ts >> build-log/gate.log 2>&1
 fx=$?
 if [ "$fx" -ne 0 ]; then echo "GATE: fixture FAILED"; tail -20 build-log/gate.log; exit 1; fi
-echo "GATE: green (build + fixture)"
+npx tsx scripts/test-determinism.ts >> build-log/gate.log 2>&1
+dt=$?
+if [ "$dt" -ne 0 ]; then echo "GATE: determinism proof FAILED"; tail -20 build-log/gate.log; exit 1; fi
+echo "GATE: green (build + fixture + determinism)"

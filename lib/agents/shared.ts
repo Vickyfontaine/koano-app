@@ -9,6 +9,7 @@ import type { DataPoint, Provenance } from '../providers/types';
 import { buildAllowedTokens, groundObservation, WITHHELD_OBSERVATION } from './grounding';
 import { deterministicConfidence, blendConfidence } from './confidence';
 import { viaCassette } from '../testing/cassette';
+import { memoizedCompletion } from './completion-memo';
 
 // Sonnet-class runtime model. Single source of truth for every agent call.
 // NOTE: CLAUDE.md v4 specifies claude-sonnet-4-20250514, but that model reached
@@ -79,6 +80,10 @@ export function clamp(n: number, lo: number, hi: number): number {
 // ---------------------------------------------------------------------------
 
 let _client: Anthropic | null = null;
+/** Tests only: supply a stand-in client (scripts/test-determinism.ts). */
+export function setAnthropicClientForTests(c: Anthropic | null): void {
+  _client = c;
+}
 export function getAnthropicClient(): Anthropic {
   return anthropic();
 }
@@ -200,7 +205,12 @@ export async function callAgentLLM(args: {
   // regression is caught while model drift is not. In production the cassette is
   // 'off' and this is a plain pass-through.
   async function runModel(messages: Anthropic.MessageParam[]): Promise<{ text: string; raw: Record<string, unknown> }> {
-    const text = await viaCassette<string>('llm', { agent, temperature, systemPrompt, messages }, async () => {
+    const system = systemPrompt + '\n' + RESPONSE_FORMAT_INSTRUCTIONS;
+    // The cassette stays outermost (fixture replays are unchanged); inside it the
+    // completion memo makes identical temperature-0 requests return the first
+    // completion (completion-memo.ts).
+    const text = await viaCassette<string>('llm', { agent, temperature, systemPrompt, messages }, () =>
+      memoizedCompletion({ agent, model: KOANO_RUNTIME_MODEL, temperature, system, messages }, async () => {
       const msg = await anthropic().messages.create({
         model: KOANO_RUNTIME_MODEL,
         max_tokens: 2000,
@@ -208,7 +218,7 @@ export async function callAgentLLM(args: {
         system: [
           {
             type: 'text',
-            text: systemPrompt + '\n' + RESPONSE_FORMAT_INSTRUCTIONS,
+            text: system,
             cache_control: { type: 'ephemeral' }, // prompt caching on the system prompt
           },
         ],
@@ -217,7 +227,7 @@ export async function callAgentLLM(args: {
       const tb = msg.content.find((b) => b.type === 'text');
       if (!tb || tb.type !== 'text') throw new Error(`Agent ${agent}: no text block in LLM response`);
       return tb.text;
-    });
+    }));
     return { text, raw: JSON.parse(extractJson(text)) as Record<string, unknown> };
   }
 
