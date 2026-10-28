@@ -71,7 +71,8 @@ Output rules:
 - Never invent figures. Do not restate confidence/risk numbers other than the given ones.
 - PROVENANCE is not yours to claim: never call any fact "live", "live-confirmed", "verified", "confirmed", "real-time", or "authoritative". The badges carry that.
 - CERTAINTY must match the given confidence — never write "definitely", "guaranteed", "certain", "proven", or "without doubt".
-- RECENCY must be sourced: do not write "recent", "latest", "as of today", or "currently" unless a data point supplies the actual date.`;
+- RECENCY must be sourced: do not write "recent", "latest", "as of today", or "currently" unless a data point supplies the actual date.
+- PUNCTUATION: never use an em dash (—) or a spaced en dash as a dash. Use a comma, a colon or a full stop instead.`;
 
 // --- deterministic aggregation ------------------------------------------------
 // The aggregation constants (DIRECTION/THRESHOLDS/verdictFromScore), the

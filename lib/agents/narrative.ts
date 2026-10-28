@@ -7,6 +7,7 @@
 // fallback) is still referred to as an indicative benchmark, never as live
 // market data.
 
+import { withoutEmDashes } from './punctuation';
 import { registry } from '../providers/registry';
 import type { DataPoint, Provenance, ResolvedAddress } from '../providers/types';
 import { getAnthropicClient, KOANO_RUNTIME_MODEL, weakestProvenance } from './shared';
@@ -19,7 +20,8 @@ Rules:
 - Data points marked provenance "representative" are indicative benchmarks, NOT live market data. When you use one, call it an "indicative benchmark" — never imply live MLS access.
 - No hype words (hot, skyrocketing, once-in-a-lifetime). No investment guarantees. No predictions beyond what the data shows.
 - Structure: neighborhood character from demographics → market conditions (prices, velocity) → activity signals (permits, mortgage lending, employment) → one measured closing sentence.
-- Output the narrative as plain text only. No headings, no markdown, no preamble.`;
+- Output the narrative as plain text only. No headings, no markdown, no preamble.
+- PUNCTUATION: never use an em dash (—) or a spaced en dash as a dash. Use a comma, a colon or a full stop instead.`;
 
 export interface NarrativeResult {
   narrative: string;
@@ -129,7 +131,7 @@ export async function generateNarrativeForAddress(addr: ResolvedAddress): Promis
   }
 
   return {
-    narrative: textBlock.text.trim(),
+    narrative: withoutEmDashes(textBlock.text.trim()),
     overall_provenance: weakestProvenance(dataPoints),
     sources: Array.from(new Set(dataPoints.map((d) => d.source))),
     generated_at: new Date().toISOString(),

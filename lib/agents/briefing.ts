@@ -6,6 +6,7 @@
 // provenance = weakest input. Decision support, never decision-making —
 // the prompt enforces the language (Section 08, Cluster 5 liability).
 
+import { withoutEmDashes } from './punctuation';
 import { registry } from '../providers/registry';
 import type { DataPoint, Provenance } from '../providers/types';
 import { getAnthropicClient, KOANO_RUNTIME_MODEL, weakestProvenance } from './shared';
@@ -30,8 +31,9 @@ PORTFOLIO SUMMARY
 PROPERTY NOTES
 RISK WATCH
 THE WEEK AHEAD
-- Under PROPERTY NOTES, one short paragraph per property. Under THE WEEK AHEAD, only follow-ups grounded in the data (e.g. re-run analysis where confidence was low, review a flood designation) — no invented events.
-- 250-400 words total. Plain text only.`;
+- Under PROPERTY NOTES, one short paragraph per property. Under THE WEEK AHEAD, only follow-ups grounded in the data (e.g. re-run analysis where confidence was low, review a flood designation), no invented events.
+- 250-400 words total. Plain text only.
+- PUNCTUATION: never use an em dash (—) or a spaced en dash as a dash. Use a comma, a colon or a full stop instead.`;
 
 export interface BriefingProperty {
   address: string; // normalized
@@ -155,7 +157,7 @@ export async function generateBriefing(properties: BriefingProperty[]): Promise<
     });
     const tb = msg.content.find((b) => b.type === 'text');
     if (!tb || tb.type !== 'text' || !tb.text.trim()) throw new Error('Briefing generation returned no text');
-    return tb.text.trim();
+    return withoutEmDashes(tb.text.trim());
   }
 
   // --- GROUNDING GATE ---------------------------------------------------------

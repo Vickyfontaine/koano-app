@@ -16,4 +16,7 @@ if [ "$fx" -ne 0 ]; then echo "GATE: fixture FAILED"; tail -20 build-log/gate.lo
 npx tsx scripts/test-determinism.ts >> build-log/gate.log 2>&1
 dt=$?
 if [ "$dt" -ne 0 ]; then echo "GATE: determinism proof FAILED"; tail -20 build-log/gate.log; exit 1; fi
-echo "GATE: green (build + fixture + determinism)"
+npx tsx scripts/test-em-dash.ts >> build-log/gate.log 2>&1
+ed=$?
+if [ "$ed" -ne 0 ]; then echo "GATE: em-dash test FAILED"; tail -20 build-log/gate.log; exit 1; fi
+echo "GATE: green (build + fixture + determinism + em dash)"

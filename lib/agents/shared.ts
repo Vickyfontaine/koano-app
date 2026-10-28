@@ -10,6 +10,7 @@ import { buildAllowedTokens, groundObservation, WITHHELD_OBSERVATION } from './g
 import { deterministicConfidence, blendConfidence } from './confidence';
 import { viaCassette } from '../testing/cassette';
 import { memoizedCompletion } from './completion-memo';
+import { withoutEmDashes } from './punctuation';
 
 // Sonnet-class runtime model. Single source of truth for every agent call.
 // NOTE: CLAUDE.md v4 specifies claude-sonnet-4-20250514, but that model reached
@@ -307,12 +308,14 @@ export async function callAgentLLM(args: {
     verdict,
     confidence: CONVICTION_TO_CONFIDENCE[conviction],
     signal_window_months: WINDOW_BAND_TO_MONTHS[windowBand],
-    headline,
-    reasoning,
+    // No em dashes in model-written prose (punctuation.ts), applied after the
+    // grounding gate so it never changes what grounding judged.
+    headline: withoutEmDashes(headline),
+    reasoning: reasoning.map((r) => ({ ...r, observation: withoutEmDashes(r.observation) })),
     minority_signals: Array.isArray(raw.minority_signals)
       ? (raw.minority_signals as Array<{ signal?: unknown; note?: unknown }>).map((m) => ({
-          signal: String(m.signal ?? ''),
-          note: m.note ? String(m.note) : undefined,
+          signal: withoutEmDashes(String(m.signal ?? '')),
+          note: m.note ? withoutEmDashes(String(m.note)) : undefined,
         }))
       : [],
     risk_score: RISK_BAND_TO_SCORE[riskBand],
