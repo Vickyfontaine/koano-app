@@ -18,6 +18,7 @@ export default function CtaBackground() {
   return (
     <HeroRender
       slot={RENDERS.cta}
+      phoneSlot="cta"
       className="cta-render"
       style={{
         position: "absolute",

@@ -4,7 +4,7 @@ import React from "react";
 import Button from "../ui/Button";
 import HeroDashboard from "./HeroDashboard";
 import HeroAddressBox from "./HeroAddressBox";
-import HeroRender from "./HeroRender";
+import HeroRender, { PhoneRenderSlot } from "./HeroRender";
 import { RENDERS } from "./renders";
 
 const STATS = [
@@ -130,7 +130,7 @@ export default function HeroSection() {
               Five specialist agents read every public record touching a property.
             </p>
             <div className="m-only hero-m-render" aria-hidden="true">
-              <HeroRender slot={RENDERS["menu-hero"]} variant="block" priority />
+              <PhoneRenderSlot slot={RENDERS["menu-hero"]} kind="hero" />
             </div>
 
             {/* Address box: resolve a lot against the public record, no account needed */}

@@ -98,6 +98,14 @@
      the Coastal palette rather than a generic grey drop. */
   --shadow-flat: 0 1px 2px rgba(13, 43, 62, 0.04), 0 2px 6px rgba(13, 43, 62, 0.04);
   --shadow-raised: 0 1px 2px rgba(13, 43, 62, 0.05), 0 6px 20px rgba(13, 43, 62, 0.07);
+  /* Mobile layout system (below 768px; build-log/mobile-audit.md). */
+  --m-gutter: 16px;       /* page gutter, every page */
+  --m-section-y: 48px;    /* section padding, top and bottom */
+  --m-card-pad: 20px;     /* card padding */
+  --m-card-pad-inner: 16px; /* a card inside a card */
+  --m-card-gap: 12px;     /* between cards in a list or grid */
+  --m-slot-gap: 24px;     /* copy to a render slot */
+
   /* Mobile type scale (below 768px; families unchanged). The mobile
      proposal, build-log/mobile-proposal.md §2. Homepage only until approved. */
   --m-display: 44px;
@@ -814,7 +822,7 @@ body {
   }
 
   .home-mobile section:not(#hero-section) {
-    padding: var(--space-8) var(--space-4) !important;
+    padding: var(--m-section-y) var(--m-gutter) !important;
   }
   .home-mobile h2.text-h2 {
     font-size: var(--m-h2) !important;
@@ -839,7 +847,7 @@ body {
      screen's image (full bleed, cropped onto the brownstones of the desktop
      stand-in), then the address box and the buttons. */
   .home-mobile #hero-section > .hero-inner {
-    padding: calc(var(--nav-h) + var(--space-6)) var(--space-4) var(--space-7) !important;
+    padding: calc(var(--nav-h) + var(--space-6)) var(--m-gutter) var(--m-section-y) !important;
   }
   .home-mobile #hero-section h1 {
     font-size: var(--m-display) !important;
@@ -850,22 +858,12 @@ body {
     margin-bottom: var(--space-5);
   }
   .home-mobile .hero-m-render {
-    margin: 0 calc(-1 * var(--space-4)) var(--space-6);
-    height: min(52svh, 440px);
-    overflow: hidden;
-  }
-  .home-mobile .hero-m-render img {
-    width: 100%;
-    height: 100%;
-    max-height: none;
-    object-fit: cover;
-    object-position: 77% 92%;
-    display: block;
+    margin: 0 calc(-1 * var(--m-gutter)) var(--space-5);
   }
 
   /* Agents: names only, as a compact list of cards. */
   .home-mobile #agents-section .card {
-    padding: var(--space-4) var(--space-5) !important;
+    padding: var(--space-4) var(--m-card-pad) !important;
   }
   .home-mobile #agents-section .card .section-number {
     margin-bottom: var(--space-1) !important;
@@ -876,8 +874,12 @@ body {
 
   /* Monitoring follows provenance on the same pale wash once the archive
      drops, so it starts without a second full top padding. */
-  .home-mobile section.home-monitoring {
-    padding-top: var(--space-4) !important;
+  .home-mobile section.home-monitoring:not(#hero-section) {
+    padding-top: 0 !important;
+  }
+  /* Its alerts are hidden on phones, so its header ends the section. */
+  .home-mobile section.home-monitoring:not(#hero-section) > div > div:first-child {
+    margin-bottom: 0 !important;
   }
 
   /* Clusters: lens names and their price chips. */
@@ -886,22 +888,19 @@ body {
     flex-direction: row !important;
     align-items: center;
     gap: var(--space-3);
-    padding: var(--space-4) var(--space-5) !important;
+    padding: var(--space-4) var(--m-card-pad) !important;
   }
   .home-mobile #clusters-section .card > div:last-child {
     margin-top: 0 !important;
     flex: none;
   }
   .home-mobile .clusters-grid {
-    gap: var(--space-2) !important;
+    gap: var(--m-card-gap) !important;
   }
 
-  /* Closing CTA: copy first, then the render filling half a screen. */
+  /* Closing CTA: the copy left-aligned like the rest of the homepage. */
+  #early-access-section > div,
   .home-mobile #early-access-section {
-    padding-bottom: 0 !important;
-    text-align: left;
-  }
-  .home-mobile #early-access-section > div {
     text-align: left !important;
   }
   .home-mobile #early-access-section .text-body-lg {
@@ -910,16 +909,92 @@ body {
   .home-mobile #early-access-section .flex {
     justify-content: flex-start !important;
   }
-  .home-mobile #early-access-section > div {
+}
+
+/* ===== Mobile layout system (below 768px), build-log/mobile-audit.md =====
+   One gutter, one section rhythm, one card padding, one hero frame and two
+   render slots for every marketing page. Values are the --m-* tokens. */
+.render-slot {
+  display: none;
+}
+@media (max-width: 767px) {
+  /* Sections: 48px top and bottom, the 16px gutter. .mk-continues starts a
+     section that shares the previous section's background without a second
+     top padding. */
+  .mk-section {
+    padding: var(--m-section-y) var(--m-gutter) !important;
+  }
+  .mk-section.mk-continues {
+    padding-top: 0 !important;
+  }
+  .mk-section .card,
+  .mk-card {
+    padding: var(--m-card-pad) !important;
+  }
+  .mk-card-inner {
+    padding: var(--m-card-pad-inner) !important;
+  }
+  #site-footer {
+    padding-left: var(--m-gutter) !important;
+    padding-right: var(--m-gutter) !important;
+  }
+
+  /* Hero frame: the copy in the gutter, then the render slot full width with
+     no side inset, flush with the section bottom. */
+  .hero-with-render {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .hero-with-render .hero-copy {
+    padding-left: var(--m-gutter) !important;
+    padding-right: var(--m-gutter) !important;
+    padding-bottom: var(--m-slot-gap) !important;
+  }
+  .hero-with-render > .render-slot {
+    order: 2;
+  }
+
+  /* Closing CTA: the copy and buttons, then the slot full width, flush with
+     the footer. */
+  .cta-with-render {
+    padding-bottom: 0 !important;
+  }
+  .cta-with-render > div {
     order: 1;
   }
-  .home-mobile #early-access-section .cta-render {
+  .cta-with-render > .render-slot {
     order: 2;
-    height: min(48svh, 400px) !important;
-    margin: var(--space-6) calc(-1 * var(--space-4)) 0 !important;
-    width: calc(100% + 2 * var(--space-4)) !important;
-    max-width: none;
-    object-fit: cover !important;
-    object-position: 0% 100% !important;
+    margin: var(--space-6) calc(-1 * var(--m-gutter)) 0;
+    width: calc(100% + 2 * var(--m-gutter));
+  }
+
+  /* Render slots: the founder's mobile render goes here. Until it exists,
+     a labelled neutral box at the slot's final size replaces the stand-in. */
+  .has-phone-slot {
+    display: none !important;
+  }
+  .render-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-1);
+    width: 100%;
+    box-sizing: border-box;
+    padding: var(--space-4);
+    background: #eef1f3;
+    border: 1px dashed var(--border-input);
+    font-family: var(--font-mono);
+    font-size: var(--m-micro);
+    line-height: 1.4;
+    color: var(--ink-muted);
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+  .render-slot-hero {
+    aspect-ratio: 4 / 5;
+  }
+  .render-slot-cta {
+    aspect-ratio: 3 / 2;
   }
 }

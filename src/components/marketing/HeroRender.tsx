@@ -20,6 +20,30 @@
 import React from "react";
 import { mobileSrc, type RenderSlot } from "./renders";
 
+// Phone render slots (mobile layout system, build-log/mobile-audit.md): the
+// final size of each slot type, full width at any phone width. Until the
+// founder's mobile render for a slot exists, phones show a labelled neutral
+// box at that size instead of the desktop stand-in (founder instruction).
+export const PHONE_SLOTS = {
+  hero: { ratio: "4:5", w: 860, h: 1075, text: "none, the copy sits above it" },
+  cta: { ratio: "3:2", w: 860, h: 573, text: "none, the copy and buttons sit above it" },
+} as const;
+export type PhoneSlotKind = keyof typeof PHONE_SLOTS;
+
+export function PhoneRenderSlot({ slot, kind }: { slot: RenderSlot; kind: PhoneSlotKind }) {
+  const s = PHONE_SLOTS[kind];
+  return (
+    <div className={`render-slot render-slot-${kind}`} aria-hidden="true">
+      <span>public/renders/mobile/{slot.name}.webp</span>
+      <span>
+        {s.w} x {s.h} px (2x at 430)
+      </span>
+      <span>{s.ratio}, full width</span>
+      <span>Text over it: {s.text}</span>
+    </div>
+  );
+}
+
 interface HeroRenderProps {
   slot: RenderSlot;
   variant?: "bleed" | "block";
@@ -27,10 +51,20 @@ interface HeroRenderProps {
   /** Extra class for the parent's own placement rules. */
   className?: string;
   style?: React.CSSProperties;
+  /** On phones, without a mobile render, show this slot's placeholder instead. */
+  phoneSlot?: PhoneSlotKind;
 }
 
-export default function HeroRender({ slot, variant = "bleed", priority = false, className = "", style }: HeroRenderProps) {
+export default function HeroRender({ slot, variant = "bleed", priority = false, className = "", style, phoneSlot }: HeroRenderProps) {
   const mobile = mobileSrc(slot);
+  if (!mobile && phoneSlot) {
+    return (
+      <>
+        <HeroRender slot={slot} variant={variant} priority={priority} className={`${className} has-phone-slot`.trim()} style={style} />
+        <PhoneRenderSlot slot={slot} kind={phoneSlot} />
+      </>
+    );
+  }
   const img = (
     // eslint-disable-next-line @next/next/no-img-element
     <img
