@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import Button from "../ui/Button";
 import HeroDashboard from "./HeroDashboard";
 import HeroAddressBox from "./HeroAddressBox";
@@ -40,11 +39,6 @@ export default function HeroSection() {
         style={{ objectFit: "contain", objectPosition: "center bottom" }}
       />
 
-      {/* Scrim: a navy wash over the text column so white copy reads AA on the
-          light sky (5.3:1 on the blended ground); fades out under the card and
-          the buildings. On phones the copy block carries the same wash. */}
-      <div className="hero-scrim" aria-hidden="true" />
-
       {/* Content overlay */}
       <div
         className="hero-inner"
@@ -80,7 +74,7 @@ export default function HeroSection() {
                 fontFamily: "var(--font-mono)",
                 fontSize: "11px",
                 fontWeight: 500,
-                color: "rgba(255, 255, 255, 0.85)",
+                color: "var(--ink-primary)",
                 letterSpacing: "1.5px",
                 textTransform: "uppercase",
                 marginBottom: "24px",
@@ -98,7 +92,7 @@ export default function HeroSection() {
                 fontWeight: 700,
                 letterSpacing: "-0.02em",
                 lineHeight: 1.05,
-                color: "#FFFFFF",
+                color: "var(--near-black)",
                 margin: 0,
                 maxWidth: "560px",
               }}
@@ -116,7 +110,7 @@ export default function HeroSection() {
                 fontSize: "18px",
                 fontWeight: 500,
                 lineHeight: 1.6,
-                color: "#FFFFFF",
+                color: "var(--near-black)",
                 maxWidth: "520px",
                 marginTop: "24px",
                 marginBottom: "28px",
@@ -141,47 +135,33 @@ export default function HeroSection() {
               <Button variant="primary" href="/signup" id="hero-cta-primary">
                 Sign up
               </Button>
-              <Button variant="ghost-light" href="/intelligence" id="hero-cta-secondary">
+              <Button variant="ghost" href="/intelligence" id="hero-cta-secondary">
                 See how it works
               </Button>
             </div>
 
-            {/* Stats row */}
+            {/* Stats row: frosted pills like the replay card, because the
+                row lands on the render's cast shadow at desktop widths. */}
             <div
               className="hero-enter hero-stats flex flex-wrap items-center"
-              style={{ animationDelay: "0.70s", gap: "0" }}
+              style={{ animationDelay: "0.70s", gap: "var(--space-2)" }}
             >
-              {STATS.map((stat, i) => (
-                <React.Fragment key={stat.label}>
-                  {i > 0 && (
-                    <span
-                      className="hero-stat-sep"
-                      style={{
-                        color: "rgba(255, 255, 255, 0.3)",
-                        margin: "0 20px",
-                        fontSize: "13px",
-                        userSelect: "none",
-                      }}
-                    >
-                      ·
-                    </span>
-                  )}
-                  <span
-                    style={{
-                      fontFamily: "var(--font-mono)",
-                      fontSize: "13px",
-                      color: "rgba(255, 255, 255, 0.85)",
-                      letterSpacing: "0.08em",
-                    }}
-                  >
-                    <span style={{ fontWeight: 700, marginRight: "6px" }}>
-                      {stat.value}
-                    </span>
-                    <span style={{ fontWeight: 400, opacity: 0.85 }}>
-                      {stat.label}
-                    </span>
+              {STATS.map((stat) => (
+                <span
+                  key={stat.label}
+                  className="hero-stat"
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "13px",
+                    color: "var(--near-black)",
+                    letterSpacing: "0.08em",
+                  }}
+                >
+                  <span style={{ fontWeight: 700, marginRight: "6px" }}>
+                    {stat.value}
                   </span>
-                </React.Fragment>
+                  <span style={{ fontWeight: 400 }}>{stat.label}</span>
+                </span>
               ))}
             </div>
           </div>
@@ -197,8 +177,11 @@ export default function HeroSection() {
       </div>
 
       <style jsx>{`
+        /* backwards, not both: a finished entrance must hold no opacity
+           animation, or the column becomes the frosted card's backdrop root
+           and the card blurs nothing. */
         .hero-enter {
-          animation: hero-enter 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+          animation: hero-enter 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
         }
         @keyframes hero-enter {
           from {
@@ -210,21 +193,24 @@ export default function HeroSection() {
             transform: translateY(0);
           }
         }
-        /* White copy on the navy wash: the focus ring is white here. */
-        #hero-section :global(:focus-visible) {
-          outline-color: var(--white);
+        /* No scrim over the render (founder decision): the copy is near-black
+           ink straight on the sky and the cast shadow, and the ghost button
+           takes the same ink so it reads AA there too. */
+        #hero-section :global(.btn-ghost) {
+          color: var(--ink-primary);
+          border-color: rgba(13, 43, 62, 0.55);
         }
-        .hero-scrim {
-          position: absolute;
-          inset: 0;
-          z-index: 0;
-          pointer-events: none;
-          background: linear-gradient(
-            90deg,
-            rgba(13, 43, 62, 0.62) 0%,
-            rgba(13, 43, 62, 0.58) 42%,
-            rgba(13, 43, 62, 0) 68%
-          );
+        .hero-stat {
+          background: var(--hero-frost-fill);
+          backdrop-filter: var(--hero-frost-blur);
+          -webkit-backdrop-filter: var(--hero-frost-blur);
+          border: 1px solid rgba(255, 255, 255, 0.7);
+          border-radius: var(--radius-pill);
+          padding: var(--space-1) var(--space-3);
+        }
+        #hero-section :global(.btn-ghost:hover) {
+          background: rgba(255, 255, 255, 0.35);
+          border-color: var(--ink-primary);
         }
         @media (max-width: 900px) {
           .hero-grid {
@@ -236,19 +222,9 @@ export default function HeroSection() {
           }
         }
         @media (max-width: 767px) {
-          .hero-scrim {
-            display: none;
-          }
-          .hero-inner {
-            background: rgba(13, 43, 62, 0.62);
-          }
           .hero-stats {
             flex-direction: column;
             align-items: flex-start !important;
-            gap: 6px !important;
-          }
-          .hero-stat-sep {
-            display: none;
           }
         }
       `}</style>

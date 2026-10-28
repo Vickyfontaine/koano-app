@@ -1,0 +1,1517 @@
+[
+  {
+    "width": 390,
+    "rows": [
+      {
+        "text": "wait",
+        "inCard": true,
+        "ink": "rgb(180, 83, 9)",
+        "size": 11,
+        "ratio": 4.51,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2125
+      },
+      {
+        "text": "buy",
+        "inCard": true,
+        "ink": "rgb(21, 128, 61)",
+        "size": 11,
+        "ratio": 4.53,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 850
+      },
+      {
+        "text": "hold",
+        "inCard": true,
+        "ink": "rgb(47, 111, 148)",
+        "size": 11,
+        "ratio": 4.8,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 850
+      },
+      {
+        "text": "Synthesis · one verdict",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 4.96,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "confidence",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 4.96,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "risk",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 4.96,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "window",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 4.96,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "Recorded example run, August 2026. Illustrative ",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 4.96,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "Replayed at about 30x.",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 4.96,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "Recorded example",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 5.23,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "Paused",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 5.23,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "HPI +5.6% YoY",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 5.23,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 850
+      },
+      {
+        "text": "80",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 5.23,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 850
+      },
+      {
+        "text": "%",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 5.23,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 850
+      },
+      {
+        "text": "675 permits in tract",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 5.23,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 850
+      },
+      {
+        "text": "82",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 5.23,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 850
+      },
+      {
+        "text": "Mortgage denials 31.9%",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 5.23,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 1275
+      },
+      {
+        "text": "74",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 5.23,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 1275
+      },
+      {
+        "text": "Flood zone X · very low",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 5.23,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 1700
+      },
+      {
+        "text": "97% unused FAR",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 5.23,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2125
+      },
+      {
+        "text": "75",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 5.23,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2125
+      },
+      {
+        "text": "175 3rd Street, Brooklyn",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 11,
+        "ratio": 6.65,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "97% unused FAR: large as-of-right development up",
+        "inCard": true,
+        "ink": "rgb(61, 90, 110)",
+        "size": 13,
+        "ratio": 6.87,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "BUY",
+        "inCard": true,
+        "ink": "rgb(21, 128, 61)",
+        "size": 32,
+        "ratio": 4.73,
+        "need": 3,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "Street address",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 16,
+        "ratio": 7.45,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "Real estate reasoning engine",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 11,
+        "ratio": 7.86,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "KOANO deploys five specialist agents that read e",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 18,
+        "ratio": 7.86,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "See how it works",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 14,
+        "ratio": 7.86,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "Try the recorded example:",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 11,
+        "ratio": 7.92,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "Check the record",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 14,
+        "ratio": 7.95,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "↗",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 14,
+        "ratio": 7.95,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "Sign up",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 14,
+        "ratio": 8.04,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "SMART DATA.",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 34,
+        "ratio": 7.86,
+        "need": 3,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "SMARTER REAL ESTATE DECISIONS.",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 34,
+        "ratio": 7.86,
+        "need": 3,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "69",
+        "inCard": true,
+        "ink": "rgb(13, 43, 62)",
+        "size": 11,
+        "ratio": 13.84,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "51",
+        "inCard": true,
+        "ink": "rgb(13, 43, 62)",
+        "size": 11,
+        "ratio": 13.84,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "12",
+        "inCard": true,
+        "ink": "rgb(13, 43, 62)",
+        "size": 11,
+        "ratio": 13.84,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "mo",
+        "inCard": true,
+        "ink": "rgb(13, 43, 62)",
+        "size": 11,
+        "ratio": 13.84,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "Every figure",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 13,
+        "ratio": 14.61,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "Data-Sourced",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 13,
+        "ratio": 14.61,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "Every verdict",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 13,
+        "ratio": 14.61,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "Reproducible",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 13,
+        "ratio": 14.61,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "Every step",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 13,
+        "ratio": 14.61,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "Auditable",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 13,
+        "ratio": 14.61,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "175 3rd Street, Brooklyn",
+        "inCard": true,
+        "ink": "rgb(13, 43, 62)",
+        "size": 15,
+        "ratio": 14.61,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "Market Timing",
+        "inCard": true,
+        "ink": "rgb(13, 43, 62)",
+        "size": 14,
+        "ratio": 14.61,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 850
+      },
+      {
+        "text": "Infrastructure Pipeline",
+        "inCard": true,
+        "ink": "rgb(13, 43, 62)",
+        "size": 14,
+        "ratio": 14.61,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 850
+      },
+      {
+        "text": "Demand Sentiment",
+        "inCard": true,
+        "ink": "rgb(13, 43, 62)",
+        "size": 14,
+        "ratio": 14.61,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 1275
+      },
+      {
+        "text": "Risk & Volatility",
+        "inCard": true,
+        "ink": "rgb(13, 43, 62)",
+        "size": 14,
+        "ratio": 14.61,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 1700
+      },
+      {
+        "text": "Regulatory & Policy",
+        "inCard": true,
+        "ink": "rgb(13, 43, 62)",
+        "size": 14,
+        "ratio": 14.61,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2125
+      }
+    ]
+  },
+  {
+    "width": 768,
+    "rows": [
+      {
+        "text": "wait",
+        "inCard": true,
+        "ink": "rgb(180, 83, 9)",
+        "size": 11,
+        "ratio": 4.51,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2125
+      },
+      {
+        "text": "buy",
+        "inCard": true,
+        "ink": "rgb(21, 128, 61)",
+        "size": 11,
+        "ratio": 4.53,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 850
+      },
+      {
+        "text": "hold",
+        "inCard": true,
+        "ink": "rgb(47, 111, 148)",
+        "size": 11,
+        "ratio": 4.8,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 850
+      },
+      {
+        "text": "risk",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 4.83,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "window",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 4.83,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "Recorded example run, August 2026. Illustrative ",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 4.83,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "Replayed at about 30x.",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 4.86,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "confidence",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 4.87,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "Synthesis · one verdict",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 4.96,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "%",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 5.19,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2125
+      },
+      {
+        "text": "75",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 5.2,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2125
+      },
+      {
+        "text": "Recorded example",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 5.23,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "Paused",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 5.23,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "HPI +5.6% YoY",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 5.23,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 850
+      },
+      {
+        "text": "80",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 5.23,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 850
+      },
+      {
+        "text": "675 permits in tract",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 5.23,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 850
+      },
+      {
+        "text": "82",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 5.23,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 850
+      },
+      {
+        "text": "Mortgage denials 31.9%",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 5.23,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 1275
+      },
+      {
+        "text": "74",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 5.23,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 1275
+      },
+      {
+        "text": "Flood zone X · very low",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 5.24,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 1700
+      },
+      {
+        "text": "97% unused FAR",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 5.24,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2125
+      },
+      {
+        "text": "97% unused FAR: large as-of-right development up",
+        "inCard": true,
+        "ink": "rgb(61, 90, 110)",
+        "size": 13,
+        "ratio": 6.69,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "BUY",
+        "inCard": true,
+        "ink": "rgb(21, 128, 61)",
+        "size": 32,
+        "ratio": 4.73,
+        "need": 3,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "Try the recorded example:",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 11,
+        "ratio": 7.11,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "175 3rd Street, Brooklyn",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 11,
+        "ratio": 7.11,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "Street address",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 16,
+        "ratio": 7.35,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "Real estate reasoning engine",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 11,
+        "ratio": 7.86,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "KOANO deploys five specialist agents that read e",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 18,
+        "ratio": 7.86,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "See how it works",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 14,
+        "ratio": 7.86,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "Check the record",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 14,
+        "ratio": 8.04,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "↗",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 14,
+        "ratio": 8.04,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "Sign up",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 14,
+        "ratio": 8.04,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "SMART DATA.",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 34,
+        "ratio": 7.86,
+        "need": 3,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "SMARTER REAL ESTATE DECISIONS.",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 34,
+        "ratio": 7.86,
+        "need": 3,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "51",
+        "inCard": true,
+        "ink": "rgb(13, 43, 62)",
+        "size": 11,
+        "ratio": 13.69,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "mo",
+        "inCard": true,
+        "ink": "rgb(13, 43, 62)",
+        "size": 11,
+        "ratio": 13.69,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "12",
+        "inCard": true,
+        "ink": "rgb(13, 43, 62)",
+        "size": 11,
+        "ratio": 13.72,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "69",
+        "inCard": true,
+        "ink": "rgb(13, 43, 62)",
+        "size": 11,
+        "ratio": 13.81,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "Every figure",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 13,
+        "ratio": 14.61,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "Data-Sourced",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 13,
+        "ratio": 14.61,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "Every verdict",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 13,
+        "ratio": 14.61,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "Reproducible",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 13,
+        "ratio": 14.61,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "Every step",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 13,
+        "ratio": 14.61,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "Auditable",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 13,
+        "ratio": 14.61,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "175 3rd Street, Brooklyn",
+        "inCard": true,
+        "ink": "rgb(13, 43, 62)",
+        "size": 15,
+        "ratio": 14.61,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "Market Timing",
+        "inCard": true,
+        "ink": "rgb(13, 43, 62)",
+        "size": 14,
+        "ratio": 14.61,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 850
+      },
+      {
+        "text": "Infrastructure Pipeline",
+        "inCard": true,
+        "ink": "rgb(13, 43, 62)",
+        "size": 14,
+        "ratio": 14.61,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 850
+      },
+      {
+        "text": "Demand Sentiment",
+        "inCard": true,
+        "ink": "rgb(13, 43, 62)",
+        "size": 14,
+        "ratio": 14.61,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 1275
+      },
+      {
+        "text": "Risk & Volatility",
+        "inCard": true,
+        "ink": "rgb(13, 43, 62)",
+        "size": 14,
+        "ratio": 14.61,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 1700
+      },
+      {
+        "text": "Regulatory & Policy",
+        "inCard": true,
+        "ink": "rgb(13, 43, 62)",
+        "size": 14,
+        "ratio": 14.64,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2125
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "rows": [
+      {
+        "text": "wait",
+        "inCard": true,
+        "ink": "rgb(180, 83, 9)",
+        "size": 11,
+        "ratio": 4.51,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2125
+      },
+      {
+        "text": "buy",
+        "inCard": true,
+        "ink": "rgb(21, 128, 61)",
+        "size": 11,
+        "ratio": 4.53,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 850
+      },
+      {
+        "text": "Flood zone X · very low",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 4.54,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 1700
+      },
+      {
+        "text": "97% unused FAR",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 4.57,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2125
+      },
+      {
+        "text": "Mortgage denials 31.9%",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 4.58,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 1275
+      },
+      {
+        "text": "Recorded example run, August 2026. Illustrative ",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 4.7,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "675 permits in tract",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 4.71,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 850
+      },
+      {
+        "text": "Synthesis · one verdict",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 4.74,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "Replayed at about 30x.",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 4.75,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "confidence",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 4.78,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "risk",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 4.78,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "window",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 4.78,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "hold",
+        "inCard": true,
+        "ink": "rgb(47, 111, 148)",
+        "size": 11,
+        "ratio": 4.8,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 850
+      },
+      {
+        "text": "%",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 4.83,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2125
+      },
+      {
+        "text": "75",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 4.83,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2125
+      },
+      {
+        "text": "82",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 4.87,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 850
+      },
+      {
+        "text": "80",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 4.91,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 1700
+      },
+      {
+        "text": "74",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 4.92,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 1275
+      },
+      {
+        "text": "HPI +5.6% YoY",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 4.94,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 850
+      },
+      {
+        "text": "Recorded example",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 5.23,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "Paused",
+        "inCard": true,
+        "ink": "rgb(82, 112, 130)",
+        "size": 11,
+        "ratio": 5.23,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "97% unused FAR: large as-of-right development up",
+        "inCard": true,
+        "ink": "rgb(61, 90, 110)",
+        "size": 13,
+        "ratio": 6.53,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "BUY",
+        "inCard": true,
+        "ink": "rgb(21, 128, 61)",
+        "size": 32,
+        "ratio": 4.53,
+        "need": 3,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "Real estate reasoning engine",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 11,
+        "ratio": 7.86,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "175 3rd Street, Brooklyn",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 11,
+        "ratio": 7.91,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "Try the recorded example:",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 11,
+        "ratio": 7.92,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "Street address",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 16,
+        "ratio": 7.96,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "Check the record",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 14,
+        "ratio": 8.04,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "↗",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 14,
+        "ratio": 8.04,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "Sign up",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 14,
+        "ratio": 8.04,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "KOANO deploys five specialist agents that read e",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 18,
+        "ratio": 8.07,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "See how it works",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 14,
+        "ratio": 8.51,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "SMART DATA.",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 54.72,
+        "ratio": 7.72,
+        "need": 3,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "SMARTER REAL ESTATE DECISIONS.",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 54.72,
+        "ratio": 7.81,
+        "need": 3,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "Risk & Volatility",
+        "inCard": true,
+        "ink": "rgb(13, 43, 62)",
+        "size": 14,
+        "ratio": 12.69,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 1700
+      },
+      {
+        "text": "Regulatory & Policy",
+        "inCard": true,
+        "ink": "rgb(13, 43, 62)",
+        "size": 14,
+        "ratio": 12.76,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2125
+      },
+      {
+        "text": "Demand Sentiment",
+        "inCard": true,
+        "ink": "rgb(13, 43, 62)",
+        "size": 14,
+        "ratio": 12.91,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 1275
+      },
+      {
+        "text": "Infrastructure Pipeline",
+        "inCard": true,
+        "ink": "rgb(13, 43, 62)",
+        "size": 14,
+        "ratio": 13.29,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 850
+      },
+      {
+        "text": "12",
+        "inCard": true,
+        "ink": "rgb(13, 43, 62)",
+        "size": 11,
+        "ratio": 13.33,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "69",
+        "inCard": true,
+        "ink": "rgb(13, 43, 62)",
+        "size": 11,
+        "ratio": 13.35,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "51",
+        "inCard": true,
+        "ink": "rgb(13, 43, 62)",
+        "size": 11,
+        "ratio": 13.35,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "mo",
+        "inCard": true,
+        "ink": "rgb(13, 43, 62)",
+        "size": 11,
+        "ratio": 13.35,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 2975
+      },
+      {
+        "text": "Reproducible",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 13,
+        "ratio": 13.72,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "Every verdict",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 13,
+        "ratio": 13.73,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "Auditable",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 13,
+        "ratio": 13.84,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "Every step",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 13,
+        "ratio": 13.96,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "Market Timing",
+        "inCard": true,
+        "ink": "rgb(13, 43, 62)",
+        "size": 14,
+        "ratio": 14.03,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 850
+      },
+      {
+        "text": "Data-Sourced",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 13,
+        "ratio": 14.35,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "175 3rd Street, Brooklyn",
+        "inCard": true,
+        "ink": "rgb(13, 43, 62)",
+        "size": 15,
+        "ratio": 14.49,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      },
+      {
+        "text": "Every figure",
+        "inCard": false,
+        "ink": "rgb(13, 43, 62)",
+        "size": 13,
+        "ratio": 14.61,
+        "need": 4.5,
+        "pass": true,
+        "frameMs": 0
+      }
+    ]
+  }
+]

@@ -98,6 +98,14 @@
      the Coastal palette rather than a generic grey drop. */
   --shadow-flat: 0 1px 2px rgba(13, 43, 62, 0.04), 0 2px 6px rgba(13, 43, 62, 0.04);
   --shadow-raised: 0 1px 2px rgba(13, 43, 62, 0.05), 0 6px 20px rgba(13, 43, 62, 0.07);
+  /* The homepage hero frost (the replay card and the stat pills). Measured
+     by scripts/ui/hero-contrast.mjs over every frame of the replay at 390,
+     768 and 1440: 0.88 is the lightest fill that holds the card's 11px
+     --ink-muted at AA where it crosses the render's dark brick side wall at
+     1440; the backdrop is blurred, desaturated and lifted before the fill. */
+  --hero-frost-fill: rgba(255, 255, 255, 0.88);
+  --hero-frost-inner: rgba(240, 247, 252, 0.7);
+  --hero-frost-blur: blur(48px) saturate(0.6) brightness(1.35);
   --shadow-hover: 0 6px 14px rgba(13, 43, 62, 0.08), 0 22px 48px rgba(13, 43, 62, 0.13);
   --shadow-accent: 0 24px 60px -24px rgba(26, 79, 110, 0.3);
 

@@ -1,0 +1,47 @@
+[
+  {
+    "name": "home",
+    "width": 390,
+    "url": "http://localhost:3000/",
+    "file": "build-log/hero-pass/after/home-390.jpg",
+    "console": [
+      "warning: Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+    ],
+    "title": "KOANO: The Real Estate Reasoning Engine",
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "scrollHeight": 13710,
+    "horizontalOverflow": false,
+    "offenders": []
+  },
+  {
+    "name": "home",
+    "width": 768,
+    "url": "http://localhost:3000/",
+    "file": "build-log/hero-pass/after/home-768.jpg",
+    "console": [
+      "warning: Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+    ],
+    "title": "KOANO: The Real Estate Reasoning Engine",
+    "scrollWidth": 768,
+    "clientWidth": 768,
+    "scrollHeight": 9766,
+    "horizontalOverflow": false,
+    "offenders": []
+  },
+  {
+    "name": "home",
+    "width": 1440,
+    "url": "http://localhost:3000/",
+    "file": "build-log/hero-pass/after/home-1440.jpg",
+    "console": [
+      "warning: Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview"
+    ],
+    "title": "KOANO: The Real Estate Reasoning Engine",
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "scrollHeight": 9053,
+    "horizontalOverflow": false,
+    "offenders": []
+  }
+]

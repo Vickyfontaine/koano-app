@@ -22,12 +22,14 @@ const AGENT_TAG: Record<string, string> = {
   "regulatory-policy": "97% unused FAR",
 };
 
+// Opaque chip fills (each is the old 12-14% tint flattened onto white), so a
+// verdict word on the frosted card reads exactly as it did on the solid one.
 const VCHIP: Record<Verdict, { color: string; bg: string }> = {
-  buy: { color: "var(--signal-positive-ink)", bg: "rgba(34,197,94,0.12)" },
-  hold: { color: "var(--mid-blue-ink)", bg: "rgba(90,155,190,0.14)" },
-  wait: { color: "var(--signal-warning-ink)", bg: "rgba(245,158,11,0.14)" },
-  sell: { color: "var(--signal-negative-ink)", bg: "rgba(239,68,68,0.12)" },
-  drop: { color: "var(--signal-negative-ink)", bg: "rgba(239,68,68,0.12)" },
+  buy: { color: "var(--signal-positive-ink)", bg: "#E5F8EC" },
+  hold: { color: "var(--mid-blue-ink)", bg: "#E8F1F6" },
+  wait: { color: "var(--signal-warning-ink)", bg: "#FEF1DD" },
+  sell: { color: "var(--signal-negative-ink)", bg: "#FDE9E9" },
+  drop: { color: "var(--signal-negative-ink)", bg: "#FDE9E9" },
 };
 
 // Ordered reading list, each row built from the real recorded summary + tag.
@@ -95,13 +97,17 @@ export default function HeroDashboard() {
       style={{
         width: "100%",
         maxWidth: "460px",
-        // A SOLID white card (CLAUDE.md §10): glass over a render blurred the
-        // buildings into the chips and made BUY/HOLD illegible (A4). Solid
-        // white with the navy-tinted raised shadow reads on the sky render.
-        background: "var(--white)",
+        // Frosted (founder decision, after A4): a blur over the render plus a
+        // pale tinted fill, so the render shows through while every ink in the
+        // card holds WCAG AA against the darkest blurred backdrop of the loop
+        // (measured by scripts/ui/hero-contrast.mjs). Tune the tint and the
+        // blur here, never the render.
+        background: "var(--hero-frost-fill)",
+        backdropFilter: "var(--hero-frost-blur)",
+        WebkitBackdropFilter: "var(--hero-frost-blur)",
         borderRadius: "var(--radius-card)",
-        border: "1px solid var(--border)",
-        boxShadow: "var(--shadow-hover)",
+        border: "1px solid rgba(255, 255, 255, 0.7)",
+        boxShadow: "0 6px 14px rgba(13, 43, 62, 0.06), 0 22px 48px rgba(13, 43, 62, 0.10)",
         padding: "var(--space-5)",
         fontFamily: "inherit",
         // The card is already centered in the hero section, but the fixed nav
@@ -223,8 +229,8 @@ export default function HeroDashboard() {
         variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE } } }}
         style={{
           marginTop: "var(--space-4)",
-          background: "var(--pale-wash)",
-          border: "1px solid var(--border)",
+          background: "var(--hero-frost-inner)",
+          border: "1px solid rgba(255, 255, 255, 0.7)",
           borderRadius: "var(--radius-inner)",
           padding: "var(--space-4) var(--space-4)",
         }}
