@@ -150,7 +150,7 @@ export default function IntelligenceContent() {
             is taller than the window its empty top sky overflows above and is
             clipped (never the buildings). object-fit is deliberately NOT used —
             aspect is preserved and nothing meaningful is cropped. */}
-        <HeroRender slot={RENDERS["how-it-works"]} priority />
+        <HeroRender slot={RENDERS["how-it-works"]} priority phoneSlot="hero" />
 
         <div
           className="hero-copy"
@@ -214,7 +214,7 @@ export default function IntelligenceContent() {
       </section>
 
       {/* Product demo video */}
-      <section style={{ background: "var(--white)", padding: "120px 32px" }}>
+      <section className="mk-section" style={{ background: "var(--white)", padding: "120px 32px" }}>
         <div style={{ maxWidth: "var(--content-reading)", margin: "0 auto", textAlign: "center" }}>
           <motion.div
             initial={false}
@@ -268,7 +268,7 @@ export default function IntelligenceContent() {
       </section>
 
       {/* Architecture — Russian doll */}
-      <section
+      <section className="mk-section"
         ref={architectureRef}
         style={{ background: "var(--pale-wash)", padding: "120px 32px" }}
       >
@@ -312,7 +312,7 @@ export default function IntelligenceContent() {
           >
             {/* Layer 1 — outer */}
             <div
-              className="arch-l1"
+              className="mk-card arch-l1"
               style={{
                 background: "var(--white)",
                 border: "1px solid var(--border)",
@@ -353,7 +353,7 @@ export default function IntelligenceContent() {
 
               {/* Layer 2 — middle */}
               <div
-                className="arch-l2"
+                className="mk-card-inner arch-l2"
                 style={{
                   background: "var(--pale-wash)",
                   border: "1px solid var(--border)",
@@ -392,7 +392,7 @@ export default function IntelligenceContent() {
 
                 {/* Layer 3 — inner */}
                 <div
-                  className="arch-l3"
+                  className="mk-card-inner arch-l3"
                   style={{
                     background: "var(--white)",
                     border: "1px solid var(--brand-blue)",
@@ -437,7 +437,7 @@ export default function IntelligenceContent() {
       </section>
 
       {/* The 5 agents */}
-      <section
+      <section className="mk-section"
         ref={agentsRef}
         style={{
           background: "var(--white)",
@@ -600,7 +600,7 @@ export default function IntelligenceContent() {
       </section>
 
       {/* Synthesis & arbitration */}
-      <section
+      <section className="mk-section"
         ref={synthesisRef}
         style={{ background: "var(--pale-wash)", padding: "120px 32px" }}
       >
@@ -690,7 +690,7 @@ export default function IntelligenceContent() {
       </section>
 
       {/* Verdict output */}
-      <section
+      <section className="mk-section"
         ref={verdictRef}
         style={{ background: "var(--white)", padding: "120px 32px" }}
       >
@@ -871,7 +871,7 @@ export default function IntelligenceContent() {
       {/* CTA */}
       <section
         ref={ctaRef}
-        className="cta-with-render"
+        className="mk-section cta-with-render"
         style={{
           background: "var(--pale-wash)",
           padding: "120px 32px",
