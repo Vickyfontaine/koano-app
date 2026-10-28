@@ -128,7 +128,7 @@ export default function VisionContent() {
 
   return (
     <>
-      <section ref={heroRef} className="hero-plain" style={{ background: "var(--white)", padding: "var(--space-8) var(--space-6)" }}>
+      <section ref={heroRef} className="mk-section hero-plain" style={{ background: "var(--white)", padding: "var(--space-8) var(--space-6)" }}>
         <div style={{ maxWidth: "var(--content-reading)", margin: "0 auto", textAlign: "center" }}>
           <motion.div initial={false} animate={show ? "visible" : "hidden"} variants={fadeUp} custom={0}>
             <Label>{CONCEPT}</Label>
@@ -152,10 +152,10 @@ export default function VisionContent() {
         </div>
       </section>
 
-      <section style={{ background: "var(--pale-wash)", padding: "var(--space-8) var(--space-6)" }}>
+      <section className="mk-section" style={{ background: "var(--pale-wash)", padding: "var(--space-8) var(--space-6)" }}>
         <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "var(--space-5)" }}>
           {/* 1. Radar */}
-          <div style={card}>
+          <div className="mk-card" style={card}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: "var(--space-3)", flexWrap: "wrap" }}>
               <SectionNumber number="01" label="Radar" />
               <Label>Concept preview</Label>
@@ -170,7 +170,7 @@ export default function VisionContent() {
           </div>
 
           {/* 2. Sentence to building */}
-          <div style={card}>
+          <div className="mk-card" style={card}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: "var(--space-3)", flexWrap: "wrap" }}>
               <SectionNumber number="02" label="Sentence to building" />
               <Label>Concept preview</Label>
@@ -197,7 +197,7 @@ export default function VisionContent() {
           </div>
 
           {/* 3. Ownership graph */}
-          <div style={card}>
+          <div className="mk-card" style={card}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: "var(--space-3)", flexWrap: "wrap" }}>
               <SectionNumber number="03" label="Ownership graph" />
               <Label>Concept preview</Label>
@@ -213,7 +213,7 @@ export default function VisionContent() {
           </div>
 
           {/* 4. Track record */}
-          <div style={card}>
+          <div className="mk-card" style={card}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: "var(--space-3)", flexWrap: "wrap" }}>
               <SectionNumber number="04" label="Track record" />
               <Label>Concept preview</Label>
@@ -231,7 +231,7 @@ export default function VisionContent() {
                 { label: "Directional hit rate", value: "n/a", note: "not yet measured" },
               ].map((t) => (
                 <div key={t.label} style={{ border: "1px solid var(--border-light)", borderRadius: "var(--radius-inner)", padding: "var(--space-3)", minWidth: 0 }}>
-                  <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--ink-muted)" }}>{t.label}</div>
+                  <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--ink-muted)", hyphens: "auto", overflowWrap: "anywhere" }} lang="en">{t.label}</div>
                   <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-data-l)", fontWeight: 500, color: "var(--ink-primary)", marginTop: "var(--space-1)" }}>{t.value}</div>
                   <div style={{ fontSize: "var(--text-caption)", color: "var(--ink-muted)" }}>{t.note}</div>
                 </div>
@@ -242,7 +242,7 @@ export default function VisionContent() {
         </div>
       </section>
 
-      <section style={{ background: "var(--white)", padding: "var(--space-8) var(--space-6)" }}>
+      <section className="mk-section" style={{ background: "var(--white)", padding: "var(--space-8) var(--space-6)" }}>
         <div style={{ maxWidth: "var(--content-prose)", margin: "0 auto", textAlign: "center" }}>
           <p style={{ fontSize: "var(--text-lead)", lineHeight: 1.6, color: "var(--ink-secondary)", margin: "0 0 var(--space-5)" }}>
             What is live today: five agents, one verdict, every figure sourced, on New York City addresses.
