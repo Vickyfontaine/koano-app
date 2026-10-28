@@ -49,7 +49,7 @@ export default function ThisWeek({ properties, id }: { properties: PortfolioProp
       <div className="this-week-grid">
         {tiles.map((t) => (
           <div key={t.label} className="this-week-tile" aria-busy={t.value === "…"}>
-            <span className="card-eyebrow">{t.label}</span>
+            <span className="tile-label">{t.label}</span>
             <span className="this-week-value">{t.value}</span>
             <span className="card-note">{t.note}</span>
           </div>

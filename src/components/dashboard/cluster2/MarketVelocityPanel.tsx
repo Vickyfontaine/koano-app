@@ -33,17 +33,7 @@ function StatTile({ tile }: { tile: Tile }) {
         gap: "8px",
       }}
     >
-      <span
-        style={{
-          fontFamily: "var(--font-mono)",
-          fontSize: "11px",
-          letterSpacing: "0.08em",
-          textTransform: "uppercase",
-          color: "var(--ink-muted)",
-        }}
-      >
-        {tile.label}
-      </span>
+      <span className="tile-label">{tile.label}</span>
       <span className="velocity-value" style={{ display: "flex", alignItems: "baseline", gap: "var(--space-2)", minWidth: 0 }}>
         <span
           style={{

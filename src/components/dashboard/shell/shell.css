@@ -351,15 +351,16 @@
   gap: var(--space-5);
   flex-wrap: wrap;
 }
+/* Band and KPI-tile labels are sentence case in the sans family (founder
+   pass): weight and size carry the hierarchy. Uppercase mono stays only on
+   timestamps and source / provenance tags. */
 .band-eyebrow {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  font-family: var(--font-mono);
-  font-size: var(--text-micro);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ink-muted);
+  font-size: var(--text-data);
+  font-weight: 500;
+  color: var(--ink-secondary);
   margin-bottom: var(--space-2);
 }
 .band-title {
@@ -431,10 +432,9 @@
   text-overflow: ellipsis;
 }
 .band-agent-verdict {
-  font-family: var(--font-mono);
-  font-size: var(--text-micro);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-size: var(--text-caption);
+  font-weight: 600;
+  text-transform: capitalize;
 }
 .band-main {
   flex: 1 1 320px;
@@ -466,11 +466,11 @@
   margin: 0;
   flex: 0 1 360px;
 }
-.band-metrics dt {
-  font-family: var(--font-mono);
-  font-size: var(--text-micro);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.band-metrics dt,
+.card-figures dt,
+.tile-label {
+  font-size: var(--text-data);
+  font-weight: 500;
   color: var(--ink-muted);
 }
 .band-metrics dd {
@@ -912,13 +912,6 @@
   gap: var(--space-2);
   margin: 0;
 }
-.card-figures dt {
-  font-family: var(--font-mono);
-  font-size: var(--text-micro);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ink-muted);
-}
 .card-figures dd {
   font-family: var(--font-mono);
   font-size: var(--text-h3);
@@ -1244,11 +1237,9 @@
 .bench-col-verdict {
   display: flex;
   flex-direction: column;
-  font-family: var(--font-mono);
   font-size: var(--text-data);
   font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  text-transform: capitalize;
 }
 .bench-col-conf,
 .bench-col-facts,
