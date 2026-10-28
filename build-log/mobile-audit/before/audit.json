@@ -1,0 +1,5667 @@
+[
+  {
+    "name": "home",
+    "url": "/",
+    "width": 360,
+    "vw": 360,
+    "pageHeight": 5488,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section#agents-section  →  div.home-mobile > section",
+        "box": {
+          "x": 0,
+          "y": 2633,
+          "w": 360,
+          "h": 143
+        },
+        "detail": "143px of empty space between the two sections' content (paddings: 64px 16px 64px 16px / 64px 16px 64px 16px)",
+        "shot": "shots/home-360-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "div.home-mobile > section  →  div.home-mobile > section.home-monitoring",
+        "box": {
+          "x": 0,
+          "y": 3029,
+          "w": 360,
+          "h": 135
+        },
+        "detail": "135px of empty space between the two sections' content (paddings: 64px 16px 64px 16px / 64px 16px 64px 16px)",
+        "shot": "shots/home-360-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "div.home-mobile > section.home-monitoring  →  section#clusters-section",
+        "box": {
+          "x": 0,
+          "y": 3352,
+          "w": 360,
+          "h": 167
+        },
+        "detail": "167px of empty space between the two sections' content (paddings: 64px 16px 64px 16px / 64px 16px 64px 16px)",
+        "shot": "shots/home-360-gap-3.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "4",
+        "sel": "section#clusters-section  →  section#early-access-section.cta-with-render",
+        "box": {
+          "x": 0,
+          "y": 4008,
+          "w": 360,
+          "h": 135
+        },
+        "detail": "135px of empty space between the two sections' content (paddings: 64px 16px 64px 16px / 64px 16px 64px 16px)",
+        "shot": "shots/home-360-gap-4.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        16,
+        12
+      ],
+      [
+        41,
+        9
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#hero-section",
+        "top": 96,
+        "height": 1768,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(173, 193, 202)"
+      },
+      {
+        "sel": "section#agents-section",
+        "top": 1983,
+        "height": 649,
+        "pad": "64px 16px 64px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "div.home-mobile > section",
+        "top": 2776,
+        "height": 253,
+        "pad": "64px 16px 64px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "div.home-mobile > section.home-monitoring",
+        "top": 3164,
+        "height": 188,
+        "pad": "64px 16px 64px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section#clusters-section",
+        "top": 3519,
+        "height": 490,
+        "pad": "64px 16px 64px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section#early-access-section.cta-with-render",
+        "top": 4143,
+        "height": 692,
+        "pad": "64px 16px 64px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 4948,
+        "height": 492,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/menu-hero.jpg",
+      "box": {
+        "x": 0,
+        "y": 402,
+        "w": 360,
+        "h": 439
+      },
+      "objectFit": "cover",
+      "objectPosition": "77% 92%",
+      "natural": "2267x1114",
+      "letterboxPct": 0,
+      "firstScreenPct": 52,
+      "startsAtPx": 402
+    }
+  },
+  {
+    "name": "intelligence",
+    "url": "/intelligence",
+    "width": 360,
+    "vw": 360,
+    "pageHeight": 9788,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-with-render.hero-group-a  →  section",
+        "box": {
+          "x": 0,
+          "y": 571,
+          "w": 360,
+          "h": 127
+        },
+        "detail": "127px of empty space between the two sections' content (paddings: 0px 0px 0px 0px / 120px 32px 120px 32px)",
+        "shot": "shots/intelligence-360-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 1036,
+          "w": 360,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/intelligence-360-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 2583,
+          "w": 360,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/intelligence-360-gap-3.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "4",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 5221,
+          "w": 360,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/intelligence-360-gap-4.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "5",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 6939,
+          "w": 360,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/intelligence-360-gap-5.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "6",
+        "sel": "section  →  section.cta-with-render",
+        "box": {
+          "x": 0,
+          "y": 8352,
+          "w": 360,
+          "h": 272
+        },
+        "detail": "272px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/intelligence-360-gap-6.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "7",
+        "sel": "section.cta-with-render  →  footer#site-footer",
+        "box": {
+          "x": 0,
+          "y": 9080,
+          "w": 360,
+          "h": 169
+        },
+        "detail": "169px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 0px 0px 0px 0px)",
+        "shot": "shots/intelligence-360-gap-7.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        61,
+        23
+      ],
+      [
+        32,
+        12
+      ],
+      [
+        65,
+        9
+      ],
+      [
+        57,
+        2
+      ],
+      [
+        74,
+        2
+      ],
+      [
+        91,
+        2
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-a",
+        "top": 105,
+        "height": 466,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 698,
+        "height": 338,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 1283,
+        "height": 1299,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section",
+        "top": 2830,
+        "height": 2392,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 5468,
+        "height": 1470,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section",
+        "top": 7186,
+        "height": 1166,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.cta-with-render",
+        "top": 8624,
+        "height": 456,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 9249,
+        "height": 492,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/how-it-works.webp",
+      "box": {
+        "x": 0,
+        "y": 374,
+        "w": 360,
+        "h": 197
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "natural": "4202x2304",
+      "letterboxPct": 0,
+      "firstScreenPct": 23,
+      "startsAtPx": 374
+    }
+  },
+  {
+    "name": "for-developers",
+    "url": "/for/developers",
+    "width": 360,
+    "vw": 360,
+    "pageHeight": 4918,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-with-render.hero-group-b  →  section",
+        "box": {
+          "x": 0,
+          "y": 975,
+          "w": 360,
+          "h": 127
+        },
+        "detail": "127px of empty space between the two sections' content (paddings: 34px 32px 0px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-developers-360-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 2400,
+          "w": 360,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-developers-360-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section  →  section.cta-with-render",
+        "box": {
+          "x": 0,
+          "y": 3379,
+          "w": 360,
+          "h": 272
+        },
+        "detail": "272px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-developers-360-gap-3.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "4",
+        "sel": "section.cta-with-render  →  footer#site-footer",
+        "box": {
+          "x": 0,
+          "y": 4210,
+          "w": 360,
+          "h": 169
+        },
+        "detail": "169px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 0px 0px 0px 0px)",
+        "shot": "shots/for-developers-360-gap-4.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        61,
+        14
+      ],
+      [
+        32,
+        10
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-b",
+        "top": 105,
+        "height": 870,
+        "pad": "34px 32px 0px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 1102,
+        "height": 1299,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section",
+        "top": 2647,
+        "height": 732,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.cta-with-render",
+        "top": 3651,
+        "height": 558,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 4379,
+        "height": 492,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/for-developers.webp",
+      "box": {
+        "x": 32,
+        "y": 809,
+        "w": 296,
+        "h": 165
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "natural": "4128x2304",
+      "letterboxPct": 0,
+      "firstScreenPct": 4,
+      "startsAtPx": 809
+    }
+  },
+  {
+    "name": "for-professionals",
+    "url": "/for/agents",
+    "width": 360,
+    "vw": 360,
+    "pageHeight": 4855,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-with-render.hero-group-b  →  section",
+        "box": {
+          "x": 0,
+          "y": 935,
+          "w": 360,
+          "h": 127
+        },
+        "detail": "127px of empty space between the two sections' content (paddings: 34px 32px 0px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-professionals-360-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 2384,
+          "w": 360,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-professionals-360-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section  →  section.cta-with-render",
+        "box": {
+          "x": 0,
+          "y": 3316,
+          "w": 360,
+          "h": 272
+        },
+        "detail": "272px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-professionals-360-gap-3.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "4",
+        "sel": "section.cta-with-render  →  footer#site-footer",
+        "box": {
+          "x": 0,
+          "y": 4147,
+          "w": 360,
+          "h": 169
+        },
+        "detail": "169px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 0px 0px 0px 0px)",
+        "shot": "shots/for-professionals-360-gap-4.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        61,
+        14
+      ],
+      [
+        32,
+        10
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-b",
+        "top": 105,
+        "height": 830,
+        "pad": "34px 32px 0px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 1062,
+        "height": 1322,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section",
+        "top": 2631,
+        "height": 685,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.cta-with-render",
+        "top": 3588,
+        "height": 558,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 4316,
+        "height": 492,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/for-professionals.webp",
+      "box": {
+        "x": 32,
+        "y": 770,
+        "w": 296,
+        "h": 165
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "natural": "4128x2304",
+      "letterboxPct": 0,
+      "firstScreenPct": 9,
+      "startsAtPx": 770
+    }
+  },
+  {
+    "name": "for-institutions",
+    "url": "/for/institutions",
+    "width": 360,
+    "vw": 360,
+    "pageHeight": 5050,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-with-render.hero-group-b  →  section",
+        "box": {
+          "x": 0,
+          "y": 938,
+          "w": 360,
+          "h": 127
+        },
+        "detail": "127px of empty space between the two sections' content (paddings: 34px 32px 0px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-institutions-360-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 2591,
+          "w": 360,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-institutions-360-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section  →  section.cta-with-render",
+        "box": {
+          "x": 0,
+          "y": 3477,
+          "w": 360,
+          "h": 272
+        },
+        "detail": "272px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-institutions-360-gap-3.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "4",
+        "sel": "section.cta-with-render  →  footer#site-footer",
+        "box": {
+          "x": 0,
+          "y": 4342,
+          "w": 360,
+          "h": 169
+        },
+        "detail": "169px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 0px 0px 0px 0px)",
+        "shot": "shots/for-institutions-360-gap-4.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        61,
+        16
+      ],
+      [
+        32,
+        10
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-b",
+        "top": 105,
+        "height": 833,
+        "pad": "34px 32px 0px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 1065,
+        "height": 1526,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section",
+        "top": 2838,
+        "height": 639,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.cta-with-render",
+        "top": 3749,
+        "height": 592,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 4511,
+        "height": 492,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/for-institutions.webp",
+      "box": {
+        "x": 32,
+        "y": 773,
+        "w": 296,
+        "h": 165
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "natural": "4128x2304",
+      "letterboxPct": 0,
+      "firstScreenPct": 8,
+      "startsAtPx": 773
+    }
+  },
+  {
+    "name": "for-community",
+    "url": "/for/community",
+    "width": 360,
+    "vw": 360,
+    "pageHeight": 5092,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-with-render.hero-group-b  →  section",
+        "box": {
+          "x": 0,
+          "y": 1009,
+          "w": 360,
+          "h": 127
+        },
+        "detail": "127px of empty space between the two sections' content (paddings: 34px 32px 0px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-community-360-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 2406,
+          "w": 360,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-community-360-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section  →  section.cta-with-render",
+        "box": {
+          "x": 0,
+          "y": 3589,
+          "w": 360,
+          "h": 272
+        },
+        "detail": "272px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-community-360-gap-3.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "4",
+        "sel": "section.cta-with-render  →  footer#site-footer",
+        "box": {
+          "x": 0,
+          "y": 4383,
+          "w": 360,
+          "h": 169
+        },
+        "detail": "169px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 0px 0px 0px 0px)",
+        "shot": "shots/for-community-360-gap-4.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        61,
+        14
+      ],
+      [
+        32,
+        11
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-b",
+        "top": 105,
+        "height": 904,
+        "pad": "34px 32px 0px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 1136,
+        "height": 1270,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section",
+        "top": 2653,
+        "height": 937,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.cta-with-render",
+        "top": 3861,
+        "height": 522,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 4552,
+        "height": 492,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/for-community.webp",
+      "box": {
+        "x": 32,
+        "y": 843,
+        "w": 296,
+        "h": 165
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "natural": "4128x2304",
+      "letterboxPct": 0,
+      "firstScreenPct": 0,
+      "startsAtPx": 843
+    }
+  },
+  {
+    "name": "pricing",
+    "url": "/pricing",
+    "width": 360,
+    "vw": 360,
+    "pageHeight": 8743,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 4519,
+          "w": 360,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 80px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/pricing-360-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section  →  section.cta-with-render",
+        "box": {
+          "x": 0,
+          "y": 7139,
+          "w": 360,
+          "h": 272
+        },
+        "detail": "272px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/pricing-360-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section.cta-with-render  →  footer#site-footer",
+        "box": {
+          "x": 0,
+          "y": 8034,
+          "w": 360,
+          "h": 169
+        },
+        "detail": "169px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 0px 0px 0px 0px)",
+        "shot": "shots/pricing-360-gap-3.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        61,
+        41
+      ],
+      [
+        32,
+        7
+      ],
+      [
+        75,
+        4
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-a",
+        "top": 105,
+        "height": 951,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 1136,
+        "height": 3383,
+        "pad": "80px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section",
+        "top": 4766,
+        "height": 2373,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.cta-with-render",
+        "top": 7411,
+        "height": 624,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 8203,
+        "height": 492,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/pricing.webp",
+      "box": {
+        "x": 0,
+        "y": 858,
+        "w": 360,
+        "h": 197
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "natural": "4202x2304",
+      "letterboxPct": 0,
+      "firstScreenPct": 0,
+      "startsAtPx": 858
+    }
+  },
+  {
+    "name": "about",
+    "url": "/about",
+    "width": 360,
+    "vw": 360,
+    "pageHeight": 6800,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-with-render.hero-about  →  section",
+        "box": {
+          "x": 0,
+          "y": 1306,
+          "w": 360,
+          "h": 127
+        },
+        "detail": "127px of empty space between the two sections' content (paddings: 34px 32px 0px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/about-360-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 2558,
+          "w": 360,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/about-360-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 3752,
+          "w": 360,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/about-360-gap-3.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "4",
+        "sel": "section  →  section.cta-with-render",
+        "box": {
+          "x": 0,
+          "y": 5361,
+          "w": 360,
+          "h": 272
+        },
+        "detail": "272px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/about-360-gap-4.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "5",
+        "sel": "section.cta-with-render  →  footer#site-footer",
+        "box": {
+          "x": 0,
+          "y": 6092,
+          "w": 360,
+          "h": 169
+        },
+        "detail": "169px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 0px 0px 0px 0px)",
+        "shot": "shots/about-360-gap-5.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        32,
+        17
+      ],
+      [
+        61,
+        12
+      ],
+      [
+        85,
+        4
+      ],
+      [
+        62,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-about",
+        "top": 105,
+        "height": 1201,
+        "pad": "34px 32px 0px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 1433,
+        "height": 1126,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section",
+        "top": 2805,
+        "height": 946,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 3999,
+        "height": 1362,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.cta-with-render",
+        "top": 5633,
+        "height": 459,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 6261,
+        "height": 492,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/about.webp",
+      "box": {
+        "x": 32,
+        "y": 1019,
+        "w": 296,
+        "h": 287
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "natural": "2066x2000",
+      "letterboxPct": 0,
+      "firstScreenPct": 0,
+      "startsAtPx": 1019
+    }
+  },
+  {
+    "name": "data",
+    "url": "/data",
+    "width": 360,
+    "vw": 360,
+    "pageHeight": 11229,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-plain  →  section",
+        "box": {
+          "x": 0,
+          "y": 872,
+          "w": 360,
+          "h": 191
+        },
+        "detail": "191px of empty space between the two sections' content (paddings: 48px 32px 64px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/data-360-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 4677,
+          "w": 360,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/data-360-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 5980,
+          "w": 360,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/data-360-gap-3.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "4",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 7644,
+          "w": 360,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/data-360-gap-4.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "5",
+        "sel": "section  →  section.cta-with-render",
+        "box": {
+          "x": 0,
+          "y": 9793,
+          "w": 360,
+          "h": 272
+        },
+        "detail": "272px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/data-360-gap-5.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "6",
+        "sel": "section.cta-with-render  →  footer#site-footer",
+        "box": {
+          "x": 0,
+          "y": 10521,
+          "w": 360,
+          "h": 169
+        },
+        "detail": "169px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 0px 0px 0px 0px)",
+        "shot": "shots/data-360-gap-6.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        32,
+        20
+      ],
+      [
+        61,
+        11
+      ],
+      [
+        113,
+        10
+      ],
+      [
+        75,
+        2
+      ],
+      [
+        79,
+        2
+      ],
+      [
+        116,
+        2
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-plain",
+        "top": 119,
+        "height": 753,
+        "pad": "48px 32px 64px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 1063,
+        "height": 3614,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section",
+        "top": 4924,
+        "height": 1056,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 6227,
+        "height": 1417,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section",
+        "top": 7891,
+        "height": 1901,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.cta-with-render",
+        "top": 10065,
+        "height": 456,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 10690,
+        "height": 492,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/cta.webp",
+      "box": {
+        "x": 32,
+        "y": 10065,
+        "w": 296,
+        "h": 102
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 100%",
+      "natural": "3840x1319",
+      "letterboxPct": 0,
+      "firstScreenPct": 0,
+      "startsAtPx": 10065
+    }
+  },
+  {
+    "name": "vision",
+    "url": "/vision",
+    "width": 360,
+    "vw": 360,
+    "pageHeight": 4117,
+    "defects": [
+      {
+        "kind": "text-box",
+        "id": "1",
+        "sel": "div > div > div > div",
+        "box": {
+          "x": 232,
+          "y": 2939,
+          "w": 75,
+          "h": 158
+        },
+        "detail": "\"Directional hit rate\" spans 245 to 325px; its box spans 232 to 307px",
+        "shot": "shots/vision-360-text-box-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section.hero-plain  →  section",
+        "box": {
+          "x": 0,
+          "y": 503,
+          "w": 360,
+          "h": 128
+        },
+        "detail": "128px of empty space between the two sections' content (paddings: 48px 32px 64px 32px / 64px 32px 64px 32px)",
+        "shot": "shots/vision-360-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 3187,
+          "w": 360,
+          "h": 128
+        },
+        "detail": "128px of empty space between the two sections' content (paddings: 64px 32px 64px 32px / 64px 32px 64px 32px)",
+        "shot": "shots/vision-360-gap-3.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        57,
+        16
+      ],
+      [
+        32,
+        5
+      ],
+      [
+        169,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-plain",
+        "top": 112,
+        "height": 391,
+        "pad": "48px 32px 64px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 631,
+        "height": 2556,
+        "pad": "64px 32px 64px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section",
+        "top": 3315,
+        "height": 150,
+        "pad": "64px 32px 64px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 3578,
+        "height": 492,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "not-found",
+    "url": "/no-such-page",
+    "width": 360,
+    "vw": 360,
+    "pageHeight": 844,
+    "defects": [],
+    "gutters": [
+      [
+        16,
+        1
+      ],
+      [
+        30,
+        1
+      ],
+      [
+        145,
+        1
+      ]
+    ],
+    "sections": [],
+    "hero": null
+  },
+  {
+    "name": "login",
+    "url": "/login",
+    "width": 360,
+    "vw": 360,
+    "pageHeight": 940,
+    "defects": [],
+    "gutters": [
+      [
+        16,
+        6
+      ],
+      [
+        113,
+        2
+      ],
+      [
+        48,
+        1
+      ],
+      [
+        170,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "div.auth-shell > main.auth-main > section.auth-brand",
+        "top": 88,
+        "height": 204,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "div.auth-shell > main.auth-main > section.auth-form",
+        "top": 324,
+        "height": 503,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "div.auth-shell > footer.auth-foot",
+        "top": null,
+        "height": null,
+        "pad": "24px 32px 24px 32px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "signup",
+    "url": "/signup",
+    "width": 360,
+    "vw": 360,
+    "pageHeight": 1101,
+    "defects": [],
+    "gutters": [
+      [
+        16,
+        7
+      ],
+      [
+        113,
+        2
+      ],
+      [
+        48,
+        1
+      ],
+      [
+        170,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "div.auth-shell > main.auth-main > section.auth-brand",
+        "top": 88,
+        "height": 204,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "div.auth-shell > main.auth-main > section.auth-form",
+        "top": 324,
+        "height": 664,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "div.auth-shell > footer.auth-foot",
+        "top": null,
+        "height": null,
+        "pad": "24px 32px 24px 32px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-develop-empty",
+    "url": "/dashboard",
+    "width": 360,
+    "vw": 360,
+    "pageHeight": 2115,
+    "defects": [],
+    "gutters": [
+      [
+        41,
+        5
+      ],
+      [
+        16,
+        4
+      ],
+      [
+        33,
+        2
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-idle",
+        "top": 97,
+        "height": 143,
+        "pad": "16px 16px 16px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 281,
+        "height": 1707,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-develop-done",
+    "url": "/dashboard",
+    "width": 360,
+    "vw": 360,
+    "pageHeight": 7117,
+    "defects": [],
+    "gutters": [
+      [
+        41,
+        23
+      ],
+      [
+        16,
+        7
+      ],
+      [
+        33,
+        4
+      ],
+      [
+        47,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-done",
+        "top": 97,
+        "height": 579,
+        "pad": "16px 16px 16px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 717,
+        "height": 6272,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "div.shell-content > div > div > section.map-frame",
+        "top": 1521,
+        "height": 44,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-acquire",
+    "url": "/dashboard",
+    "width": 360,
+    "vw": 360,
+    "pageHeight": 5403,
+    "defects": [
+      {
+        "kind": "text-box",
+        "id": "1",
+        "sel": "div#c5-archive",
+        "box": {
+          "x": 16,
+          "y": 2883,
+          "w": 328,
+          "h": 733
+        },
+        "detail": "\"Aug 24\" spans 373 to 395px; its box spans 16 to 344px",
+        "shot": "shots/dashboard-acquire-360-text-box-1.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        41,
+        20
+      ],
+      [
+        16,
+        6
+      ],
+      [
+        33,
+        2
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-idle",
+        "top": 97,
+        "height": 143,
+        "pad": "16px 16px 16px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 281,
+        "height": 4995,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div > section.map-frame",
+        "top": 800,
+        "height": 61,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-price-empty",
+    "url": "/dashboard",
+    "width": 360,
+    "vw": 360,
+    "pageHeight": 1593,
+    "defects": [],
+    "gutters": [
+      [
+        16,
+        4
+      ],
+      [
+        33,
+        2
+      ],
+      [
+        41,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-idle.verdict-band-compact",
+        "top": 97,
+        "height": 143,
+        "pad": "16px 16px 16px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 281,
+        "height": 1185,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-price-done",
+    "url": "/dashboard",
+    "width": 360,
+    "vw": 360,
+    "pageHeight": 6682,
+    "defects": [
+      {
+        "kind": "text-box",
+        "id": "1",
+        "sel": "section#c2-scatter > div > div",
+        "box": {
+          "x": 89,
+          "y": 3148,
+          "w": 230,
+          "h": 220
+        },
+        "detail": "\"$0\" spans 68 to 82px; its box spans 89 to 319px",
+        "shot": "shots/dashboard-price-done-360-text-box-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section#c2-map.map-frame  →  section#c2-scatter",
+        "box": {
+          "x": 0,
+          "y": 1953,
+          "w": 360,
+          "h": 1151
+        },
+        "detail": "1151px of empty space between the two sections' content (paddings: 0px 0px 0px 0px / 24px 24px 24px 24px)",
+        "shot": "shots/dashboard-price-done-360-gap-2.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        41,
+        45
+      ],
+      [
+        16,
+        8
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-done.verdict-band-compact",
+        "top": 93,
+        "height": 89,
+        "pad": "12px 16px 12px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 219,
+        "height": 6335,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "section#c2-map.map-frame",
+        "top": 1893,
+        "height": 61,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "section#c2-scatter",
+        "top": 3105,
+        "height": 407,
+        "pad": "24px 24px 24px 24px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section#c2-permits",
+        "top": 3586,
+        "height": 381,
+        "pad": "24px 24px 24px 24px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-property-empty",
+    "url": "/dashboard",
+    "width": 360,
+    "vw": 360,
+    "pageHeight": 1641,
+    "defects": [],
+    "gutters": [
+      [
+        16,
+        4
+      ],
+      [
+        33,
+        2
+      ],
+      [
+        41,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-idle",
+        "top": 97,
+        "height": 143,
+        "pad": "16px 16px 16px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 281,
+        "height": 1233,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-property-done",
+    "url": "/dashboard",
+    "width": 360,
+    "vw": 360,
+    "pageHeight": 7102,
+    "defects": [],
+    "gutters": [
+      [
+        41,
+        32
+      ],
+      [
+        16,
+        8
+      ],
+      [
+        33,
+        4
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-done",
+        "top": 97,
+        "height": 579,
+        "pad": "16px 16px 16px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 717,
+        "height": 6257,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "section#c1-map.map-frame",
+        "top": 6025,
+        "height": 61,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "settings",
+    "url": "/dashboard/settings",
+    "width": 360,
+    "vw": 360,
+    "pageHeight": 1812,
+    "defects": [
+      {
+        "kind": "overflow",
+        "id": "1",
+        "sel": "div > div > div > span",
+        "box": {
+          "x": 129,
+          "y": 855,
+          "w": 257,
+          "h": 20
+        },
+        "detail": "document 386px wide on a 360px screen; element right edge 386px",
+        "shot": "shots/settings-360-overflow-1.jpg"
+      },
+      {
+        "kind": "overflow",
+        "id": "2",
+        "sel": "div > div > div > span",
+        "box": {
+          "x": 129,
+          "y": 882,
+          "w": 257,
+          "h": 17
+        },
+        "detail": "document 386px wide on a 360px screen; element right edge 386px",
+        "shot": "shots/settings-360-overflow-2.jpg"
+      },
+      {
+        "kind": "overflow",
+        "id": "3",
+        "sel": "div > div > div > input",
+        "box": {
+          "x": 129,
+          "y": 909,
+          "w": 257,
+          "h": 24
+        },
+        "detail": "document 386px wide on a 360px screen; element right edge 386px",
+        "shot": "shots/settings-360-overflow-3.jpg"
+      },
+      {
+        "kind": "overflow",
+        "id": "4",
+        "sel": "div > div > div > span",
+        "box": {
+          "x": 129,
+          "y": 949,
+          "w": 257,
+          "h": 20
+        },
+        "detail": "document 386px wide on a 360px screen; element right edge 386px",
+        "shot": "shots/settings-360-overflow-4.jpg"
+      },
+      {
+        "kind": "overflow",
+        "id": "5",
+        "sel": "div > div > div > span",
+        "box": {
+          "x": 129,
+          "y": 976,
+          "w": 257,
+          "h": 17
+        },
+        "detail": "document 386px wide on a 360px screen; element right edge 386px",
+        "shot": "shots/settings-360-overflow-5.jpg"
+      },
+      {
+        "kind": "overflow",
+        "id": "6",
+        "sel": "div > div > div > input",
+        "box": {
+          "x": 129,
+          "y": 1003,
+          "w": 257,
+          "h": 24
+        },
+        "detail": "document 386px wide on a 360px screen; element right edge 386px",
+        "shot": "shots/settings-360-overflow-6.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        41,
+        15
+      ],
+      [
+        16,
+        1
+      ]
+    ],
+    "sections": [],
+    "hero": null
+  },
+  {
+    "name": "home",
+    "url": "/",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 5401,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section#agents-section  →  div.home-mobile > section",
+        "box": {
+          "x": 0,
+          "y": 2591,
+          "w": 390,
+          "h": 143
+        },
+        "detail": "143px of empty space between the two sections' content (paddings: 64px 16px 64px 16px / 64px 16px 64px 16px)",
+        "shot": "shots/home-390-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "div.home-mobile > section  →  div.home-mobile > section.home-monitoring",
+        "box": {
+          "x": 0,
+          "y": 2967,
+          "w": 390,
+          "h": 135
+        },
+        "detail": "135px of empty space between the two sections' content (paddings: 64px 16px 64px 16px / 64px 16px 64px 16px)",
+        "shot": "shots/home-390-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "div.home-mobile > section.home-monitoring  →  section#clusters-section",
+        "box": {
+          "x": 0,
+          "y": 3289,
+          "w": 390,
+          "h": 167
+        },
+        "detail": "167px of empty space between the two sections' content (paddings: 64px 16px 64px 16px / 64px 16px 64px 16px)",
+        "shot": "shots/home-390-gap-3.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "4",
+        "sel": "section#clusters-section  →  section#early-access-section.cta-with-render",
+        "box": {
+          "x": 0,
+          "y": 3946,
+          "w": 390,
+          "h": 135
+        },
+        "detail": "135px of empty space between the two sections' content (paddings: 64px 16px 64px 16px / 64px 16px 64px 16px)",
+        "shot": "shots/home-390-gap-4.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        16,
+        12
+      ],
+      [
+        41,
+        9
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#hero-section",
+        "top": 96,
+        "height": 1752,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(173, 193, 202)"
+      },
+      {
+        "sel": "section#agents-section",
+        "top": 1967,
+        "height": 625,
+        "pad": "64px 16px 64px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "div.home-mobile > section",
+        "top": 2734,
+        "height": 232,
+        "pad": "64px 16px 64px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "div.home-mobile > section.home-monitoring",
+        "top": 3102,
+        "height": 188,
+        "pad": "64px 16px 64px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section#clusters-section",
+        "top": 3456,
+        "height": 490,
+        "pad": "64px 16px 64px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section#early-access-section.cta-with-render",
+        "top": 4081,
+        "height": 667,
+        "pad": "64px 16px 64px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 4862,
+        "height": 492,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/menu-hero.jpg",
+      "box": {
+        "x": 0,
+        "y": 402,
+        "w": 390,
+        "h": 439
+      },
+      "objectFit": "cover",
+      "objectPosition": "77% 92%",
+      "natural": "2267x1114",
+      "letterboxPct": 0,
+      "firstScreenPct": 52,
+      "startsAtPx": 402
+    }
+  },
+  {
+    "name": "intelligence",
+    "url": "/intelligence",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 9476,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-with-render.hero-group-a  →  section",
+        "box": {
+          "x": 0,
+          "y": 588,
+          "w": 390,
+          "h": 127
+        },
+        "detail": "127px of empty space between the two sections' content (paddings: 0px 0px 0px 0px / 120px 32px 120px 32px)",
+        "shot": "shots/intelligence-390-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 1070,
+          "w": 390,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/intelligence-390-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 2517,
+          "w": 390,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/intelligence-390-gap-3.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "4",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 5045,
+          "w": 390,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/intelligence-390-gap-4.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "5",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 6664,
+          "w": 390,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/intelligence-390-gap-5.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "6",
+        "sel": "section  →  section.cta-with-render",
+        "box": {
+          "x": 0,
+          "y": 8029,
+          "w": 390,
+          "h": 272
+        },
+        "detail": "272px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/intelligence-390-gap-6.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "7",
+        "sel": "section.cta-with-render  →  footer#site-footer",
+        "box": {
+          "x": 0,
+          "y": 8767,
+          "w": 390,
+          "h": 169
+        },
+        "detail": "169px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 0px 0px 0px 0px)",
+        "shot": "shots/intelligence-390-gap-7.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        61,
+        23
+      ],
+      [
+        32,
+        12
+      ],
+      [
+        65,
+        9
+      ],
+      [
+        57,
+        2
+      ],
+      [
+        74,
+        2
+      ],
+      [
+        91,
+        2
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-a",
+        "top": 105,
+        "height": 483,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 715,
+        "height": 355,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 1317,
+        "height": 1201,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section",
+        "top": 2764,
+        "height": 2281,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 5292,
+        "height": 1372,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section",
+        "top": 6911,
+        "height": 1118,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.cta-with-render",
+        "top": 8301,
+        "height": 467,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 8936,
+        "height": 492,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/how-it-works.webp",
+      "box": {
+        "x": 0,
+        "y": 374,
+        "w": 390,
+        "h": 214
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "natural": "4202x2304",
+      "letterboxPct": 0,
+      "firstScreenPct": 25,
+      "startsAtPx": 374
+    }
+  },
+  {
+    "name": "for-developers",
+    "url": "/for/developers",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 4685,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-with-render.hero-group-b  →  section",
+        "box": {
+          "x": 0,
+          "y": 959,
+          "w": 390,
+          "h": 127
+        },
+        "detail": "127px of empty space between the two sections' content (paddings: 34px 32px 0px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-developers-390-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 2292,
+          "w": 390,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-developers-390-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section  →  section.cta-with-render",
+        "box": {
+          "x": 0,
+          "y": 3201,
+          "w": 390,
+          "h": 272
+        },
+        "detail": "272px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-developers-390-gap-3.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "4",
+        "sel": "section.cta-with-render  →  footer#site-footer",
+        "box": {
+          "x": 0,
+          "y": 3977,
+          "w": 390,
+          "h": 169
+        },
+        "detail": "169px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 0px 0px 0px 0px)",
+        "shot": "shots/for-developers-390-gap-4.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        61,
+        14
+      ],
+      [
+        32,
+        10
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-b",
+        "top": 105,
+        "height": 854,
+        "pad": "34px 32px 0px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 1086,
+        "height": 1206,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section",
+        "top": 2539,
+        "height": 662,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.cta-with-render",
+        "top": 3473,
+        "height": 504,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 4146,
+        "height": 492,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/for-developers.webp",
+      "box": {
+        "x": 32,
+        "y": 777,
+        "w": 326,
+        "h": 182
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "natural": "4128x2304",
+      "letterboxPct": 0,
+      "firstScreenPct": 8,
+      "startsAtPx": 777
+    }
+  },
+  {
+    "name": "for-professionals",
+    "url": "/for/agents",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 4585,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-with-render.hero-group-b  →  section",
+        "box": {
+          "x": 0,
+          "y": 920,
+          "w": 390,
+          "h": 127
+        },
+        "detail": "127px of empty space between the two sections' content (paddings: 34px 32px 0px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-professionals-390-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 2252,
+          "w": 390,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-professionals-390-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section  →  section.cta-with-render",
+        "box": {
+          "x": 0,
+          "y": 3138,
+          "w": 390,
+          "h": 272
+        },
+        "detail": "272px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-professionals-390-gap-3.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "4",
+        "sel": "section.cta-with-render  →  footer#site-footer",
+        "box": {
+          "x": 0,
+          "y": 3877,
+          "w": 390,
+          "h": 169
+        },
+        "detail": "169px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 0px 0px 0px 0px)",
+        "shot": "shots/for-professionals-390-gap-4.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        61,
+        14
+      ],
+      [
+        32,
+        10
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-b",
+        "top": 105,
+        "height": 815,
+        "pad": "34px 32px 0px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 1047,
+        "height": 1206,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section",
+        "top": 2499,
+        "height": 639,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.cta-with-render",
+        "top": 3410,
+        "height": 467,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 4046,
+        "height": 492,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/for-professionals.webp",
+      "box": {
+        "x": 32,
+        "y": 738,
+        "w": 326,
+        "h": 182
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "natural": "4128x2304",
+      "letterboxPct": 0,
+      "firstScreenPct": 13,
+      "startsAtPx": 738
+    }
+  },
+  {
+    "name": "for-institutions",
+    "url": "/for/institutions",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 4804,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-with-render.hero-group-b  →  section",
+        "box": {
+          "x": 0,
+          "y": 955,
+          "w": 390,
+          "h": 127
+        },
+        "detail": "127px of empty space between the two sections' content (paddings: 34px 32px 0px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-institutions-390-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 2492,
+          "w": 390,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-institutions-390-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section  →  section.cta-with-render",
+        "box": {
+          "x": 0,
+          "y": 3331,
+          "w": 390,
+          "h": 272
+        },
+        "detail": "272px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-institutions-390-gap-3.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "4",
+        "sel": "section.cta-with-render  →  footer#site-footer",
+        "box": {
+          "x": 0,
+          "y": 4096,
+          "w": 390,
+          "h": 169
+        },
+        "detail": "169px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 0px 0px 0px 0px)",
+        "shot": "shots/for-institutions-390-gap-4.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        61,
+        16
+      ],
+      [
+        32,
+        10
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-b",
+        "top": 105,
+        "height": 850,
+        "pad": "34px 32px 0px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 1082,
+        "height": 1410,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section",
+        "top": 2739,
+        "height": 592,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.cta-with-render",
+        "top": 3603,
+        "height": 492,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 4265,
+        "height": 492,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/for-institutions.webp",
+      "box": {
+        "x": 32,
+        "y": 773,
+        "w": 326,
+        "h": 182
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "natural": "4128x2304",
+      "letterboxPct": 0,
+      "firstScreenPct": 8,
+      "startsAtPx": 773
+    }
+  },
+  {
+    "name": "for-community",
+    "url": "/for/community",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 4906,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-with-render.hero-group-b  →  section",
+        "box": {
+          "x": 0,
+          "y": 1007,
+          "w": 390,
+          "h": 127
+        },
+        "detail": "127px of empty space between the two sections' content (paddings: 34px 32px 0px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-community-390-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 2298,
+          "w": 390,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-community-390-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section  →  section.cta-with-render",
+        "box": {
+          "x": 0,
+          "y": 3458,
+          "w": 390,
+          "h": 272
+        },
+        "detail": "272px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-community-390-gap-3.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "4",
+        "sel": "section.cta-with-render  →  footer#site-footer",
+        "box": {
+          "x": 0,
+          "y": 4197,
+          "w": 390,
+          "h": 169
+        },
+        "detail": "169px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 0px 0px 0px 0px)",
+        "shot": "shots/for-community-390-gap-4.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        61,
+        14
+      ],
+      [
+        32,
+        11
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-b",
+        "top": 105,
+        "height": 902,
+        "pad": "34px 32px 0px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 1134,
+        "height": 1164,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section",
+        "top": 2545,
+        "height": 913,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.cta-with-render",
+        "top": 3730,
+        "height": 467,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 4366,
+        "height": 492,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/for-community.webp",
+      "box": {
+        "x": 32,
+        "y": 825,
+        "w": 326,
+        "h": 182
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "natural": "4128x2304",
+      "letterboxPct": 0,
+      "firstScreenPct": 2,
+      "startsAtPx": 825
+    }
+  },
+  {
+    "name": "pricing",
+    "url": "/pricing",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 8267,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 4249,
+          "w": 390,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 80px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/pricing-390-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section  →  section.cta-with-render",
+        "box": {
+          "x": 0,
+          "y": 6678,
+          "w": 390,
+          "h": 272
+        },
+        "detail": "272px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/pricing-390-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section.cta-with-render  →  footer#site-footer",
+        "box": {
+          "x": 0,
+          "y": 7559,
+          "w": 390,
+          "h": 169
+        },
+        "detail": "169px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 0px 0px 0px 0px)",
+        "shot": "shots/pricing-390-gap-3.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        61,
+        41
+      ],
+      [
+        32,
+        7
+      ],
+      [
+        75,
+        4
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-a",
+        "top": 105,
+        "height": 938,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 1123,
+        "height": 3125,
+        "pad": "80px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section",
+        "top": 4496,
+        "height": 2183,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.cta-with-render",
+        "top": 6950,
+        "height": 608,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 7728,
+        "height": 492,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/pricing.webp",
+      "box": {
+        "x": 0,
+        "y": 830,
+        "w": 390,
+        "h": 214
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "natural": "4202x2304",
+      "letterboxPct": 0,
+      "firstScreenPct": 2,
+      "startsAtPx": 830
+    }
+  },
+  {
+    "name": "about",
+    "url": "/about",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 6580,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-with-render.hero-about  →  section",
+        "box": {
+          "x": 0,
+          "y": 1269,
+          "w": 390,
+          "h": 127
+        },
+        "detail": "127px of empty space between the two sections' content (paddings: 34px 32px 0px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/about-390-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 2499,
+          "w": 390,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/about-390-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 3692,
+          "w": 390,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/about-390-gap-3.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "4",
+        "sel": "section  →  section.cta-with-render",
+        "box": {
+          "x": 0,
+          "y": 5156,
+          "w": 390,
+          "h": 272
+        },
+        "detail": "272px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/about-390-gap-4.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "5",
+        "sel": "section.cta-with-render  →  footer#site-footer",
+        "box": {
+          "x": 0,
+          "y": 5871,
+          "w": 390,
+          "h": 169
+        },
+        "detail": "169px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 0px 0px 0px 0px)",
+        "shot": "shots/about-390-gap-5.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        32,
+        17
+      ],
+      [
+        61,
+        12
+      ],
+      [
+        85,
+        4
+      ],
+      [
+        62,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-about",
+        "top": 105,
+        "height": 1164,
+        "pad": "34px 32px 0px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 1396,
+        "height": 1102,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section",
+        "top": 2746,
+        "height": 946,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 3939,
+        "height": 1217,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.cta-with-render",
+        "top": 5428,
+        "height": 444,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 6040,
+        "height": 492,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/about.webp",
+      "box": {
+        "x": 32,
+        "y": 954,
+        "w": 326,
+        "h": 316
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "natural": "2066x2000",
+      "letterboxPct": 0,
+      "firstScreenPct": 0,
+      "startsAtPx": 954
+    }
+  },
+  {
+    "name": "data",
+    "url": "/data",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 10763,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-plain  →  section",
+        "box": {
+          "x": 0,
+          "y": 814,
+          "w": 390,
+          "h": 191
+        },
+        "detail": "191px of empty space between the two sections' content (paddings: 48px 32px 64px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/data-390-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 4522,
+          "w": 390,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/data-390-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 5721,
+          "w": 390,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/data-390-gap-3.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "4",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 7333,
+          "w": 390,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/data-390-gap-4.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "5",
+        "sel": "section  →  section.cta-with-render",
+        "box": {
+          "x": 0,
+          "y": 9342,
+          "w": 390,
+          "h": 272
+        },
+        "detail": "272px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/data-390-gap-5.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "6",
+        "sel": "section.cta-with-render  →  footer#site-footer",
+        "box": {
+          "x": 0,
+          "y": 10055,
+          "w": 390,
+          "h": 169
+        },
+        "detail": "169px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 0px 0px 0px 0px)",
+        "shot": "shots/data-390-gap-6.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        32,
+        20
+      ],
+      [
+        61,
+        11
+      ],
+      [
+        113,
+        10
+      ],
+      [
+        90,
+        2
+      ],
+      [
+        94,
+        2
+      ],
+      [
+        131,
+        2
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-plain",
+        "top": 119,
+        "height": 695,
+        "pad": "48px 32px 64px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 1005,
+        "height": 3517,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section",
+        "top": 4769,
+        "height": 951,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 5968,
+        "height": 1365,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section",
+        "top": 7580,
+        "height": 1762,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.cta-with-render",
+        "top": 9614,
+        "height": 441,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 10224,
+        "height": 492,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/cta.webp",
+      "box": {
+        "x": 32,
+        "y": 9614,
+        "w": 326,
+        "h": 112
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 100%",
+      "natural": "3840x1319",
+      "letterboxPct": 0,
+      "firstScreenPct": 0,
+      "startsAtPx": 9614
+    }
+  },
+  {
+    "name": "vision",
+    "url": "/vision",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 3982,
+    "defects": [
+      {
+        "kind": "text-box",
+        "id": "1",
+        "sel": "div > div > div > div",
+        "box": {
+          "x": 249,
+          "y": 2804,
+          "w": 84,
+          "h": 158
+        },
+        "detail": "\"Directional hit rate\" spans 262 to 342px; its box spans 249 to 333px",
+        "shot": "shots/vision-390-text-box-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section.hero-plain  →  section",
+        "box": {
+          "x": 0,
+          "y": 468,
+          "w": 390,
+          "h": 128
+        },
+        "detail": "128px of empty space between the two sections' content (paddings: 48px 32px 64px 32px / 64px 32px 64px 32px)",
+        "shot": "shots/vision-390-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 3052,
+          "w": 390,
+          "h": 128
+        },
+        "detail": "128px of empty space between the two sections' content (paddings: 64px 32px 64px 32px / 64px 32px 64px 32px)",
+        "shot": "shots/vision-390-gap-3.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        57,
+        16
+      ],
+      [
+        32,
+        5
+      ],
+      [
+        195,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-plain",
+        "top": 112,
+        "height": 356,
+        "pad": "48px 32px 64px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 596,
+        "height": 2456,
+        "pad": "64px 32px 64px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section",
+        "top": 3180,
+        "height": 150,
+        "pad": "64px 32px 64px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 3443,
+        "height": 492,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "not-found",
+    "url": "/no-such-page",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 844,
+    "defects": [],
+    "gutters": [
+      [
+        16,
+        1
+      ],
+      [
+        45,
+        1
+      ],
+      [
+        160,
+        1
+      ]
+    ],
+    "sections": [],
+    "hero": null
+  },
+  {
+    "name": "login",
+    "url": "/login",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 940,
+    "defects": [],
+    "gutters": [
+      [
+        16,
+        6
+      ],
+      [
+        128,
+        2
+      ],
+      [
+        48,
+        1
+      ],
+      [
+        185,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "div.auth-shell > main.auth-main > section.auth-brand",
+        "top": 88,
+        "height": 204,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "div.auth-shell > main.auth-main > section.auth-form",
+        "top": 324,
+        "height": 503,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "div.auth-shell > footer.auth-foot",
+        "top": null,
+        "height": null,
+        "pad": "24px 32px 24px 32px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "signup",
+    "url": "/signup",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 1101,
+    "defects": [],
+    "gutters": [
+      [
+        16,
+        7
+      ],
+      [
+        128,
+        2
+      ],
+      [
+        48,
+        1
+      ],
+      [
+        185,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "div.auth-shell > main.auth-main > section.auth-brand",
+        "top": 88,
+        "height": 204,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "div.auth-shell > main.auth-main > section.auth-form",
+        "top": 324,
+        "height": 664,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "div.auth-shell > footer.auth-foot",
+        "top": null,
+        "height": null,
+        "pad": "24px 32px 24px 32px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-develop-empty",
+    "url": "/dashboard",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 2096,
+    "defects": [],
+    "gutters": [
+      [
+        41,
+        5
+      ],
+      [
+        16,
+        4
+      ],
+      [
+        33,
+        2
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-idle",
+        "top": 97,
+        "height": 143,
+        "pad": "16px 16px 16px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 281,
+        "height": 1687,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-develop-done",
+    "url": "/dashboard",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 6859,
+    "defects": [],
+    "gutters": [
+      [
+        41,
+        23
+      ],
+      [
+        16,
+        7
+      ],
+      [
+        33,
+        4
+      ],
+      [
+        47,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-done",
+        "top": 97,
+        "height": 579,
+        "pad": "16px 16px 16px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 717,
+        "height": 6014,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "div.shell-content > div > div > section.map-frame",
+        "top": 1469,
+        "height": 44,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-acquire",
+    "url": "/dashboard",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 5217,
+    "defects": [
+      {
+        "kind": "text-box",
+        "id": "1",
+        "sel": "div#c5-archive",
+        "box": {
+          "x": 16,
+          "y": 2792,
+          "w": 358,
+          "h": 694
+        },
+        "detail": "\"Aug 24\" spans 373 to 395px; its box spans 16 to 374px",
+        "shot": "shots/dashboard-acquire-390-text-box-1.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        41,
+        20
+      ],
+      [
+        16,
+        6
+      ],
+      [
+        33,
+        2
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-idle",
+        "top": 97,
+        "height": 143,
+        "pad": "16px 16px 16px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 281,
+        "height": 4808,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div > section.map-frame",
+        "top": 781,
+        "height": 61,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-price-empty",
+    "url": "/dashboard",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 1526,
+    "defects": [],
+    "gutters": [
+      [
+        16,
+        4
+      ],
+      [
+        33,
+        2
+      ],
+      [
+        41,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-idle.verdict-band-compact",
+        "top": 97,
+        "height": 143,
+        "pad": "16px 16px 16px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 281,
+        "height": 1117,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-price-done",
+    "url": "/dashboard",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 6395,
+    "defects": [
+      {
+        "kind": "text-box",
+        "id": "1",
+        "sel": "section#c2-scatter > div > div",
+        "box": {
+          "x": 89,
+          "y": 2951,
+          "w": 260,
+          "h": 220
+        },
+        "detail": "\"$0\" spans 68 to 82px; its box spans 89 to 349px",
+        "shot": "shots/dashboard-price-done-390-text-box-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section#c2-map.map-frame  →  section#c2-scatter",
+        "box": {
+          "x": 0,
+          "y": 1794,
+          "w": 390,
+          "h": 1114
+        },
+        "detail": "1114px of empty space between the two sections' content (paddings: 0px 0px 0px 0px / 24px 24px 24px 24px)",
+        "shot": "shots/dashboard-price-done-390-gap-2.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        41,
+        45
+      ],
+      [
+        16,
+        8
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-done.verdict-band-compact",
+        "top": 93,
+        "height": 89,
+        "pad": "12px 16px 12px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 219,
+        "height": 6048,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "section#c2-map.map-frame",
+        "top": 1734,
+        "height": 61,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "section#c2-scatter",
+        "top": 2908,
+        "height": 407,
+        "pad": "24px 24px 24px 24px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section#c2-permits",
+        "top": 3389,
+        "height": 363,
+        "pad": "24px 24px 24px 24px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-property-empty",
+    "url": "/dashboard",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 1600,
+    "defects": [],
+    "gutters": [
+      [
+        16,
+        4
+      ],
+      [
+        33,
+        2
+      ],
+      [
+        41,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-idle",
+        "top": 97,
+        "height": 143,
+        "pad": "16px 16px 16px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 281,
+        "height": 1191,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-property-done",
+    "url": "/dashboard",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 6675,
+    "defects": [],
+    "gutters": [
+      [
+        41,
+        32
+      ],
+      [
+        16,
+        8
+      ],
+      [
+        33,
+        4
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-done",
+        "top": 97,
+        "height": 579,
+        "pad": "16px 16px 16px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 717,
+        "height": 5830,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "section#c1-map.map-frame",
+        "top": 5617,
+        "height": 61,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "settings",
+    "url": "/dashboard/settings",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 1793,
+    "defects": [],
+    "gutters": [
+      [
+        41,
+        15
+      ],
+      [
+        16,
+        1
+      ]
+    ],
+    "sections": [],
+    "hero": null
+  },
+  {
+    "name": "home",
+    "url": "/",
+    "width": 430,
+    "vw": 430,
+    "pageHeight": 5068,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section#agents-section  →  div.home-mobile > section",
+        "box": {
+          "x": 0,
+          "y": 2497,
+          "w": 430,
+          "h": 143
+        },
+        "detail": "143px of empty space between the two sections' content (paddings: 64px 16px 64px 16px / 64px 16px 64px 16px)",
+        "shot": "shots/home-430-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "div.home-mobile > section  →  div.home-mobile > section.home-monitoring",
+        "box": {
+          "x": 0,
+          "y": 2872,
+          "w": 430,
+          "h": 135
+        },
+        "detail": "135px of empty space between the two sections' content (paddings: 64px 16px 64px 16px / 64px 16px 64px 16px)",
+        "shot": "shots/home-430-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "div.home-mobile > section.home-monitoring  →  section#clusters-section",
+        "box": {
+          "x": 0,
+          "y": 3170,
+          "w": 430,
+          "h": 167
+        },
+        "detail": "167px of empty space between the two sections' content (paddings: 64px 16px 64px 16px / 64px 16px 64px 16px)",
+        "shot": "shots/home-430-gap-3.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "4",
+        "sel": "section#clusters-section  →  section#early-access-section.cta-with-render",
+        "box": {
+          "x": 0,
+          "y": 3805,
+          "w": 430,
+          "h": 135
+        },
+        "detail": "135px of empty space between the two sections' content (paddings: 64px 16px 64px 16px / 64px 16px 64px 16px)",
+        "shot": "shots/home-430-gap-4.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        16,
+        12
+      ],
+      [
+        41,
+        9
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#hero-section",
+        "top": 96,
+        "height": 1657,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(173, 193, 202)"
+      },
+      {
+        "sel": "section#agents-section",
+        "top": 1872,
+        "height": 625,
+        "pad": "64px 16px 64px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "div.home-mobile > section",
+        "top": 2640,
+        "height": 232,
+        "pad": "64px 16px 64px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "div.home-mobile > section.home-monitoring",
+        "top": 3007,
+        "height": 163,
+        "pad": "64px 16px 64px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section#clusters-section",
+        "top": 3337,
+        "height": 468,
+        "pad": "64px 16px 64px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section#early-access-section.cta-with-render",
+        "top": 3940,
+        "height": 667,
+        "pad": "64px 16px 64px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 4721,
+        "height": 300,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/menu-hero.jpg",
+      "box": {
+        "x": 0,
+        "y": 358,
+        "w": 430,
+        "h": 439
+      },
+      "objectFit": "cover",
+      "objectPosition": "77% 92%",
+      "natural": "2267x1114",
+      "letterboxPct": 0,
+      "firstScreenPct": 52,
+      "startsAtPx": 358
+    }
+  },
+  {
+    "name": "intelligence",
+    "url": "/intelligence",
+    "width": 430,
+    "vw": 430,
+    "pageHeight": 8924,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-with-render.hero-group-a  →  section",
+        "box": {
+          "x": 0,
+          "y": 610,
+          "w": 430,
+          "h": 127
+        },
+        "detail": "127px of empty space between the two sections' content (paddings: 0px 0px 0px 0px / 120px 32px 120px 32px)",
+        "shot": "shots/intelligence-430-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 1114,
+          "w": 430,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/intelligence-430-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 2450,
+          "w": 430,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/intelligence-430-gap-3.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "4",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 4827,
+          "w": 430,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/intelligence-430-gap-4.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "5",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 6376,
+          "w": 430,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/intelligence-430-gap-5.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "6",
+        "sel": "section  →  section.cta-with-render",
+        "box": {
+          "x": 0,
+          "y": 7680,
+          "w": 430,
+          "h": 272
+        },
+        "detail": "272px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/intelligence-430-gap-6.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "7",
+        "sel": "section.cta-with-render  →  footer#site-footer",
+        "box": {
+          "x": 0,
+          "y": 8407,
+          "w": 430,
+          "h": 169
+        },
+        "detail": "169px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 0px 0px 0px 0px)",
+        "shot": "shots/intelligence-430-gap-7.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        61,
+        23
+      ],
+      [
+        32,
+        12
+      ],
+      [
+        65,
+        9
+      ],
+      [
+        57,
+        2
+      ],
+      [
+        74,
+        2
+      ],
+      [
+        91,
+        2
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-a",
+        "top": 105,
+        "height": 505,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 737,
+        "height": 378,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 1361,
+        "height": 1089,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section",
+        "top": 2697,
+        "height": 2130,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 5074,
+        "height": 1302,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section",
+        "top": 6623,
+        "height": 1058,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.cta-with-render",
+        "top": 7952,
+        "height": 455,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 8576,
+        "height": 300,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/how-it-works.webp",
+      "box": {
+        "x": 0,
+        "y": 374,
+        "w": 430,
+        "h": 236
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "natural": "4202x2304",
+      "letterboxPct": 0,
+      "firstScreenPct": 28,
+      "startsAtPx": 374
+    }
+  },
+  {
+    "name": "for-developers",
+    "url": "/for/developers",
+    "width": 430,
+    "vw": 430,
+    "pageHeight": 4327,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-with-render.hero-group-b  →  section",
+        "box": {
+          "x": 0,
+          "y": 935,
+          "w": 430,
+          "h": 127
+        },
+        "detail": "127px of empty space between the two sections' content (paddings: 34px 32px 0px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-developers-430-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 2198,
+          "w": 430,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-developers-430-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section  →  section.cta-with-render",
+        "box": {
+          "x": 0,
+          "y": 3084,
+          "w": 430,
+          "h": 272
+        },
+        "detail": "272px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-developers-430-gap-3.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "4",
+        "sel": "section.cta-with-render  →  footer#site-footer",
+        "box": {
+          "x": 0,
+          "y": 3811,
+          "w": 430,
+          "h": 169
+        },
+        "detail": "169px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 0px 0px 0px 0px)",
+        "shot": "shots/for-developers-430-gap-4.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        61,
+        14
+      ],
+      [
+        32,
+        10
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-b",
+        "top": 105,
+        "height": 830,
+        "pad": "34px 32px 0px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 1062,
+        "height": 1136,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section",
+        "top": 2445,
+        "height": 639,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.cta-with-render",
+        "top": 3356,
+        "height": 455,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 3980,
+        "height": 300,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/for-developers.webp",
+      "box": {
+        "x": 32,
+        "y": 731,
+        "w": 366,
+        "h": 204
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "natural": "4128x2304",
+      "letterboxPct": 0,
+      "firstScreenPct": 13,
+      "startsAtPx": 731
+    }
+  },
+  {
+    "name": "for-professionals",
+    "url": "/for/agents",
+    "width": 430,
+    "vw": 430,
+    "pageHeight": 4264,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-with-render.hero-group-b  →  section",
+        "box": {
+          "x": 0,
+          "y": 895,
+          "w": 430,
+          "h": 127
+        },
+        "detail": "127px of empty space between the two sections' content (paddings: 34px 32px 0px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-professionals-430-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 2158,
+          "w": 430,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-professionals-430-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section  →  section.cta-with-render",
+        "box": {
+          "x": 0,
+          "y": 3021,
+          "w": 430,
+          "h": 272
+        },
+        "detail": "272px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-professionals-430-gap-3.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "4",
+        "sel": "section.cta-with-render  →  footer#site-footer",
+        "box": {
+          "x": 0,
+          "y": 3748,
+          "w": 430,
+          "h": 169
+        },
+        "detail": "169px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 0px 0px 0px 0px)",
+        "shot": "shots/for-professionals-430-gap-4.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        61,
+        14
+      ],
+      [
+        32,
+        10
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-b",
+        "top": 105,
+        "height": 790,
+        "pad": "34px 32px 0px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 1022,
+        "height": 1136,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section",
+        "top": 2405,
+        "height": 616,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.cta-with-render",
+        "top": 3293,
+        "height": 455,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 3917,
+        "height": 300,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/for-professionals.webp",
+      "box": {
+        "x": 32,
+        "y": 691,
+        "w": 366,
+        "h": 204
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "natural": "4128x2304",
+      "letterboxPct": 0,
+      "firstScreenPct": 18,
+      "startsAtPx": 691
+    }
+  },
+  {
+    "name": "for-institutions",
+    "url": "/for/institutions",
+    "width": 430,
+    "vw": 430,
+    "pageHeight": 4528,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-with-render.hero-group-b  →  section",
+        "box": {
+          "x": 0,
+          "y": 927,
+          "w": 430,
+          "h": 127
+        },
+        "detail": "127px of empty space between the two sections' content (paddings: 34px 32px 0px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-institutions-430-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 2418,
+          "w": 430,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-institutions-430-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section  →  section.cta-with-render",
+        "box": {
+          "x": 0,
+          "y": 3234,
+          "w": 430,
+          "h": 272
+        },
+        "detail": "272px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-institutions-430-gap-3.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "4",
+        "sel": "section.cta-with-render  →  footer#site-footer",
+        "box": {
+          "x": 0,
+          "y": 4012,
+          "w": 430,
+          "h": 169
+        },
+        "detail": "169px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 0px 0px 0px 0px)",
+        "shot": "shots/for-institutions-430-gap-4.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        61,
+        16
+      ],
+      [
+        32,
+        10
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-b",
+        "top": 105,
+        "height": 822,
+        "pad": "34px 32px 0px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 1054,
+        "height": 1363,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section",
+        "top": 2665,
+        "height": 569,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.cta-with-render",
+        "top": 3506,
+        "height": 506,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 4181,
+        "height": 300,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/for-institutions.webp",
+      "box": {
+        "x": 32,
+        "y": 723,
+        "w": 366,
+        "h": 204
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "natural": "4128x2304",
+      "letterboxPct": 0,
+      "firstScreenPct": 14,
+      "startsAtPx": 723
+    }
+  },
+  {
+    "name": "for-community",
+    "url": "/for/community",
+    "width": 430,
+    "vw": 430,
+    "pageHeight": 4549,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-with-render.hero-group-b  →  section",
+        "box": {
+          "x": 0,
+          "y": 969,
+          "w": 430,
+          "h": 127
+        },
+        "detail": "127px of empty space between the two sections' content (paddings: 34px 32px 0px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-community-430-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 2190,
+          "w": 430,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-community-430-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section  →  section.cta-with-render",
+        "box": {
+          "x": 0,
+          "y": 3280,
+          "w": 430,
+          "h": 272
+        },
+        "detail": "272px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-community-430-gap-3.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "4",
+        "sel": "section.cta-with-render  →  footer#site-footer",
+        "box": {
+          "x": 0,
+          "y": 4033,
+          "w": 430,
+          "h": 169
+        },
+        "detail": "169px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 0px 0px 0px 0px)",
+        "shot": "shots/for-community-430-gap-4.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        61,
+        14
+      ],
+      [
+        32,
+        11
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-b",
+        "top": 105,
+        "height": 864,
+        "pad": "34px 32px 0px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 1096,
+        "height": 1094,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section",
+        "top": 2437,
+        "height": 843,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.cta-with-render",
+        "top": 3552,
+        "height": 481,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 4202,
+        "height": 300,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/for-community.webp",
+      "box": {
+        "x": 32,
+        "y": 765,
+        "w": 366,
+        "h": 204
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "natural": "4128x2304",
+      "letterboxPct": 0,
+      "firstScreenPct": 9,
+      "startsAtPx": 765
+    }
+  },
+  {
+    "name": "pricing",
+    "url": "/pricing",
+    "width": 430,
+    "vw": 430,
+    "pageHeight": 7680,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 4032,
+          "w": 430,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 80px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/pricing-430-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section  →  section.cta-with-render",
+        "box": {
+          "x": 0,
+          "y": 6295,
+          "w": 430,
+          "h": 272
+        },
+        "detail": "272px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/pricing-430-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section.cta-with-render  →  footer#site-footer",
+        "box": {
+          "x": 0,
+          "y": 7163,
+          "w": 430,
+          "h": 169
+        },
+        "detail": "169px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 0px 0px 0px 0px)",
+        "shot": "shots/pricing-430-gap-3.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        61,
+        41
+      ],
+      [
+        32,
+        7
+      ],
+      [
+        75,
+        4
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-a",
+        "top": 105,
+        "height": 834,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 1019,
+        "height": 3013,
+        "pad": "80px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section",
+        "top": 4279,
+        "height": 2016,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.cta-with-render",
+        "top": 6567,
+        "height": 596,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 7332,
+        "height": 300,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/pricing.webp",
+      "box": {
+        "x": 0,
+        "y": 704,
+        "w": 430,
+        "h": 236
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "natural": "4202x2304",
+      "letterboxPct": 0,
+      "firstScreenPct": 17,
+      "startsAtPx": 704
+    }
+  },
+  {
+    "name": "about",
+    "url": "/about",
+    "width": 430,
+    "vw": 430,
+    "pageHeight": 6083,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-with-render.hero-about  →  section",
+        "box": {
+          "x": 0,
+          "y": 1210,
+          "w": 430,
+          "h": 127
+        },
+        "detail": "127px of empty space between the two sections' content (paddings: 34px 32px 0px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/about-430-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 2370,
+          "w": 430,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/about-430-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 3493,
+          "w": 430,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/about-430-gap-3.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "4",
+        "sel": "section  →  section.cta-with-render",
+        "box": {
+          "x": 0,
+          "y": 4902,
+          "w": 430,
+          "h": 272
+        },
+        "detail": "272px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/about-430-gap-4.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "5",
+        "sel": "section.cta-with-render  →  footer#site-footer",
+        "box": {
+          "x": 0,
+          "y": 5567,
+          "w": 430,
+          "h": 169
+        },
+        "detail": "169px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 0px 0px 0px 0px)",
+        "shot": "shots/about-430-gap-5.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        32,
+        17
+      ],
+      [
+        61,
+        12
+      ],
+      [
+        85,
+        4
+      ],
+      [
+        62,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-about",
+        "top": 105,
+        "height": 1105,
+        "pad": "34px 32px 0px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 1337,
+        "height": 1033,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section",
+        "top": 2617,
+        "height": 877,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 3740,
+        "height": 1162,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.cta-with-render",
+        "top": 5174,
+        "height": 392,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 5736,
+        "height": 300,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/about.webp",
+      "box": {
+        "x": 32,
+        "y": 856,
+        "w": 366,
+        "h": 354
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "natural": "2066x2000",
+      "letterboxPct": 0,
+      "firstScreenPct": 0,
+      "startsAtPx": 856
+    }
+  },
+  {
+    "name": "data",
+    "url": "/data",
+    "width": 430,
+    "vw": 430,
+    "pageHeight": 10183,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-plain  →  section",
+        "box": {
+          "x": 0,
+          "y": 814,
+          "w": 430,
+          "h": 191
+        },
+        "detail": "191px of empty space between the two sections' content (paddings: 48px 32px 64px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/data-430-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 4459,
+          "w": 430,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/data-430-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 5598,
+          "w": 430,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/data-430-gap-3.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "4",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 7117,
+          "w": 430,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/data-430-gap-4.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "5",
+        "sel": "section  →  section.cta-with-render",
+        "box": {
+          "x": 0,
+          "y": 8940,
+          "w": 430,
+          "h": 272
+        },
+        "detail": "272px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/data-430-gap-5.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "6",
+        "sel": "section.cta-with-render  →  footer#site-footer",
+        "box": {
+          "x": 0,
+          "y": 9666,
+          "w": 430,
+          "h": 169
+        },
+        "detail": "169px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 0px 0px 0px 0px)",
+        "shot": "shots/data-430-gap-6.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        32,
+        20
+      ],
+      [
+        61,
+        11
+      ],
+      [
+        113,
+        10
+      ],
+      [
+        110,
+        2
+      ],
+      [
+        114,
+        2
+      ],
+      [
+        151,
+        2
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-plain",
+        "top": 119,
+        "height": 695,
+        "pad": "48px 32px 64px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 1005,
+        "height": 3454,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section",
+        "top": 4706,
+        "height": 892,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 5845,
+        "height": 1272,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section",
+        "top": 7364,
+        "height": 1576,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.cta-with-render",
+        "top": 9212,
+        "height": 455,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 9835,
+        "height": 300,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/cta.webp",
+      "box": {
+        "x": 32,
+        "y": 9212,
+        "w": 366,
+        "h": 126
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 100%",
+      "natural": "3840x1319",
+      "letterboxPct": 0,
+      "firstScreenPct": 0,
+      "startsAtPx": 9212
+    }
+  },
+  {
+    "name": "vision",
+    "url": "/vision",
+    "width": 430,
+    "vw": 430,
+    "pageHeight": 3562,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-plain  →  section",
+        "box": {
+          "x": 0,
+          "y": 427,
+          "w": 430,
+          "h": 128
+        },
+        "detail": "128px of empty space between the two sections' content (paddings: 48px 32px 64px 32px / 64px 32px 64px 32px)",
+        "shot": "shots/vision-430-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section  →  section",
+        "box": {
+          "x": 0,
+          "y": 2849,
+          "w": 430,
+          "h": 128
+        },
+        "detail": "128px of empty space between the two sections' content (paddings: 64px 32px 64px 32px / 64px 32px 64px 32px)",
+        "shot": "shots/vision-430-gap-2.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        57,
+        14
+      ],
+      [
+        32,
+        4
+      ],
+      [
+        235,
+        3
+      ],
+      [
+        45,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-plain",
+        "top": 113,
+        "height": 314,
+        "pad": "48px 32px 64px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section",
+        "top": 555,
+        "height": 2294,
+        "pad": "64px 32px 64px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section",
+        "top": 2977,
+        "height": 124,
+        "pad": "64px 32px 64px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 3214,
+        "height": 300,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "not-found",
+    "url": "/no-such-page",
+    "width": 430,
+    "vw": 430,
+    "pageHeight": 844,
+    "defects": [],
+    "gutters": [
+      [
+        16,
+        1
+      ],
+      [
+        65,
+        1
+      ],
+      [
+        180,
+        1
+      ]
+    ],
+    "sections": [],
+    "hero": null
+  },
+  {
+    "name": "login",
+    "url": "/login",
+    "width": 430,
+    "vw": 430,
+    "pageHeight": 916,
+    "defects": [],
+    "gutters": [
+      [
+        16,
+        6
+      ],
+      [
+        148,
+        2
+      ],
+      [
+        48,
+        1
+      ],
+      [
+        205,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "div.auth-shell > main.auth-main > section.auth-brand",
+        "top": 88,
+        "height": 179,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "div.auth-shell > main.auth-main > section.auth-form",
+        "top": 299,
+        "height": 503,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "div.auth-shell > footer.auth-foot",
+        "top": null,
+        "height": null,
+        "pad": "24px 32px 24px 32px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "signup",
+    "url": "/signup",
+    "width": 430,
+    "vw": 430,
+    "pageHeight": 1077,
+    "defects": [],
+    "gutters": [
+      [
+        16,
+        7
+      ],
+      [
+        148,
+        2
+      ],
+      [
+        48,
+        1
+      ],
+      [
+        205,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "div.auth-shell > main.auth-main > section.auth-brand",
+        "top": 88,
+        "height": 179,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "div.auth-shell > main.auth-main > section.auth-form",
+        "top": 299,
+        "height": 664,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "div.auth-shell > footer.auth-foot",
+        "top": null,
+        "height": null,
+        "pad": "24px 32px 24px 32px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-develop-empty",
+    "url": "/dashboard",
+    "width": 430,
+    "vw": 430,
+    "pageHeight": 1967,
+    "defects": [],
+    "gutters": [
+      [
+        41,
+        5
+      ],
+      [
+        16,
+        4
+      ],
+      [
+        33,
+        2
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-idle",
+        "top": 97,
+        "height": 122,
+        "pad": "16px 16px 16px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 260,
+        "height": 1579,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-develop-done",
+    "url": "/dashboard",
+    "width": 430,
+    "vw": 430,
+    "pageHeight": 6645,
+    "defects": [],
+    "gutters": [
+      [
+        41,
+        23
+      ],
+      [
+        16,
+        7
+      ],
+      [
+        33,
+        4
+      ],
+      [
+        47,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-done",
+        "top": 97,
+        "height": 555,
+        "pad": "16px 16px 16px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 693,
+        "height": 5824,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "div.shell-content > div > div > section.map-frame",
+        "top": 1379,
+        "height": 44,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-acquire",
+    "url": "/dashboard",
+    "width": 430,
+    "vw": 430,
+    "pageHeight": 5124,
+    "defects": [
+      {
+        "kind": "text-box",
+        "id": "1",
+        "sel": "div#c5-archive",
+        "box": {
+          "x": 16,
+          "y": 2718,
+          "w": 398,
+          "h": 694
+        },
+        "detail": "\"Aug 31\" spans 433 to 454px; its box spans 16 to 414px",
+        "shot": "shots/dashboard-acquire-430-text-box-1.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        41,
+        20
+      ],
+      [
+        16,
+        6
+      ],
+      [
+        33,
+        2
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-idle",
+        "top": 97,
+        "height": 122,
+        "pad": "16px 16px 16px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 260,
+        "height": 4736,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div > section.map-frame",
+        "top": 740,
+        "height": 44,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-price-empty",
+    "url": "/dashboard",
+    "width": 430,
+    "vw": 430,
+    "pageHeight": 1463,
+    "defects": [],
+    "gutters": [
+      [
+        16,
+        4
+      ],
+      [
+        33,
+        2
+      ],
+      [
+        41,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-idle.verdict-band-compact",
+        "top": 97,
+        "height": 122,
+        "pad": "16px 16px 16px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 260,
+        "height": 1075,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-price-done",
+    "url": "/dashboard",
+    "width": 430,
+    "vw": 430,
+    "pageHeight": 6114,
+    "defects": [
+      {
+        "kind": "text-box",
+        "id": "1",
+        "sel": "section#c2-scatter > div > div",
+        "box": {
+          "x": 89,
+          "y": 2739,
+          "w": 300,
+          "h": 220
+        },
+        "detail": "\"$0\" spans 68 to 82px; its box spans 89 to 389px",
+        "shot": "shots/dashboard-price-done-430-text-box-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section#c2-map.map-frame  →  section#c2-scatter",
+        "box": {
+          "x": 0,
+          "y": 1619,
+          "w": 430,
+          "h": 1078
+        },
+        "detail": "1078px of empty space between the two sections' content (paddings: 0px 0px 0px 0px / 24px 24px 24px 24px)",
+        "shot": "shots/dashboard-price-done-430-gap-2.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        41,
+        45
+      ],
+      [
+        16,
+        8
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-done.verdict-band-compact",
+        "top": 93,
+        "height": 44,
+        "pad": "12px 16px 12px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 174,
+        "height": 5812,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "section#c2-map.map-frame",
+        "top": 1558,
+        "height": 61,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "section#c2-scatter",
+        "top": 2697,
+        "height": 389,
+        "pad": "24px 24px 24px 24px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section#c2-permits",
+        "top": 3159,
+        "height": 351,
+        "pad": "24px 24px 24px 24px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-property-empty",
+    "url": "/dashboard",
+    "width": 430,
+    "vw": 430,
+    "pageHeight": 1559,
+    "defects": [],
+    "gutters": [
+      [
+        16,
+        4
+      ],
+      [
+        33,
+        2
+      ],
+      [
+        41,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-idle",
+        "top": 97,
+        "height": 122,
+        "pad": "16px 16px 16px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 260,
+        "height": 1172,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-property-done",
+    "url": "/dashboard",
+    "width": 430,
+    "vw": 430,
+    "pageHeight": 6304,
+    "defects": [],
+    "gutters": [
+      [
+        41,
+        32
+      ],
+      [
+        16,
+        8
+      ],
+      [
+        33,
+        4
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-done",
+        "top": 97,
+        "height": 555,
+        "pad": "16px 16px 16px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 693,
+        "height": 5483,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "section#c1-map.map-frame",
+        "top": 5266,
+        "height": 61,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "settings",
+    "url": "/dashboard/settings",
+    "width": 430,
+    "vw": 430,
+    "pageHeight": 1793,
+    "defects": [],
+    "gutters": [
+      [
+        41,
+        15
+      ],
+      [
+        16,
+        1
+      ]
+    ],
+    "sections": [],
+    "hero": null
+  }
+]
