@@ -1,0 +1,1998 @@
+diff --git a/scripts/ui/dash-shots.mjs b/scripts/ui/dash-shots.mjs
+index b002c9a..678ad4c 100644
+--- a/scripts/ui/dash-shots.mjs
++++ b/scripts/ui/dash-shots.mjs
+@@ -91,6 +91,11 @@ for (const cluster of CLUSTERS) {
+   const addrs = ADDR[cluster];
+   if (cluster === "cluster_4") {
+     await page.fill("#site-0", addrs[0]);
++    // Slots open one at a time since WS4: add the second site first.
++    if ((await page.locator("#site-1").count()) === 0) {
++      await page.locator('button:has-text("Add site")').click();
++      await page.waitForTimeout(300);
++    }
+     await page.fill("#site-1", addrs[1]);
+     await page.locator('button:has-text("Run comparison")').click();
+     await page.waitForTimeout(15000);
+@@ -109,7 +114,7 @@ for (const cluster of CLUSTERS) {
+       await page.waitForTimeout(9000);
+     }
+     await snap(page, `${cluster}-tracked`);
+-    await page.locator('button:has-text("Analyze"), button:has-text("Re-run")').first().click();
++    await page.locator('button:has-text("Analyze"), button:has-text("Re-run")').locator('visible=true').first().click();
+     await page.waitForTimeout(15000);
+     await snap(page, `${cluster}-running`);
+     await waitForDone(page);
+diff --git a/scripts/ui/ws4-interactions.mjs b/scripts/ui/ws4-interactions.mjs
+new file mode 100644
+index 0000000..dac9d7b
+--- /dev/null
++++ b/scripts/ui/ws4-interactions.mjs
+@@ -0,0 +1,116 @@
++// WS4 interaction captures: phone map toggle, swipe lists, the owner/renter
++// switch, the lot-zoom control, and the sticky action, around one real run.
++// node scripts/ui/ws4-interactions.mjs --state <storageState.json> --out build-log/ui-ws-4/after/interactions
++import { chromium } from 'playwright';
++import fs from 'node:fs';
++import path from 'node:path';
++
++const args = Object.fromEntries(process.argv.slice(2).map((a, i, arr) => a.startsWith('--') ? [a.slice(2), arr[i + 1]] : []).filter(Boolean));
++const out = args.out ?? 'build-log/ui-ws-4/after/interactions';
++const base = args.base ?? 'http://localhost:3000';
++const state = args.state;
++const address = args.address ?? '425 6th Street, Brooklyn, NY 11215';
++fs.mkdirSync(out, { recursive: true });
++const shot = (page, name) => page.screenshot({ path: path.join(out, `${name}.jpg`), type: 'jpeg', quality: 78 });
++const errors = [];
++const checks = {};
++const browser = await chromium.launch();
++async function ctx(width) {
++  const c = await browser.newContext({ viewport: { width, height: width < 500 ? 844 : 900 }, deviceScaleFactor: 1, storageState: state });
++  const p = await c.newPage();
++  p.on('console', (m) => { if ((m.type() === 'error' || m.type() === 'warning') && !/GL Driver|development keys/.test(m.text())) errors.push(`[${m.type()}] ${m.text().slice(0, 200)}`); });
++  p.on('pageerror', (e) => errors.push(`[pageerror] ${String(e).slice(0, 200)}`));
++  return { c, p };
++}
++async function waitForDone(page, timeoutMs = 300000) {
++  const t0 = Date.now();
++  while (Date.now() - t0 < timeoutMs) {
++    if (await page.locator('.verdict-band-done, .verdict-band-error').count()) return (await page.locator('.verdict-band-done').count()) > 0;
++    await page.waitForTimeout(3000);
++  }
++  return false;
++}
++const overflow = (page) => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
++
++// Property lens at 390: run, persona switch, map toggle, findings order, sticky
++{
++  const { c, p } = await ctx(390);
++  await p.goto(base + '/dashboard', { waitUntil: 'load' });
++  await p.waitForTimeout(2500);
++  await p.click('.shell-lens-btn');
++  await p.waitForTimeout(500);
++  await p.locator('#shell-lens-sheet [data-lens="cluster_1"]').click();
++  await p.waitForTimeout(1000);
++  await p.click('[data-tab="search"]');
++  await p.waitForTimeout(800);
++  await p.locator('#shell-search-sheet input').fill(address);
++  await p.locator('#shell-search-sheet input').press('Enter');
++  checks.runDone = await waitForDone(p);
++  await p.waitForTimeout(2500);
++  await shot(p, 'property-done-390-top');
++  checks.propertyOverflow390 = await overflow(p);
++  await p.locator('.segmented button:has-text("I rent here")').click();
++  await p.waitForTimeout(600);
++  checks.renterHeading = await p.locator('#c1-alerts h3').first().textContent();
++  await p.locator('#c1-alerts').scrollIntoViewIfNeeded();
++  await p.waitForTimeout(300);
++  await shot(p, 'property-renter-findings-390');
++  await p.locator('#c1-map').scrollIntoViewIfNeeded();
++  await p.waitForTimeout(300);
++  await shot(p, 'property-map-collapsed-390');
++  const toggle = p.locator('#c1-map button:has-text("Show map")');
++  checks.mapToggleVisible = (await toggle.count()) > 0;
++  if (checks.mapToggleVisible) {
++    await toggle.click();
++    await p.waitForTimeout(3500);
++    await shot(p, 'property-map-open-390');
++    const lotBtn = p.locator('.map-frame-controls button:has-text("Lot")');
++    checks.lotControl = (await lotBtn.count()) > 0;
++    if (checks.lotControl) { await lotBtn.click(); await p.waitForTimeout(2500); await shot(p, 'property-map-lot-390'); }
++  }
++  checks.propertyOverflowAfterMap = await overflow(p);
++  await c.close();
++}
++
++// Price lens at 390: comp cards, sticky documents, tiles
++{
++  const { c, p } = await ctx(390);
++  await p.goto(base + '/dashboard', { waitUntil: 'load' });
++  await p.waitForTimeout(2500);
++  await p.click('.shell-lens-btn'); await p.waitForTimeout(500);
++  await p.locator('#shell-lens-sheet [data-lens="cluster_2"]').click(); await p.waitForTimeout(1000);
++  await p.click('[data-tab="search"]'); await p.waitForTimeout(800);
++  await p.locator('#shell-search-sheet input').fill(address);
++  await p.locator('#shell-search-sheet input').press('Enter');
++  checks.priceRunDone = await waitForDone(p);
++  await p.waitForTimeout(2500);
++  await p.locator('#c2-pricing').scrollIntoViewIfNeeded(); await p.waitForTimeout(300);
++  await shot(p, 'price-pricing-first-390');
++  await p.locator('#c2-cma').scrollIntoViewIfNeeded(); await p.waitForTimeout(300);
++  await shot(p, 'price-comp-cards-390');
++  checks.compCardsVisible = await p.locator('#c2-cma .comp-card').first().isVisible();
++  checks.compTableHidden = !(await p.locator('#c2-cma table').first().isVisible().catch(() => false));
++  checks.stickyVisible = await p.locator('.sticky-action').first().isVisible();
++  checks.priceOverflow390 = await overflow(p);
++  await c.close();
++}
++
++// Acquire lens: this-week tiles and holding cards at 390, table at 1440
++{
++  const { c, p } = await ctx(390);
++  await p.goto(base + '/dashboard', { waitUntil: 'load' });
++  await p.waitForTimeout(2500);
++  await p.click('.shell-lens-btn'); await p.waitForTimeout(500);
++  await p.locator('#shell-lens-sheet [data-lens="cluster_5"]').click(); await p.waitForTimeout(4000);
++  await p.locator('#c5-week').scrollIntoViewIfNeeded(); await p.waitForTimeout(300);
++  await shot(p, 'acquire-this-week-390');
++  await p.locator('#c5-portfolio').scrollIntoViewIfNeeded(); await p.waitForTimeout(300);
++  await shot(p, 'acquire-holding-cards-390');
++  checks.holdingCardsVisible = await p.locator('.holding-card').first().isVisible().catch(() => false);
++  checks.acquireOverflow390 = await overflow(p);
++  await c.close();
++}
++await browser.close();
++fs.writeFileSync(path.join(out, 'checks.json'), JSON.stringify(checks, null, 2));
++fs.writeFileSync(path.join(out, 'console.json'), JSON.stringify(errors, null, 2));
++console.log('done', JSON.stringify(checks), 'console entries:', errors.length);
+diff --git a/src/app/globals.css b/src/app/globals.css
+index 77713b8..b772602 100644
+--- a/src/app/globals.css
++++ b/src/app/globals.css
+@@ -13,6 +13,7 @@
+   /* Content width shared by every dashboard lens (UI sprint, A5). */
+   --content-max: 1200px;
+   /* Marketing site (WS2): one section width, one prose width. */
++  --chart-h: 260px;
+   --content-marketing: 1200px;
+   --content-reading: 900px;
+   --content-prose: 720px;
+@@ -241,7 +242,6 @@ body {
+   justify-content: center;
+   gap: 8px;
+   cursor: pointer;
+-  box-shadow: var(--shadow-raised);
+   transition: background 220ms cubic-bezier(0.16, 1, 0.3, 1),
+     border-color 220ms cubic-bezier(0.16, 1, 0.3, 1),
+     transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+@@ -250,18 +250,15 @@ body {
+   white-space: nowrap;
+ }
+ 
++/* Hover is a tint change on the same plane: no lift, no glow (A8). */
+ .btn-primary:hover {
+   background: var(--sky);
+-  border-color: var(--sky);
+-  transform: translateY(-2px);
+-  box-shadow: 0 10px 24px rgba(26, 79, 110, 0.28);
++  border-color: var(--mid-blue);
+ }
+ 
+ .btn-primary:active {
+-  transform: translateY(0);
+   background: var(--brand-blue);
+-  border-color: var(--brand-blue);
+-  box-shadow: var(--shadow-flat);
++  border-color: var(--deep-navy);
+   transition-duration: 100ms;
+ }
+ 
+@@ -316,12 +313,11 @@ body {
+ .btn-ghost:hover {
+   background: var(--pale-wash);
+   color: var(--ink-primary);
+-  border-color: var(--brand-blue);
+-  transform: translateY(-1px);
++  border-color: var(--mid-blue);
+ }
+ 
+ .btn-ghost:active {
+-  transform: translateY(0);
++  background: var(--sky);
+   transition-duration: 100ms;
+ }
+ 
+@@ -769,3 +765,18 @@ body {
+ }
+ 
+ /* Tablet: two-column marketing grids collapse handled per component. */
++
++/* Dashboard tiles and charts (UI sprint WS4) */
++.velocity-grid {
++  display: grid;
++  grid-template-columns: repeat(3, minmax(0, 1fr));
++  gap: var(--space-3);
++}
++@media (max-width: 767px) {
++  :root {
++    --chart-h: 220px;
++  }
++  .velocity-grid {
++    grid-template-columns: repeat(2, minmax(0, 1fr));
++  }
++}
+diff --git a/src/components/dashboard/cluster1/AlertsPanel.tsx b/src/components/dashboard/cluster1/AlertsPanel.tsx
+index 7f1a98a..e2e1f3c 100644
+--- a/src/components/dashboard/cluster1/AlertsPanel.tsx
++++ b/src/components/dashboard/cluster1/AlertsPanel.tsx
+@@ -163,6 +163,14 @@ interface AlertsPanelProps {
+   detail: SiteDetailResponse | null;
+   detailError: string | null;
+   id?: string;
++  /** Orders the findings for the reader: a renter sees the building's record first. */
++  persona?: "owner" | "renter";
++}
++
++const RENTER_FIRST = /violation|owner|speculation|flood|demolition/i;
++function orderFor(persona: "owner" | "renter", alerts: AlertItem[]): AlertItem[] {
++  if (persona === "owner") return alerts;
++  return [...alerts].sort((a, b) => Number(RENTER_FIRST.test(b.text)) - Number(RENTER_FIRST.test(a.text)));
+ }
+ 
+ const NOTIF_COLOR: Record<string, string> = {
+@@ -171,7 +179,7 @@ const NOTIF_COLOR: Record<string, string> = {
+   info: "var(--mid-blue)",
+ };
+ 
+-export default function AlertsPanel({ detail, detailError, id }: AlertsPanelProps) {
++export default function AlertsPanel({ detail, detailError, id, persona = "owner" }: AlertsPanelProps) {
+   const bbl = detail?.resolved_address.bbl ?? null;
+   const [feed, setFeed] = useState<NotificationRow[] | null>(null);
+ 
+@@ -224,11 +232,14 @@ export default function AlertsPanel({ detail, detailError, id }: AlertsPanelProp
+   }
+ 
+   // FALLBACK — point-in-time signals (no monitoring history yet, or no changes).
+-  const alerts = deriveAlerts(detail);
++  const alerts = orderFor(persona, deriveAlerts(detail));
+ 
+   return (
+     <div style={panelStyle} id={id}>
+-      <PanelHeader title="Alerts: derived from this analysis" />
++      <PanelHeader
++        title={persona === "renter" ? "What the record says about this building" : "What the record says about this property"}
++        sub="Plain findings from this analysis, each with its source"
++      />
+       {alerts.length === 0 ? (
+         <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
+           No notable signals in the fetched data.
+diff --git a/src/components/dashboard/cluster1/Cluster1Dashboard.tsx b/src/components/dashboard/cluster1/Cluster1Dashboard.tsx
+index c7b8de0..331053a 100644
+--- a/src/components/dashboard/cluster1/Cluster1Dashboard.tsx
++++ b/src/components/dashboard/cluster1/Cluster1Dashboard.tsx
+@@ -23,6 +23,7 @@ import type { SiteDetailResponse } from "@/app/api/site-detail/route";
+ 
+ const PROPERTY_BLOCKS = [
+   "zoning",
++  "geometry",
+   "permits",
+   "opportunity_zone",
+   "flood",
+@@ -71,13 +72,16 @@ export default function Cluster1Dashboard() {
+     void fetchDetail(payload);
+   });
+ 
++  // Owner or renter: the same findings, ordered and worded for the reader.
++  // The engine computes one verdict; the switch never changes it.
++  const [persona, setPersona] = useState<"owner" | "renter">("owner");
+   const { status, result } = stream;
+   // The shell's verdict band and evidence drawer render this run.
+   useRegisterRun(stream, { subject: lastInput });
+ 
+   return (
+     <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+-      <div id="c1-property">
++      <div id="c1-property" style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+         <h1
+           style={{
+             fontSize: "32px",
+@@ -101,6 +105,14 @@ export default function Cluster1Dashboard() {
+         >
+           {c.audience}
+         </p>
++        <div className="segmented" role="group" aria-label="I am">
++          <button type="button" aria-pressed={persona === "owner"} onClick={() => setPersona("owner")}>
++            I own this home
++          </button>
++          <button type="button" aria-pressed={persona === "renter"} onClick={() => setPersona("renter")}>
++            I rent here
++          </button>
++        </div>
+       </div>
+ 
+       <LocationConfidenceNote confidence={detail?.resolved_address?.location_confidence} />
+@@ -130,32 +142,36 @@ export default function Cluster1Dashboard() {
+       {status === "done" && result && (
+         <>
+ 
++          <AlertsPanel detail={detail} detailError={detailError} id="c1-alerts" persona={persona} />
++
+           <div
++            className="c1-panels"
+             style={{
+               display: "grid",
+               gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+               gap: "16px",
+             }}
+           >
+-            <ValuationPanel detail={detail} detailError={detailError} id="c1-valuation" />
+-            <PermitHistoryPanel permits={detail?.permits} error={detailError} id="c1-permits" />
+-            <ViolationsPanel
+-              violations={detail?.building_violations}
+-              error={detailError}
+-              id="c1-violations"
+-            />
+-            <OwnershipPanel
+-              portfolio={detail?.landlord_portfolio}
+-              error={detailError}
+-              id="c1-ownership"
+-            />
++            {persona === "owner" ? (
++              <>
++                <ValuationPanel detail={detail} detailError={detailError} id="c1-valuation" />
++                <PermitHistoryPanel permits={detail?.permits} error={detailError} id="c1-permits" />
++                <ViolationsPanel violations={detail?.building_violations} error={detailError} id="c1-violations" />
++                <OwnershipPanel portfolio={detail?.landlord_portfolio} error={detailError} id="c1-ownership" />
++              </>
++            ) : (
++              <>
++                <ViolationsPanel violations={detail?.building_violations} error={detailError} id="c1-violations" />
++                <OwnershipPanel portfolio={detail?.landlord_portfolio} error={detailError} id="c1-ownership" />
++                <PermitHistoryPanel permits={detail?.permits} error={detailError} id="c1-permits" />
++                <ValuationPanel detail={detail} detailError={detailError} id="c1-valuation" />
++              </>
++            )}
+           </div>
+ 
+-          <AlertsPanel detail={detail} detailError={detailError} id="c1-alerts" />
+-
+           {/* Downloadable documents — the Community document set, all built
+               from the analyzed address on live NYC public data. */}
+-          <div id="c1-documents" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
++          <div id="c1-documents" className="lens-documents" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+             <div>
+               <h2
+                 style={{
+diff --git a/src/components/dashboard/cluster1/PropertyMap.tsx b/src/components/dashboard/cluster1/PropertyMap.tsx
+index 3271568..68ec5da 100644
+--- a/src/components/dashboard/cluster1/PropertyMap.tsx
++++ b/src/components/dashboard/cluster1/PropertyMap.tsx
+@@ -5,7 +5,7 @@
+ // EPA cleanup sites, and mappable comparable sales. Each layer carries the
+ // provenance of the block it came from, straight onto the map.
+ 
+-import React from "react";
++import React, { useState } from "react";
+ import KoanoMap, {
+   type MapLegendItem,
+   type MapMarker,
+@@ -18,6 +18,8 @@ import {
+   FLOOD_SHADED_FILL,
+ } from "@/components/ui/map/mapColors";
+ import type { SiteDetailResponse } from "@/app/api/site-detail/route";
++import MapFrame from "@/components/ui/map/MapFrame";
++import { LOT_LINE } from "@/components/ui/map/mapColors";
+ import { compPool } from "../../../../lib/documents/valuation-guard";
+ 
+ const SUPERFUND_RED = "#EF4444";
+@@ -27,14 +29,6 @@ function money(n: number): string {
+   return `$${Math.round(n).toLocaleString()}`;
+ }
+ 
+-const panelTitle: React.CSSProperties = {
+-  fontFamily: "var(--font-mono)",
+-  fontSize: "11px",
+-  letterSpacing: "0.08em",
+-  textTransform: "uppercase",
+-  color: "var(--ink-muted)",
+-};
+-
+ export default function PropertyMap({
+   detail,
+   detailError,
+@@ -49,11 +43,11 @@ export default function PropertyMap({
+ }) {
+   const ra = detail?.resolved_address;
+   const hasCoords = !!ra && Number.isFinite(ra.latitude) && Number.isFinite(ra.longitude);
++  const [focusLot, setFocusLot] = useState<string | null>(null);
+ 
+   if (!detail || !hasCoords) {
+     return (
+-      <section id={id} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+-        <span style={panelTitle}>{title}</span>
++      <MapFrame id={id} title={title} summary={detailError ? "The map could not be built for this run." : "Loads with the first block of data."}>
+         <div
+           style={{
+             height: 440,
+@@ -69,7 +63,7 @@ export default function PropertyMap({
+             {detailError ? `Map data unavailable: ${detailError}` : "Loading map…"}
+           </p>
+         </div>
+-      </section>
++      </MapFrame>
+     );
+   }
+ 
+@@ -94,6 +88,18 @@ export default function PropertyMap({
+   });
+   legend.push({ label: "Subject property", provenance: "live", kind: "subject" });
+ 
++  // The subject lot footprint (live MapPLUTO), so the map can zoom to the lot.
++  const geo = detail.geometry?.data;
++  if (geo?.lot_polygon) {
++    polygons.push({
++      id: "lot",
++      kind: "lot",
++      provenance: detail.geometry?.provenance ?? "live",
++      features: [{ geometry: geo.lot_polygon }],
++    });
++    legend.push({ label: "Subject lot", provenance: detail.geometry?.provenance ?? "live", kind: "flood", accent: LOT_LINE });
++  }
++
+   // Flood-hazard polygons.
+   const fz = detail.flood_zones;
+   if (fz?.data && fz.data.zones.length > 0) {
+@@ -189,16 +195,18 @@ export default function PropertyMap({
+     });
+   }
+ 
++  const summary = legend.map((l) => l.label).filter(Boolean).slice(0, 3).join(" · ");
+   return (
+-    <section id={id} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+-      <span style={panelTitle}>{title}</span>
++    <MapFrame id={id} title={title} summary={summary}>
+       <KoanoMap
+         center={center}
+         markers={markers}
+         polygons={polygons}
+         legend={legend}
++        focusLot={focusLot}
++        onFrameChange={setFocusLot}
+         note={fz?.data && fz.data.zones.length > 0 ? "FEMA NFHL · minimal-hazard areas omitted" : undefined}
+       />
+-    </section>
++    </MapFrame>
+   );
+ }
+diff --git a/src/components/dashboard/cluster2/Cluster2Dashboard.tsx b/src/components/dashboard/cluster2/Cluster2Dashboard.tsx
+index 343e6dd..7221014 100644
+--- a/src/components/dashboard/cluster2/Cluster2Dashboard.tsx
++++ b/src/components/dashboard/cluster2/Cluster2Dashboard.tsx
+@@ -23,10 +23,12 @@ import PricingPanel from "./PricingPanel";
+ import PermitTrend from "./PermitTrend";
+ import NarrativePanel from "./NarrativePanel";
+ import DocumentButton from "../DocumentButton";
++import StickyAction from "../shell/StickyAction";
+ import type { SiteDetailResponse } from "@/app/api/site-detail/route";
+ 
+ const MARKET_BLOCKS = [
+   "zoning",
++  "geometry",
+   "permits",
+   "hpi",
+   "demographics",
+@@ -143,10 +145,11 @@ export default function Cluster2Dashboard() {
+           />
+           <PermitTrend detail={detail} id="c2-permits" />
+           <NarrativePanel address={subjectAddress} candidate={activeCandidate} id="c2-narrative" />
++          {subjectAddress && <StickyAction label="Documents" targetId="c2-documents" hint="Neighborhood report, pricing sheet, net sheet" />}
+ 
+           {/* Downloadable documents — grouped, matching the Cluster 1 & 5 pattern */}
+           {subjectAddress && (
+-            <div id="c2-documents" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
++            <div id="c2-documents" className="lens-documents" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+               <div>
+                 <h2
+                   style={{
+diff --git a/src/components/dashboard/cluster2/CmaBuilder.tsx b/src/components/dashboard/cluster2/CmaBuilder.tsx
+index edc1a48..71c2f10 100644
+--- a/src/components/dashboard/cluster2/CmaBuilder.tsx
++++ b/src/components/dashboard/cluster2/CmaBuilder.tsx
+@@ -11,6 +11,7 @@ import React from "react";
+ import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
+ import { BlockError, PanelHeader, Row, fmtInt, fmtMoney, panelStyle, panelTitle } from "../panels";
+ import { deriveAlerts } from "../cluster1/AlertsPanel";
++import CompCards from "./CompCards";
+ import type { SiteDetailResponse } from "@/app/api/site-detail/route";
+ 
+ interface CmaBuilderProps {
+@@ -70,7 +71,8 @@ export default function CmaBuilder({ detail, detailError, id }: CmaBuilderProps)
+           >
+             Live recorded residential sales from NYC public records. {comps.data.scope_note}
+           </div>
+-          <div className="scroll-x" style={{ overflowX: "auto", padding: "2px" }}>
++          <CompCards comps={comps.data.comps} provenance={comps.provenance} />
++          <div className="scroll-x wide-only" style={{ overflowX: "auto", padding: "2px" }}>
+             <table style={{ borderCollapse: "collapse", width: "100%", minWidth: "520px" }}>
+               <thead>
+                 <tr>
+diff --git a/src/components/dashboard/cluster2/CompCards.tsx b/src/components/dashboard/cluster2/CompCards.tsx
+new file mode 100644
+index 0000000..7a80422
+--- /dev/null
++++ b/src/components/dashboard/cluster2/CompCards.tsx
+@@ -0,0 +1,49 @@
++"use client";
++
++// CompCards (UI sprint WS4): the comparable sales as swipe cards on phones
++// (the table stays from 768px). Distance from the subject and the block's
++// provenance on every card; the same figures as the table.
++
++import React from "react";
++import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
++import type { Provenance } from "@/components/ui/verdict";
++import { fmtInt, fmtMoney } from "../panels";
++
++interface Comp {
++  address: string;
++  sale_price: number;
++  sale_date: string;
++  gross_square_feet: number | null;
++  price_per_sqft: number;
++  distance_mi?: number | null;
++}
++
++export default function CompCards({ comps, provenance }: { comps: Comp[]; provenance: Provenance }) {
++  return (
++    <div className="swipe-list phone-only" role="list" aria-label="Comparable sales">
++      {comps.map((c, i) => (
++        <div key={`${c.address}-${i}`} className="comp-card" role="listitem">
++          <span className="card-eyebrow">
++            {c.distance_mi != null ? `${c.distance_mi.toFixed(2)} mi away` : "Comparable"} · {c.sale_date}
++          </span>
++          <span className="card-title">{c.address}</span>
++          <dl className="card-figures">
++            <div>
++              <dt>Sale</dt>
++              <dd>{fmtMoney(c.sale_price)}</dd>
++            </div>
++            <div>
++              <dt>Sq ft</dt>
++              <dd>{fmtInt(c.gross_square_feet)}</dd>
++            </div>
++            <div>
++              <dt>$ / sq ft</dt>
++              <dd>{fmtMoney(c.price_per_sqft)}</dd>
++            </div>
++          </dl>
++          <ProvenanceBadge provenance={provenance} />
++        </div>
++      ))}
++    </div>
++  );
++}
+diff --git a/src/components/dashboard/cluster2/CompsScatter.tsx b/src/components/dashboard/cluster2/CompsScatter.tsx
+index 7e9d7fe..302cad4 100644
+--- a/src/components/dashboard/cluster2/CompsScatter.tsx
++++ b/src/components/dashboard/cluster2/CompsScatter.tsx
+@@ -9,6 +9,7 @@ import React from "react";
+ import Scatter, { type AxisTick, type ScatterPoint } from "@/components/ui/charts/Scatter";
+ import { compDivergingColor } from "@/components/ui/map/mapColors";
+ import { panelStyle, PanelHeader } from "../panels";
++import { niceTicks } from "@/components/ui/charts/domains";
+ import { isTrustedProvenance } from "@/components/ui/verdict";
+ import { compPool } from "../../../../lib/documents/valuation-guard";
+ import type { SiteDetailResponse } from "@/app/api/site-detail/route";
+@@ -73,10 +74,11 @@ export default function CompsScatter({
+     const v = xStart + ((now - xStart) * k) / 4;
+     return { value: v, label: monthLabel(v) };
+   });
+-  const yTicks: AxisTick[] = [yDomain[0], (yDomain[0] + yDomain[1]) / 2, yDomain[1]].map((v) => ({
+-    value: v,
+-    label: money(v),
+-  }));
++  // Five rounded ticks; the plot spans the tick range so every tick lands inside it.
++  const tickValues = niceTicks(yDomain[0], yDomain[1], 5);
++  yDomain[0] = Math.min(yDomain[0], tickValues[0]);
++  yDomain[1] = Math.max(yDomain[1], tickValues[tickValues.length - 1]);
++  const yTicks: AxisTick[] = tickValues.map((v) => ({ value: v, label: money(v) }));
+ 
+   return (
+     <section id={id} style={panelStyle}>
+diff --git a/src/components/dashboard/cluster2/MarketVelocityPanel.tsx b/src/components/dashboard/cluster2/MarketVelocityPanel.tsx
+index ba32b9c..9534d35 100644
+--- a/src/components/dashboard/cluster2/MarketVelocityPanel.tsx
++++ b/src/components/dashboard/cluster2/MarketVelocityPanel.tsx
+@@ -15,6 +15,8 @@ import type { SiteDetailResponse } from "@/app/api/site-detail/route";
+ interface Tile {
+   label: string;
+   value: string;
++  /** The unit, set beside the value in the caption size so the value never wraps. */
++  unit?: string;
+   sub?: string;
+   provenance: Provenance;
+ }
+@@ -42,15 +44,24 @@ function StatTile({ tile }: { tile: Tile }) {
+       >
+         {tile.label}
+       </span>
+-      <span
+-        style={{
+-          fontFamily: "var(--font-mono)",
+-          fontSize: "22px",
+-          fontWeight: 500,
+-          color: "var(--ink-primary)",
+-        }}
+-      >
+-        {tile.value}
++      <span style={{ display: "flex", alignItems: "baseline", gap: "var(--space-2)", minWidth: 0, flexWrap: "wrap" }}>
++        <span
++          style={{
++            fontFamily: "var(--font-mono)",
++            fontSize: "var(--text-data-l)",
++            fontWeight: 500,
++            color: "var(--ink-primary)",
++            whiteSpace: "nowrap",
++            lineHeight: 1.1,
++          }}
++        >
++          {tile.value}
++        </span>
++        {tile.unit && (
++          <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-data)", color: "var(--ink-muted)", whiteSpace: "nowrap" }}>
++            {tile.unit}
++          </span>
++        )}
+       </span>
+       {tile.sub && <span style={{ fontSize: "12px", color: "var(--ink-muted)" }}>{tile.sub}</span>}
+       <ProvenanceBadge provenance={tile.provenance} />
+@@ -75,7 +86,8 @@ export default function MarketVelocityPanel({ detail, detailError, id }: MarketV
+   if (hpi?.data) {
+     tiles.push({
+       label: "Price velocity (FHFA)",
+-      value: hpi.data.yoy_change_pct != null ? `${hpi.data.yoy_change_pct}% yoy` : "—",
++      value: hpi.data.yoy_change_pct != null ? `${hpi.data.yoy_change_pct}%` : "n/a",
++      unit: hpi.data.yoy_change_pct != null ? "yoy" : undefined,
+       sub: `${hpi.data.region} · ${hpi.data.latest_period}${hpi.data.five_yr_change_pct != null ? ` · ${hpi.data.five_yr_change_pct}% 5yr` : ""}`,
+       provenance: hpi.provenance,
+     });
+@@ -84,12 +96,14 @@ export default function MarketVelocityPanel({ detail, detailError, id }: MarketV
+     tiles.push({
+       label: "Recorded sales (ZIP, 12mo)",
+       value: `${mls_comps.data.sales_count}`,
++      unit: "sales",
+       sub: `price trend: ${mls_comps.data.price_trend}`,
+       provenance: mls_comps.provenance,
+     });
+     tiles.push({
+       label: "Area median $/sq ft (12mo)",
+       value: `$${mls_comps.data.median_price_per_sqft.toLocaleString("en-US")}`,
++      unit: "/ sq ft",
+       sub: "NYC DOF recorded sales",
+       provenance: mls_comps.provenance,
+     });
+@@ -99,7 +113,8 @@ export default function MarketVelocityPanel({ detail, detailError, id }: MarketV
+     // gap KOANO does not source).
+     tiles.push({
+       label: "Recorded sales velocity",
+-      value: `${(mls_comps.data.sales_count / 12).toFixed(1)} sales/mo`,
++      value: `${(mls_comps.data.sales_count / 12).toFixed(1)}`,
++      unit: "sales / mo",
+       sub: "Trailing 12 mo (DOF) · not absorption / months-of-supply",
+       provenance: mls_comps.provenance,
+     });
+@@ -108,7 +123,8 @@ export default function MarketVelocityPanel({ detail, detailError, id }: MarketV
+     const m = mortgage_demand.data;
+     tiles.push({
+       label: "Mortgage demand (HMDA)",
+-      value: m.originations_yoy_pct != null ? `${m.originations_yoy_pct >= 0 ? "+" : ""}${m.originations_yoy_pct}% yoy` : `${m.originations.toLocaleString("en-US")}`,
++      value: m.originations_yoy_pct != null ? `${m.originations_yoy_pct >= 0 ? "+" : ""}${m.originations_yoy_pct}%` : `${m.originations.toLocaleString("en-US")}`,
++      unit: m.originations_yoy_pct != null ? "yoy" : "originations",
+       sub: `${m.originations.toLocaleString("en-US")} originations · ${m.denial_rate_pct ?? "—"}% denied · ${m.year}`,
+       provenance: mortgage_demand.provenance,
+     });
+@@ -117,26 +133,21 @@ export default function MarketVelocityPanel({ detail, detailError, id }: MarketV
+     const e = employment.data;
+     tiles.push({
+       label: "Employment (QCEW)",
+-      value: e.employment_yoy_pct != null ? `${e.employment_yoy_pct >= 0 ? "+" : ""}${e.employment_yoy_pct}% yoy` : "—",
++      value: e.employment_yoy_pct != null ? `${e.employment_yoy_pct >= 0 ? "+" : ""}${e.employment_yoy_pct}%` : "n/a",
++      unit: e.employment_yoy_pct != null ? "yoy" : undefined,
+       sub: `${e.total_employment?.toLocaleString("en-US") ?? "—"} jobs · wage ${e.avg_weekly_wage_yoy_pct != null ? `${e.avg_weekly_wage_yoy_pct >= 0 ? "+" : ""}${e.avg_weekly_wage_yoy_pct}%` : "—"} · ${e.period}`,
+       provenance: employment.provenance,
+     });
+   }
+   return (
+     <div style={panelStyle} id={id}>
+-      <PanelHeader title="Market velocity" />
++      <PanelHeader title="Market velocity" sub="How fast this market is moving, from the public record" />
+       {tiles.length === 0 ? (
+         <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
+           No velocity data available for this area.
+         </p>
+       ) : (
+-        <div
+-          style={{
+-            display: "grid",
+-            gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+-            gap: "12px",
+-          }}
+-        >
++        <div className="velocity-grid">
+           {tiles.map((t) => (
+             <StatTile key={t.label} tile={t} />
+           ))}
+diff --git a/src/components/dashboard/cluster4/MultiSiteMap.tsx b/src/components/dashboard/cluster4/MultiSiteMap.tsx
+index 97c5379..254d684 100644
+--- a/src/components/dashboard/cluster4/MultiSiteMap.tsx
++++ b/src/components/dashboard/cluster4/MultiSiteMap.tsx
+@@ -15,6 +15,7 @@ import KoanoMap, {
+ } from "@/components/ui/map/KoanoMap";
+ import { OZ_FILL, LOT_LINE } from "@/components/ui/map/mapColors";
+ import type { SiteDetailResponse } from "@/app/api/site-detail/route";
++import MapFrame from "@/components/ui/map/MapFrame";
+ 
+ export interface MultiSite {
+   label: string; // "Site A"
+@@ -35,7 +36,7 @@ function hasCoords(d: SiteDetailResponse | null): d is SiteDetailResponse {
+   );
+ }
+ 
+-export default function MultiSiteMap({ sites }: { sites: MultiSite[] }) {
++export default function MultiSiteMap({ sites, focusIndex = null, onFocus }: { sites: MultiSite[]; focusIndex?: number | null; onFocus?: (i: number | null) => void }) {
+   const withCoords = sites.filter((s) => hasCoords(s.detail));
+   if (withCoords.length === 0) return null;
+ 
+@@ -105,14 +106,22 @@ export default function MultiSiteMap({ sites }: { sites: MultiSite[] }) {
+   if (anyLot)
+     legend.push({ label: "Subject lot", kind: "flood", provenance: "live", accent: LOT_LINE });
+ 
++  const focusLot = focusIndex !== null && polygons.some((p) => p.id === `lot-${focusIndex}`) ? `lot-${focusIndex}` : null;
+   return (
+-    <KoanoMap
+-      center={center}
+-      markers={markers}
+-      polygons={polygons}
+-      legend={legend}
+-      height={460}
+-      note="Sites, their Opportunity-Zone tract shading, and each subject lot: all live. Zoning + FAR headroom in each pin."
+-    />
++    <MapFrame
++      title="Sites on the map"
++      summary={`${withCoords.length} site${withCoords.length === 1 ? "" : "s"}${anyOz ? " · Opportunity Zone tract" : ""}${anyLot ? " · subject lots" : ""}`}
++    >
++      <KoanoMap
++        center={center}
++        markers={markers}
++        polygons={polygons}
++        legend={legend}
++        height={460}
++        focusLot={focusLot}
++        onFrameChange={onFocus ? (lot) => onFocus(lot ? Number(lot.replace("lot-", "")) : null) : undefined}
++        note="Sites, their Opportunity-Zone tract shading, and each subject lot: all live. Zoning + FAR headroom in each pin."
++      />
++    </MapFrame>
+   );
+ }
+diff --git a/src/components/dashboard/cluster4/SiteCards.tsx b/src/components/dashboard/cluster4/SiteCards.tsx
+new file mode 100644
+index 0000000..fb735a3
+--- /dev/null
++++ b/src/components/dashboard/cluster4/SiteCards.tsx
+@@ -0,0 +1,95 @@
++"use client";
++
++// SiteCards (UI sprint WS4, A3): the ranked sites as cards. A swipe list on
++// phones, a row from 768px. Each card carries the same figures the ranking
++// table shows (rank, verdict, confidence, risk), the buildable envelope from
++// live PLUTO when present, and the structural guard when one applied. Tapping
++// a card puts that site in the shell's verdict band and zooms the map to its lot.
++
++import React from "react";
++import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
++import { VERDICT_COLORS, type SynthesisResult } from "@/components/ui/verdict";
++import { riskInk, fmtInt } from "../panels";
++import type { SiteDetailResponse } from "@/app/api/site-detail/route";
++
++const GUARD_LABEL: Record<string, string> = {
++  active_construction: "active ground-up permit on the lot, FAR upside not counted",
++  coop_condo: "co-op or condo, FAR upside not counted",
++  likely_stabilized: "likely rent-stabilized, FAR upside not counted",
++};
++
++export interface SiteCardData {
++  slot: number;
++  rank: number;
++  address: string;
++  verdict: SynthesisResult;
++  detail: SiteDetailResponse | null;
++}
++
++export default function SiteCards({
++  sites,
++  selected,
++  onSelect,
++}: {
++  sites: SiteCardData[];
++  selected: number | null;
++  onSelect: (slot: number) => void;
++}) {
++  if (sites.length === 0) return null;
++  return (
++    <div className="swipe-list" role="list" aria-label="Ranked sites">
++      {sites.map((s) => {
++        const z = s.detail?.zoning?.data;
++        const guardKey = (s.verdict.weighting_breakdown as { structural_guard?: string | null } | undefined)?.structural_guard ?? null;
++        const guard = guardKey ? GUARD_LABEL[guardKey] ?? guardKey : null;
++        const unused = z?.unused_far_pct;
++        return (
++          <div key={s.slot} role="listitem" style={{ display: "flex", minWidth: 0 }}>
++          <button
++            type="button"
++            className="site-card"
++            aria-pressed={selected === s.slot}
++            onClick={() => onSelect(s.slot)}
++            style={{ textAlign: "left", cursor: "pointer", font: "inherit", width: "100%" }}
++          >
++            <span className="card-eyebrow">
++              Rank #{s.rank} · <span style={{ color: VERDICT_COLORS[s.verdict.verdict] }}>{s.verdict.verdict.toUpperCase()}</span>
++            </span>
++            <span className="card-title">{s.address}</span>
++            <dl className="card-figures">
++              <div>
++                <dt>Confidence</dt>
++                <dd>{s.verdict.confidence}</dd>
++              </div>
++              <div>
++                <dt>Risk</dt>
++                <dd style={{ color: riskInk(s.verdict.risk_score) }}>{s.verdict.risk_score}</dd>
++              </div>
++              <div>
++                <dt>Unused FAR</dt>
++                <dd>{unused != null ? `${unused}%` : "n/a"}</dd>
++              </div>
++            </dl>
++            {z && (
++              <span className="card-note">
++                {z.zoning_district ?? "Zoning n/a"}
++                {z.building_area_sqft != null ? ` · ${fmtInt(z.building_area_sqft)} sq ft built` : ""}
++                {z.max_residential_far != null ? ` · max FAR ${z.max_residential_far}` : ""}
++              </span>
++            )}
++            {guard && (
++              <span className="card-note" style={{ color: "var(--signal-warning-ink)" }}>
++                Guard: {guard}
++              </span>
++            )}
++            <span style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", flexWrap: "wrap" }}>
++              <ProvenanceBadge provenance={s.verdict.overall_provenance} />
++              <span className="card-eyebrow">{selected === s.slot ? "In the band" : "Tap to show in the band"}</span>
++            </span>
++          </button>
++          </div>
++        );
++      })}
++    </div>
++  );
++}
+diff --git a/src/components/dashboard/cluster4/SiteComparison.tsx b/src/components/dashboard/cluster4/SiteComparison.tsx
+index eb97c24..b12020f 100644
+--- a/src/components/dashboard/cluster4/SiteComparison.tsx
++++ b/src/components/dashboard/cluster4/SiteComparison.tsx
+@@ -17,6 +17,8 @@ import type { RunPayload } from "../useAddressResolver";
+ import { useRegisterRun, usePendingSubject, useSubject } from "../shell/SubjectProvider";
+ import RunDegradationNote from "@/components/ui/RunDegradationNote";
+ import SitePanels from "./SitePanels";
++import SiteCards from "./SiteCards";
++import StickyAction from "../shell/StickyAction";
+ import MultiSiteMap, { type MultiSite } from "./MultiSiteMap";
+ import SiteMathStrip, { type StripSite } from "./SiteMathStrip";
+ import MonitoringFeed from "../cluster5/MonitoringFeed";
+@@ -56,6 +58,10 @@ const monoLabel: React.CSSProperties = {
+ 
+ export default function SiteComparison() {
+   const [addresses, setAddresses] = useState<string[]>(["", "", ""]);
++  // Slots open one at a time ("Add site"); a filled slot keeps the next one open.
++  const [openSlots, setOpenSlots] = useState(1);
++  const visibleSlots = Math.max(openSlots, addresses.reduce((n, a, i) => (a.trim() ? i + 1 : n), 1));
++  const [mapFocus, setMapFocus] = useState<number | null>(null);
+   // The site shown in the shell's verdict band (and its evidence drawer).
+   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
+   const { openDrawer } = useSubject();
+@@ -234,7 +240,7 @@ export default function SiteComparison() {
+             gap: "12px",
+           }}
+         >
+-          {SLOT_LABELS.map((label, i) => (
++          {SLOT_LABELS.slice(0, visibleSlots).map((label, i) => (
+             <div key={label} style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+               <label htmlFor={`site-${i}`} style={monoLabel}>
+                 {label}
+@@ -271,8 +277,18 @@ export default function SiteComparison() {
+             {running ? "Comparing sites…" : "Run comparison"}
+             {!running && <span aria-hidden="true">↗</span>}
+           </button>
++          {visibleSlots < 3 && (
++            <button
++              type="button"
++              className="btn-ghost"
++              onClick={() => setOpenSlots((n) => Math.min(3, Math.max(n, visibleSlots) + 1))}
++              disabled={running}
++            >
++              Add site
++            </button>
++          )}
+           <span style={{ fontSize: "12px", color: "var(--ink-muted)" }}>
+-            Up to three sites · all five agents run on each · ~1–3 min
++            Up to three sites · all five agents run on each · about 1 to 3 minutes
+           </span>
+         </div>
+       </form>
+@@ -389,10 +405,26 @@ export default function SiteComparison() {
+           <RunDegradationNote degradation={runDegradation} />
+ 
+           {/* The three sites in space — Opportunity-Zone tract shading + subject lots, all live. */}
+-          <MultiSiteMap sites={rankedSites} />
++          <SiteCards
++            sites={ranked.map((slot, rank) => ({
++              slot,
++              rank: rank + 1,
++              address: streams[slot].result!.resolved_address.normalized,
++              verdict: streams[slot].result!.verdict,
++              detail: details[slot].data,
++            }))}
++            selected={bandSlot}
++            onSelect={(slot) => {
++              setSelectedSlot(slot);
++              setMapFocus(ranked.indexOf(slot));
++              window.scrollTo({ top: 0, behavior: "smooth" });
++            }}
++          />
+ 
+-          {/* Summary table */}
+-          <div className="scroll-x" style={{ overflowX: "auto", padding: "2px" }}>
++          <MultiSiteMap sites={rankedSites} focusIndex={mapFocus} onFocus={setMapFocus} />
++
++          {/* Summary table (from 768px; the cards above carry it on phones) */}
++          <div className="scroll-x wide-only" style={{ overflowX: "auto", padding: "2px" }}>
+             <table style={{ borderCollapse: "collapse", width: "100%", minWidth: "560px" }}>
+               <thead>
+                 <tr>
+@@ -548,6 +580,8 @@ export default function SiteComparison() {
+             );
+           })}
+ 
++          <StickyAction label="Documents" targetId={`c4-screening-${ranked[0]}`} hint="Screening memo, entitlement memo, comparison brief" />
++
+           {/* One comparison brief across the ranked sites */}
+           {ranked.length >= 2 && (
+             <DocumentButton
+diff --git a/src/components/dashboard/cluster4/SiteMathStrip.tsx b/src/components/dashboard/cluster4/SiteMathStrip.tsx
+index cdc7399..9e9c85e 100644
+--- a/src/components/dashboard/cluster4/SiteMathStrip.tsx
++++ b/src/components/dashboard/cluster4/SiteMathStrip.tsx
+@@ -70,6 +70,7 @@ export default function SiteMathStrip({ sites }: { sites: StripSite[] }) {
+     <div>
+       <div style={{ ...mono, marginBottom: "10px" }}>Verdict math, side by side</div>
+       <div
++        className="site-math-strip"
+         style={{
+           display: "grid",
+           gridTemplateColumns: `repeat(${Math.min(sites.length, 3)}, minmax(0, 1fr))`,
+diff --git a/src/components/dashboard/cluster5/Cluster5Dashboard.tsx b/src/components/dashboard/cluster5/Cluster5Dashboard.tsx
+index 7c1cc15..15c5a36 100644
+--- a/src/components/dashboard/cluster5/Cluster5Dashboard.tsx
++++ b/src/components/dashboard/cluster5/Cluster5Dashboard.tsx
+@@ -19,6 +19,8 @@ import ArchiveTrend from "./ArchiveTrend";
+ import MondayBriefing from "./MondayBriefing";
+ import RiskMonitor from "./RiskMonitor";
+ import DocumentButton from "../DocumentButton";
++import StickyAction from "../shell/StickyAction";
++import ThisWeek from "./ThisWeek";
+ import type { PortfolioProperty } from "@/app/api/properties/route";
+ 
+ export default function Cluster5Dashboard() {
+@@ -117,9 +119,12 @@ export default function Cluster5Dashboard() {
+           </p>
+         </div>
+ 
+-        <PortfolioMap properties={properties} loadError={loadError} />
+       </div>
+ 
++      <ThisWeek properties={properties} id="c5-week" />
++
++      <PortfolioMap properties={properties} loadError={loadError} />
++
+       <PortfolioOverview
+         properties={properties}
+         loadError={loadError}
+@@ -132,13 +137,14 @@ export default function Cluster5Dashboard() {
+ 
+       {/* Active analysis */}
+ 
++      {!!properties && properties.length > 0 && <StickyAction label="Generate briefing" targetId="c5-briefing" hint="The Monday portfolio briefing" />}
+       <MondayBriefing hasProperties={!!properties && properties.length > 0} id="c5-briefing" />
+ 
+       <MonitoringFeed id="c5-monitoring" />
+ 
+       {/* Downloadable documents — portfolio briefing PDF + per-asset one-pager,
+           matching the Cluster 1 grouped pattern. */}
+-      <div id="c5-documents" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
++      <div id="c5-documents" className="lens-documents" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+         <div>
+           <h2
+             style={{
+diff --git a/src/components/dashboard/cluster5/HoldingCards.tsx b/src/components/dashboard/cluster5/HoldingCards.tsx
+new file mode 100644
+index 0000000..42f9a9d
+--- /dev/null
++++ b/src/components/dashboard/cluster5/HoldingCards.tsx
+@@ -0,0 +1,67 @@
++"use client";
++
++// HoldingCards (UI sprint WS4): the book as cards on phones (the table stays
++// from 768px). The latest verdict leads, then risk and the as-of date; the
++// same values as the table, with 44px actions.
++
++import React from "react";
++import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
++import { VERDICT_COLORS, type Verdict } from "@/components/ui/verdict";
++import { riskInk } from "../panels";
++import type { PortfolioProperty } from "@/app/api/properties/route";
++
++export default function HoldingCards({
++  properties,
++  analyzingId,
++  onAnalyze,
++  onRemove,
++}: {
++  properties: PortfolioProperty[];
++  analyzingId: string | null;
++  onAnalyze: (p: PortfolioProperty) => void;
++  onRemove: (id: string) => void;
++}) {
++  return (
++    <div className="phone-only" style={{ flexDirection: "column", gap: "var(--space-3)" }} role="list" aria-label="Holdings">
++      {properties.map((p) => {
++        const v = p.latest_verdict;
++        const busy = analyzingId === p.id;
++        return (
++          <div key={p.id} className="holding-card" role="listitem">
++            <span className="card-title">{p.address_normalized ?? p.address_input}</span>
++            {v ? (
++              <dl className="card-figures">
++                <div>
++                  <dt>Verdict</dt>
++                  <dd style={{ color: VERDICT_COLORS[v.verdict as Verdict] ?? "var(--ink-primary)" }}>{v.verdict.toUpperCase()}</dd>
++                </div>
++                <div>
++                  <dt>Confidence</dt>
++                  <dd>{v.confidence}</dd>
++                </div>
++                <div>
++                  <dt>Risk</dt>
++                  <dd style={{ color: riskInk(v.risk_score) }}>{v.risk_score}</dd>
++                </div>
++              </dl>
++            ) : (
++              <span className="card-note">Not analyzed yet.</span>
++            )}
++            <span style={{ display: "flex", gap: "var(--space-2)", alignItems: "center", flexWrap: "wrap" }}>
++              {v && <ProvenanceBadge provenance={v.overall_provenance} />}
++              <span className="card-eyebrow">{v ? `as of ${new Date(v.created_at).toLocaleDateString()}` : p.bbl ? `BBL ${p.bbl}` : ""}</span>
++            </span>
++            <span className="card-actions">
++              <button type="button" className="btn-ghost" onClick={() => onAnalyze(p)} disabled={analyzingId !== null}>
++                {busy ? "Analyzing…" : v ? "Re-run" : "Analyze"}
++              </button>
++              <button type="button" className="btn-ghost" onClick={() => onRemove(p.id)} disabled={busy}>
++                Remove
++              </button>
++            </span>
++          </div>
++        );
++      })}
++    </div>
++  );
++}
+diff --git a/src/components/dashboard/cluster5/PortfolioMap.tsx b/src/components/dashboard/cluster5/PortfolioMap.tsx
+index 655dda7..e3c589c 100644
+--- a/src/components/dashboard/cluster5/PortfolioMap.tsx
++++ b/src/components/dashboard/cluster5/PortfolioMap.tsx
+@@ -17,6 +17,7 @@ import React from "react";
+ import KoanoMap, { type MapLegendItem, type MapMarker } from "@/components/ui/map/KoanoMap";
+ import { riskPinColor, RISK_LOW, RISK_MID, RISK_HIGH, RISK_UNKNOWN } from "@/components/ui/map/mapColors";
+ import type { PortfolioProperty } from "@/app/api/properties/route";
++import MapFrame from "@/components/ui/map/MapFrame";
+ 
+ const NYC_DEFAULT_CENTER: [number, number] = [-73.95, 40.7]; // fallback if nothing frames
+ 
+@@ -141,7 +142,7 @@ export default function PortfolioMap({
+     (anyUncertain ? " Dashed pins have an unverified location." : "");
+ 
+   return (
+-    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
++    <MapFrame title="Holdings on the map" summary={note}>
+       <KoanoMap center={center} markers={markers} legend={legend} height={520} note={note} />
+       {unpinnable.length > 0 && (
+         <div
+@@ -163,6 +164,6 @@ export default function PortfolioMap({
+           </p>
+         </div>
+       )}
+-    </div>
++    </MapFrame>
+   );
+ }
+diff --git a/src/components/dashboard/cluster5/PortfolioOverview.tsx b/src/components/dashboard/cluster5/PortfolioOverview.tsx
+index 277d953..fee644a 100644
+--- a/src/components/dashboard/cluster5/PortfolioOverview.tsx
++++ b/src/components/dashboard/cluster5/PortfolioOverview.tsx
+@@ -10,6 +10,7 @@ import ProvenanceBadge from "@/components/ui/ProvenanceBadge";
+ import CandidatePicker from "@/components/ui/CandidatePicker";
+ import { VERDICT_COLORS, type Verdict, type AddressCandidate } from "@/components/ui/verdict";
+ import { PanelHeader, panelStyle, panelTitle } from "../panels";
++import HoldingCards from "./HoldingCards";
+ import type { RunPayload } from "../useAddressResolver";
+ import type { PortfolioProperty } from "@/app/api/properties/route";
+ 
+@@ -133,13 +134,20 @@ export default function PortfolioOverview({
+ 
+       {/* Holdings table */}
+       {properties === null && !loadError ? (
+-        <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>Loading portfolio…</p>
++        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }} aria-busy="true">
++          {[0, 1].map((i) => (
++            <div key={i} className="koano-pulse" style={{ height: "var(--space-3)", width: `${70 - i * 20}%`, borderRadius: "var(--radius-chip)", background: "var(--border-light)" }} />
++          ))}
++          <span className="sr-only">Loading the book</span>
++        </div>
+       ) : properties && properties.length === 0 ? (
+         <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
+           No tracked properties yet. Add the first one above.
+         </p>
+       ) : properties && properties.length > 0 ? (
+-        <div className="scroll-x" style={{ overflowX: "auto", padding: "2px" }}>
++        <>
++        <HoldingCards properties={properties} analyzingId={analyzingId} onAnalyze={onAnalyze} onRemove={(id) => void onRemove(id)} />
++        <div className="scroll-x wide-only" style={{ overflowX: "auto", padding: "2px" }}>
+           <table style={{ borderCollapse: "collapse", width: "100%", minWidth: "640px" }}>
+             <thead>
+               <tr>
+@@ -237,6 +245,7 @@ export default function PortfolioOverview({
+             </tbody>
+           </table>
+         </div>
++        </>
+       ) : null}
+ 
+       <p style={{ fontSize: "11px", color: "var(--ink-muted)", margin: 0 }}>
+diff --git a/src/components/dashboard/cluster5/RiskMonitor.tsx b/src/components/dashboard/cluster5/RiskMonitor.tsx
+index e7d3c75..116cedf 100644
+--- a/src/components/dashboard/cluster5/RiskMonitor.tsx
++++ b/src/components/dashboard/cluster5/RiskMonitor.tsx
+@@ -98,7 +98,48 @@ export default function RiskMonitor({ properties, id }: RiskMonitorProps) {
+       )}
+ 
+       {rows.length > 0 && (
+-        <div className="scroll-x" style={{ overflowX: "auto", padding: "2px" }}>
++        <div className="phone-only" style={{ flexDirection: "column", gap: "var(--space-3)" }} role="list" aria-label="Hazard signals by holding">
++          {rows.map((r) => {
++            const v = r.property.latest_verdict;
++            const flood = r.detail?.flood;
++            const contamination = r.detail?.contamination;
++            const seismic = r.detail?.seismic;
++            const disaster = r.detail?.disaster_history;
++            return (
++              <div key={r.property.id} className="holding-card" role="listitem" aria-busy={r.loading}>
++                <span className="card-title">{r.property.address_normalized ?? r.property.address_input}</span>
++                <dl className="card-figures" style={{ gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }}>
++                  <div>
++                    <dt>Verdict risk</dt>
++                    <dd style={{ color: v ? riskInk(v.risk_score) : "var(--ink-muted)" }}>{v ? v.risk_score : "n/a"}</dd>
++                  </div>
++                  <div>
++                    <dt>FEMA flood</dt>
++                    <dd style={{ fontSize: "var(--text-ui)" }}>
++                      {r.loading ? "…" : flood?.data ? `zone ${flood.data.flood_zone ?? "n/a"}${flood.data.in_special_flood_hazard_area ? " · SFHA" : ""}` : "n/a"}
++                    </dd>
++                  </div>
++                  <div>
++                    <dt>Superfund ≤2mi</dt>
++                    <dd>{contamination?.data ? contamination.data.superfund_sites_within_radius : r.loading ? "…" : "n/a"}</dd>
++                  </div>
++                  <div>
++                    <dt>Disasters 10yr</dt>
++                    <dd>{disaster?.data ? disaster.data.declarations_last_10yr : r.loading ? "…" : "n/a"}</dd>
++                  </div>
++                </dl>
++                <span className="card-note">
++                  Seismic {seismic?.data && seismic.data.pga_g != null ? `${seismic.data.pga_g}g PGA` : "n/a"}
++                  {r.error ? ` · ${r.error}` : ""}
++                </span>
++                {flood?.data && <ProvenanceBadge provenance={flood.provenance} />}
++              </div>
++            );
++          })}
++        </div>
++      )}
++      {rows.length > 0 && (
++        <div className="scroll-x wide-only" style={{ overflowX: "auto", padding: "2px" }}>
+           <table style={{ borderCollapse: "collapse", width: "100%", minWidth: "640px" }}>
+             <thead>
+               <tr>
+diff --git a/src/components/dashboard/cluster5/ThisWeek.tsx b/src/components/dashboard/cluster5/ThisWeek.tsx
+new file mode 100644
+index 0000000..6acb5fc
+--- /dev/null
++++ b/src/components/dashboard/cluster5/ThisWeek.tsx
+@@ -0,0 +1,60 @@
++"use client";
++
++// ThisWeek (UI sprint WS4): four tiles that open the Acquire lens. Every
++// figure is a count from the book (/api/properties) or the monitoring feed
++// (/api/notifications) for the last seven days; nothing is estimated.
++
++import React, { useEffect, useState } from "react";
++import type { PortfolioProperty } from "@/app/api/properties/route";
++import type { NotificationRow } from "@/app/api/notifications/route";
++import { panelStyle, PanelHeader } from "../panels";
++
++const WEEK_MS = 7 * 86400000;
++
++export default function ThisWeek({ properties, id }: { properties: PortfolioProperty[] | null; id?: string }) {
++  const [feed, setFeed] = useState<NotificationRow[] | null>(null);
++  const [feedError, setFeedError] = useState(false);
++
++  useEffect(() => {
++    let live = true;
++    fetch("/api/notifications?limit=100")
++      .then((r) => (r.ok ? r.json() : Promise.reject(new Error())))
++      .then((j) => {
++        if (live) setFeed((j.notifications as NotificationRow[]) ?? []);
++      })
++      .catch(() => {
++        if (live) setFeedError(true);
++      });
++    return () => {
++      live = false;
++    };
++  }, []);
++
++  const holdings = properties?.length ?? null;
++  const highRisk = properties ? properties.filter((p) => (p.latest_verdict?.risk_score ?? 0) >= 67).length : null;
++  const notAnalyzed = properties ? properties.filter((p) => !p.latest_verdict).length : null;
++  const cutoff = Date.now() - WEEK_MS;
++  const changes = feed ? feed.filter((n) => new Date(n.created_at).getTime() >= cutoff).length : null;
++
++  const tiles: { label: string; value: string; note: string }[] = [
++    { label: "Holdings", value: holdings === null ? "…" : String(holdings), note: "in the book" },
++    { label: "Changes, 7 days", value: feedError ? "n/a" : changes === null ? "…" : String(changes), note: feedError ? "feed not loaded" : "from the weekly diff" },
++    { label: "High risk", value: highRisk === null ? "…" : String(highRisk), note: "risk 67 or above" },
++    { label: "Not analyzed", value: notAnalyzed === null ? "…" : String(notAnalyzed), note: "no verdict yet" },
++  ];
++
++  return (
++    <div style={panelStyle} id={id}>
++      <PanelHeader title="This week" sub="Counts from the book and the weekly diff. Nothing estimated." />
++      <div className="this-week-grid">
++        {tiles.map((t) => (
++          <div key={t.label} className="this-week-tile" aria-busy={t.value === "…"}>
++            <span className="card-eyebrow">{t.label}</span>
++            <span className="this-week-value">{t.value}</span>
++            <span className="card-note">{t.note}</span>
++          </div>
++        ))}
++      </div>
++    </div>
++  );
++}
+diff --git a/src/components/dashboard/panels.tsx b/src/components/dashboard/panels.tsx
+index 5f1400f..528ecf3 100644
+--- a/src/components/dashboard/panels.tsx
++++ b/src/components/dashboard/panels.tsx
+@@ -38,6 +38,23 @@ export const panelTitle: React.CSSProperties = {
+ 
+ export const monoLabel = panelTitle;
+ 
++// Panel heading (UI sprint WS4, A7): sentence case in the UI size, the ink
++// primary. The mono microlabel above stays for SUB-labels inside a panel.
++export const panelHeading: React.CSSProperties = {
++  fontSize: "var(--text-ui)",
++  fontWeight: 500,
++  letterSpacing: "-0.01em",
++  color: "var(--ink-primary)",
++  lineHeight: 1.3,
++};
++
++const panelSub: React.CSSProperties = {
++  fontSize: "var(--text-data)",
++  color: "var(--ink-muted)",
++  lineHeight: 1.5,
++  marginTop: "2px",
++};
++
+ // Fill hue for meters, bars and dots.
+ export function riskColor(score: number): string {
+   return score >= 67
+@@ -84,10 +101,13 @@ export function Row({ label, value }: { label: string; value: React.ReactNode })
+ 
+ export function PanelHeader({
+   title,
++  sub,
+   provenance,
+   becomesLiveWith,
+ }: {
+   title: string;
++  /** One line under the title: what the panel reads and from where. */
++  sub?: string;
+   provenance?: Provenance;
+   becomesLiveWith?: string | null;
+ }) {
+@@ -96,27 +116,74 @@ export function PanelHeader({
+       style={{
+         display: "flex",
+         justifyContent: "space-between",
+-        alignItems: "center",
+-        gap: "8px",
++        alignItems: "flex-start",
++        gap: "var(--space-3)",
+       }}
+     >
+-      <span style={panelTitle}>{title}</span>
+-      {provenance && <ProvenanceBadge provenance={provenance} becomesLiveWith={becomesLiveWith} />}
++      <div style={{ minWidth: 0 }}>
++        <h3 style={{ ...panelHeading, margin: 0 }}>{title}</h3>
++        {sub && <p style={{ ...panelSub, margin: 0 }}>{sub}</p>}
++      </div>
++      {provenance && (
++        <span style={{ flex: "none", paddingTop: "2px" }}>
++          <ProvenanceBadge provenance={provenance} becomesLiveWith={becomesLiveWith} />
++        </span>
++      )}
++    </div>
++  );
++}
++
++/** Skeleton rows while a panel's data is still in flight (never "Unavailable"). */
++export function PanelLoading({ title, rows = 3, id }: { title: string; rows?: number; id?: string }) {
++  return (
++    <div style={panelStyle} id={id} aria-busy="true">
++      <PanelHeader title={title} />
++      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }} aria-hidden="true">
++        {Array.from({ length: rows }).map((_, i) => (
++          <div
++            key={i}
++            className="koano-pulse"
++            style={{
++              height: "var(--space-3)",
++              width: `${78 - i * 14}%`,
++              borderRadius: "var(--radius-chip)",
++              background: "var(--border-light)",
++            }}
++          />
++        ))}
++      </div>
++      <span className="sr-only">Loading {title}</span>
+     </div>
+   );
+ }
+ 
+-export function BlockError({ title, error }: { title: string; error?: string }) {
++/** Nothing to show, by design (no data for this subject, not a failure). */
++export function PanelEmpty({ title, children, id, provenance }: { title: string; children: React.ReactNode; id?: string; provenance?: Provenance }) {
+   return (
+-    <div style={panelStyle}>
++    <div style={panelStyle} id={id}>
++      <PanelHeader title={title} provenance={provenance} />
++      <p style={{ fontSize: "var(--text-body)", lineHeight: 1.5, color: "var(--ink-secondary)", margin: 0 }}>{children}</p>
++    </div>
++  );
++}
++
++/** The block could not be read for this run: the reason, plainly. */
++export function PanelAbsent({ title, reason, id }: { title: string; reason?: string; id?: string }) {
++  return (
++    <div style={{ ...panelStyle, borderLeft: "3px solid var(--signal-warning)" }} id={id}>
+       <PanelHeader title={title} />
+-      <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
+-        Unavailable{error ? `: ${error}` : ""}
++      <p style={{ fontSize: "var(--text-body)", lineHeight: 1.5, color: "var(--ink-secondary)", margin: 0 }}>
++        Not available for this run.{reason ? ` ${reason.replace(/\.$/, "")}.` : ""} Nothing is estimated in its place.
+       </p>
+     </div>
+   );
+ }
+ 
++/** Legacy entry point: no error means the fetch is still in flight. */
++export function BlockError({ title, error, id }: { title: string; error?: string; id?: string }) {
++  return error ? <PanelAbsent title={title} reason={error} id={id} /> : <PanelLoading title={title} id={id} />;
++}
++
+ export function Meter({ value, color }: { value: number; color: string }) {
+   return (
+     <div
+diff --git a/src/components/dashboard/shell/StickyAction.tsx b/src/components/dashboard/shell/StickyAction.tsx
+new file mode 100644
+index 0000000..4c4a5a4
+--- /dev/null
++++ b/src/components/dashboard/shell/StickyAction.tsx
+@@ -0,0 +1,37 @@
++"use client";
++
++// StickyAction (UI sprint WS4): the one action a lens keeps within reach on a
++// phone (Documents, Generate briefing). Sticky above the bottom tabs; hidden
++// from 768px where the sidebar carries it. Scrolls to a section or runs a
++// handler; never a second copy of the data.
++
++import React from "react";
++
++interface StickyActionProps {
++  label: string;
++  targetId?: string;
++  onClick?: () => void;
++  hint?: string;
++}
++
++export default function StickyAction({ label, targetId, onClick, hint }: StickyActionProps) {
++  return (
++    <div className="sticky-action">
++      <button
++        type="button"
++        className="btn-primary"
++        style={{ width: "100%", minHeight: "48px" }}
++        onClick={() => {
++          if (onClick) onClick();
++          if (targetId) document.getElementById(targetId)?.scrollIntoView({ behavior: "smooth", block: "start" });
++        }}
++      >
++        {label}
++        <span aria-hidden="true" className="btn-arrow">
++          ↓
++        </span>
++      </button>
++      {hint && <span className="sticky-action-hint">{hint}</span>}
++    </div>
++  );
++}
+diff --git a/src/components/dashboard/shell/shell.css b/src/components/dashboard/shell/shell.css
+index c154754..e8b9a9c 100644
+--- a/src/components/dashboard/shell/shell.css
++++ b/src/components/dashboard/shell/shell.css
+@@ -818,3 +818,265 @@
+   align-items: center;
+   justify-content: center;
+ }
++
++/* Width utilities and phone patterns (UI sprint WS4) ------------------- */
++.phone-only {
++  display: none;
++}
++@media (max-width: 767px) {
++  .wide-only {
++    display: none !important;
++  }
++  .phone-only {
++    display: flex;
++  }
++}
++/* A horizontal snap list of cards on phones; a grid from 768px. */
++.swipe-list {
++  display: grid;
++  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
++  gap: var(--space-4);
++}
++@media (max-width: 767px) {
++  .swipe-list {
++    display: flex;
++    overflow-x: auto;
++    scroll-snap-type: x mandatory;
++    gap: var(--space-3);
++    margin: 0 calc(-1 * var(--space-4));
++    padding: var(--space-1) var(--space-4) var(--space-3);
++    -webkit-overflow-scrolling: touch;
++  }
++  .swipe-list > * {
++    flex: 0 0 84%;
++    scroll-snap-align: start;
++  }
++}
++.site-card,
++.comp-card,
++.holding-card {
++  background: var(--white);
++  border: 1px solid var(--border);
++  border-radius: var(--radius-card);
++  padding: var(--space-4);
++  display: flex;
++  flex-direction: column;
++  gap: var(--space-2);
++  min-width: 0;
++}
++.site-card[aria-pressed="true"] {
++  border-color: var(--deep-navy);
++  box-shadow: var(--shadow-flat);
++}
++.card-eyebrow {
++  font-family: var(--font-mono);
++  font-size: var(--text-micro);
++  letter-spacing: 0.08em;
++  text-transform: uppercase;
++  color: var(--ink-muted);
++}
++.card-title {
++  font-size: var(--text-ui);
++  font-weight: 500;
++  color: var(--ink-primary);
++  line-height: 1.3;
++}
++.card-figures {
++  display: grid;
++  grid-template-columns: repeat(3, minmax(0, 1fr));
++  gap: var(--space-2);
++  margin: 0;
++}
++.card-figures dt {
++  font-family: var(--font-mono);
++  font-size: var(--text-micro);
++  letter-spacing: 0.06em;
++  text-transform: uppercase;
++  color: var(--ink-muted);
++}
++.card-figures dd {
++  font-family: var(--font-mono);
++  font-size: var(--text-h3);
++  font-weight: 500;
++  color: var(--ink-primary);
++  margin: 2px 0 0;
++  white-space: nowrap;
++}
++.card-note {
++  font-size: var(--text-data);
++  color: var(--ink-secondary);
++  line-height: 1.5;
++}
++.card-actions {
++  display: flex;
++  gap: var(--space-2);
++  flex-wrap: wrap;
++  margin-top: var(--space-1);
++}
++.card-actions .btn-ghost {
++  padding: var(--space-2) var(--space-4);
++  min-height: 44px;
++}
++/* The site math strip scrolls sideways on phones. */
++@media (max-width: 767px) {
++  .site-math-strip {
++    display: flex !important;
++    overflow-x: auto;
++    scroll-snap-type: x mandatory;
++    margin: 0 calc(-1 * var(--space-4));
++    padding: var(--space-1) var(--space-4) var(--space-3);
++  }
++  .site-math-strip > * {
++    flex: 0 0 84%;
++    scroll-snap-align: start;
++  }
++}
++/* Sticky lens action above the bottom tabs (phones only). */
++.sticky-action {
++  display: none;
++}
++@media (max-width: 767px) {
++  .sticky-action {
++    display: flex;
++    flex-direction: column;
++    gap: var(--space-1);
++    position: sticky;
++    bottom: calc(64px + env(safe-area-inset-bottom, 0px) + var(--space-2));
++    z-index: 25;
++    padding: var(--space-2);
++    background: rgba(255, 255, 255, 0.92);
++    border: 1px solid var(--border);
++    border-radius: var(--radius-card);
++    box-shadow: var(--shadow-raised);
++  }
++  .sticky-action-hint {
++    font-family: var(--font-mono);
++    font-size: var(--text-micro);
++    color: var(--ink-muted);
++    text-align: center;
++  }
++}
++/* Segmented control (the Property lens's owner / renter switch) */
++.segmented {
++  display: inline-flex;
++  border: 1px solid var(--border-input);
++  border-radius: var(--radius-pill);
++  padding: 2px;
++  background: var(--white);
++}
++.segmented button {
++  min-height: 40px;
++  padding: 0 var(--space-4);
++  border: 0;
++  border-radius: var(--radius-pill);
++  background: transparent;
++  color: var(--ink-muted);
++  font: inherit;
++  font-size: var(--text-body);
++  cursor: pointer;
++}
++.segmented button[aria-pressed="true"] {
++  background: var(--deep-navy);
++  color: var(--white);
++  font-weight: 500;
++}
++/* Phone orders inside a lens's flex column */
++@media (max-width: 767px) {
++  #c2-pricing {
++    order: -2;
++  }
++  #c2-velocity {
++    order: -1;
++  }
++  #c1-alerts {
++    order: 1;
++  }
++  .c1-panels {
++    order: 2;
++  }
++  .lens-documents {
++    order: 4;
++  }
++  #c1-map {
++    order: 5;
++  }
++}
++/* Lot-zoom controls on the map */
++.map-frame-controls {
++  position: absolute;
++  right: var(--space-3);
++  bottom: var(--space-6);
++  z-index: 2;
++  display: inline-flex;
++  background: var(--white);
++  border: 1px solid var(--border);
++  border-radius: var(--radius-pill);
++  overflow: hidden;
++  box-shadow: var(--shadow-flat);
++}
++.map-frame-controls button {
++  min-height: 36px;
++  padding: 0 var(--space-3);
++  border: 0;
++  background: transparent;
++  color: var(--ink-muted);
++  font: inherit;
++  font-size: var(--text-caption);
++  cursor: pointer;
++}
++.map-frame-controls button[aria-pressed="true"] {
++  background: var(--pale-wash);
++  color: var(--ink-primary);
++  font-weight: 500;
++}
++.this-week-grid {
++  display: grid;
++  grid-template-columns: repeat(4, minmax(0, 1fr));
++  gap: var(--space-3);
++}
++.this-week-tile {
++  border: 1px solid var(--border-light);
++  border-radius: var(--radius-inner);
++  padding: var(--space-4);
++  display: flex;
++  flex-direction: column;
++  gap: var(--space-1);
++  min-width: 0;
++}
++.this-week-value {
++  font-family: var(--font-mono);
++  font-size: var(--text-data-l);
++  font-weight: 500;
++  color: var(--ink-primary);
++  line-height: 1.1;
++}
++@media (max-width: 767px) {
++  .this-week-grid {
++    grid-template-columns: repeat(2, minmax(0, 1fr));
++  }
++}
++/* Comp cards: the sale price is the widest figure */
++.comp-card .card-figures {
++  grid-template-columns: 1.5fr 1fr 1fr;
++}
++.comp-card .card-figures dd {
++  font-size: var(--text-ui);
++}
++/* The owner / renter switch sits inline on wide screens, full width on phones. */
++@media (min-width: 768px) {
++  .segmented {
++    align-self: flex-start;
++  }
++}
++@media (max-width: 767px) {
++  .segmented button {
++    flex: 1 1 0;
++  }
++  /* History closes every lens on phones. */
++  #c1-history,
++  #c2-history,
++  #c4-history,
++  #c5-history {
++    order: 6;
++  }
++}
+diff --git a/src/components/ui/charts/BarChart.tsx b/src/components/ui/charts/BarChart.tsx
+index 5e0323a..4520850 100644
+--- a/src/components/ui/charts/BarChart.tsx
++++ b/src/components/ui/charts/BarChart.tsx
+@@ -7,6 +7,7 @@
+ 
+ import React from "react";
+ import { scaleLinear } from "@visx/scale";
++import { niceTicks } from "./domains";
+ 
+ export interface BarDatum {
+   key: string;
+@@ -40,7 +41,7 @@ const axisLabel: React.CSSProperties = {
+ 
+ export default function BarChart({
+   data,
+-  height = 140,
++  height = 200,
+   color = "var(--mid-blue)",
+   borderColor,
+   axisEvery = 6,
+@@ -48,11 +49,13 @@ export default function BarChart({
+   valueFormat = (n) => n.toLocaleString("en-US"),
+   ariaLabel,
+ }: BarChartProps) {
+-  const max = Math.max(1, ...data.map((d) => d.value));
++  const dataMax = Math.max(1, ...data.map((d) => d.value));
++  // Five rounded ticks; the axis top is the last tick, so bars never overrun it.
++  const yTicks = yAxis ? niceTicks(0, dataMax, 5) : [];
++  const max = yAxis ? yTicks[yTicks.length - 1] : dataMax;
+   const yScale = scaleLinear({ domain: [0, max], range: [0, 100] });
+   const n = data.length || 1;
+-  const gutter = yAxis ? 34 : 0;
+-  const yTicks = yAxis ? [max, max / 2, 0] : [];
++  const gutter = yAxis ? 40 : 0;
+ 
+   return (
+     <div>
+diff --git a/src/components/ui/charts/Scatter.tsx b/src/components/ui/charts/Scatter.tsx
+index 4e62b99..2b36bfa 100644
+--- a/src/components/ui/charts/Scatter.tsx
++++ b/src/components/ui/charts/Scatter.tsx
+@@ -49,7 +49,7 @@ export default function Scatter({
+   xTicks,
+   yTicks,
+   refLine,
+-  height = 180,
++  height,
+   gutter = 48,
+ }: ScatterProps) {
+   const xScale = scaleLinear({ domain: xDomain, range: [0, 100] });
+@@ -62,7 +62,7 @@ export default function Scatter({
+       <div
+         style={{
+           position: "relative",
+-          height: `${height}px`,
++          height: height ? `${height}px` : "var(--chart-h, 260px)",
+           marginLeft: `${gutter}px`,
+           borderLeft: "1px solid var(--border)",
+           borderBottom: "1px solid var(--border)",
+diff --git a/src/components/ui/charts/domains.ts b/src/components/ui/charts/domains.ts
+index c4f65eb..42ba4ea 100644
+--- a/src/components/ui/charts/domains.ts
++++ b/src/components/ui/charts/domains.ts
+@@ -29,3 +29,20 @@ export const DOMAIN_DEMOGRAPHICS = "#E7DCF4"; // pastel lavender
+ export const DOMAIN_DEMOGRAPHICS_EDGE = "#B49ED8";
+ export const DOMAIN_LENDING = "#F6DEEB"; // pastel rose
+ export const DOMAIN_LENDING_EDGE = "#E0A6C4";
++
++/**
++ * Five evenly spaced, rounded tick values across a domain (the sprint's floor
++ * for a readable axis). Ticks land on round steps (1, 2, 2.5, 5 × 10^n) and
++ * cover the domain.
++ */
++export function niceTicks(lo: number, hi: number, count = 5): number[] {
++  if (!Number.isFinite(lo) || !Number.isFinite(hi) || hi <= lo) return [lo];
++  const raw = (hi - lo) / (count - 1);
++  const mag = Math.pow(10, Math.floor(Math.log10(raw)));
++  const steps = [1, 2, 2.5, 5, 10];
++  const step = steps.map((s) => s * mag).find((s) => s >= raw) ?? 10 * mag;
++  const start = Math.floor(lo / step) * step;
++  const out: number[] = [];
++  for (let v = start; v <= hi + step / 2 && out.length < count + 2; v += step) out.push(Math.round(v * 1e6) / 1e6);
++  return out;
++}
+diff --git a/src/components/ui/map/KoanoMap.tsx b/src/components/ui/map/KoanoMap.tsx
+index e0fe6b9..4f3fd54 100644
+--- a/src/components/ui/map/KoanoMap.tsx
++++ b/src/components/ui/map/KoanoMap.tsx
+@@ -107,6 +107,9 @@ export interface MapLegendItem {
+ }
+ 
+ interface KoanoMapProps {
++  /** A lot polygon layer id to zoom to (lot-zoom frame); null frames the markers. */
++  focusLot?: string | null;
++  onFrameChange?: (lot: string | null) => void;
+   center: [number, number]; // [lon, lat] — the subject
+   markers: MapMarker[];
+   polygons?: MapPolygonLayer[];
+@@ -232,7 +235,25 @@ function legendGlyph(
+   );
+ }
+ 
+-export default function KoanoMap({ center, markers, polygons = [], legend, height = 440, note }: KoanoMapProps) {
++function polygonBounds(features: Array<{ geometry: PolyGeometry }>): [[number, number], [number, number]] | null {
++  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
++  const visit = (c: unknown) => {
++    if (Array.isArray(c) && typeof c[0] === "number") {
++      const [x, y] = c as number[];
++      if (x < minX) minX = x;
++      if (x > maxX) maxX = x;
++      if (y < minY) minY = y;
++      if (y > maxY) maxY = y;
++    } else if (Array.isArray(c)) c.forEach(visit);
++  };
++  features.forEach((f) => visit(f.geometry.coordinates));
++  return Number.isFinite(minX) ? [[minX, minY], [maxX, maxY]] : null;
++}
++
++export default function KoanoMap({ center, markers, polygons = [], legend, height = 440, note ,
++  focusLot = null,
++  onFrameChange,
++}: KoanoMapProps) {
+   const containerRef = useRef<HTMLDivElement>(null);
+   const mapRef = useRef<MapboxMap | null>(null);
+   const markerObjs = useRef<MapboxMarker[]>([]);
+@@ -276,11 +297,24 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
+         map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), "top-right");
+         popupRef.current = new mapboxgl.Popup({ closeButton: false, closeOnClick: false, offset: 12, className: "koano-map-popup" });
+         map.on("load", () => {
+-          // Strip decorative labels — keep only what aids orientation.
++          // Branded base (A9): only street names and neighborhood names stay,
++          // set in the ink-muted color with a white halo. Points of interest,
++          // transit, airports, cities, water and natural labels are off, so a
++          // Brooklyn map never reads "Newark" or "LGA".
+           try {
+             for (const layer of map!.getStyle().layers ?? []) {
+-              if (/poi|transit|natural-point|water-point-label/.test(layer.id)) {
++              if (layer.type !== "symbol") continue;
++              const keep = /^road-label|^settlement-subdivision-label/.test(layer.id);
++              if (!keep) {
+                 map!.setLayoutProperty(layer.id, "visibility", "none");
++                continue;
++              }
++              try {
++                map!.setPaintProperty(layer.id, "text-color", "#527082");
++                map!.setPaintProperty(layer.id, "text-halo-color", "#FFFFFF");
++                map!.setPaintProperty(layer.id, "text-halo-width", 1.2);
++              } catch {
++                /* non-fatal */
+               }
+             }
+           } catch {
+@@ -423,10 +457,23 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
+       const finite = (m: MapMarker) => Number.isFinite(m.lon) && Number.isFinite(m.lat);
+       const framed = markers.filter((m) => m.frame && finite(m));
+       const pts = framed.length >= 1 ? framed : markers.filter(finite);
+-      if (pts.length >= 2) {
++      const lotLayer = focusLot ? polygons.find((p) => p.id === focusLot && p.kind === "lot") : null;
++      const lotBounds = lotLayer ? polygonBounds(lotLayer.features) : null;
++      if (lotBounds) {
++        // Lot-zoom frame: the subject's footprint fills the view.
++        map.fitBounds(lotBounds, { padding: 80, maxZoom: 17.5, duration: 0 });
++      } else if (pts.length >= 2) {
+         const b = new mapboxgl!.LngLatBounds();
+         pts.forEach((m) => b.extend([m.lon, m.lat]));
+         map.fitBounds(b, { padding: 64, maxZoom: 16, duration: 0 });
++      } else if (pts.length === 1 && polygons.some((p) => p.kind === "lot")) {
++        const only = polygons.find((p) => p.kind === "lot")!;
++        const bb = polygonBounds(only.features);
++        if (bb) map.fitBounds(bb, { padding: 80, maxZoom: 17, duration: 0 });
++        else {
++          map.setCenter(center);
++          map.setZoom(14);
++        }
+       } else {
+         map.setCenter(center);
+         map.setZoom(14);
+@@ -472,7 +519,7 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
+       }
+     };
+     // eslint-disable-next-line react-hooks/exhaustive-deps
+-  }, [ready, signature]);
++  }, [ready, signature, focusLot]);
+ 
+   if (!TOKEN || failed) {
+     return (
+@@ -505,6 +552,16 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
+   return (
+     <div style={{ position: "relative", borderRadius: "var(--radius-card)", overflow: "hidden", border: "1px solid var(--border)" }}>
+       <div ref={containerRef} style={{ height, width: "100%" }} />
++      {onFrameChange && polygons.some((p) => p.kind === "lot") && (
++        <div className="map-frame-controls" role="group" aria-label="Map frame">
++          <button type="button" aria-pressed={!!focusLot} onClick={() => onFrameChange(polygons.find((p) => p.kind === "lot")!.id)}>
++            Lot
++          </button>
++          <button type="button" aria-pressed={!focusLot} onClick={() => onFrameChange(null)}>
++            All
++          </button>
++        </div>
++      )}
+       {/* In-map legend — provenance lives ON the canvas, not in a caption elsewhere. */}
+       <div
+         style={{
+diff --git a/src/components/ui/map/MapFrame.tsx b/src/components/ui/map/MapFrame.tsx
+new file mode 100644
+index 0000000..8d13efe
+--- /dev/null
++++ b/src/components/ui/map/MapFrame.tsx
+@@ -0,0 +1,61 @@
++"use client";
++
++// MapFrame (UI sprint WS4, A9/A3): the frame every dashboard map sits in. A
++// sentence-case title with an optional one-line summary, and on phones a
++// "Show map" toggle (collapsed by default, the summary says what the map
++// holds) so a 440px canvas never leads a phone screen. From 768px the map is
++// always open and the toggle is hidden.
++
++import React, { useEffect, useState } from "react";
++import { panelHeading } from "@/components/dashboard/panels";
++
++interface MapFrameProps {
++  title: string;
++  summary?: string;
++  children: React.ReactNode;
++  id?: string;
++}
++
++function phoneQuery(): MediaQueryList | null {
++  return typeof window !== "undefined" && typeof window.matchMedia === "function" ? window.matchMedia("(max-width: 767px)") : null;
++}
++
++export default function MapFrame({ title, summary, children, id }: MapFrameProps) {
++  const [phone, setPhone] = useState(false);
++  const [open, setOpen] = useState(false);
++
++  useEffect(() => {
++    const mq = phoneQuery();
++    if (!mq) return;
++    const apply = () => setPhone(mq.matches);
++    apply();
++    mq.addEventListener("change", apply);
++    return () => mq.removeEventListener("change", apply);
++  }, []);
++
++  const show = !phone || open;
++  return (
++    <section id={id} className="map-frame" style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
++      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "var(--space-3)" }}>
++        <div style={{ minWidth: 0 }}>
++          <h3 style={{ ...panelHeading, margin: 0 }}>{title}</h3>
++          {summary && (
++            <p style={{ fontSize: "var(--text-data)", color: "var(--ink-muted)", lineHeight: 1.5, margin: "2px 0 0" }}>{summary}</p>
++          )}
++        </div>
++        {phone && (
++          <button
++            type="button"
++            className="btn-ghost"
++            style={{ padding: "var(--space-2) var(--space-4)", minHeight: "44px", flex: "none" }}
++            aria-expanded={open}
++            onClick={() => setOpen((v) => !v)}
++          >
++            {open ? "Hide map" : "Show map"}
++          </button>
++        )}
++      </div>
++      {show && children}
++    </section>
++  );
++}

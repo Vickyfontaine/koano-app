@@ -83,6 +83,8 @@ The whole-sprint reviewer (a fresh subagent given the sprint file, every report,
 | 11 | Placeholder dashes remained in several panels; provider source strings with em dashes print in PDFs | Fixed in the panels (21 placeholders now "n/a"); provider source strings are engine text and stay |
 | 12 | Run-to-run confidence spread of about 12 points on the same address | Engine behavior (§07C explains temp-0 wobble of a point or two; this spread is wider); recorded for the engine owner, outside this sprint |
 
+Evidence note: the fixes for findings 1, 2, 3, 5, 6, 7, 8 and 11 were typechecked, linted and gated (commit 1d1b26a) but a confirming capture run on the dev server failed at the end of the session and was not retried, so the final QA set (`ui-ws-6/after/`) shows the state before those eight fixes except the Property lens, which was re-captured after the Bench fix. The next session should re-run `scripts/ui/ws5-trace.mjs` (the humanized ledger and thread, the paginated history) and `scripts/ui/shots.mjs` for the homepage at 390 (the annotated ledger row) into `ui-ws-6/after/`.
+
 ## Not fully satisfied
 
 - **A2** closes only when the founder's 4:5 mobile render set arrives; the temporary stacked layout stands and tablets show the desktop compositions.
