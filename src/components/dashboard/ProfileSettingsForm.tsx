@@ -137,10 +137,11 @@ function AssetUpload({
           <span style={{ fontSize: "11px", color: "var(--ink-muted)" }}>None</span>
         )}
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+      {/* minWidth 0: the native file input never widens the row past a 360 screen. */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "8px", minWidth: 0 }}>
         <span style={{ fontSize: "13px", fontWeight: 500, color: "var(--ink-primary)" }}>{label}</span>
         <span style={{ fontSize: "11px", color: "var(--ink-muted)" }}>PNG, JPEG, or WebP · up to 2 MB</span>
-        <div style={{ display: "flex", gap: "8px", marginTop: "2px" }}>
+        <div style={{ display: "flex", gap: "8px", marginTop: "2px", minWidth: 0 }}>
           <input
             ref={inputRef}
             type="file"
@@ -150,7 +151,7 @@ function AssetUpload({
               const f = e.target.files?.[0];
               if (f) void upload(f);
             }}
-            style={{ fontSize: "12px", color: "var(--ink-secondary)" }}
+            style={{ fontSize: "12px", color: "var(--ink-secondary)", minWidth: 0, maxWidth: "100%" }}
           />
           {url && (
             <button
