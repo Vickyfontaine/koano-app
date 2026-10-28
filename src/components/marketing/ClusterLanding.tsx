@@ -93,7 +93,7 @@ export default function ClusterLanding({
         {/* Hero render — full-bleed behind the text block. The image was
             composed against the hero's text width + padding, so the copy lands
             in its blank strip. */}
-        {render && <HeroRender slot={RENDERS[render]} priority />}
+        {render && <HeroRender slot={RENDERS[render]} priority phoneSlot="hero" />}
 
         <div
           className="hero-copy"
@@ -227,7 +227,7 @@ export default function ClusterLanding({
       </section>
 
       {/* Features section */}
-      <section
+      <section className="mk-section"
         ref={featuresRef}
         style={{
           background: "var(--pale-wash)",
@@ -304,7 +304,7 @@ export default function ClusterLanding({
 
       {/* Secondary features / add-on section (if present) */}
       {secondaryFeatures && (
-        <section
+        <section className="mk-section"
           style={{
             background: "var(--white)",
             padding: "120px 32px",
@@ -375,7 +375,7 @@ export default function ClusterLanding({
       {/* Pricing CTA section */}
       <section
         ref={pricingRef}
-        className="cta-with-render"
+        className="mk-section cta-with-render"
         style={{
           background: secondaryFeatures ? "var(--pale-wash)" : "var(--white)",
           padding: "120px 32px",
