@@ -73,13 +73,17 @@ export function riskInk(score: number): string {
       : "var(--signal-positive-ink)";
 }
 
+// A label and its value on one line when both fit; otherwise the value wraps
+// onto its own full-width line (flex-wrap) instead of being squeezed into a
+// column one word wide beside a long label.
 export function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div
       style={{
         display: "flex",
+        flexWrap: "wrap",
         justifyContent: "space-between",
-        gap: "12px",
+        columnGap: "12px",
         fontSize: "14px",
         lineHeight: 1.5,
       }}
@@ -91,7 +95,8 @@ export function Row({ label, value }: { label: string; value: React.ReactNode })
           fontSize: "13px",
           color: "var(--ink-primary)",
           textAlign: "right",
-          maxWidth: "62%",
+          marginLeft: "auto",
+          maxWidth: "100%",
           overflowWrap: "break-word",
         }}
       >

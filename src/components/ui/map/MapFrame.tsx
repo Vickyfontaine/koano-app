@@ -41,7 +41,7 @@ export default function MapFrame({ title, summary, children, id, openKey }: MapF
 
   const show = !phone || open;
   return (
-    <section id={id} className="map-frame" style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+    <section id={id} className="map-frame" data-map-open={phone && open ? "true" : undefined} style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "var(--space-3)" }}>
         <div style={{ minWidth: 0 }}>
           <h3 style={{ ...panelHeading, margin: 0 }}>{title}</h3>

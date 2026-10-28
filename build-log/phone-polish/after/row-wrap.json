@@ -1,0 +1,126 @@
+{
+  "before": [
+    {
+      "label": "Recorded residential sales in the area (12mo, market median)",
+      "words": 4,
+      "lines": 4,
+      "oneWordPerLine": true
+    },
+    {
+      "label": "Tract median home value (2023)",
+      "words": 1,
+      "lines": 1,
+      "oneWordPerLine": false
+    },
+    {
+      "label": "Price velocity: New York-Jersey City-White Plains (msa, FHFA HPI)",
+      "words": 5,
+      "lines": 4,
+      "oneWordPerLine": false
+    },
+    {
+      "label": "Registered owner (HPD)",
+      "words": 7,
+      "lines": 2,
+      "oneWordPerLine": false
+    },
+    {
+      "label": "Managing agent",
+      "words": 4,
+      "lines": 2,
+      "oneWordPerLine": false
+    },
+    {
+      "label": "Most recent inspection",
+      "words": 1,
+      "lines": 1,
+      "oneWordPerLine": false
+    },
+    {
+      "label": "Area median (all qualifying sales)",
+      "words": 7,
+      "lines": 2,
+      "oneWordPerLine": false
+    },
+    {
+      "label": "Most recent permit",
+      "words": 4,
+      "lines": 2,
+      "oneWordPerLine": false
+    },
+    {
+      "label": "Submarket profile",
+      "words": 5,
+      "lines": 2,
+      "oneWordPerLine": false
+    },
+    {
+      "label": "Lot area",
+      "words": 3,
+      "lines": 1,
+      "oneWordPerLine": false
+    }
+  ],
+  "after": [
+    {
+      "label": "Recorded residential sales in the area (12mo, market median)",
+      "words": 4,
+      "lines": 1,
+      "oneWordPerLine": false
+    },
+    {
+      "label": "Tract median home value (2023)",
+      "words": 1,
+      "lines": 1,
+      "oneWordPerLine": false
+    },
+    {
+      "label": "Price velocity: New York-Jersey City-White Plains (msa, FHFA HPI)",
+      "words": 5,
+      "lines": 1,
+      "oneWordPerLine": false
+    },
+    {
+      "label": "Registered owner (HPD)",
+      "words": 7,
+      "lines": 2,
+      "oneWordPerLine": false
+    },
+    {
+      "label": "Managing agent",
+      "words": 4,
+      "lines": 1,
+      "oneWordPerLine": false
+    },
+    {
+      "label": "Most recent inspection",
+      "words": 1,
+      "lines": 1,
+      "oneWordPerLine": false
+    },
+    {
+      "label": "Area median (all qualifying sales)",
+      "words": 7,
+      "lines": 1,
+      "oneWordPerLine": false
+    },
+    {
+      "label": "Most recent permit",
+      "words": 4,
+      "lines": 1,
+      "oneWordPerLine": false
+    },
+    {
+      "label": "Submarket profile",
+      "words": 5,
+      "lines": 1,
+      "oneWordPerLine": false
+    },
+    {
+      "label": "Lot area",
+      "words": 3,
+      "lines": 1,
+      "oneWordPerLine": false
+    }
+  ]
+}

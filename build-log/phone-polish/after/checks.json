@@ -1,0 +1,18 @@
+{
+  "acquireHasHoldings": true,
+  "stickyOverMap": {
+    "overlap": true,
+    "stickyVisible": false
+  },
+  "stickyBackPastMap": true,
+  "stickyIsLastBlock": true,
+  "acquireRows": {
+    "total": 0,
+    "bad": []
+  },
+  "propertyRunDone": false,
+  "propertyRows": {
+    "total": 0,
+    "bad": []
+  }
+}

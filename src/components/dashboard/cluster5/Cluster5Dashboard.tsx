@@ -137,7 +137,6 @@ export default function Cluster5Dashboard() {
 
       {/* Active analysis */}
 
-      {!!properties && properties.length > 0 && <StickyAction label="Monday briefing" targetId="c5-briefing" hint="Jump to the briefing and its Generate button" />}
       <MondayBriefing hasProperties={!!properties && properties.length > 0} id="c5-briefing" />
 
       <MonitoringFeed id="c5-monitoring" />
@@ -249,6 +248,10 @@ export default function Cluster5Dashboard() {
       <RiskMonitor properties={properties} id="c5-risk" />
       <ArchiveTrend id="c5-archive" />
       <VerdictHistory id="c5-history" />
+
+      {/* Last in the column: its in-flow slot sits at the end of the page, so
+          the sticky action leaves no band of space between two panels. */}
+      {!!properties && properties.length > 0 && <StickyAction label="Monday briefing" targetId="c5-briefing" hint="Jump to the briefing and its Generate button" />}
     </div>
   );
 }

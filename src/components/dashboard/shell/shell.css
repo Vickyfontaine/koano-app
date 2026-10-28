@@ -973,6 +973,15 @@
     border: 1px solid var(--border);
     border-radius: var(--radius-card);
     box-shadow: var(--shadow-raised);
+    transition: opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out), visibility 0s;
+  }
+  /* Over an opened map: out of the way and out of the tab order. */
+  .sticky-action-away {
+    opacity: 0;
+    transform: translateY(var(--space-2));
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out), visibility 0s var(--dur-2);
   }
   .sticky-action-hint {
     font-family: var(--font-mono);
