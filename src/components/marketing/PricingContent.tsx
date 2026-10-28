@@ -130,7 +130,7 @@ export default function PricingContent() {
       >
         {/* Hero render — full-bleed, BOTTOM-anchored so the park foreground sits
             on the fold; excess top sky overflows above and is clipped. */}
-        <HeroRender slot={RENDERS.pricing} priority />
+        <HeroRender slot={RENDERS.pricing} priority phoneSlot="hero" />
 
         <div
           className="hero-copy"
@@ -228,7 +228,7 @@ export default function PricingContent() {
       </section>
 
       {/* Pricing tiers */}
-      <section
+      <section className="mk-section"
         ref={tiersRef}
         style={{ background: "var(--pale-wash)", padding: "80px 32px 120px" }}
       >
@@ -251,7 +251,7 @@ export default function PricingContent() {
                 variants={fadeUp}
                 whileHover={{ y: -3, transition: { duration: 0.26, ease: EASE } }}
                 whileTap={{ y: -1, transition: { duration: 0.12, ease: EASE } }}
-                className={`card-interactive${tier.isEnterprise ? " card-featured" : ""}`}
+                className={`mk-card card-interactive${tier.isEnterprise ? " card-featured" : ""}`}
                 style={{
                   background: "var(--white)",
                   borderRadius: "var(--radius-card)",
@@ -413,7 +413,7 @@ export default function PricingContent() {
       </section>
 
       {/* FAQ */}
-      <section
+      <section className="mk-section"
         ref={faqRef}
         style={{ background: "var(--white)", padding: "120px 32px" }}
       >
@@ -520,7 +520,7 @@ export default function PricingContent() {
       {/* Enterprise CTA */}
       <section
         ref={ctaRef}
-        className="cta-with-render"
+        className="mk-section cta-with-render"
         style={{
           background: "var(--pale-wash)",
           padding: "120px 32px",
