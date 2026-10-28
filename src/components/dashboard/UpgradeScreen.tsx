@@ -68,7 +68,7 @@ export default function UpgradeScreen({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        padding: "24px",
+        padding: "var(--panel-pad)",
       }}
       onClick={onClose}
     >
@@ -137,7 +137,7 @@ export default function UpgradeScreen({
                   background: "var(--white)",
                   border: "1px solid var(--border)",
                   borderRadius: "var(--radius-card)",
-                  padding: "24px",
+                  padding: "var(--panel-pad)",
                   cursor: busyTier ? "wait" : "pointer",
                   fontFamily: "inherit",
                   display: "flex",

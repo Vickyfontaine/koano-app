@@ -24,7 +24,7 @@ export default function CandidatePicker({ candidates, onChoose, busy = false }: 
         border: "1px solid var(--border)",
         borderLeft: "3px solid var(--signal-warning)",
         borderRadius: "0 var(--radius-card) var(--radius-card) 0",
-        padding: "24px",
+        padding: "var(--panel-pad)",
         maxWidth: "680px",
         display: "flex",
         flexDirection: "column",

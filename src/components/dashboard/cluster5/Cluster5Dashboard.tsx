@@ -181,7 +181,7 @@ export default function Cluster5Dashboard() {
               style={{
                 border: "1px dashed var(--border)",
                 borderRadius: "var(--radius-card)",
-                padding: "24px",
+                padding: "var(--panel-pad)",
                 fontSize: "13px",
                 color: "var(--ink-muted)",
               }}
@@ -202,7 +202,7 @@ export default function Cluster5Dashboard() {
               style={{
                 border: "1px dashed var(--border)",
                 borderRadius: "var(--radius-card)",
-                padding: "24px",
+                padding: "var(--panel-pad)",
                 fontSize: "13px",
                 color: "var(--ink-muted)",
               }}
@@ -234,7 +234,7 @@ export default function Cluster5Dashboard() {
               style={{
                 border: "1px dashed var(--border)",
                 borderRadius: "var(--radius-card)",
-                padding: "24px",
+                padding: "var(--panel-pad)",
                 fontSize: "13px",
                 color: "var(--ink-muted)",
               }}

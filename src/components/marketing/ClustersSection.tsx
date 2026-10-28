@@ -50,7 +50,7 @@ export default function ClustersSection() {
     >
       <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
         {/* Section header */}
-        <motion.div
+        <motion.div className="mk-head"
           initial={false}
           animate={isInView ? "visible" : "hidden"}
           variants={fadeUp}

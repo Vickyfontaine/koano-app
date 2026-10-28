@@ -235,7 +235,7 @@ export default function ClusterLanding({
         }}
       >
         <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
-          <motion.div
+          <motion.div className="mk-head"
             initial={false}
             animate={featuresInView ? "visible" : "hidden"}
             variants={fadeUp}
@@ -311,7 +311,7 @@ export default function ClusterLanding({
           }}
         >
           <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
-            <div style={{ marginBottom: "64px" }}>
+            <div className="mk-head" style={{ marginBottom: "64px" }}>
               <SectionNumber number="02" label={secondaryFeatures.title} />
               <h2
                 className="text-h2"

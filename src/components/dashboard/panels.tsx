@@ -22,7 +22,7 @@ export const panelStyle: React.CSSProperties = {
   background: "var(--white)",
   border: "1px solid var(--border)",
   borderRadius: "var(--radius-card)",
-  padding: "24px",
+  padding: "var(--panel-pad)",
   display: "flex",
   flexDirection: "column",
   gap: "16px",

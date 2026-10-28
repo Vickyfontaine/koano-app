@@ -242,7 +242,7 @@ export default function DataContent() {
         style={{ background: "var(--pale-wash)", padding: "120px 32px" }}
       >
         <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
-          <motion.div
+          <motion.div className="mk-head"
             initial={false}
             animate={liveInView ? "visible" : "hidden"}
             variants={fadeUp}
@@ -372,7 +372,7 @@ export default function DataContent() {
         style={{ background: "var(--white)", padding: "120px 32px" }}
       >
         <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
-          <motion.div
+          <motion.div className="mk-head"
             initial={false}
             animate={repInView ? "visible" : "hidden"}
             variants={fadeUp}
@@ -510,7 +510,7 @@ export default function DataContent() {
         style={{ background: "var(--pale-wash)", padding: "120px 32px" }}
       >
         <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
-          <motion.div
+          <motion.div className="mk-head"
             initial={false}
             animate={provInView ? "visible" : "hidden"}
             variants={fadeUp}
@@ -597,7 +597,7 @@ export default function DataContent() {
         style={{ background: "var(--white)", padding: "120px 32px" }}
       >
         <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
-          <motion.div
+          <motion.div className="mk-head"
             initial={false}
             animate={pipelineInView ? "visible" : "hidden"}
             variants={fadeUp}

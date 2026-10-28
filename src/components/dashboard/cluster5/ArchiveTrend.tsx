@@ -6,8 +6,41 @@
 // view) and shows every gap AS a gap — never interpolated, never backfilled. A
 // missing capture is part of the honest record, not a hole to paper over.
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { PanelHeader, panelStyle } from "../panels";
+
+// A sideways-scrolling table that says so (founder decision): while more weeks
+// lie to the right, a "Scroll" hint shows above it and the right edge fades.
+function ScrollTable({ children }: { children: React.ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [more, setMore] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const check = () => setMore(el.scrollWidth - el.clientWidth - el.scrollLeft > 2);
+    check();
+    el.addEventListener("scroll", check, { passive: true });
+    window.addEventListener("resize", check);
+    return () => {
+      el.removeEventListener("scroll", check);
+      window.removeEventListener("resize", check);
+    };
+  }, []);
+  return (
+    <div>
+      {more && (
+        <div className="scroll-hint" aria-hidden="true">
+          Scroll →
+        </div>
+      )}
+      <div className={more ? "scroll-fade-wrap scroll-fade-on" : "scroll-fade-wrap"}>
+        <div ref={ref} className="scroll-x" style={{ overflowX: "auto", padding: "2px" }}>
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 interface CoverageCell {
   week: string;
@@ -89,7 +122,7 @@ export default function ArchiveTrend({ id, previewData }: { id?: string; preview
 
           {/* Coverage timeline: datasets × weeks. A captured cell shows its row
               count; a gap shows amber "gap" — the outage made visible, in place. */}
-          <div className="scroll-x" style={{ overflowX: "auto", padding: "2px" }}>
+          <ScrollTable>
             <table style={{ borderCollapse: "collapse", minWidth: "420px" }}>
               <thead>
                 <tr>
@@ -127,7 +160,7 @@ export default function ArchiveTrend({ id, previewData }: { id?: string; preview
                 ))}
               </tbody>
             </table>
-          </div>
+          </ScrollTable>
 
           <p style={{ fontSize: "12px", lineHeight: 1.55, color: "var(--ink-muted)", margin: 0, maxWidth: "680px" }}>
             An amber <span style={{ color: "var(--signal-warning-ink)" }}>gap</span> is a week a dataset

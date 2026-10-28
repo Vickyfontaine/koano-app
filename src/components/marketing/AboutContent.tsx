@@ -232,7 +232,7 @@ export default function AboutContent() {
         style={{ background: "var(--pale-wash)", padding: "120px 32px" }}
       >
         <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
-          <motion.div
+          <motion.div className="mk-head"
             initial={false}
             animate={principlesInView ? "visible" : "hidden"}
             variants={fadeUp}
@@ -309,7 +309,7 @@ export default function AboutContent() {
         style={{ background: "var(--white)", padding: "120px 32px" }}
       >
         <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
-          <motion.div
+          <motion.div className="mk-head"
             initial={false}
             animate={notInView ? "visible" : "hidden"}
             variants={fadeUp}
@@ -408,7 +408,7 @@ export default function AboutContent() {
         style={{ background: "var(--pale-wash)", padding: "120px 32px" }}
       >
         <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
-          <motion.div
+          <motion.div className="mk-head"
             initial={false}
             animate={teamInView ? "visible" : "hidden"}
             variants={fadeUp}

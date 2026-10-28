@@ -335,7 +335,7 @@
   background: var(--white);
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
-  padding: var(--space-5);
+  padding: var(--panel-pad);
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
@@ -1374,4 +1374,27 @@ body.trace-on [data-trace].trace-hit {
   letter-spacing: 0.04em;
   color: var(--ink-muted);
   overflow-wrap: anywhere;
+}
+
+/* The Acquire longitudinal table: a fade on the right edge while more weeks
+   lie to the right, and the "Scroll" hint above it. */
+.scroll-fade-wrap {
+  position: relative;
+}
+.scroll-fade-on::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 40px;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), var(--white));
+}
+.scroll-hint {
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  color: var(--ink-muted);
+  text-align: right;
+  margin-bottom: var(--space-1);
 }

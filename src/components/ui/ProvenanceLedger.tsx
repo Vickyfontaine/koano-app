@@ -69,7 +69,7 @@ export default function ProvenanceLedger({ dataPoints, locationConfidence, addre
   })).filter((g) => g.rows.length > 0);
 
   return (
-    <div style={{ border: "1px solid var(--border)", borderRadius: "var(--radius-card)", background: "var(--white)", padding: "24px" }} id={id}>
+    <div style={{ border: "1px solid var(--border)", borderRadius: "var(--radius-card)", background: "var(--white)", padding: "var(--panel-pad)" }} id={id}>
       <button
         onClick={() => collapsible && setOpen((v) => !v)}
         aria-expanded={collapsible ? open : undefined}

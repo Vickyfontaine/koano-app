@@ -148,7 +148,7 @@ export default function OnboardingClusters() {
                     ? "1px solid var(--mid-blue)"
                     : "1px solid var(--border)",
                   borderRadius: "var(--radius-card)",
-                  padding: "24px",
+                  padding: "var(--panel-pad)",
                   cursor: saving ? "wait" : "pointer",
                   fontFamily: "inherit",
                   display: "flex",

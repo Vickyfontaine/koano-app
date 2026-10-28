@@ -78,7 +78,7 @@ export default function AgentsSection() {
 
       <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto", position: "relative" }}>
         {/* Section header */}
-        <motion.div
+        <motion.div className="mk-head"
           initial={false}
           animate={isInView ? "visible" : "hidden"}
           variants={fadeUp}

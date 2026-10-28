@@ -153,7 +153,7 @@ export default function VisionContent() {
       </section>
 
       <section className="mk-section" style={{ background: "var(--pale-wash)", padding: "var(--space-8) var(--space-6)" }}>
-        <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "var(--space-5)" }}>
+        <div className="mk-grid" style={{ maxWidth: "var(--content-marketing)", margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "var(--space-5)" }}>
           {/* 1. Radar */}
           <div className="mk-card" style={card}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: "var(--space-3)", flexWrap: "wrap" }}>

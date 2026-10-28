@@ -273,7 +273,7 @@ export default function IntelligenceContent() {
         style={{ background: "var(--pale-wash)", padding: "120px 32px" }}
       >
         <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
-          <motion.div
+          <motion.div className="mk-head"
             initial={false}
             animate={architectureInView ? "visible" : "hidden"}
             variants={fadeUp}
@@ -468,7 +468,7 @@ export default function IntelligenceContent() {
             position: "relative",
           }}
         >
-          <motion.div
+          <motion.div className="mk-head"
             initial={false}
             animate={agentsInView ? "visible" : "hidden"}
             variants={fadeUp}
@@ -605,7 +605,7 @@ export default function IntelligenceContent() {
         style={{ background: "var(--pale-wash)", padding: "120px 32px" }}
       >
         <div style={{ maxWidth: "var(--content-marketing)", margin: "0 auto" }}>
-          <motion.div
+          <motion.div className="mk-head"
             initial={false}
             animate={synthesisInView ? "visible" : "hidden"}
             variants={fadeUp}
@@ -695,7 +695,7 @@ export default function IntelligenceContent() {
         style={{ background: "var(--white)", padding: "120px 32px" }}
       >
         <div style={{ maxWidth: "var(--content-reading)", margin: "0 auto" }}>
-          <motion.div
+          <motion.div className="mk-head"
             initial={false}
             animate={verdictInView ? "visible" : "hidden"}
             variants={fadeUp}

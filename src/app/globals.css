@@ -98,6 +98,9 @@
      the Coastal palette rather than a generic grey drop. */
   --shadow-flat: 0 1px 2px rgba(13, 43, 62, 0.04), 0 2px 6px rgba(13, 43, 62, 0.04);
   --shadow-raised: 0 1px 2px rgba(13, 43, 62, 0.05), 0 6px 20px rgba(13, 43, 62, 0.07);
+  /* Panel padding: 24 from 768px up, the system's 20 on phones. */
+  --panel-pad: 24px;
+
   /* Mobile layout system (below 768px; build-log/mobile-audit.md). */
   --m-gutter: 16px;       /* page gutter, every page */
   --m-section-y: 48px;    /* section padding, top and bottom */
@@ -840,7 +843,7 @@ body {
   /* Section headers sit left on phones, like the hero, and tighter. */
   .home-mobile section:not(#hero-section) > div > div:first-child {
     text-align: left !important;
-    margin-bottom: var(--space-6) !important;
+    margin-bottom: var(--space-5) !important;
   }
 
   /* Hero: headline and one line in the clear sky, then the render as the
@@ -878,7 +881,7 @@ body {
     padding-top: 0 !important;
   }
   /* Its alerts are hidden on phones, so its header ends the section. */
-  .home-mobile section.home-monitoring:not(#hero-section) > div > div:first-child {
+  .home-mobile section.home-monitoring:not(#hero-section) > div > div.mk-head:first-child {
     margin-bottom: 0 !important;
   }
 
@@ -926,6 +929,28 @@ body {
   }
   .mk-section.mk-continues {
     padding-top: 0 !important;
+  }
+  :root {
+    --panel-pad: 20px;
+  }
+  /* Section header to its content: 24px. */
+  .mk-section .mk-head,
+  .home-mobile section:not(#hero-section) > div > div.mk-head {
+    margin-bottom: var(--space-5) !important;
+  }
+  /* Cards in a grid or list: 12px apart. */
+  .mk-grid,
+  .about-principles-grid,
+  .about-not-grid,
+  .clusters-grid,
+  .data-source-grid,
+  .data-rep-grid,
+  .data-prov-grid,
+  .intelligence-agents-grid,
+  .intelligence-arb-grid,
+  .pricing-grid,
+  .cluster-features-grid {
+    gap: var(--m-card-gap) !important;
   }
   .mk-section .card,
   .mk-card {

@@ -54,7 +54,7 @@ function fieldError(key: FieldKey, v: string): string | null {
 const cardStyle: React.CSSProperties = {
   border: "1px solid var(--border)",
   borderRadius: "var(--radius-card)",
-  padding: "24px",
+  padding: "var(--panel-pad)",
   background: "var(--white)",
   display: "flex",
   flexDirection: "column",

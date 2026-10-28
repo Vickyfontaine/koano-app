@@ -37,7 +37,7 @@ export default function MonitoringSection() {
   return (
     <section ref={ref} className="home-monitoring" style={{ background: "var(--pale-wash)", padding: "120px 32px" }}>
       <div style={{ maxWidth: "var(--content-reading)", margin: "0 auto" }}>
-        <motion.div
+        <motion.div className="mk-head"
           initial={false}
           animate={isInView ? "visible" : "hidden"}
           variants={fadeUp}
