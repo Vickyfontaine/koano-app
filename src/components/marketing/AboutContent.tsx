@@ -223,11 +223,11 @@ export default function AboutContent() {
             edge of the hero, sitting beside the left-aligned text. */}
         {/* Brownstone row, flush right, sized by the hero height (.hero-about
             rules); below the copy at full width on phones. */}
-        <HeroRender slot={RENDERS.about} priority />
+        <HeroRender slot={RENDERS.about} priority phoneSlot="hero" />
       </section>
 
       {/* Founding principles */}
-      <section
+      <section className="mk-section"
         ref={principlesRef}
         style={{ background: "var(--pale-wash)", padding: "120px 32px" }}
       >
@@ -304,7 +304,7 @@ export default function AboutContent() {
       </section>
 
       {/* What KOANO is NOT */}
-      <section
+      <section className="mk-section"
         ref={notRef}
         style={{ background: "var(--white)", padding: "120px 32px" }}
       >
@@ -403,7 +403,7 @@ export default function AboutContent() {
       </section>
 
       {/* Team */}
-      <section
+      <section className="mk-section"
         ref={teamRef}
         style={{ background: "var(--pale-wash)", padding: "120px 32px" }}
       >
@@ -518,7 +518,7 @@ export default function AboutContent() {
       {/* CTA */}
       <section
         ref={ctaRef}
-        className="cta-with-render"
+        className="mk-section cta-with-render"
         style={{
           background: "var(--white)",
           padding: "120px 32px",
