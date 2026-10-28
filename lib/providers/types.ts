@@ -188,6 +188,18 @@ export interface JobFilingsSummary {
   scope_note: string;
 }
 
+// Landmark status (Phase 0): the LPC designations MapPLUTO carries per lot.
+export interface LandmarkStatus {
+  individual_landmark: string | null; // e.g. "INDIVIDUAL AND INTERIOR LANDMARK"
+  historic_district: string | null; // e.g. "Park Slope Historic District"
+  designated: boolean;
+}
+
+export interface LandmarkProvider {
+  name: string;
+  getLandmarkStatus(addr: ResolvedAddress): Promise<ProviderResult<LandmarkStatus>>;
+}
+
 export interface JobFilingsProvider {
   name: string;
   getJobFilings(addr: ResolvedAddress): Promise<ProviderResult<JobFilingsSummary>>;

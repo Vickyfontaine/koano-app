@@ -20,7 +20,8 @@
 // (the driver names the guard), so the verdict math shows why the headroom was
 // not counted. The over-max "needs a variance" lean is a subject constraint and
 // still applies. Landmark status is not a fact the engine fetches yet (a Phase 0
-// data task), so it is not guarded here.
+// data task); Phase 0 added it: an individual landmark or a lot in a historic
+// district (MapPLUTO's LPC fields) suppresses the lean the same way.
 //
 // Pure and client-safe (types only). Returns the nudge (on the score's [-2,2]
 // axis) and the drivers, so the panel can SHOW which facts produced the lean.
@@ -40,13 +41,16 @@ export interface StructuralFacts {
   // Ground-up permits on the SUBJECT lot (infrastructure data points, matched
   // to the subject address): e.g. "Foundation permit issued 2026-03-04".
   subjectActiveConstruction: string[];
+  // LPC designations on the subject lot (regulatory-policy data points, Phase 0).
+  individualLandmark: string | null;
+  historicDistrict: string | null;
 }
 
 export interface StructuralDirection {
   nudge: number; // added to the aggregate score; + = buy-ward, − = wait/sell-ward
   drivers: string[]; // the facts that produced the lean (shown to the user)
   // The guard that suppressed the FAR lean, if any (shown as a flag on the site).
-  guard: 'active_construction' | 'coop_condo' | 'likely_stabilized' | null;
+  guard: 'active_construction' | 'landmark' | 'coop_condo' | 'likely_stabilized' | null;
 }
 
 function num(v: unknown): number | null {
@@ -56,6 +60,12 @@ function num(v: unknown): number | null {
 
 function str(v: unknown): string | null {
   return typeof v === 'string' && v.trim() ? v.trim() : null;
+}
+
+// The regulatory agent writes "none" when a lot carries no designation.
+function designation(v: unknown): string | null {
+  const s = str(v);
+  return s && s.toLowerCase() !== 'none' ? s : null;
 }
 
 // "175 3 STREET, Brooklyn, NY, USA" and "175 3 STREET" → "175 3 st"; tolerant of
@@ -122,6 +132,8 @@ export function extractStructuralFacts(agents: AgentVerdict[], subjectAddress?: 
     residentialUnits: num(find(/^residential_units$/)),
     yearBuilt: num(find(/^year_built$/)),
     subjectActiveConstruction: Array.from(new Set(subjectActiveConstruction)),
+    individualLandmark: designation(find(/^individual_landmark$/)),
+    historicDistrict: designation(find(/^historic_district$/)),
   };
 }
 
@@ -139,6 +151,15 @@ export function occupancyGuard(f: StructuralFacts): { guard: StructuralDirection
     return {
       guard: 'active_construction',
       reason: `active construction on the lot (${f.subjectActiveConstruction.slice(0, 2).join('; ')}): the as-of-right upside is already being executed by the current owner, not waiting for a buyer`,
+    };
+  }
+  if (f.individualLandmark || f.historicDistrict) {
+    const what = [f.individualLandmark ? `an individual landmark (${f.individualLandmark.toLowerCase()})` : null, f.historicDistrict ? `in the ${f.historicDistrict}` : null]
+      .filter(Boolean)
+      .join(' and ');
+    return {
+      guard: 'landmark',
+      reason: `the lot is ${what}: exterior changes and new construction need Landmarks Preservation Commission approval, so the as-of-right upside is not one a buyer can count on`,
     };
   }
   const cls = (f.buildingClass ?? '').toUpperCase();

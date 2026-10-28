@@ -1,5 +1,6 @@
-// DOB NOW job filings (Phase 0): job-type classification, the active-status rule,
-// and the construction guard reading an active ground-up job on the subject lot.
+// DOB NOW job filings and landmark status (Phase 0): job-type classification,
+// the active-status rule, and the construction guard reading an active
+// ground-up job or an LPC designation on the subject lot.
 //   npx tsx scripts/test-dob-jobs.ts
 import { classifyJob, isActiveFiling } from '../lib/providers/real/nyc-dob-now-jobs';
 import { extractStructuralFacts, occupancyGuard } from '../lib/agents/direction';
@@ -31,5 +32,13 @@ eq('the guard fires as active construction', occupancyGuard(withJob)?.guard, 'ac
 const without = extractStructuralFacts([agent([dp('tract_new_building_jobs_24mo', 24)])], '175 3 STREET, Brooklyn, NY, USA');
 eq('tract jobs alone do not fire the guard', occupancyGuard(without), null);
 
+// Landmark status (Phase 0) feeds the same guard.
+const lm = extractStructuralFacts([agent([dp('individual_landmark', 'INDIVIDUAL AND INTERIOR LANDMARK'), dp('historic_district', 'none')])], '55 WALL STREET');
+eq('an individual landmark fires the landmark guard', occupancyGuard(lm)?.guard, 'landmark');
+const hd = extractStructuralFacts([agent([dp('individual_landmark', 'none'), dp('historic_district', 'Park Slope Historic District')])], '1 X STREET');
+eq('a historic district fires the landmark guard', occupancyGuard(hd)?.guard, 'landmark');
+const none = extractStructuralFacts([agent([dp('individual_landmark', 'none'), dp('historic_district', 'none')])], '1 X STREET');
+eq('"none" does not fire it', occupancyGuard(none), null);
+
 if (fail) process.exit(1);
-console.log('✓ DOB NOW job filings');
+console.log('✓ DOB NOW job filings and landmark status');

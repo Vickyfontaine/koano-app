@@ -67,7 +67,7 @@ export interface WeightingBreakdown {
   structural_nudge?: number;
   structural_drivers?: string[];
   // Which occupancy/construction guard suppressed the FAR lean (null = none).
-  structural_guard?: 'active_construction' | 'coop_condo' | 'likely_stabilized' | null;
+  structural_guard?: 'active_construction' | 'landmark' | 'coop_condo' | 'likely_stabilized' | null;
   final_score?: number;
   // TRUE when this breakdown was RE-DERIVED now from a persisted verdict's stored
   // inputs, rather than computed live at verdict time. Same arithmetic, same

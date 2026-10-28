@@ -32,12 +32,14 @@ import type {
   ProformaBenchmarkProvider,
   ZoningProvider,
   JobFilingsProvider,
+  LandmarkProvider,
 } from './types';
 
 import { nycGeoSearch } from './real/geocode';
 import { nycLandlord } from './real/nyc-landlord';
 import { nycPermits } from './real/nyc-permits';
 import { nycDobNowJobs } from './real/nyc-dob-now-jobs';
+import { nycLandmarks } from './real/nyc-landmarks';
 import { nycViolations } from './real/nyc-violations';
 import { nycZoning } from './real/nyc-zoning';
 import { nycAssemblage } from './real/nyc-assemblage';
@@ -72,6 +74,7 @@ export interface ProviderRegistry {
   buildingViolations: BuildingViolationsProvider;
   landlordPortfolio: LandlordPortfolioProvider;
   zoning: ZoningProvider;
+  landmark: LandmarkProvider;
   opportunityZones: OpportunityZoneProvider;
   lihtcEligibility: LihtcEligibilityProvider;
   geometry: GeometryProvider;
@@ -110,6 +113,7 @@ export const registry: ProviderRegistry = {
   buildingViolations: nycViolations,
   landlordPortfolio: nycLandlord,
   zoning: nycZoning,
+  landmark: nycLandmarks,
   opportunityZones: irsOpportunity,
   lihtcEligibility: hudQctDda,
   geometry: nycGeometry,

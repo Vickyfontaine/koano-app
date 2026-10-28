@@ -79,6 +79,14 @@ export const PROVIDER_CATALOG: Record<keyof ProviderRegistry, ProviderCatalogEnt
     provenance: 'live',
     usedBy: 'Infrastructure pipeline agent',
   },
+  landmark: {
+    source: 'MapPLUTO, LPC landmark and historic district fields',
+    category: 'Landmark status',
+    group: 'Parcel, zoning and ownership',
+    coverage: 'nyc',
+    provenance: 'live',
+    usedBy: 'Regulatory and policy agent',
+  },
   jobFilings: {
     source: 'NYC DOB NOW Job Application Filings',
     category: 'New building and demolition jobs',

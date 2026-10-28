@@ -1,5 +1,6 @@
 // KOANO Regulatory & Policy agent — Step 4a + Phase B ownership wiring.
-// LIVE inputs: nyc-zoning (MapPLUTO) + irs-opportunity (HUD Opportunity Zones)
+// LIVE inputs: nyc-zoning (MapPLUTO) + nyc-landmarks (MapPLUTO LPC fields)
+// + irs-opportunity (HUD Opportunity Zones)
 // + landlord portfolio (HPD registrations/contacts + Speculation Watch List).
 // Depends ONLY on the provider registry. Output: AgentVerdict (KoanoVerdict schema).
 // NOTE: portfolio feeds SUMMARY data points only — the buildings list is
@@ -21,16 +22,18 @@ How to reason:
 - Opportunity Zone designation is a material tax incentive for capital-gains investors (10-year basis step-up); absence of it is neutral, not negative.
 - LIHTC eligibility (HUD QCT / DDA): a Qualified Census Tract OR a Difficult Development Area qualifies a Low-Income Housing Tax Credit project for a 30% eligible-basis boost — a material affordable-housing feasibility signal, and a federal designation like the Opportunity Zone. State QCT and DDA status exactly as given (in / not in), and if designated note the 30% basis boost for affordable/mixed-income development. Absence is neutral, not negative — it only means this specific LIHTC incentive does not apply. Do NOT infer income limits, rents, or unit counts from the designation; it is an eligibility flag, not a pro forma.
 - Older year_built + low built FAR + high max FAR = classic redevelopment candidate.
+- Landmark status: individual_landmark and historic_district come from the LPC designations on the lot. If either is set, exterior changes and new construction need Landmarks Preservation Commission approval, which constrains realizing FAR headroom; state the designation exactly as given. "none" means the lot carries no designation.
 - Ownership records: the registered owner and portfolio come from HPD registrations under EXACT name matching only — treat portfolio size as a floor, never a ceiling, and say so when you use it. A portfolio with heavy open violations signals an operator with regulatory exposure. Speculation Watch List membership means the building sold at a price/cap-rate profile the city flags as speculative — material tenant-displacement and regulatory-scrutiny context. hpd_registered=false just means the building is not a registered 3+ unit rental.
 - Your verdict is about regulatory posture: "buy" = regulatory tailwinds/latent rights, "wait" = entitlement uncertainty, "hold" = neutral, "drop" = regulatory blockers.
 - risk_score reflects regulatory/entitlement risk specifically.`;
 
 export async function runRegulatoryPolicyAgent(addr: ResolvedAddress): Promise<AgentVerdict> {
-  const [zoningRes, ozRes, portfolioRes, lihtcRes] = await Promise.all([
+  const [zoningRes, ozRes, portfolioRes, lihtcRes, landmarkRes] = await Promise.all([
     registry.zoning.getZoning(addr),
     registry.opportunityZones.getOpportunityZone(addr),
     registry.landlordPortfolio.getPortfolio(addr),
     registry.lihtcEligibility.getLihtcEligibility(addr),
+    registry.landmark.getLandmarkStatus(addr),
   ]);
 
   const dataPoints: DataPoint[] = [];
@@ -85,6 +88,19 @@ export async function runRegulatoryPolicyAgent(addr: ResolvedAddress): Promise<A
       provenance: ozRes.provenance,
       source: ozRes.source,
     });
+  }
+
+  // LPC designations (Phase 0): an individual landmark or a historic district
+  // means LPC approval for exterior work and new construction. The construction
+  // guard reads these two points.
+  if (landmarkRes.data) {
+    const lm = landmarkRes.data;
+    dataPoints.push(
+      { label: 'individual_landmark', value: lm.individual_landmark ?? 'none', provenance: landmarkRes.provenance, source: landmarkRes.source },
+      { label: 'historic_district', value: lm.historic_district ?? 'none', provenance: landmarkRes.provenance, source: landmarkRes.source },
+    );
+  } else {
+    dataPoints.push({ label: 'landmark_status_unavailable', value: landmarkRes.error ?? 'no data', provenance: landmarkRes.provenance, source: landmarkRes.source });
   }
 
   // HUD LIHTC eligibility (QCT / DDA) — a federal affordable-housing incentive,
