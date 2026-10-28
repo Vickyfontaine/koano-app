@@ -1,0 +1,4 @@
+# Rendered output and Remotion caches
+out/
+.remotion/
+node_modules/

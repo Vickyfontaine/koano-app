@@ -47,3 +47,11 @@ next-env.d.ts
 # generated demo documents (regenerable via scripts/gen-community-docs.ts)
 koano-*.pdf
 koano-*.docx
+
+# working captures, third-party reference captures, local media kits and agent tooling (kept locally, not tracked)
+/build-log/ui-ws-*/wip/
+/build-log/mobile-ref/foundation/
+/demo-kit/
+/.agents/
+/.claude/skills/
+/skills-lock.json
