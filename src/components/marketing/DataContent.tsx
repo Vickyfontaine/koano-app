@@ -133,7 +133,7 @@ export default function DataContent() {
       {/* Hero */}
       <section
         ref={heroRef}
-        className="hero-plain"
+        className="mk-section hero-plain"
         style={{
           background: "var(--white)",
           padding: "160px 32px 120px",
@@ -237,7 +237,7 @@ export default function DataContent() {
       </section>
 
       {/* Live sources, grouped into named families */}
-      <section
+      <section className="mk-section"
         ref={liveRef}
         style={{ background: "var(--pale-wash)", padding: "120px 32px" }}
       >
@@ -367,7 +367,7 @@ export default function DataContent() {
       </section>
 
       {/* Representative sources, the honest gap made the pitch */}
-      <section
+      <section className="mk-section"
         ref={repRef}
         style={{ background: "var(--white)", padding: "120px 32px" }}
       >
@@ -505,7 +505,7 @@ export default function DataContent() {
       </section>
 
       {/* Provenance model, the five states */}
-      <section
+      <section className="mk-section"
         ref={provRef}
         style={{ background: "var(--pale-wash)", padding: "120px 32px" }}
       >
@@ -592,7 +592,7 @@ export default function DataContent() {
       </section>
 
       {/* Pipeline architecture */}
-      <section
+      <section className="mk-section"
         ref={pipelineRef}
         style={{ background: "var(--white)", padding: "120px 32px" }}
       >
@@ -714,7 +714,7 @@ export default function DataContent() {
       {/* CTA */}
       <section
         ref={ctaRef}
-        className="cta-with-render"
+        className="mk-section cta-with-render"
         style={{
           background: "var(--pale-wash)",
           padding: "120px 32px",
