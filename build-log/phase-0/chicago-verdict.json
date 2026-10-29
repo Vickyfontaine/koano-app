@@ -1,0 +1,8 @@
+{
+  "address": "233 S Wacker Dr, Chicago, IL 60606",
+  "seconds": 89,
+  "persisted": false,
+  "persist_error": "new row for relation \"verdicts\" violates check constraint \"verdicts_overall_provenance_check\"",
+  "row": null,
+  "row_error": null
+}

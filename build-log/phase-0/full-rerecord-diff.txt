@@ -1,0 +1,21 @@
+Full live re-record of nyc-175-3rd-st on 2026-10-29 (Phase 0 code) vs the committed surgical fixture. NOT committed: every moved field belongs to an agent no Phase 0 change reaches (sampling variance), plus a month of newer permit data.
+
+confidence: 68 → 58
+risk_score: 53 → 54
+agents.0.verdict: "hold" → "wait"
+agents.1.confidence: 85 → 80
+agents.3.risk_score: 54 → 63
+agents.4.confidence: 80 → 75
+agents.4.signal_window_months: 24 → 12
+breakdown.aggregate_score: 0.24 → 0.03
+breakdown.final_score: 0.24 → 0.03
+breakdown.structural_drivers.0: "97% unused FAR not counted as upside: active construction on the lot (Foundation permit issued 2026-03-04; New Building job B00680917-Z3 (Approved, filed 2026-04-10)): the as-of-right upside is already being executed by the current owner, not waiting for a buyer" → "97% unused FAR not counted as upside: active construction on the lot (Support of Excavation permit issued 2026-09-22; Foundation permit issued 2026-09-11): the as-of-right upside is already being executed by the current owner, not waiting for a buyer"
+breakdown.total_weight: 393 → 383
+breakdown.agents.0.verdict: "hold" → "wait"
+breakdown.agents.0.direction: 0 → -1
+breakdown.agents.0.contribution: 0 → -73
+breakdown.agents.1.confidence: 85 → 80
+breakdown.agents.1.weight: 85 → 80
+breakdown.agents.1.contribution: 170 → 160
+breakdown.agents.4.confidence: 80 → 75
+breakdown.agents.4.weight: 80 → 75
