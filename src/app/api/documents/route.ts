@@ -590,8 +590,10 @@ export async function POST(req: Request) {
 
   // Append-only audit row (also the doc-cap counter). A failure to log must not
   // deny the user the document they just generated — log the error and proceed.
+  // supabase-js returns { error } rather than throwing, so the result is
+  // checked (Phase 0): a silent failure here also undercounts the doc cap.
   try {
-    await supabaseAdmin()
+    const audit = await supabaseAdmin()
       .from('documents')
       .insert({
         clerk_user_id: userId,
@@ -605,6 +607,7 @@ export async function POST(req: Request) {
         address_input: addressInput,
         overall_provenance: overallProvenance,
       });
+    if (audit.error) console.error('[documents] audit insert failed:', audit.error.message);
   } catch (e) {
     console.error('[documents] audit insert failed:', e instanceof Error ? e.message : String(e));
   }

@@ -154,10 +154,15 @@ export async function sendWeeklyDigests(admin: SupabaseClient): Promise<{ usersE
   const appUrl = productionAppUrl();
   if (!from) { console.error('[digest] MONITORING_EMAIL_FROM not set, skipping digests'); return { usersEmailed: 0, notificationsSent: 0 }; }
 
-  const { data: pending } = await admin
+  // Every read and write here is checked (Phase 0): supabase-js returns
+  // { error } rather than throwing. A failed read never sends against unknown
+  // preferences; a failed "sent" mark is logged loudly, because those
+  // notifications would go out again next Monday.
+  const { data: pending, error: pendingError } = await admin
     .from('notifications')
     .select('id, clerk_user_id, property_id, signal_type, severity, title, body, link_path, data')
     .eq('email_status', 'pending');
+  if (pendingError) throw new Error(`pending notifications read failed: ${pendingError.message}`);
   if (!pending || pending.length === 0) return { usersEmailed: 0, notificationsSent: 0 };
 
   const byUser = new Map<string, typeof pending>();
@@ -171,11 +176,12 @@ export async function sendWeeklyDigests(admin: SupabaseClient): Promise<{ usersE
   let notificationsSent = 0;
 
   for (const [userId, notifs] of Array.from(byUser.entries())) {
-    const { data: pref } = await admin
+    const { data: pref, error: prefError } = await admin
       .from('monitoring_preferences')
       .select('email_enabled, frequency, muted_signal_types, min_severity')
       .eq('clerk_user_id', userId)
       .maybeSingle();
+    if (prefError) { console.error(`[digest] preferences read failed for ${userId}, leaving pending: ${prefError.message}`); continue; }
     const emailEnabled = pref?.email_enabled ?? true;
     const frequency = (pref?.frequency as string) ?? 'weekly';
     const muted = new Set((pref?.muted_signal_types as string[]) ?? []);
@@ -187,16 +193,19 @@ export async function sendWeeklyDigests(admin: SupabaseClient): Promise<{ usersE
     );
 
     if (!emailEnabled || frequency === 'off' || kept.filter((n) => n.signal_type !== 'verdict_data_change').length === 0) {
-      await admin.from('notifications').update({ email_status: 'skipped' }).in('id', notifs.map((n) => n.id));
+      const skipped = await admin.from('notifications').update({ email_status: 'skipped' }).in('id', notifs.map((n) => n.id));
+      if (skipped.error) console.error(`[digest] could not mark ${notifs.length} notifications skipped for ${userId}: ${skipped.error.message}`);
       continue;
     }
 
-    const { data: profile } = await admin.from('profiles').select('email').eq('clerk_user_id', userId).maybeSingle();
+    const { data: profile, error: profileError } = await admin.from('profiles').select('email').eq('clerk_user_id', userId).maybeSingle();
+    if (profileError) { console.error(`[digest] profile read failed for ${userId}, leaving pending: ${profileError.message}`); continue; }
     const to = profile?.email as string | undefined;
     if (!to) { console.error(`[digest] no email for ${userId} — leaving pending`); continue; }
 
     const propIds = Array.from(new Set(kept.map((n) => n.property_id as string)));
-    const { data: props } = await admin.from('properties').select('id, address_normalized, address_input').in('id', propIds);
+    const { data: props, error: propsError } = await admin.from('properties').select('id, address_normalized, address_input').in('id', propIds);
+    if (propsError) { console.error(`[digest] property read failed for ${userId}, leaving pending: ${propsError.message}`); continue; }
     const addr = new Map((props ?? []).map((p) => [p.id as string, (p.address_normalized as string) || (p.address_input as string)]));
 
     const groups: AddressedGroup[] = propIds.map((pid) => ({
@@ -211,7 +220,8 @@ export async function sendWeeklyDigests(admin: SupabaseClient): Promise<{ usersE
     if (!digest) continue;
     const okSend = await resendSend(from, to, digest.subject, digest.html, digest.text);
     if (okSend) {
-      await admin.from('notifications').update({ email_status: 'sent', channels_sent: ['email'] }).in('id', kept.map((n) => n.id));
+      const marked = await admin.from('notifications').update({ email_status: 'sent', channels_sent: ['email'] }).in('id', kept.map((n) => n.id));
+      if (marked.error) console.error(`[digest] SENT to ${userId} but could not mark ${kept.length} notifications sent; they will go out again next Monday: ${marked.error.message}`);
       usersEmailed += 1;
       notificationsSent += kept.filter((n) => n.signal_type !== 'verdict_data_change').length;
     }

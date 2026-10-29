@@ -29,14 +29,23 @@ interface Snap { captured_week: string; data: Record<string, unknown> }
 const CONFLICT = 'clerk_user_id,property_id,signal_type,captured_week';
 
 async function twoMostRecent(
-  admin: SupabaseClient, dataset: string, scopeType: string, scopeKey: string,
+  admin: SupabaseClient, dataset: string, scopeType: string, scopeKey: string, readErrors?: string[],
 ): Promise<{ prior: Snap; current: Snap } | null> {
-  const { data } = await admin
+  // Checked (Phase 0): a failed read must not pass silently as "no history yet".
+  // It skips this one dataset (the rest of the scan continues) and is counted
+  // in the run result, because the week's diff for it is lost.
+  const { data, error } = await admin
     .from('archive_snapshots')
     .select('captured_week, data')
     .eq('dataset', dataset).eq('scope_type', scopeType).eq('scope_key', scopeKey)
     .order('captured_week', { ascending: false })
     .limit(2);
+  if (error) {
+    const msg = `snapshot read failed (${dataset} ${scopeKey}): ${error.message}`;
+    console.error(`[monitor] ${msg}`);
+    readErrors?.push(msg);
+    return null;
+  }
   const rows = (data ?? []) as Snap[];
   return rows.length < 2 ? null : { current: rows[0], prior: rows[1] };
 }
@@ -60,19 +69,21 @@ async function monitoredInScope(admin: SupabaseClient, kind: 'county' | 'zip', k
 
 async function latestVerdict(admin: SupabaseClient, bbl: string | null): Promise<string | null> {
   if (!bbl) return null;
-  const { data } = await admin
+  const { data, error } = await admin
     .from('verdicts').select('verdict').eq('bbl', bbl)
     .order('created_at', { ascending: false }).limit(1).maybeSingle();
+  if (error) console.error(`[monitor] latest verdict read failed for ${bbl}: ${error.message}`);
   return (data?.verdict as string) ?? null;
 }
 
-export interface MonitorResult { propertiesChecked: number; changesDetected: number; notificationsCreated: number }
+export interface MonitorResult { propertiesChecked: number; changesDetected: number; notificationsCreated: number; readErrors: number }
 
 export async function scanMonitoring(
   admin: SupabaseClient, runWeek: string, shardRows: MonitoredProperty[], activeIds: Set<string>,
 ): Promise<MonitorResult> {
   let changesDetected = 0;
   let notificationsCreated = 0;
+  const readErrors: string[] = [];
   // Properties that saw a material/high change → candidates for verdict_data_change.
   const material = new Map<string, { prop: MonitoredProperty; signals: Set<string> }>();
 
@@ -109,16 +120,16 @@ export async function scanMonitoring(
   // 1. Property-scoped datasets (scope = BBL) — one owner each.
   for (const p of shardRows) {
     if (!p.bbl) continue;
-    const V = await twoMostRecent(admin, 'violations', 'property', p.bbl);
+    const V = await twoMostRecent(admin, 'violations', 'property', p.bbl, readErrors);
     if (V && V.current.captured_week === runWeek)
       for (const ch of detectViolations(V.prior.data as unknown as ViolationsData, V.current.data as unknown as ViolationsData)) await emit(p, ch, V);
-    const L = await twoMostRecent(admin, 'landlord', 'property', p.bbl);
+    const L = await twoMostRecent(admin, 'landlord', 'property', p.bbl, readErrors);
     if (L && L.current.captured_week === runWeek)
       for (const ch of detectOwnership(L.prior.data as unknown as LandlordData, L.current.data as unknown as LandlordData)) await emit(p, ch, L);
-    const F = await twoMostRecent(admin, 'filings', 'property', p.bbl);
+    const F = await twoMostRecent(admin, 'filings', 'property', p.bbl, readErrors);
     if (F && F.current.captured_week === runWeek)
       for (const ch of detectFilings(F.prior.data as unknown as FilingsData, F.current.data as unknown as FilingsData)) await emit(p, ch, F);
-    const C = await twoMostRecent(admin, 'contamination', 'property', p.bbl);
+    const C = await twoMostRecent(admin, 'contamination', 'property', p.bbl, readErrors);
     if (C && C.current.captured_week === runWeek)
       for (const ch of detectContamination(C.prior.data as unknown as ContaminationData, C.current.data as unknown as ContaminationData)) await emit(p, ch, C);
   }
@@ -128,7 +139,7 @@ export async function scanMonitoring(
   //    mid-week change still hears about it. Deduped by the notification key.
   const counties = Array.from(new Set(shardRows.map((p) => p.tract_geoid?.slice(0, 5)).filter(Boolean))) as string[];
   for (const county of counties) {
-    const pair = await twoMostRecent(admin, 'disaster_history', 'county', county);
+    const pair = await twoMostRecent(admin, 'disaster_history', 'county', county, readErrors);
     if (!pair || pair.current.captured_week !== runWeek) continue;
     const changes = detectDisaster(pair.prior.data as unknown as DisasterData, pair.current.data as unknown as DisasterData);
     if (changes.length === 0) continue;
@@ -138,7 +149,7 @@ export async function scanMonitoring(
   // 3. Comp price — fan a ZIP change out to every monitored property in that ZIP.
   const zips = Array.from(new Set(shardRows.map((p) => p.zip).filter(Boolean))) as string[];
   for (const zip of zips) {
-    const pair = await twoMostRecent(admin, 'comp_zip', 'zip', zip);
+    const pair = await twoMostRecent(admin, 'comp_zip', 'zip', zip, readErrors);
     if (!pair || pair.current.captured_week !== runWeek) continue;
     const changes = detectComp(pair.prior.data as unknown as CompData, pair.current.data as unknown as CompData);
     if (changes.length === 0) continue;
@@ -168,8 +179,11 @@ export async function scanMonitoring(
       email_status: 'pending',
     };
     const { error } = await admin.from('notifications').upsert(rec, { onConflict: CONFLICT, ignoreDuplicates: true });
-    if (!error) notificationsCreated += 1;
+    if (error) {
+      console.error(`[monitor] verdict_data_change upsert failed for ${prop.id}: ${error.message}`);
+      readErrors.push(`verdict_data_change upsert (${prop.id}): ${error.message}`);
+    } else notificationsCreated += 1;
   }
 
-  return { propertiesChecked: shardRows.length, changesDetected, notificationsCreated };
+  return { propertiesChecked: shardRows.length, changesDetected, notificationsCreated, readErrors: readErrors.length };
 }

@@ -60,6 +60,13 @@ export async function POST(req: Request) {
   }
 
   const sb = supabaseAdmin();
+  // Every write is checked (Phase 0): supabase-js reports failures in { error }
+  // rather than throwing, so an unchecked update acknowledged a payment Stripe
+  // would never resend. A failed write now throws, the handler answers 500 and
+  // Stripe retries the event.
+  const must = (res: { error: { message: string } | null }, what: string): void => {
+    if (res.error) throw new Error(`${what}: ${res.error.message}`);
+  };
   const now = () => new Date().toISOString();
 
   try {
@@ -72,7 +79,8 @@ export async function POST(req: Request) {
           s.client_reference_id ?? (s.metadata?.clerk_user_id as string | undefined) ?? null;
         const tier = isPaidTier(s.metadata?.tier) ? (s.metadata!.tier as PaidTier) : null;
         if (clerkUserId && tier) {
-          await sb
+          must(
+            await sb
             .from('profiles')
             .update({
               stripe_customer_id: s.customer ? customerIdOf(s.customer) : null,
@@ -82,7 +90,8 @@ export async function POST(req: Request) {
               plan: tier,
               updated_at: now(),
             })
-            .eq('clerk_user_id', clerkUserId);
+            .eq('clerk_user_id', clerkUserId),
+            'checkout.session.completed: set plan');
         } else {
           console.warn('[stripe-webhook] checkout.session.completed missing user/tier', s.id);
         }
@@ -96,7 +105,8 @@ export async function POST(req: Request) {
         const customerId = customerIdOf(sub.customer);
         const tier = tierFromSubscription(sub);
         if (ACTIVE_STATUSES.has(sub.status) && tier) {
-          await sb
+          must(
+            await sb
             .from('profiles')
             .update({
               plan: tier,
@@ -104,18 +114,23 @@ export async function POST(req: Request) {
               stripe_subscription_id: sub.id,
               updated_at: now(),
             })
-            .eq('stripe_customer_id', customerId);
+            .eq('stripe_customer_id', customerId),
+            'subscription.updated: set plan');
         } else if (TERMINAL_STATUSES.has(sub.status)) {
-          await sb
+          must(
+            await sb
             .from('profiles')
             .update({ plan: 'free', subscription_status: sub.status, updated_at: now() })
-            .eq('stripe_customer_id', customerId);
+            .eq('stripe_customer_id', customerId),
+            'subscription.updated: downgrade to free');
         } else {
           // e.g. 'incomplete' — record status, do not change entitlement yet.
-          await sb
+          must(
+            await sb
             .from('profiles')
             .update({ subscription_status: sub.status, updated_at: now() })
-            .eq('stripe_customer_id', customerId);
+            .eq('stripe_customer_id', customerId),
+            'subscription.updated: record status');
         }
         break;
       }
@@ -124,7 +139,8 @@ export async function POST(req: Request) {
       case 'customer.subscription.deleted': {
         const sub = event.data.object as Stripe.Subscription;
         const customerId = customerIdOf(sub.customer);
-        await sb
+        must(
+          await sb
           .from('profiles')
           .update({
             plan: 'free',
@@ -132,7 +148,8 @@ export async function POST(req: Request) {
             stripe_subscription_id: null,
             updated_at: now(),
           })
-          .eq('stripe_customer_id', customerId);
+          .eq('stripe_customer_id', customerId),
+            'subscription.deleted: downgrade to free');
         break;
       }
 

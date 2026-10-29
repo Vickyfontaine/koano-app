@@ -143,6 +143,7 @@ async function handle(req: Request) {
   // properties. DOWNSTREAM of the archive: isolated so a failure never marks the
   // archive run partial, and no model call / no verdict allowance is consumed.
   let monitor: { checked: number; changes: number; notifications: number; error?: string } = { checked: 0, changes: 0, notifications: 0 };
+  let monitorRunId: string | null = null;
   try {
     // ACTIVE set only — enforces per-plan monitoring caps (free = 0; over-cap
     // properties are paused, oldest-watched stay active). Non-destructive. The
@@ -151,17 +152,31 @@ async function handle(req: Request) {
     const monitored = await loadActiveMonitoredProperties(admin);
     const activeIds = new Set(monitored.map((p) => p.id));
     const shardMonitored = sharded ? monitored.filter((p) => p.bbl && propertyShard(p.bbl) === shard) : monitored;
-    const { data: mr } = await admin.from('monitor_runs').insert({ run_week: runWeek, status: 'running' }).select('id').single();
+    // Every monitor_runs write is checked (Phase 0): a run that cannot be
+    // recorded, or a run left "running" by a scan that threw, is reported.
+    const opened = await admin.from('monitor_runs').insert({ run_week: runWeek, status: 'running' }).select('id').single();
+    if (opened.error) console.error(`[cron/archive] monitor_runs open failed: ${opened.error.message}`);
+    monitorRunId = opened.data?.id ?? null;
     const res = await scanMonitoring(admin, runWeek, shardMonitored, activeIds);
     monitor = { checked: res.propertiesChecked, changes: res.changesDetected, notifications: res.notificationsCreated };
-    if (mr) {
-      await admin.from('monitor_runs').update({
+    if (res.readErrors > 0) monitor.error = `${res.readErrors} snapshot or notification write(s) failed; see logs`;
+    if (opened.error) monitor.error = `monitor run not recorded: ${opened.error.message}`;
+    if (monitorRunId) {
+      const closed = await admin.from('monitor_runs').update({
         finished_at: new Date().toISOString(), properties_checked: res.propertiesChecked,
         changes_detected: res.changesDetected, notifications_created: res.notificationsCreated, status: 'succeeded',
-      }).eq('id', mr.id);
+      }).eq('id', monitorRunId);
+      if (closed.error) {
+        console.error(`[cron/archive] monitor_runs close failed: ${closed.error.message}`);
+        monitor.error = `monitor run left open: ${closed.error.message}`;
+      }
     }
   } catch (e) {
     monitor = { checked: 0, changes: 0, notifications: 0, error: e instanceof Error ? e.message : String(e) };
+    if (monitorRunId) {
+      const failed = await admin.from('monitor_runs').update({ finished_at: new Date().toISOString(), status: 'failed' }).eq('id', monitorRunId);
+      if (failed.error) console.error(`[cron/archive] monitor_runs could not be marked failed: ${failed.error.message}`);
+    }
   }
 
   // WEEKLY DIGEST — Monday (shard 0), after this day's monitoring, covering all
@@ -185,10 +200,14 @@ async function handle(req: Request) {
   // status — it was computed above from archive datasets only).
   const datasetsWithOutcomes = { ...datasets, outcomes };
 
-  await admin
+  // Checked (Phase 0): a run whose close fails would stay "running" in the
+  // failure ledger, so the failure is logged and returned with the response.
+  const closedRun = await admin
     .from('archive_runs')
     .update({ finished_at: new Date().toISOString(), status, datasets: datasetsWithOutcomes, rows_written: total })
     .eq('id', runId);
+  const runRecordError = closedRun.error ? `archive run ${runId} not closed: ${closedRun.error.message}` : null;
+  if (runRecordError) console.error(`[cron/archive] ${runRecordError}`);
 
   // Alert on THIS run failing to fully capture, and on MISSED shard-days. Shard
   // gap detection only runs once the daily model is established (migration-015).
@@ -216,7 +235,7 @@ async function handle(req: Request) {
     );
   }
 
-  return NextResponse.json({ run_week: runWeek, shard, sharded, status, datasets, outcomes, monitor, digest, rows_written: total, shard_gaps: gaps, never_captured: neverCaptured });
+  return NextResponse.json({ run_week: runWeek, shard, sharded, status, datasets, outcomes, monitor, digest, rows_written: total, shard_gaps: gaps, never_captured: neverCaptured, ...(runRecordError ? { run_record_error: runRecordError } : {}) });
 }
 
 // GET = the Vercel cron trigger (the one that was missing). POST = manual runs.

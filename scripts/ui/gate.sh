@@ -17,6 +17,7 @@ npx tsx scripts/test-determinism.ts >> build-log/gate.log 2>&1
 dt=$?
 if [ "$dt" -ne 0 ]; then echo "GATE: determinism proof FAILED"; tail -20 build-log/gate.log; exit 1; fi
 npx tsx scripts/test-dob-jobs.ts >> build-log/gate.log 2>&1 || { echo "GATE: DOB jobs test FAILED"; tail -20 build-log/gate.log; exit 1; }
+npx tsx scripts/test-supabase-errors.ts >> build-log/gate.log 2>&1 || { echo "GATE: Supabase error test FAILED"; tail -20 build-log/gate.log; exit 1; }
 npx tsx scripts/test-em-dash.ts >> build-log/gate.log 2>&1
 ed=$?
 if [ "$ed" -ne 0 ]; then echo "GATE: em-dash test FAILED"; tail -20 build-log/gate.log; exit 1; fi
