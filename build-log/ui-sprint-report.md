@@ -92,3 +92,28 @@ Evidence note: the fixes for findings 1, 2, 3, 5, 6, 7, 8 and 11 were typechecke
 - **Phone polish left open**: the Acquire sticky action overlaps an opened map's bottom edge and leaves a gap above the briefing; Property Row values can wrap a word per line; the sticky action renders at its viewport position in full-page captures.
 - **Engine, not UI**: the narrator's prose can carry em dashes; the same address returned confidence 68 to 80 across the day's runs; the per-figure evidence bundle is not persisted, so sealed records cannot show the ledger.
 - **Draw-the-thread Trace and `provider_result` Bench facts** are follow-ons (WS5 report).
+
+## After the sprint: founder passes (2026-10-28 and 2026-10-29)
+
+These supersede the "Open from the last session" capture note above: the final set is now `build-log/final/`.
+
+| Pass | Commits | What changed |
+|---|---|---|
+| Blockers | `d6d83be` | Migration-023 taken off the blocker list after the founder reported it applied. The Phase 0 acceptance run then found it missing from the `.env.local` project (`build-log/phase-0-report.md` on `phase-0`). |
+| Standing rule | `034cc21` | No visual or copy decision the founder did not ask for (CLAUDE.md, KOANO_UI_SPRINT.md). |
+| Homepage hero | `85e2097` | Reverted to white text, the koano.co glass card and main's stat row. The only fix kept is the entrance animation, so the blur renders. Contrast is reported and not changed: `build-log/hero-revert/contrast.md`. |
+| Phones | `6b48004` | The Acquire sticky action steps aside over an opened map and leaves no gap. Row values wrap by line. |
+| Labels | `79503e3` | The band and the KPI tiles use sentence-case labels; mono caps stay only on timestamps and source tags. |
+| Mobile proposal | `d6b2e32` | `build-log/mobile-proposal.md`. Built on the homepage only; the rollout is paused and the phone type scale is kept. |
+| Mobile audit and layout system | `759bd30` to `8324e2d` | `build-log/mobile-audit.md`: 129 section gaps and two overflows fixed. 16px gutter, 48px sections, 20px cards. Render slots are labelled placeholders (`build-log/mobile-render-slots.md`). |
+| Layout system everywhere outside the heroes | `1b9301c` | 24px from heading to content, 12px card gaps, 20px panel padding on phones. The Acquire table fades at its right edge with a "Scroll →" hint. |
+| Cleanup | `bcc877e` | `KOANO_BUILD_SPEC.md` tracked, video/ source tracked, local-only folders ignored. |
+| Text fit | `aad7c2e` | Every page and lens at 360, 390, 430, 768 and 1440: 1,659 findings fixed, and the checker reports 0 across 105 runs (`build-log/text-fit/`). Nothing needed rewording (`build-log/copy-to-trim.md`). |
+
+Final captures: `build-log/final/shots/<page>-<width>-full.jpg`. That is 21 surfaces (11 marketing pages and the 404, sign-in and sign-up, settings, and the four lenses empty and with a verdict) at 390, 768 and 1440, with `build-log/final/audit.json`. The lenses "with a verdict" show the recorded 175 3rd St run replayed offline; their panels read the live public record.
+
+Findings left in the final audit, all known and none of them defects:
+- **Acquire:** the longitudinal table is a sideways scroller, now with its fade and hint.
+- **Price:** the scatter's y-axis labels sit outside the plot frame by design, and the "gap" between the map and the scatter has panels in it.
+- **App shell:** the sidebar and icon rail are flush to the left edge by design.
+- **Marketing at 768 and 1440:** the desktop section spacing, which the phone system does not change.

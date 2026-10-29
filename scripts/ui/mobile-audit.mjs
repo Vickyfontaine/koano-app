@@ -250,17 +250,25 @@ async function runOnce(name, url, width, opts, last) {
   try {
     await page.goto(base + url, { waitUntil: "load", timeout: 60000 });
     await page.waitForTimeout(2500);
+    // Phones open a lens from the lens sheet; from 768 the sidebar lists them.
     if (opts.lens) {
-      await page.click(".shell-lens-btn");
-      await page.waitForTimeout(500);
-      await page.locator(`#shell-lens-sheet [data-lens="${opts.lens}"]`).click();
+      if (width < 768) {
+        await page.click(".shell-lens-btn");
+        await page.waitForTimeout(500);
+        await page.locator(`#shell-lens-sheet [data-lens="${opts.lens}"]`).click();
+      } else await page.locator(`[data-lens="${opts.lens}"]`).first().click();
       await page.waitForTimeout(3000);
     }
     if (opts.runFixture) {
-      await page.click('[data-tab="search"]');
-      await page.waitForTimeout(800);
-      await page.locator("#shell-search-sheet input").fill("175 3rd Street, Brooklyn, NY 11215");
-      await page.locator("#shell-search-sheet input").press("Enter");
+      if (width < 768) {
+        await page.click('[data-tab="search"]');
+        await page.waitForTimeout(800);
+        await page.locator("#shell-search-sheet input").fill("175 3rd Street, Brooklyn, NY 11215");
+        await page.locator("#shell-search-sheet input").press("Enter");
+      } else {
+        await page.locator(".gsearch-bar input").fill("175 3rd Street, Brooklyn, NY 11215");
+        await page.locator(".gsearch-bar input").press("Enter");
+      }
       await page.waitForTimeout(2500);
       if (opts.runFixture === "develop") {
         const btn = page.locator('button:has-text("Run comparison")');

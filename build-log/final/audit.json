@@ -1,0 +1,5136 @@
+[
+  {
+    "name": "home",
+    "url": "/",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 5067,
+    "defects": [],
+    "gutters": [
+      [
+        16,
+        12
+      ],
+      [
+        37,
+        9
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#hero-section",
+        "top": 96,
+        "height": 1793,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(173, 193, 202)"
+      },
+      {
+        "sel": "section#agents-section",
+        "top": 1992,
+        "height": 638,
+        "pad": "48px 16px 48px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "div.home-mobile > section",
+        "top": 2740,
+        "height": 225,
+        "pad": "48px 16px 48px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "div.home-mobile > section.home-monitoring",
+        "top": 3020,
+        "height": 189,
+        "pad": "0px 16px 48px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section#clusters-section",
+        "top": 3312,
+        "height": 495,
+        "pad": "48px 16px 48px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section#early-access-section.cta-with-render",
+        "top": 3910,
+        "height": 521,
+        "pad": "48px 16px 48px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 4528,
+        "height": 492,
+        "pad": "0px 16px 0px 16px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "intelligence",
+    "url": "/intelligence",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 8273,
+    "defects": [],
+    "gutters": [
+      [
+        37,
+        25
+      ],
+      [
+        16,
+        12
+      ],
+      [
+        49,
+        9
+      ],
+      [
+        54,
+        2
+      ],
+      [
+        71,
+        2
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-a",
+        "top": 105,
+        "height": 748,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 908,
+        "height": 373,
+        "pad": "48px 16px 48px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 1384,
+        "height": 1090,
+        "pad": "48px 16px 48px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 2578,
+        "height": 1947,
+        "pad": "48px 16px 48px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 4628,
+        "height": 1174,
+        "pad": "48px 16px 48px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 5905,
+        "height": 1063,
+        "pad": "48px 16px 48px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section.cta-with-render",
+        "top": 7071,
+        "height": 614,
+        "pad": "48px 16px 0px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 7734,
+        "height": 492,
+        "pad": "0px 16px 0px 16px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "for-developers",
+    "url": "/for/developers",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 4211,
+    "defects": [],
+    "gutters": [
+      [
+        37,
+        14
+      ],
+      [
+        16,
+        10
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-b",
+        "top": 105,
+        "height": 1123,
+        "pad": "34px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 1283,
+        "height": 961,
+        "pad": "48px 16px 48px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 2347,
+        "height": 559,
+        "pad": "48px 16px 48px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section.cta-with-render",
+        "top": 3009,
+        "height": 614,
+        "pad": "48px 16px 0px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 3672,
+        "height": 492,
+        "pad": "0px 16px 0px 16px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "for-professionals",
+    "url": "/for/agents",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 4130,
+    "defects": [],
+    "gutters": [
+      [
+        37,
+        14
+      ],
+      [
+        16,
+        10
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-b",
+        "top": 105,
+        "height": 1065,
+        "pad": "34px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 1225,
+        "height": 984,
+        "pad": "48px 16px 48px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 2312,
+        "height": 512,
+        "pad": "48px 16px 48px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section.cta-with-render",
+        "top": 2928,
+        "height": 614,
+        "pad": "48px 16px 0px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 3591,
+        "height": 492,
+        "pad": "0px 16px 0px 16px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "for-institutions",
+    "url": "/for/institutions",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 4403,
+    "defects": [],
+    "gutters": [
+      [
+        37,
+        16
+      ],
+      [
+        16,
+        10
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-b",
+        "top": 105,
+        "height": 1129,
+        "pad": "34px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 1289,
+        "height": 1164,
+        "pad": "48px 16px 48px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 2557,
+        "height": 489,
+        "pad": "48px 16px 48px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section.cta-with-render",
+        "top": 3149,
+        "height": 665,
+        "pad": "48px 16px 0px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 3863,
+        "height": 492,
+        "pad": "0px 16px 0px 16px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "for-community",
+    "url": "/for/community",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 4416,
+    "defects": [],
+    "gutters": [
+      [
+        37,
+        14
+      ],
+      [
+        16,
+        11
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-b",
+        "top": 105,
+        "height": 1139,
+        "pad": "34px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 1299,
+        "height": 943,
+        "pad": "48px 16px 48px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 2345,
+        "height": 739,
+        "pad": "48px 16px 48px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section.cta-with-render",
+        "top": 3187,
+        "height": 640,
+        "pad": "48px 16px 0px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 3876,
+        "height": 492,
+        "pad": "0px 16px 0px 16px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "pricing",
+    "url": "/pricing",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 7424,
+    "defects": [],
+    "gutters": [
+      [
+        37,
+        41
+      ],
+      [
+        16,
+        7
+      ],
+      [
+        51,
+        4
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-a",
+        "top": 105,
+        "height": 1078,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 1231,
+        "height": 2834,
+        "pad": "48px 16px 48px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 4168,
+        "height": 1808,
+        "pad": "48px 16px 48px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section.cta-with-render",
+        "top": 6080,
+        "height": 756,
+        "pad": "48px 16px 0px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 6884,
+        "height": 492,
+        "pad": "0px 16px 0px 16px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "about",
+    "url": "/about",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 5662,
+    "defects": [],
+    "gutters": [
+      [
+        16,
+        17
+      ],
+      [
+        37,
+        12
+      ],
+      [
+        61,
+        4
+      ],
+      [
+        46,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-about",
+        "top": 105,
+        "height": 1230,
+        "pad": "34px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 1390,
+        "height": 905,
+        "pad": "48px 16px 48px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 2398,
+        "height": 725,
+        "pad": "48px 16px 48px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 3226,
+        "height": 1193,
+        "pad": "48px 16px 48px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section.cta-with-render",
+        "top": 4522,
+        "height": 552,
+        "pad": "48px 16px 0px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 5122,
+        "height": 492,
+        "pad": "0px 16px 0px 16px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "data",
+    "url": "/data",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 9330,
+    "defects": [],
+    "gutters": [
+      [
+        16,
+        20
+      ],
+      [
+        37,
+        11
+      ],
+      [
+        89,
+        10
+      ],
+      [
+        90,
+        2
+      ],
+      [
+        94,
+        2
+      ],
+      [
+        131,
+        2
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.mk-section.hero-plain",
+        "top": 119,
+        "height": 707,
+        "pad": "48px 16px 48px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 929,
+        "height": 3482,
+        "pad": "48px 16px 48px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 4515,
+        "height": 781,
+        "pad": "48px 16px 48px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 5399,
+        "height": 1136,
+        "pad": "48px 16px 48px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 6639,
+        "height": 1386,
+        "pad": "48px 16px 48px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section.cta-with-render",
+        "top": 8127,
+        "height": 614,
+        "pad": "48px 16px 0px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 8790,
+        "height": 492,
+        "pad": "0px 16px 0px 16px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "vision",
+    "url": "/vision",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 3634,
+    "defects": [],
+    "gutters": [
+      [
+        37,
+        14
+      ],
+      [
+        16,
+        4
+      ],
+      [
+        215,
+        3
+      ],
+      [
+        25,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.mk-section.hero-plain",
+        "top": 113,
+        "height": 314,
+        "pad": "48px 16px 48px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 523,
+        "height": 2255,
+        "pad": "48px 16px 48px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 2874,
+        "height": 124,
+        "pad": "48px 16px 48px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 3095,
+        "height": 492,
+        "pad": "0px 16px 0px 16px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "not-found",
+    "url": "/no-such-page",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 844,
+    "defects": [],
+    "gutters": [
+      [
+        16,
+        1
+      ],
+      [
+        45,
+        1
+      ],
+      [
+        160,
+        1
+      ]
+    ],
+    "sections": [],
+    "hero": null
+  },
+  {
+    "name": "login",
+    "url": "/login",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 940,
+    "defects": [],
+    "gutters": [
+      [
+        16,
+        6
+      ],
+      [
+        128,
+        2
+      ],
+      [
+        48,
+        1
+      ],
+      [
+        185,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "div.auth-shell > main.auth-main > section.auth-brand",
+        "top": 88,
+        "height": 204,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "div.auth-shell > main.auth-main > section.auth-form",
+        "top": 324,
+        "height": 503,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "div.auth-shell > footer.auth-foot",
+        "top": null,
+        "height": null,
+        "pad": "24px 32px 24px 32px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "signup",
+    "url": "/signup",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 1101,
+    "defects": [],
+    "gutters": [
+      [
+        16,
+        7
+      ],
+      [
+        128,
+        2
+      ],
+      [
+        48,
+        1
+      ],
+      [
+        185,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "div.auth-shell > main.auth-main > section.auth-brand",
+        "top": 88,
+        "height": 204,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "div.auth-shell > main.auth-main > section.auth-form",
+        "top": 324,
+        "height": 664,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "div.auth-shell > footer.auth-foot",
+        "top": null,
+        "height": null,
+        "pad": "24px 32px 24px 32px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-develop-empty",
+    "url": "/dashboard",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 2078,
+    "defects": [],
+    "gutters": [
+      [
+        37,
+        5
+      ],
+      [
+        16,
+        4
+      ],
+      [
+        33,
+        2
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-idle",
+        "top": 97,
+        "height": 147,
+        "pad": "16px 16px 16px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 285,
+        "height": 1666,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-develop-done",
+    "url": "/dashboard",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 6950,
+    "defects": [],
+    "gutters": [
+      [
+        37,
+        23
+      ],
+      [
+        16,
+        7
+      ],
+      [
+        33,
+        4
+      ],
+      [
+        47,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-done",
+        "top": 97,
+        "height": 583,
+        "pad": "16px 16px 16px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 721,
+        "height": 6101,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "div.shell-content > div > div > section.map-frame",
+        "top": 1563,
+        "height": 44,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-acquire",
+    "url": "/dashboard",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 5348,
+    "defects": [
+      {
+        "kind": "text-box",
+        "id": "1",
+        "sel": "div#c5-archive",
+        "box": {
+          "x": 16,
+          "y": 2946,
+          "w": 358,
+          "h": 706
+        },
+        "detail": "\"Aug 24\" spans 369 to 391px; its box spans 16 to 374px",
+        "shot": "shots/dashboard-acquire-390-text-box-1.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        37,
+        20
+      ],
+      [
+        16,
+        6
+      ],
+      [
+        33,
+        2
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-idle",
+        "top": 97,
+        "height": 147,
+        "pad": "16px 16px 16px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 285,
+        "height": 4936,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div > section.map-frame",
+        "top": 801,
+        "height": 61,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-price-empty",
+    "url": "/dashboard",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 1510,
+    "defects": [],
+    "gutters": [
+      [
+        16,
+        4
+      ],
+      [
+        33,
+        2
+      ],
+      [
+        37,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-idle.verdict-band-compact",
+        "top": 97,
+        "height": 147,
+        "pad": "16px 16px 16px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 285,
+        "height": 1098,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-price-done",
+    "url": "/dashboard",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 6367,
+    "defects": [
+      {
+        "kind": "text-box",
+        "id": "1",
+        "sel": "section#c2-scatter > div > div",
+        "box": {
+          "x": 85,
+          "y": 2975,
+          "w": 268,
+          "h": 220
+        },
+        "detail": "\"$0\" spans 64 to 78px; its box spans 85 to 353px",
+        "shot": "shots/dashboard-price-done-390-text-box-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section#c2-map.map-frame  →  section#c2-scatter",
+        "box": {
+          "x": 0,
+          "y": 1782,
+          "w": 390,
+          "h": 1150
+        },
+        "detail": "1150px of empty space between the two sections' content (paddings: 0px 0px 0px 0px / 20px 20px 20px 20px)",
+        "shot": "shots/dashboard-price-done-390-gap-2.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        37,
+        45
+      ],
+      [
+        16,
+        8
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-done.verdict-band-compact",
+        "top": 93,
+        "height": 89,
+        "pad": "12px 16px 12px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 219,
+        "height": 6020,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "section#c2-map.map-frame",
+        "top": 1722,
+        "height": 61,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "section#c2-scatter",
+        "top": 2932,
+        "height": 407,
+        "pad": "20px 20px 20px 20px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section#c2-permits",
+        "top": 3405,
+        "height": 351,
+        "pad": "20px 20px 20px 20px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-property-empty",
+    "url": "/dashboard",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 1584,
+    "defects": [],
+    "gutters": [
+      [
+        16,
+        4
+      ],
+      [
+        33,
+        2
+      ],
+      [
+        37,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-idle",
+        "top": 97,
+        "height": 147,
+        "pad": "16px 16px 16px 16px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 285,
+        "height": 1172,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-property-done",
+    "url": "/dashboard",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 6588,
+    "defects": [],
+    "gutters": [
+      [
+        37,
+        32
+      ],
+      [
+        16,
+        8
+      ],
+      [
+        33,
+        4
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-done",
+        "top": 97,
+        "height": 583,
+        "pad": "16px 16px 16px 16px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 721,
+        "height": 5739,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "section#c1-map.map-frame",
+        "top": 5550,
+        "height": 61,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "settings",
+    "url": "/dashboard/settings",
+    "width": 390,
+    "vw": 390,
+    "pageHeight": 1960,
+    "defects": [],
+    "gutters": [
+      [
+        37,
+        15
+      ],
+      [
+        16,
+        1
+      ]
+    ],
+    "sections": [],
+    "hero": null
+  },
+  {
+    "name": "home",
+    "url": "/",
+    "width": 768,
+    "vw": 768,
+    "pageHeight": 9794,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section#hero-section  →  section#agents-section",
+        "box": {
+          "x": 0,
+          "y": 1334,
+          "w": 768,
+          "h": 127
+        },
+        "detail": "127px of empty space between the two sections' content (paddings: 0px 0px 0px 0px / 120px 32px 120px 32px)",
+        "shot": "shots/home-768-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section#agents-section  →  div.home-mobile > section",
+        "box": {
+          "x": 0,
+          "y": 4152,
+          "w": 768,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/home-768-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "div.home-mobile > section  →  div.home-mobile > section.m-drop",
+        "box": {
+          "x": 0,
+          "y": 6001,
+          "w": 768,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/home-768-gap-3.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "4",
+        "sel": "div.home-mobile > section.m-drop  →  div.home-mobile > section.home-monitoring",
+        "box": {
+          "x": 0,
+          "y": 6827,
+          "w": 768,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/home-768-gap-4.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "5",
+        "sel": "div.home-mobile > section.home-monitoring  →  section#clusters-section",
+        "box": {
+          "x": 0,
+          "y": 7770,
+          "w": 768,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/home-768-gap-5.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "6",
+        "sel": "section#clusters-section  →  section#data-ticker-section.m-drop",
+        "box": {
+          "x": 0,
+          "y": 8731,
+          "w": 768,
+          "h": 168
+        },
+        "detail": "168px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 48px 0px 48px 0px)",
+        "shot": "shots/home-768-gap-6.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        32,
+        17
+      ],
+      [
+        61,
+        14
+      ],
+      [
+        57,
+        7
+      ],
+      [
+        55,
+        6
+      ],
+      [
+        423,
+        4
+      ],
+      [
+        64,
+        2
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        54,
+        1
+      ],
+      [
+        74,
+        1
+      ],
+      [
+        104,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#hero-section",
+        "top": 0,
+        "height": 1334,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(173, 193, 202)"
+      },
+      {
+        "sel": "section#agents-section",
+        "top": 1461,
+        "height": 2691,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "div.home-mobile > section",
+        "top": 4399,
+        "height": 1601,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "div.home-mobile > section.m-drop",
+        "top": 6248,
+        "height": 579,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "div.home-mobile > section.home-monitoring",
+        "top": 7074,
+        "height": 697,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section#clusters-section",
+        "top": 8017,
+        "height": 714,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section#data-ticker-section.m-drop",
+        "top": 8899,
+        "height": 66,
+        "pad": "48px 0px 48px 0px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section#early-access-section.cta-with-render",
+        "top": 9013,
+        "height": 524,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 9570,
+        "height": 176,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/menu-hero.jpg",
+      "box": {
+        "x": 0,
+        "y": 0,
+        "w": 768,
+        "h": 1334
+      },
+      "objectFit": "contain",
+      "objectPosition": "50% 100%",
+      "natural": "2267x1114",
+      "letterboxPct": 72,
+      "firstScreenPct": 100,
+      "startsAtPx": 0
+    }
+  },
+  {
+    "name": "intelligence",
+    "url": "/intelligence",
+    "width": 768,
+    "vw": 768,
+    "pageHeight": 7785,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-with-render.hero-group-a  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 761,
+          "w": 768,
+          "h": 127
+        },
+        "detail": "127px of empty space between the two sections' content (paddings: 0px 0px 0px 0px / 120px 32px 120px 32px)",
+        "shot": "shots/intelligence-768-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section.mk-section  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 1434,
+          "w": 768,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/intelligence-768-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section.mk-section  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 2635,
+          "w": 768,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/intelligence-768-gap-3.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "4",
+        "sel": "section.mk-section  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 4612,
+          "w": 768,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/intelligence-768-gap-4.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "5",
+        "sel": "section.mk-section  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 5829,
+          "w": 768,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/intelligence-768-gap-5.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        61,
+        20
+      ],
+      [
+        137,
+        9
+      ],
+      [
+        32,
+        7
+      ],
+      [
+        104,
+        3
+      ],
+      [
+        183,
+        3
+      ],
+      [
+        64,
+        2
+      ],
+      [
+        73,
+        2
+      ],
+      [
+        106,
+        2
+      ],
+      [
+        131,
+        2
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-a",
+        "top": 105,
+        "height": 656,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 888,
+        "height": 547,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 1681,
+        "height": 954,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 2882,
+        "height": 1730,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 4859,
+        "height": 970,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 6076,
+        "height": 836,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section.cta-with-render",
+        "top": 7031,
+        "height": 497,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 7561,
+        "height": 176,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/how-it-works.webp",
+      "box": {
+        "x": 0,
+        "y": 339,
+        "w": 768,
+        "h": 421
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "natural": "4202x2304",
+      "letterboxPct": 0,
+      "firstScreenPct": 50,
+      "startsAtPx": 339
+    }
+  },
+  {
+    "name": "for-developers",
+    "url": "/for/developers",
+    "width": 768,
+    "vw": 768,
+    "pageHeight": 3427,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-with-render.hero-group-b  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 989,
+          "w": 768,
+          "h": 127
+        },
+        "detail": "127px of empty space between the two sections' content (paddings: 34px 32px 0px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-developers-768-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section.mk-section  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 1866,
+          "w": 768,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-developers-768-gap-2.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        61,
+        8
+      ],
+      [
+        423,
+        6
+      ],
+      [
+        32,
+        5
+      ],
+      [
+        64,
+        5
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-b",
+        "top": 105,
+        "height": 884,
+        "pad": "34px 32px 0px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 1116,
+        "height": 750,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 2113,
+        "height": 388,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section.cta-with-render",
+        "top": 2621,
+        "height": 548,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 3203,
+        "height": 176,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/for-developers.webp",
+      "box": {
+        "x": 32,
+        "y": 596,
+        "w": 704,
+        "h": 393
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "natural": "4128x2304",
+      "letterboxPct": 0,
+      "firstScreenPct": 29,
+      "startsAtPx": 596
+    }
+  },
+  {
+    "name": "for-professionals",
+    "url": "/for/agents",
+    "width": 768,
+    "vw": 768,
+    "pageHeight": 3473,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-with-render.hero-group-b  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 989,
+          "w": 768,
+          "h": 127
+        },
+        "detail": "127px of empty space between the two sections' content (paddings: 34px 32px 0px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-professionals-768-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section.mk-section  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 1889,
+          "w": 768,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-professionals-768-gap-2.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        61,
+        8
+      ],
+      [
+        423,
+        6
+      ],
+      [
+        32,
+        5
+      ],
+      [
+        64,
+        5
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-b",
+        "top": 105,
+        "height": 884,
+        "pad": "34px 32px 0px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 1116,
+        "height": 773,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 2136,
+        "height": 411,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section.cta-with-render",
+        "top": 2667,
+        "height": 548,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 3249,
+        "height": 176,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/for-professionals.webp",
+      "box": {
+        "x": 32,
+        "y": 596,
+        "w": 704,
+        "h": 393
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "natural": "4128x2304",
+      "letterboxPct": 0,
+      "firstScreenPct": 29,
+      "startsAtPx": 596
+    }
+  },
+  {
+    "name": "for-institutions",
+    "url": "/for/institutions",
+    "width": 768,
+    "vw": 768,
+    "pageHeight": 3499,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-with-render.hero-group-b  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 992,
+          "w": 768,
+          "h": 127
+        },
+        "detail": "127px of empty space between the two sections' content (paddings: 34px 32px 0px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-institutions-768-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section.mk-section  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 1962,
+          "w": 768,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-institutions-768-gap-2.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        61,
+        8
+      ],
+      [
+        423,
+        8
+      ],
+      [
+        32,
+        5
+      ],
+      [
+        64,
+        5
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-b",
+        "top": 105,
+        "height": 887,
+        "pad": "34px 32px 0px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 1119,
+        "height": 843,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 2209,
+        "height": 365,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section.cta-with-render",
+        "top": 2694,
+        "height": 548,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 3275,
+        "height": 176,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/for-institutions.webp",
+      "box": {
+        "x": 32,
+        "y": 599,
+        "w": 704,
+        "h": 393
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "natural": "4128x2304",
+      "letterboxPct": 0,
+      "firstScreenPct": 29,
+      "startsAtPx": 599
+    }
+  },
+  {
+    "name": "for-community",
+    "url": "/for/community",
+    "width": 768,
+    "vw": 768,
+    "pageHeight": 3548,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-with-render.hero-group-b  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 994,
+          "w": 768,
+          "h": 127
+        },
+        "detail": "127px of empty space between the two sections' content (paddings: 34px 32px 0px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-community-768-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section.mk-section  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 1760,
+          "w": 768,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-community-768-gap-2.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        61,
+        8
+      ],
+      [
+        32,
+        6
+      ],
+      [
+        423,
+        6
+      ],
+      [
+        64,
+        5
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-b",
+        "top": 105,
+        "height": 889,
+        "pad": "34px 32px 0px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 1121,
+        "height": 639,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 2007,
+        "height": 616,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section.cta-with-render",
+        "top": 2743,
+        "height": 548,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 3324,
+        "height": 176,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/for-community.webp",
+      "box": {
+        "x": 32,
+        "y": 601,
+        "w": 704,
+        "h": 393
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "natural": "4128x2304",
+      "letterboxPct": 0,
+      "firstScreenPct": 29,
+      "startsAtPx": 601
+    }
+  },
+  {
+    "name": "pricing",
+    "url": "/pricing",
+    "width": 768,
+    "vw": 768,
+    "pageHeight": 5147,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.mk-section  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 2602,
+          "w": 768,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 80px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/pricing-768-gap-1.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        61,
+        27
+      ],
+      [
+        423,
+        14
+      ],
+      [
+        64,
+        4
+      ],
+      [
+        32,
+        2
+      ],
+      [
+        75,
+        2
+      ],
+      [
+        437,
+        2
+      ],
+      [
+        84,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-a",
+        "top": 105,
+        "height": 839,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 1024,
+        "height": 1578,
+        "pad": "80px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 2849,
+        "height": 1373,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section.cta-with-render",
+        "top": 4342,
+        "height": 548,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 4923,
+        "height": 176,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/pricing.webp",
+      "box": {
+        "x": 0,
+        "y": 523,
+        "w": 768,
+        "h": 421
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "natural": "4202x2304",
+      "letterboxPct": 0,
+      "firstScreenPct": 38,
+      "startsAtPx": 523
+    }
+  },
+  {
+    "name": "about",
+    "url": "/about",
+    "width": 768,
+    "vw": 768,
+    "pageHeight": 5221,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-with-render.hero-about  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 1315,
+          "w": 768,
+          "h": 127
+        },
+        "detail": "127px of empty space between the two sections' content (paddings: 34px 32px 0px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/about-768-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section.mk-section  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 2312,
+          "w": 768,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/about-768-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section.mk-section  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 3291,
+          "w": 768,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/about-768-gap-3.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        32,
+        15
+      ],
+      [
+        61,
+        12
+      ],
+      [
+        85,
+        4
+      ],
+      [
+        64,
+        2
+      ],
+      [
+        62,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-about",
+        "top": 105,
+        "height": 1210,
+        "pad": "34px 32px 0px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 1442,
+        "height": 870,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 2559,
+        "height": 732,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 3538,
+        "height": 809,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section.cta-with-render",
+        "top": 4467,
+        "height": 497,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 4997,
+        "height": 176,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/about.webp",
+      "box": {
+        "x": 32,
+        "y": 634,
+        "w": 704,
+        "h": 682
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "natural": "2066x2000",
+      "letterboxPct": 0,
+      "firstScreenPct": 25,
+      "startsAtPx": 634
+    }
+  },
+  {
+    "name": "data",
+    "url": "/data",
+    "width": 768,
+    "vw": 768,
+    "pageHeight": 8621,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.mk-section.hero-plain  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 683,
+          "w": 768,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 160px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/data-768-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section.mk-section  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 4151,
+          "w": 768,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/data-768-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section.mk-section  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 5100,
+          "w": 768,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/data-768-gap-3.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "4",
+        "sel": "section.mk-section  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 6310,
+          "w": 768,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/data-768-gap-4.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        32,
+        17
+      ],
+      [
+        61,
+        11
+      ],
+      [
+        113,
+        10
+      ],
+      [
+        64,
+        2
+      ],
+      [
+        188,
+        2
+      ],
+      [
+        279,
+        2
+      ],
+      [
+        378,
+        2
+      ],
+      [
+        54,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.mk-section.hero-plain",
+        "top": 231,
+        "height": 452,
+        "pad": "160px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 930,
+        "height": 3221,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 4398,
+        "height": 702,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 5347,
+        "height": 963,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 6557,
+        "height": 1190,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section.cta-with-render",
+        "top": 7867,
+        "height": 497,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 8397,
+        "height": 176,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/cta.webp",
+      "box": {
+        "x": 0,
+        "y": 7867,
+        "w": 768,
+        "h": 497
+      },
+      "objectFit": "cover",
+      "objectPosition": "50% 100%",
+      "natural": "3840x1319",
+      "letterboxPct": 0,
+      "firstScreenPct": 0,
+      "startsAtPx": 7867
+    }
+  },
+  {
+    "name": "vision",
+    "url": "/vision",
+    "width": 768,
+    "vw": 768,
+    "pageHeight": 2258,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.mk-section.hero-plain  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 340,
+          "w": 768,
+          "h": 128
+        },
+        "detail": "128px of empty space between the two sections' content (paddings: 64px 32px 64px 32px / 64px 32px 64px 32px)",
+        "shot": "shots/vision-768-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section.mk-section  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 1694,
+          "w": 768,
+          "h": 128
+        },
+        "detail": "128px of empty space between the two sections' content (paddings: 64px 32px 64px 32px / 64px 32px 64px 32px)",
+        "shot": "shots/vision-768-gap-2.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        421,
+        8
+      ],
+      [
+        57,
+        7
+      ],
+      [
+        32,
+        4
+      ],
+      [
+        209,
+        1
+      ],
+      [
+        214,
+        1
+      ],
+      [
+        573,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.mk-section.hero-plain",
+        "top": 129,
+        "height": 211,
+        "pad": "64px 32px 64px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 468,
+        "height": 1226,
+        "pad": "64px 32px 64px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 1822,
+        "height": 99,
+        "pad": "64px 32px 64px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 2034,
+        "height": 176,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "not-found",
+    "url": "/no-such-page",
+    "width": 768,
+    "vw": 768,
+    "pageHeight": 844,
+    "defects": [],
+    "gutters": [
+      [
+        164,
+        1
+      ],
+      [
+        234,
+        1
+      ],
+      [
+        349,
+        1
+      ]
+    ],
+    "sections": [],
+    "hero": null
+  },
+  {
+    "name": "login",
+    "url": "/login",
+    "width": 768,
+    "vw": 768,
+    "pageHeight": 916,
+    "defects": [],
+    "gutters": [
+      [
+        16,
+        6
+      ],
+      [
+        317,
+        2
+      ],
+      [
+        48,
+        1
+      ],
+      [
+        374,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "div.auth-shell > main.auth-main > section.auth-brand",
+        "top": 88,
+        "height": 179,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "div.auth-shell > main.auth-main > section.auth-form",
+        "top": 299,
+        "height": 503,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "div.auth-shell > footer.auth-foot",
+        "top": null,
+        "height": null,
+        "pad": "24px 32px 24px 32px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "signup",
+    "url": "/signup",
+    "width": 768,
+    "vw": 768,
+    "pageHeight": 1056,
+    "defects": [],
+    "gutters": [
+      [
+        16,
+        7
+      ],
+      [
+        317,
+        2
+      ],
+      [
+        48,
+        1
+      ],
+      [
+        374,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "div.auth-shell > main.auth-main > section.auth-brand",
+        "top": 88,
+        "height": 179,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "div.auth-shell > main.auth-main > section.auth-form",
+        "top": 299,
+        "height": 643,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "div.auth-shell > footer.auth-foot",
+        "top": null,
+        "height": null,
+        "pad": "24px 32px 24px 32px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "settings",
+    "url": "/dashboard/settings",
+    "width": 768,
+    "vw": 768,
+    "pageHeight": 1821,
+    "defects": [],
+    "gutters": [
+      [
+        65,
+        15
+      ],
+      [
+        40,
+        1
+      ]
+    ],
+    "sections": [],
+    "hero": null
+  },
+  {
+    "name": "home",
+    "url": "/",
+    "width": 1440,
+    "vw": 1440,
+    "pageHeight": 9053,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section#hero-section  →  section#agents-section",
+        "box": {
+          "x": 0,
+          "y": 844,
+          "w": 1440,
+          "h": 127
+        },
+        "detail": "127px of empty space between the two sections' content (paddings: 0px 0px 0px 0px / 120px 32px 120px 32px)",
+        "shot": "shots/home-1440-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section#agents-section  →  div.home-mobile > section",
+        "box": {
+          "x": 0,
+          "y": 3834,
+          "w": 1440,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/home-1440-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "div.home-mobile > section  →  div.home-mobile > section.m-drop",
+        "box": {
+          "x": 0,
+          "y": 5516,
+          "w": 1440,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/home-1440-gap-3.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "4",
+        "sel": "div.home-mobile > section.m-drop  →  div.home-mobile > section.home-monitoring",
+        "box": {
+          "x": 0,
+          "y": 6146,
+          "w": 1440,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/home-1440-gap-4.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "5",
+        "sel": "div.home-mobile > section.home-monitoring  →  section#clusters-section",
+        "box": {
+          "x": 0,
+          "y": 7150,
+          "w": 1440,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/home-1440-gap-5.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "6",
+        "sel": "section#clusters-section  →  section#data-ticker-section.m-drop",
+        "box": {
+          "x": 0,
+          "y": 7908,
+          "w": 1440,
+          "h": 168
+        },
+        "detail": "168px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 48px 0px 48px 0px)",
+        "shot": "shots/home-1440-gap-6.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        270,
+        10
+      ],
+      [
+        295,
+        7
+      ],
+      [
+        293,
+        6
+      ],
+      [
+        299,
+        6
+      ],
+      [
+        120,
+        5
+      ],
+      [
+        819,
+        4
+      ],
+      [
+        149,
+        2
+      ],
+      [
+        152,
+        2
+      ],
+      [
+        400,
+        2
+      ],
+      [
+        454,
+        2
+      ],
+      [
+        759,
+        2
+      ],
+      [
+        1064,
+        2
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        390,
+        1
+      ],
+      [
+        410,
+        1
+      ],
+      [
+        440,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#hero-section",
+        "top": 0,
+        "height": 844,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(173, 193, 202)"
+      },
+      {
+        "sel": "section#agents-section",
+        "top": 971,
+        "height": 2863,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "div.home-mobile > section",
+        "top": 4081,
+        "height": 1435,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "div.home-mobile > section.m-drop",
+        "top": 5763,
+        "height": 383,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "div.home-mobile > section.home-monitoring",
+        "top": 6393,
+        "height": 757,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section#clusters-section",
+        "top": 7397,
+        "height": 511,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section#data-ticker-section.m-drop",
+        "top": 8076,
+        "height": 66,
+        "pad": "48px 0px 48px 0px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section#early-access-section.cta-with-render",
+        "top": 8189,
+        "height": 607,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 8829,
+        "height": 176,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/menu-hero.jpg",
+      "box": {
+        "x": 0,
+        "y": 0,
+        "w": 1440,
+        "h": 844
+      },
+      "objectFit": "contain",
+      "objectPosition": "50% 100%",
+      "natural": "2267x1114",
+      "letterboxPct": 16,
+      "firstScreenPct": 100,
+      "startsAtPx": 0
+    }
+  },
+  {
+    "name": "intelligence",
+    "url": "/intelligence",
+    "width": 1440,
+    "vw": 1440,
+    "pageHeight": 7392,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-with-render.hero-group-a  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 850,
+          "w": 1440,
+          "h": 127
+        },
+        "detail": "127px of empty space between the two sections' content (paddings: 0px 0px 0px 0px / 120px 32px 120px 32px)",
+        "shot": "shots/intelligence-1440-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section.mk-section  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 1657,
+          "w": 1440,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/intelligence-1440-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section.mk-section  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 2858,
+          "w": 1440,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/intelligence-1440-gap-3.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "4",
+        "sel": "section.mk-section  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 4356,
+          "w": 1440,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/intelligence-1440-gap-4.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "5",
+        "sel": "section.mk-section  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 5329,
+          "w": 1440,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/intelligence-1440-gap-5.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        473,
+        9
+      ],
+      [
+        299,
+        6
+      ],
+      [
+        772,
+        6
+      ],
+      [
+        120,
+        4
+      ],
+      [
+        149,
+        4
+      ],
+      [
+        759,
+        4
+      ],
+      [
+        440,
+        3
+      ],
+      [
+        524,
+        3
+      ],
+      [
+        270,
+        2
+      ],
+      [
+        400,
+        2
+      ],
+      [
+        401,
+        2
+      ],
+      [
+        434,
+        2
+      ],
+      [
+        459,
+        2
+      ],
+      [
+        340,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-a",
+        "top": 60,
+        "height": 790,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 977,
+        "height": 680,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 1904,
+        "height": 953,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 3105,
+        "height": 1252,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 4603,
+        "height": 726,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 5576,
+        "height": 859,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section.cta-with-render",
+        "top": 6555,
+        "height": 580,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 7168,
+        "height": 176,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/how-it-works.webp",
+      "box": {
+        "x": 0,
+        "y": 60,
+        "w": 1440,
+        "h": 790
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "natural": "4202x2304",
+      "letterboxPct": 0,
+      "firstScreenPct": 93,
+      "startsAtPx": 60
+    }
+  },
+  {
+    "name": "for-developers",
+    "url": "/for/developers",
+    "width": 1440,
+    "vw": 1440,
+    "pageHeight": 3160,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-with-render.hero-group-b  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 844,
+          "w": 1440,
+          "h": 127
+        },
+        "detail": "127px of empty space between the two sections' content (paddings: 34px 32px 0px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-developers-1440-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section.mk-section  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 1517,
+          "w": 1440,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-developers-1440-gap-2.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        149,
+        6
+      ],
+      [
+        556,
+        6
+      ],
+      [
+        400,
+        5
+      ],
+      [
+        120,
+        2
+      ],
+      [
+        320,
+        2
+      ],
+      [
+        962,
+        2
+      ],
+      [
+        340,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-b",
+        "top": 64,
+        "height": 780,
+        "pad": "34px 32px 0px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 971,
+        "height": 546,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 1764,
+        "height": 388,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section.cta-with-render",
+        "top": 2271,
+        "height": 631,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 2936,
+        "height": 176,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/for-developers.webp",
+      "box": {
+        "x": 0,
+        "y": 64,
+        "w": 1440,
+        "h": 780
+      },
+      "objectFit": "cover",
+      "objectPosition": "50% 50%",
+      "natural": "4128x2304",
+      "letterboxPct": 0,
+      "firstScreenPct": 92,
+      "startsAtPx": 64
+    }
+  },
+  {
+    "name": "for-professionals",
+    "url": "/for/agents",
+    "width": 1440,
+    "vw": 1440,
+    "pageHeight": 3206,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-with-render.hero-group-b  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 844,
+          "w": 1440,
+          "h": 127
+        },
+        "detail": "127px of empty space between the two sections' content (paddings: 34px 32px 0px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-professionals-1440-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section.mk-section  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 1540,
+          "w": 1440,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-professionals-1440-gap-2.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        149,
+        6
+      ],
+      [
+        556,
+        6
+      ],
+      [
+        400,
+        5
+      ],
+      [
+        120,
+        2
+      ],
+      [
+        320,
+        2
+      ],
+      [
+        962,
+        2
+      ],
+      [
+        340,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-b",
+        "top": 64,
+        "height": 780,
+        "pad": "34px 32px 0px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 971,
+        "height": 569,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 1787,
+        "height": 411,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section.cta-with-render",
+        "top": 2318,
+        "height": 631,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 2982,
+        "height": 176,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/for-professionals.webp",
+      "box": {
+        "x": 0,
+        "y": 64,
+        "w": 1440,
+        "h": 780
+      },
+      "objectFit": "cover",
+      "objectPosition": "50% 50%",
+      "natural": "4128x2304",
+      "letterboxPct": 0,
+      "firstScreenPct": 92,
+      "startsAtPx": 64
+    }
+  },
+  {
+    "name": "for-institutions",
+    "url": "/for/institutions",
+    "width": 1440,
+    "vw": 1440,
+    "pageHeight": 3206,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-with-render.hero-group-b  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 844,
+          "w": 1440,
+          "h": 127
+        },
+        "detail": "127px of empty space between the two sections' content (paddings: 34px 32px 0px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-institutions-1440-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section.mk-section  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 1586,
+          "w": 1440,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-institutions-1440-gap-2.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        149,
+        6
+      ],
+      [
+        556,
+        6
+      ],
+      [
+        400,
+        5
+      ],
+      [
+        962,
+        4
+      ],
+      [
+        120,
+        2
+      ],
+      [
+        320,
+        2
+      ],
+      [
+        340,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-b",
+        "top": 64,
+        "height": 780,
+        "pad": "34px 32px 0px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 971,
+        "height": 615,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 1833,
+        "height": 364,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section.cta-with-render",
+        "top": 2318,
+        "height": 631,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 2982,
+        "height": 176,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/for-institutions.webp",
+      "box": {
+        "x": 0,
+        "y": 64,
+        "w": 1440,
+        "h": 780
+      },
+      "objectFit": "cover",
+      "objectPosition": "50% 50%",
+      "natural": "4128x2304",
+      "letterboxPct": 0,
+      "firstScreenPct": 92,
+      "startsAtPx": 64
+    }
+  },
+  {
+    "name": "for-community",
+    "url": "/for/community",
+    "width": 1440,
+    "vw": 1440,
+    "pageHeight": 3229,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-with-render.hero-group-b  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 844,
+          "w": 1440,
+          "h": 127
+        },
+        "detail": "127px of empty space between the two sections' content (paddings: 34px 32px 0px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-community-1440-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section.mk-section  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 1610,
+          "w": 1440,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/for-community-1440-gap-2.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        149,
+        6
+      ],
+      [
+        400,
+        5
+      ],
+      [
+        556,
+        4
+      ],
+      [
+        962,
+        4
+      ],
+      [
+        320,
+        3
+      ],
+      [
+        120,
+        2
+      ],
+      [
+        340,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-b",
+        "top": 64,
+        "height": 780,
+        "pad": "34px 32px 0px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 971,
+        "height": 639,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 1857,
+        "height": 364,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section.cta-with-render",
+        "top": 2341,
+        "height": 631,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 3005,
+        "height": 176,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/for-community.webp",
+      "box": {
+        "x": 0,
+        "y": 64,
+        "w": 1440,
+        "h": 780
+      },
+      "objectFit": "cover",
+      "objectPosition": "50% 50%",
+      "natural": "4128x2304",
+      "letterboxPct": 0,
+      "firstScreenPct": 92,
+      "startsAtPx": 64
+    }
+  },
+  {
+    "name": "pricing",
+    "url": "/pricing",
+    "width": 1440,
+    "vw": 1440,
+    "pageHeight": 4365,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.mk-section  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 1833,
+          "w": 1440,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 80px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/pricing-1440-gap-1.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        299,
+        12
+      ],
+      [
+        759,
+        8
+      ],
+      [
+        149,
+        7
+      ],
+      [
+        454,
+        7
+      ],
+      [
+        1064,
+        7
+      ],
+      [
+        400,
+        4
+      ],
+      [
+        163,
+        1
+      ],
+      [
+        270,
+        1
+      ],
+      [
+        340,
+        1
+      ],
+      [
+        420,
+        1
+      ],
+      [
+        468,
+        1
+      ],
+      [
+        773,
+        1
+      ],
+      [
+        1078,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-group-a",
+        "top": 60,
+        "height": 790,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 930,
+        "height": 903,
+        "pad": "80px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 2080,
+        "height": 1277,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section.cta-with-render",
+        "top": 3477,
+        "height": 631,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 4141,
+        "height": 176,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/pricing.webp",
+      "box": {
+        "x": 0,
+        "y": 60,
+        "w": 1440,
+        "h": 790
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "natural": "4202x2304",
+      "letterboxPct": 0,
+      "firstScreenPct": 93,
+      "startsAtPx": 60
+    }
+  },
+  {
+    "name": "about",
+    "url": "/about",
+    "width": 1440,
+    "vw": 1440,
+    "pageHeight": 4238,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.hero-with-render.hero-about  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 844,
+          "w": 1440,
+          "h": 127
+        },
+        "detail": "127px of empty space between the two sections' content (paddings: 34px 32px 0px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/about-1440-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section.mk-section  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 1509,
+          "w": 1440,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/about-1440-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section.mk-section  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 2289,
+          "w": 1440,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/about-1440-gap-3.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        120,
+        15
+      ],
+      [
+        149,
+        6
+      ],
+      [
+        759,
+        6
+      ],
+      [
+        173,
+        2
+      ],
+      [
+        400,
+        2
+      ],
+      [
+        783,
+        2
+      ],
+      [
+        150,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.hero-with-render.hero-about",
+        "top": 64,
+        "height": 780,
+        "pad": "34px 32px 0px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 971,
+        "height": 538,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 1756,
+        "height": 533,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 2536,
+        "height": 805,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section.cta-with-render",
+        "top": 3461,
+        "height": 520,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 4014,
+        "height": 176,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/about.webp",
+      "box": {
+        "x": 634,
+        "y": 64,
+        "w": 806,
+        "h": 780
+      },
+      "objectFit": "fill",
+      "objectPosition": "50% 50%",
+      "natural": "2066x2000",
+      "letterboxPct": 0,
+      "firstScreenPct": 92,
+      "startsAtPx": 64
+    }
+  },
+  {
+    "name": "data",
+    "url": "/data",
+    "width": 1440,
+    "vw": 1440,
+    "pageHeight": 7258,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.mk-section.hero-plain  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 602,
+          "w": 1440,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 160px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/data-1440-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section.mk-section  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 2975,
+          "w": 1440,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/data-1440-gap-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section.mk-section  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 3782,
+          "w": 1440,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/data-1440-gap-3.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "4",
+        "sel": "section.mk-section  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 4781,
+          "w": 1440,
+          "h": 247
+        },
+        "detail": "247px of empty space between the two sections' content (paddings: 120px 32px 120px 32px / 120px 32px 120px 32px)",
+        "shot": "shots/data-1440-gap-4.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        120,
+        16
+      ],
+      [
+        441,
+        10
+      ],
+      [
+        149,
+        6
+      ],
+      [
+        759,
+        3
+      ],
+      [
+        389,
+        2
+      ],
+      [
+        400,
+        2
+      ],
+      [
+        578,
+        2
+      ],
+      [
+        757,
+        2
+      ],
+      [
+        842,
+        2
+      ],
+      [
+        270,
+        1
+      ],
+      [
+        390,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.mk-section.hero-plain",
+        "top": 231,
+        "height": 371,
+        "pad": "160px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 849,
+        "height": 2125,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 3222,
+        "height": 560,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 4029,
+        "height": 752,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 5028,
+        "height": 1273,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section.cta-with-render",
+        "top": 6421,
+        "height": 580,
+        "pad": "120px 32px 120px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 7034,
+        "height": 176,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": {
+      "src": "/renders/cta.webp",
+      "box": {
+        "x": 0,
+        "y": 6421,
+        "w": 1440,
+        "h": 580
+      },
+      "objectFit": "cover",
+      "objectPosition": "50% 100%",
+      "natural": "3840x1319",
+      "letterboxPct": 0,
+      "firstScreenPct": 0,
+      "startsAtPx": 6421
+    }
+  },
+  {
+    "name": "vision",
+    "url": "/vision",
+    "width": 1440,
+    "vw": 1440,
+    "pageHeight": 2201,
+    "defects": [
+      {
+        "kind": "gap",
+        "id": "1",
+        "sel": "section.mk-section.hero-plain  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 358,
+          "w": 1440,
+          "h": 128
+        },
+        "detail": "128px of empty space between the two sections' content (paddings: 64px 32px 64px 32px / 64px 32px 64px 32px)",
+        "shot": "shots/vision-1440-gap-1.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "2",
+        "sel": "section.mk-section  →  section.mk-section",
+        "box": {
+          "x": 0,
+          "y": 1637,
+          "w": 1440,
+          "h": 128
+        },
+        "detail": "128px of empty space between the two sections' content (paddings: 64px 32px 64px 32px / 64px 32px 64px 32px)",
+        "shot": "shots/vision-1440-gap-2.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        145,
+        6
+      ],
+      [
+        553,
+        5
+      ],
+      [
+        961,
+        3
+      ],
+      [
+        270,
+        2
+      ],
+      [
+        341,
+        2
+      ],
+      [
+        360,
+        2
+      ],
+      [
+        550,
+        1
+      ],
+      [
+        1157,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section.mk-section.hero-plain",
+        "top": 129,
+        "height": 229,
+        "pad": "64px 32px 64px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 486,
+        "height": 1151,
+        "pad": "64px 32px 64px 32px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "section.mk-section",
+        "top": 1765,
+        "height": 99,
+        "pad": "64px 32px 64px 32px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "footer#site-footer",
+        "top": 1977,
+        "height": 176,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "not-found",
+    "url": "/no-such-page",
+    "width": 1440,
+    "vw": 1440,
+    "pageHeight": 844,
+    "defects": [],
+    "gutters": [
+      [
+        500,
+        1
+      ],
+      [
+        570,
+        1
+      ],
+      [
+        685,
+        1
+      ]
+    ],
+    "sections": [],
+    "hero": null
+  },
+  {
+    "name": "login",
+    "url": "/login",
+    "width": 1440,
+    "vw": 1440,
+    "pageHeight": 844,
+    "defects": [],
+    "gutters": [
+      [
+        152,
+        6
+      ],
+      [
+        957,
+        2
+      ],
+      [
+        832,
+        1
+      ],
+      [
+        1014,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "div.auth-shell > main.auth-main > section.auth-form",
+        "top": 156,
+        "height": 503,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "div.auth-shell > main.auth-main > section.auth-brand",
+        "top": 289,
+        "height": 237,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "div.auth-shell > footer.auth-foot",
+        "top": null,
+        "height": null,
+        "pad": "24px 32px 24px 32px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "signup",
+    "url": "/signup",
+    "width": 1440,
+    "vw": 1440,
+    "pageHeight": 894,
+    "defects": [],
+    "gutters": [
+      [
+        152,
+        6
+      ],
+      [
+        957,
+        2
+      ],
+      [
+        800,
+        1
+      ],
+      [
+        832,
+        1
+      ],
+      [
+        1014,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "div.auth-shell > main.auth-main > section.auth-form",
+        "top": 100,
+        "height": 664,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "div.auth-shell > main.auth-main > section.auth-brand",
+        "top": 314,
+        "height": 237,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "div.auth-shell > footer.auth-foot",
+        "top": null,
+        "height": null,
+        "pad": "24px 32px 24px 32px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "settings",
+    "url": "/dashboard/settings",
+    "width": 1440,
+    "vw": 1440,
+    "pageHeight": 1821,
+    "defects": [],
+    "gutters": [
+      [
+        401,
+        15
+      ],
+      [
+        376,
+        1
+      ]
+    ],
+    "sections": [],
+    "hero": null
+  },
+  {
+    "name": "dashboard-develop-empty",
+    "url": "/dashboard",
+    "width": 768,
+    "vw": 768,
+    "pageHeight": 1710,
+    "defects": [
+      {
+        "kind": "edge",
+        "id": "1",
+        "sel": "div.koano-shell > aside.shell-side",
+        "box": {
+          "x": 0,
+          "y": 64,
+          "w": 64,
+          "h": 780
+        },
+        "detail": "left 0px, right gap 704px, width 64px",
+        "shot": "shots/dashboard-develop-empty-768-edge-1.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        113,
+        7
+      ],
+      [
+        88,
+        4
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-idle",
+        "top": 113,
+        "height": 105,
+        "pad": "24px 24px 24px 24px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 267,
+        "height": 1380,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-develop-done",
+    "url": "/dashboard",
+    "width": 768,
+    "vw": 768,
+    "pageHeight": 5594,
+    "defects": [
+      {
+        "kind": "edge",
+        "id": "1",
+        "sel": "div.koano-shell > aside.shell-side",
+        "box": {
+          "x": 0,
+          "y": 64,
+          "w": 64,
+          "h": 780
+        },
+        "detail": "left 0px, right gap 704px, width 64px",
+        "shot": "shots/dashboard-develop-done-768-edge-1.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        113,
+        20
+      ],
+      [
+        88,
+        7
+      ],
+      [
+        449,
+        7
+      ],
+      [
+        119,
+        1
+      ],
+      [
+        120,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-done",
+        "top": 113,
+        "height": 413,
+        "pad": "24px 24px 24px 24px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 575,
+        "height": 4955,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "div.shell-content > div > div > section.map-frame",
+        "top": 1234,
+        "height": 515,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-acquire",
+    "url": "/dashboard",
+    "width": 768,
+    "vw": 768,
+    "pageHeight": 4412,
+    "defects": [
+      {
+        "kind": "text-box",
+        "id": "1",
+        "sel": "div#c5-archive",
+        "box": {
+          "x": 88,
+          "y": 3027,
+          "w": 656,
+          "h": 579
+        },
+        "detail": "\"Sep 28\" spans 741 to 763px; its box spans 88 to 744px",
+        "shot": "shots/dashboard-acquire-768-text-box-1.jpg"
+      },
+      {
+        "kind": "edge",
+        "id": "2",
+        "sel": "div.koano-shell > aside.shell-side",
+        "box": {
+          "x": 0,
+          "y": 64,
+          "w": 64,
+          "h": 780
+        },
+        "detail": "left 0px, right gap 704px, width 64px",
+        "shot": "shots/dashboard-acquire-768-edge-2.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        113,
+        20
+      ],
+      [
+        88,
+        6
+      ],
+      [
+        449,
+        2
+      ],
+      [
+        120,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-idle",
+        "top": 113,
+        "height": 105,
+        "pad": "24px 24px 24px 24px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 267,
+        "height": 4082,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div > section.map-frame",
+        "top": 639,
+        "height": 575,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-price-empty",
+    "url": "/dashboard",
+    "width": 768,
+    "vw": 768,
+    "pageHeight": 1250,
+    "defects": [
+      {
+        "kind": "edge",
+        "id": "1",
+        "sel": "div.koano-shell > aside.shell-side",
+        "box": {
+          "x": 0,
+          "y": 64,
+          "w": 64,
+          "h": 780
+        },
+        "detail": "left 0px, right gap 704px, width 64px",
+        "shot": "shots/dashboard-price-empty-768-edge-1.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        88,
+        4
+      ],
+      [
+        113,
+        3
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-idle.verdict-band-compact",
+        "top": 113,
+        "height": 105,
+        "pad": "24px 24px 24px 24px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 267,
+        "height": 919,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-price-done",
+    "url": "/dashboard",
+    "width": 768,
+    "vw": 768,
+    "pageHeight": 5852,
+    "defects": [
+      {
+        "kind": "text-box",
+        "id": "1",
+        "sel": "section#c2-scatter > div > div",
+        "box": {
+          "x": 161,
+          "y": 2809,
+          "w": 558,
+          "h": 260
+        },
+        "detail": "\"$0\" spans 140 to 154px; its box spans 161 to 719px",
+        "shot": "shots/dashboard-price-done-768-text-box-1.jpg"
+      },
+      {
+        "kind": "edge",
+        "id": "2",
+        "sel": "div.koano-shell > aside.shell-side",
+        "box": {
+          "x": 0,
+          "y": 64,
+          "w": 64,
+          "h": 780
+        },
+        "detail": "left 0px, right gap 704px, width 64px",
+        "shot": "shots/dashboard-price-done-768-edge-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section#c2-map.map-frame  →  section#c2-scatter",
+        "box": {
+          "x": 0,
+          "y": 1686,
+          "w": 768,
+          "h": 1081
+        },
+        "detail": "1081px of empty space between the two sections' content (paddings: 0px 0px 0px 0px / 24px 24px 24px 24px)",
+        "shot": "shots/dashboard-price-done-768-gap-3.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "4",
+        "sel": "section#c2-scatter  →  section#c2-permits",
+        "box": {
+          "x": 0,
+          "y": 3159,
+          "w": 768,
+          "h": 430
+        },
+        "detail": "430px of empty space between the two sections' content (paddings: 24px 24px 24px 24px / 24px 24px 24px 24px)",
+        "shot": "shots/dashboard-price-done-768-gap-4.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        113,
+        45
+      ],
+      [
+        88,
+        8
+      ],
+      [
+        449,
+        4
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-done.verdict-band-compact",
+        "top": 113,
+        "height": 413,
+        "pad": "24px 24px 24px 24px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 575,
+        "height": 5213,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "section#c2-map.map-frame",
+        "top": 1191,
+        "height": 495,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "section#c2-scatter",
+        "top": 2766,
+        "height": 393,
+        "pad": "24px 24px 24px 24px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section#c2-permits",
+        "top": 3589,
+        "height": 315,
+        "pad": "24px 24px 24px 24px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-property-empty",
+    "url": "/dashboard",
+    "width": 768,
+    "vw": 768,
+    "pageHeight": 1346,
+    "defects": [
+      {
+        "kind": "edge",
+        "id": "1",
+        "sel": "div.koano-shell > aside.shell-side",
+        "box": {
+          "x": 0,
+          "y": 64,
+          "w": 64,
+          "h": 780
+        },
+        "detail": "left 0px, right gap 704px, width 64px",
+        "shot": "shots/dashboard-property-empty-768-edge-1.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        88,
+        4
+      ],
+      [
+        113,
+        3
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-idle",
+        "top": 113,
+        "height": 105,
+        "pad": "24px 24px 24px 24px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 267,
+        "height": 1016,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-property-done",
+    "url": "/dashboard",
+    "width": 768,
+    "vw": 768,
+    "pageHeight": 5642,
+    "defects": [
+      {
+        "kind": "edge",
+        "id": "1",
+        "sel": "div.koano-shell > aside.shell-side",
+        "box": {
+          "x": 0,
+          "y": 64,
+          "w": 64,
+          "h": 780
+        },
+        "detail": "left 0px, right gap 704px, width 64px",
+        "shot": "shots/dashboard-property-done-768-edge-1.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        113,
+        26
+      ],
+      [
+        449,
+        10
+      ],
+      [
+        88,
+        8
+      ],
+      [
+        120,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-done",
+        "top": 113,
+        "height": 413,
+        "pad": "24px 24px 24px 24px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 154,
+        "height": 5425,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "section#c1-map.map-frame",
+        "top": 154,
+        "height": 1564,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-develop-empty",
+    "url": "/dashboard",
+    "width": 1440,
+    "vw": 1440,
+    "pageHeight": 1440,
+    "defects": [
+      {
+        "kind": "edge",
+        "id": "1",
+        "sel": "div.koano-shell > aside.shell-side",
+        "box": {
+          "x": 0,
+          "y": 64,
+          "w": 240,
+          "h": 780
+        },
+        "detail": "left 0px, right gap 1200px, width 240px",
+        "shot": "shots/dashboard-develop-empty-1440-edge-1.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        297,
+        7
+      ],
+      [
+        272,
+        4
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-idle",
+        "top": 121,
+        "height": 105,
+        "pad": "24px 24px 24px 24px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 275,
+        "height": 1101,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-develop-done",
+    "url": "/dashboard",
+    "width": 1440,
+    "vw": 1440,
+    "pageHeight": 4736,
+    "defects": [
+      {
+        "kind": "edge",
+        "id": "1",
+        "sel": "div.koano-shell > aside.shell-side",
+        "box": {
+          "x": 0,
+          "y": 64,
+          "w": 240,
+          "h": 780
+        },
+        "detail": "left 0px, right gap 1200px, width 240px",
+        "shot": "shots/dashboard-develop-done-1440-edge-1.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        297,
+        21
+      ],
+      [
+        272,
+        7
+      ],
+      [
+        1065,
+        3
+      ],
+      [
+        873,
+        2
+      ],
+      [
+        303,
+        1
+      ],
+      [
+        304,
+        1
+      ],
+      [
+        681,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-done",
+        "top": 121,
+        "height": 274,
+        "pad": "24px 24px 24px 24px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 444,
+        "height": 4229,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "div.shell-content > div > div > section.map-frame",
+        "top": 1049,
+        "height": 515,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-acquire",
+    "url": "/dashboard",
+    "width": 1440,
+    "vw": 1440,
+    "pageHeight": 3697,
+    "defects": [
+      {
+        "kind": "edge",
+        "id": "1",
+        "sel": "div.koano-shell > aside.shell-side",
+        "box": {
+          "x": 0,
+          "y": 64,
+          "w": 240,
+          "h": 780
+        },
+        "detail": "left 0px, right gap 1200px, width 240px",
+        "shot": "shots/dashboard-acquire-1440-edge-1.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        297,
+        20
+      ],
+      [
+        272,
+        6
+      ],
+      [
+        681,
+        2
+      ],
+      [
+        304,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-idle",
+        "top": 121,
+        "height": 105,
+        "pad": "24px 24px 24px 24px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 275,
+        "height": 3358,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div > section.map-frame",
+        "top": 628,
+        "height": 575,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-price-empty",
+    "url": "/dashboard",
+    "width": 1440,
+    "vw": 1440,
+    "pageHeight": 1050,
+    "defects": [
+      {
+        "kind": "edge",
+        "id": "1",
+        "sel": "div.koano-shell > aside.shell-side",
+        "box": {
+          "x": 0,
+          "y": 64,
+          "w": 240,
+          "h": 780
+        },
+        "detail": "left 0px, right gap 1200px, width 240px",
+        "shot": "shots/dashboard-price-empty-1440-edge-1.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        272,
+        4
+      ],
+      [
+        297,
+        3
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-idle.verdict-band-compact",
+        "top": 121,
+        "height": 105,
+        "pad": "24px 24px 24px 24px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 275,
+        "height": 711,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-price-done",
+    "url": "/dashboard",
+    "width": 1440,
+    "vw": 1440,
+    "pageHeight": 5227,
+    "defects": [
+      {
+        "kind": "text-box",
+        "id": "1",
+        "sel": "section#c2-scatter > div > div",
+        "box": {
+          "x": 345,
+          "y": 2539,
+          "w": 1038,
+          "h": 260
+        },
+        "detail": "\"$0\" spans 324 to 338px; its box spans 345 to 1383px",
+        "shot": "shots/dashboard-price-done-1440-text-box-1.jpg"
+      },
+      {
+        "kind": "edge",
+        "id": "2",
+        "sel": "div.koano-shell > aside.shell-side",
+        "box": {
+          "x": 0,
+          "y": 64,
+          "w": 240,
+          "h": 780
+        },
+        "detail": "left 0px, right gap 1200px, width 240px",
+        "shot": "shots/dashboard-price-done-1440-edge-2.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "3",
+        "sel": "section#c2-map.map-frame  →  section#c2-scatter",
+        "box": {
+          "x": 0,
+          "y": 1517,
+          "w": 1440,
+          "h": 980
+        },
+        "detail": "980px of empty space between the two sections' content (paddings: 0px 0px 0px 0px / 24px 24px 24px 24px)",
+        "shot": "shots/dashboard-price-done-1440-gap-3.jpg"
+      },
+      {
+        "kind": "gap",
+        "id": "4",
+        "sel": "section#c2-scatter  →  section#c2-permits",
+        "box": {
+          "x": 0,
+          "y": 2871,
+          "w": 1440,
+          "h": 391
+        },
+        "detail": "391px of empty space between the two sections' content (paddings: 24px 24px 24px 24px / 24px 24px 24px 24px)",
+        "shot": "shots/dashboard-price-done-1440-gap-4.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        297,
+        45
+      ],
+      [
+        272,
+        8
+      ],
+      [
+        681,
+        2
+      ],
+      [
+        1065,
+        2
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-done.verdict-band-compact",
+        "top": 121,
+        "height": 274,
+        "pad": "24px 24px 24px 24px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 444,
+        "height": 4720,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "section#c2-map.map-frame",
+        "top": 1022,
+        "height": 495,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "section#c2-scatter",
+        "top": 2496,
+        "height": 375,
+        "pad": "24px 24px 24px 24px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "sel": "section#c2-permits",
+        "top": 3262,
+        "height": 315,
+        "pad": "24px 24px 24px 24px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-property-empty",
+    "url": "/dashboard",
+    "width": 1440,
+    "vw": 1440,
+    "pageHeight": 1146,
+    "defects": [
+      {
+        "kind": "edge",
+        "id": "1",
+        "sel": "div.koano-shell > aside.shell-side",
+        "box": {
+          "x": 0,
+          "y": 64,
+          "w": 240,
+          "h": 780
+        },
+        "detail": "left 0px, right gap 1200px, width 240px",
+        "shot": "shots/dashboard-property-empty-1440-edge-1.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        272,
+        4
+      ],
+      [
+        297,
+        3
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-idle",
+        "top": 121,
+        "height": 105,
+        "pad": "24px 24px 24px 24px",
+        "bg": "rgb(240, 247, 252)"
+      },
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 275,
+        "height": 808,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      }
+    ],
+    "hero": null
+  },
+  {
+    "name": "dashboard-property-done",
+    "url": "/dashboard",
+    "width": 1440,
+    "vw": 1440,
+    "pageHeight": 4404,
+    "defects": [
+      {
+        "kind": "edge",
+        "id": "1",
+        "sel": "div.koano-shell > aside.shell-side",
+        "box": {
+          "x": 0,
+          "y": 64,
+          "w": 240,
+          "h": 780
+        },
+        "detail": "left 0px, right gap 1200px, width 240px",
+        "shot": "shots/dashboard-property-done-1440-edge-1.jpg"
+      }
+    ],
+    "gutters": [
+      [
+        297,
+        25
+      ],
+      [
+        272,
+        8
+      ],
+      [
+        1065,
+        6
+      ],
+      [
+        681,
+        5
+      ],
+      [
+        304,
+        1
+      ]
+    ],
+    "sections": [
+      {
+        "sel": "main#shell-main.shell-main > div.shell-content > div",
+        "top": 22,
+        "height": 4318,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "section#c1-map.map-frame",
+        "top": 22,
+        "height": 1564,
+        "pad": "0px 0px 0px 0px",
+        "bg": "rgba(0, 0, 0, 0)"
+      },
+      {
+        "sel": "section#verdict-band.verdict-band.verdict-band-done",
+        "top": 121,
+        "height": 274,
+        "pad": "24px 24px 24px 24px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ],
+    "hero": null
+  }
+]
