@@ -393,7 +393,7 @@ export default function SiteComparison() {
                 fontWeight: 700,
                 letterSpacing: "-0.02em",
                 color: "var(--ink-primary)",
-                margin: "0 0 4px",
+                margin: "0 0 8px",
               }}
             >
               Risk-adjusted opportunity ranking
@@ -485,7 +485,7 @@ export default function SiteComparison() {
                         <button
                           type="button"
                           className="btn-ghost"
-                          style={{ padding: "8px 14px", minHeight: "40px" }}
+                          style={{ padding: "12px 20px", minHeight: "44px" }}
                           aria-pressed={bandSlot === slot}
                           onClick={() => {
                             setSelectedSlot(slot);

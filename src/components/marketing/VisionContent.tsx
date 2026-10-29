@@ -232,8 +232,8 @@ export default function VisionContent() {
               ].map((t) => (
                 <div key={t.label} style={{ border: "1px solid var(--border-light)", borderRadius: "var(--radius-inner)", padding: "var(--space-3)", minWidth: 0 }}>
                   <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-micro)", letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--ink-muted)", hyphens: "auto", overflowWrap: "anywhere" }} lang="en">{t.label}</div>
-                  <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-data-l)", fontWeight: 500, color: "var(--ink-primary)", marginTop: "var(--space-1)" }}>{t.value}</div>
-                  <div style={{ fontSize: "var(--text-caption)", color: "var(--ink-muted)" }}>{t.note}</div>
+                  <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-data-l)", fontWeight: 500, color: "var(--ink-primary)", marginTop: "var(--space-2)" }}>{t.value}</div>
+                  <div style={{ fontSize: "var(--text-caption)", color: "var(--ink-muted)", marginTop: "var(--space-2)" }}>{t.note}</div>
                 </div>
               ))}
             </div>

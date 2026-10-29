@@ -671,8 +671,8 @@
   background: var(--pale-wash);
 }
 .gsearch-go {
-  padding: var(--space-2) var(--space-4);
-  min-height: 40px;
+  padding: var(--space-2) var(--space-5);
+  min-height: 44px;
 }
 .gsearch-panel-bar {
   position: absolute;
@@ -765,7 +765,7 @@
 @media (max-width: 767px) {
   .evidence-drawer .ledger-row {
     grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) !important;
-    row-gap: var(--space-1) !important;
+    row-gap: var(--space-2) !important;
   }
   .evidence-drawer .ledger-row > :nth-child(3) {
     grid-column: 1;
@@ -1397,4 +1397,64 @@ body.trace-on [data-trace].trace-hit {
   color: var(--ink-muted);
   text-align: right;
   margin-bottom: var(--space-1);
+}
+
+/* ===== Text fit (founder pass; scripts/ui/text-fit.mjs) =====================
+   Buttons: text at least 12px from top and bottom and 20px from the sides;
+   every control at least 44 x 44; at least 8px between text stacked in a
+   card; wrapped body text at line-height 1.45 or more. Nothing shrinks. */
+.band-btn,
+.vh-btn,
+.card-actions .btn-ghost,
+.map-frame-controls button,
+.segmented button,
+.shell-lens-btn,
+.map-frame .btn-ghost {
+  padding-left: var(--space-5) !important;
+  padding-right: var(--space-5) !important;
+}
+.band-btn,
+.vh-btn {
+  min-height: 44px !important;
+}
+.shell-item,
+.shell-side-sections .shell-item {
+  min-height: 44px;
+}
+.shell-topbar-logo {
+  min-width: 44px;
+  justify-content: center;
+}
+.gsearch-input {
+  min-height: 44px;
+}
+.site-card,
+.comp-card,
+.holding-card {
+  padding: var(--space-5);
+}
+.card-title {
+  line-height: 1.45;
+}
+.card-figures dd,
+.band-metrics dd {
+  margin-top: var(--space-2);
+}
+.this-week-tile {
+  gap: var(--space-2);
+}
+.band-copy {
+  margin-top: var(--space-2);
+}
+@media (max-width: 767px) {
+  .velocity-value {
+    gap: var(--space-2) !important;
+  }
+}
+/* Site cards on the narrowest phones: three figures in 2 columns, so the
+   unwrapped values stay inside the card's padding (text fit, 360). */
+@media (max-width: 400px) {
+  .site-card .card-figures {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }

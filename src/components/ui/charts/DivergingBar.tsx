@@ -61,7 +61,7 @@ const mono: React.CSSProperties = {
 export default function DivergingBar({
   data,
   domain,
-  barHeight = 22,
+  barHeight = 24,
   labelWidth = 176,
   tracePrefix,
   neutralLabel = "no directional signal",
@@ -90,7 +90,7 @@ export default function DivergingBar({
             }}
           >
             {/* Label column */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "4px", minWidth: 0 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px", minWidth: 0 }}>
               <span
                 style={{
                   fontSize: "13px",

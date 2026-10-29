@@ -131,10 +131,12 @@ export default function Scatter({
 
       {/* X axis labels */}
       <div style={{ position: "relative", height: "14px", marginTop: "6px", marginLeft: `${gutter}px` }}>
-        {xTicks.map((t) => (
+        {xTicks.map((t, i) => (
           <span
             key={`x-${t.value}`}
-            style={{ ...axisLabel, position: "absolute", left: `${leftPct(t.value)}%`, transform: "translateX(-50%)" }}
+            // The last tick label is anchored by its right edge so it ends at
+            // the plot's edge instead of running past the panel (text fit).
+            style={{ ...axisLabel, position: "absolute", left: `${leftPct(t.value)}%`, transform: i === xTicks.length - 1 && xTicks.length > 1 ? "translateX(-100%)" : "translateX(-50%)" }}
           >
             {t.label}
           </span>

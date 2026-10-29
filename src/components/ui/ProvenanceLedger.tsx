@@ -81,10 +81,11 @@ export default function ProvenanceLedger({ dataPoints, locationConfidence, addre
           cursor: "pointer",
           textAlign: "left",
           display: "flex",
-          alignItems: "baseline",
+          alignItems: "center",
           justifyContent: "space-between",
           gap: "12px",
           padding: 0,
+          minHeight: "44px", // a 44px target (text fit pass)
         }}
       >
         <span>

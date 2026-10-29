@@ -606,6 +606,7 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
             justifyContent: "space-between",
             gap: "8px",
             width: "100%",
+            minHeight: "44px", // a 44px target (text fit pass)
             border: "none",
             background: "transparent",
             padding: 0,
@@ -647,7 +648,7 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
                 if (item.gradient) {
                   // A diverging scale decoded on the map: the bar + its value anchors.
                   return (
-                    <div key={item.label} style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                    <div key={item.label} style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                         {labelText}
                         {provDot}
@@ -677,7 +678,7 @@ export default function KoanoMap({ center, markers, polygons = [], legend, heigh
                   );
                 }
                 return (
-                  <div key={item.label} style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                  <div key={item.label} style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                       <span style={{ display: "inline-flex", width: "16px", justifyContent: "center" }}>
                         {legendGlyph(item.kind, item.provenance, item.accent, item.uncertain)}

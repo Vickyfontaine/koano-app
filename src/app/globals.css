@@ -756,7 +756,7 @@ body {
   /* Provenance ledger rows: two columns on phones. */
   .ledger-row {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
-    gap: var(--space-1) var(--space-3) !important;
+    gap: var(--space-2) var(--space-3) !important;
   }
 
   /* Verdict math panel: tighter padding; bar rows stack label over track. */
@@ -783,7 +783,7 @@ body {
   .arch-l3 { padding: var(--space-4) !important; text-align: left !important; }
 
   /* Intelligence verdict card: agent name above its explanation. */
-  .reason-row { flex-direction: column !important; gap: var(--space-1) !important; }
+  .reason-row { flex-direction: column !important; gap: var(--space-2) !important; }
   .reason-agent { width: auto !important; }
 }
 
@@ -829,7 +829,7 @@ body {
   }
   .home-mobile h2.text-h2 {
     font-size: var(--m-h2) !important;
-    line-height: 1.08 !important;
+    line-height: 1.1 !important;
   }
   .home-mobile section h3 {
     font-size: var(--m-h3) !important;
@@ -869,7 +869,7 @@ body {
     padding: var(--space-4) var(--m-card-pad) !important;
   }
   .home-mobile #agents-section .card .section-number {
-    margin-bottom: var(--space-1) !important;
+    margin-bottom: var(--space-2) !important;
   }
   .home-mobile #agents-section [style*="padding-bottom: 40px"] {
     padding-bottom: var(--space-2) !important;

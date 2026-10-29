@@ -62,7 +62,7 @@ export default function ScoreBands({
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: "4px",
+            gap: "8px",
             whiteSpace: "nowrap",
           }}
         >

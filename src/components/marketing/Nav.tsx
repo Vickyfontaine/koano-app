@@ -296,7 +296,9 @@ export default function Nav() {
         .nav-link {
           display: inline-flex;
           align-items: center;
+          justify-content: center;
           min-height: 44px;
+          min-width: 44px;
           font-size: var(--text-data);
           font-weight: 400;
           color: var(--ink-muted);

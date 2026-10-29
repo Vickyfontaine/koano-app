@@ -51,6 +51,7 @@ const metricLabel: React.CSSProperties = {
 };
 
 const metricValue: React.CSSProperties = {
+  marginTop: "8px",
   fontFamily: "var(--font-mono)",
   fontSize: "20px",
   fontWeight: 500,
@@ -131,18 +132,18 @@ export default function VerdictCard({ verdict, address }: VerdictCardProps) {
       >
         <div>
           <div style={metricLabel}>Confidence</div>
-          <div style={{ ...metricValue, marginTop: "6px" }}>{verdict.confidence}/100</div>
+          <div style={{ ...metricValue, marginTop: "8px" }}>{verdict.confidence}/100</div>
           <Meter value={verdict.confidence} color="var(--mid-blue)" />
         </div>
         <div>
           <div style={metricLabel}>Signal window</div>
-          <div style={{ ...metricValue, marginTop: "6px" }}>
+          <div style={{ ...metricValue, marginTop: "8px" }}>
             {verdict.signal_window_months} mo
           </div>
         </div>
         <div>
           <div style={metricLabel}>Risk score</div>
-          <div style={{ ...metricValue, marginTop: "6px" }}>{verdict.risk_score}/100</div>
+          <div style={{ ...metricValue, marginTop: "8px" }}>{verdict.risk_score}/100</div>
           <Meter
             value={verdict.risk_score}
             color={

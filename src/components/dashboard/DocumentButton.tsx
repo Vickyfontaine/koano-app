@@ -102,8 +102,10 @@ export default function DocumentButton({
     alignItems: "flex-start",
     gap: "8px",
     fontSize: "13px",
+    lineHeight: 1.5,
     color: "var(--ink-secondary)",
     cursor: "pointer",
+    minHeight: "44px",
   };
 
   return (
@@ -120,10 +122,10 @@ export default function DocumentButton({
       }}
     >
       <div>
-        <h3 style={{ fontSize: "16px", fontWeight: 500, color: "var(--ink-primary)", margin: "0 0 4px" }}>
+        <h3 style={{ fontSize: "16px", fontWeight: 500, color: "var(--ink-primary)", margin: "0 0 8px" }}>
           {title}
         </h3>
-        <p style={{ fontSize: "12px", color: "var(--ink-muted)", margin: 0 }}>
+        <p style={{ fontSize: "12px", color: "var(--ink-muted)", margin: 0, lineHeight: 1.5 }}>
           {singleAction
             ? "A complete, provenance-labeled record built directly from live public data. Every figure carries its source; the disclaimer footer is on every page."
             : "A professional, provenance-labeled document for the analyzed address. Every figure carries its source; the disclaimer footer is on every page."}
@@ -193,7 +195,8 @@ export default function DocumentButton({
                 background: format === f ? "var(--pale-wash)" : "transparent",
                 color: format === f ? "var(--deep-navy)" : "var(--ink-muted)",
                 borderRadius: "100px",
-                padding: "4px 12px",
+                padding: "12px 20px",
+                minHeight: "44px",
                 fontSize: "12px",
                 textTransform: "uppercase",
                 cursor: "pointer",

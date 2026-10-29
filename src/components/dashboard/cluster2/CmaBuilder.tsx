@@ -156,7 +156,7 @@ export default function CmaBuilder({ detail, detailError, id }: CmaBuilderProps)
                           : "var(--mid-blue)",
                 }}
               />
-              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                 <span style={{ fontSize: "13px", lineHeight: 1.5, color: "var(--ink-secondary)" }}>
                   {s.text}
                 </span>

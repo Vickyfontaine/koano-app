@@ -77,7 +77,7 @@ export default function SitePanels({ detail, detailError, verdict }: SitePanelsP
               {regPolicy.headline}
             </p>
             {entFactors && entFactors.length > 0 && (
-              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                 <span
                   style={{
                     fontFamily: "var(--font-mono)",

@@ -214,7 +214,7 @@ export default function DataContent() {
                     fontWeight: 700,
                     color: "var(--ink-primary)",
                     letterSpacing: "-0.02em",
-                    marginBottom: "4px",
+                    marginBottom: "8px",
                   }}
                 >
                   {item.stat}
@@ -326,7 +326,7 @@ export default function DataContent() {
                         padding: "14px 16px",
                         display: "flex",
                         flexDirection: "column",
-                        gap: "6px",
+                        gap: "8px",
                       }}
                     >
                       <div
@@ -342,7 +342,7 @@ export default function DataContent() {
                             fontSize: "14px",
                             fontWeight: 500,
                             color: "var(--ink-primary)",
-                            lineHeight: 1.35,
+                            lineHeight: 1.45,
                           }}
                         >
                           {source.source}

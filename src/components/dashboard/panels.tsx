@@ -84,6 +84,7 @@ export function Row({ label, value }: { label: string; value: React.ReactNode })
         flexWrap: "wrap",
         justifyContent: "space-between",
         columnGap: "12px",
+        rowGap: "8px",
         fontSize: "14px",
         lineHeight: 1.5,
       }}
@@ -129,7 +130,7 @@ export function PanelHeader({
     >
       <div style={{ minWidth: 0 }}>
         <h3 style={{ ...panelHeading, margin: 0 }}>{title}</h3>
-        {sub && <p style={{ ...panelSub, margin: 0 }}>{sub}</p>}
+        {sub && <p style={{ ...panelSub, margin: "8px 0 0" }}>{sub}</p>}
       </div>
       {provenance && (
         <span style={{ flex: "none", paddingTop: "2px" }}>

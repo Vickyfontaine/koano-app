@@ -106,7 +106,7 @@ export default function MonitoringSection() {
                     fontSize: "15px",
                     fontWeight: 500,
                     color: "var(--ink-primary)",
-                    margin: "0 0 6px",
+                    margin: "0 0 8px",
                   }}
                 >
                   {alert.title}

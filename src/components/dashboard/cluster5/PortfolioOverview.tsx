@@ -212,7 +212,8 @@ export default function PortfolioOverview({
                           border: "1px solid var(--border)",
                           background: "transparent",
                           borderRadius: "100px",
-                          padding: "8px 16px",
+                          padding: "12px 20px",
+                          minHeight: "44px",
                           fontFamily: "inherit",
                           fontSize: "12px",
                           fontWeight: 500,
@@ -234,6 +235,8 @@ export default function PortfolioOverview({
                           fontSize: "12px",
                           color: "var(--ink-muted)",
                           cursor: "pointer",
+                          minHeight: "44px",
+                          minWidth: "44px",
                         }}
                       >
                         Remove

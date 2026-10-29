@@ -54,7 +54,7 @@ export default function MonitoringFeed({ id }: { id?: string }) {
     <div style={panelStyle} id={id}>
       <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: "12px" }}>
         <div>
-          <h2 style={{ fontSize: "22px", fontWeight: 700, letterSpacing: "-0.02em", color: "var(--ink-primary)", margin: "8px 0 2px" }}>
+          <h2 style={{ fontSize: "22px", fontWeight: 700, letterSpacing: "-0.02em", color: "var(--ink-primary)", margin: "8px 0 8px" }}>
             Portfolio monitoring
           </h2>
           <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
@@ -105,7 +105,7 @@ export default function MonitoringFeed({ id }: { id?: string }) {
                     flexShrink: 0,
                   }}
                 />
-                <div style={{ display: "flex", flexDirection: "column", gap: "4px", flex: 1 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px", flex: 1 }}>
                   <span style={{ fontSize: "14px", fontWeight: 500, color: "var(--ink-primary)" }}>{n.title}</span>
                   <span style={{ fontSize: "13px", lineHeight: 1.5, color: "var(--ink-secondary)" }}>{n.body}</span>
                   {w.window_from && w.window_to && (

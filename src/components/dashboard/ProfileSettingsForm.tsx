@@ -151,7 +151,7 @@ function AssetUpload({
               const f = e.target.files?.[0];
               if (f) void upload(f);
             }}
-            style={{ fontSize: "12px", color: "var(--ink-secondary)", minWidth: 0, maxWidth: "100%" }}
+            style={{ fontSize: "12px", color: "var(--ink-secondary)", minWidth: 0, maxWidth: "100%", minHeight: "44px" }}
           />
           {url && (
             <button
@@ -249,7 +249,7 @@ export default function ProfileSettingsForm() {
     <div style={{ display: "flex", flexDirection: "column", gap: "24px", maxWidth: "640px" }}>
       <div style={cardStyle}>
         <div>
-          <h2 style={{ fontSize: "18px", fontWeight: 500, color: "var(--ink-primary)", margin: "0 0 4px" }}>
+          <h2 style={{ fontSize: "18px", fontWeight: 500, color: "var(--ink-primary)", margin: "0 0 8px" }}>
             Preparer details
           </h2>
           <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
@@ -285,7 +285,7 @@ export default function ProfileSettingsForm() {
 
       <div style={cardStyle}>
         <div>
-          <h2 style={{ fontSize: "18px", fontWeight: 500, color: "var(--ink-primary)", margin: "0 0 4px" }}>
+          <h2 style={{ fontSize: "18px", fontWeight: 500, color: "var(--ink-primary)", margin: "0 0 8px" }}>
             Branding
           </h2>
           <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0 }}>
@@ -304,7 +304,8 @@ export default function ProfileSettingsForm() {
           style={{
             border: "none",
             borderRadius: "100px",
-            padding: "10px 24px",
+            padding: "12px 24px",
+            minHeight: "44px",
             fontSize: "14px",
             fontWeight: 500,
             cursor: saving || hasErrors ? "default" : "pointer",

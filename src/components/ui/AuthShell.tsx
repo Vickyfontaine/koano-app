@@ -65,6 +65,9 @@ export default function AuthShell({ children }: { children: React.ReactNode }) {
         }
         .auth-logo {
           display: inline-flex;
+          min-width: 44px;
+          min-height: 44px;
+          justify-content: center;
           align-items: center;
           min-height: 44px;
           border-radius: var(--radius-chip);

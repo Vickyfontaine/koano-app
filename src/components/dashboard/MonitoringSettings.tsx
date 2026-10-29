@@ -91,7 +91,7 @@ export default function MonitoringSettings({ id }: { id?: string }) {
                   <button key={v} type="button" onClick={() => {
                     const next = on ? [...p.muted_signal_types, v] : p.muted_signal_types.filter((x) => x !== v);
                     savePrefs({ muted_signal_types: next });
-                  }} style={{ border: "1px solid var(--border)", background: on ? "var(--sky)" : "transparent", color: on ? "var(--deep-navy)" : "var(--ink-muted)", borderRadius: 100, padding: "4px 12px", fontSize: 12, cursor: "pointer" }}>
+                  }} style={{ border: "1px solid var(--border)", background: on ? "var(--sky)" : "transparent", color: on ? "var(--deep-navy)" : "var(--ink-muted)", borderRadius: 100, padding: "12px 20px", minHeight: 44, fontSize: 12, cursor: "pointer" }}>
                     {l}
                   </button>
                 );
@@ -116,7 +116,7 @@ export default function MonitoringSettings({ id }: { id?: string }) {
                     {paused && <span style={badge("var(--signal-warning-ink)")}>Paused: over {s.plan} limit</span>}
                     {!pr.monitoring_enabled && <span style={badge("var(--ink-muted)")}>Not watched</span>}
                     {!isFree && (
-                      <button type="button" onClick={() => void toggleWatch(pr.id, !pr.monitoring_enabled)} style={{ border: "1px solid var(--border)", background: "transparent", borderRadius: 100, padding: "4px 12px", fontSize: 12, color: "var(--ink-muted)", cursor: "pointer" }}>
+                      <button type="button" onClick={() => void toggleWatch(pr.id, !pr.monitoring_enabled)} style={{ border: "1px solid var(--border)", background: "transparent", borderRadius: 100, padding: "12px 20px", minHeight: 44, fontSize: 12, color: "var(--ink-muted)", cursor: "pointer" }}>
                         {pr.monitoring_enabled ? "Unwatch" : "Watch"}
                       </button>
                     )}
@@ -136,8 +136,9 @@ export default function MonitoringSettings({ id }: { id?: string }) {
   );
 }
 
-const rowStyle: React.CSSProperties = { display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, color: "var(--ink-secondary)" };
-const selectStyle: React.CSSProperties = { border: "1px solid var(--border)", borderRadius: "var(--radius-chip)", padding: "4px 8px", fontSize: 13, fontFamily: "inherit" };
+// Each row is a 44px target (the label toggles its checkbox); the select is 44px tall.
+const rowStyle: React.CSSProperties = { display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 13, color: "var(--ink-secondary)", minHeight: 44 };
+const selectStyle: React.CSSProperties = { border: "1px solid var(--border)", borderRadius: "var(--radius-chip)", padding: "4px 8px", fontSize: 13, fontFamily: "inherit", minHeight: 44 };
 function badge(color: string): React.CSSProperties {
   return { fontSize: 11, fontWeight: 500, color, border: `1px solid ${color}`, borderRadius: 100, padding: "2px 8px", whiteSpace: "nowrap" };
 }

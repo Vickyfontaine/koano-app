@@ -66,7 +66,7 @@ export default function ValuationPanel({ detail, detailError, id }: ValuationPan
           </span>
           {comps && <ProvenanceBadge provenance={comps.provenance} />}
         </div>
-        <p style={{ fontSize: "12px", color: "var(--ink-muted)", margin: "6px 0 0", lineHeight: 1.5 }}>
+        <p style={{ fontSize: "12px", color: "var(--ink-muted)", margin: "8px 0 0", lineHeight: 1.5 }}>
           {!guard.allowed ? (
             guard.reason
           ) : (

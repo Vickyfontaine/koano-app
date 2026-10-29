@@ -233,7 +233,7 @@ export default function VerdictMathPanel({ verdict, recorded = false }: VerdictM
           returned no directional signal despite their confidence. */}
       <div style={{ borderTop: "1px solid var(--border-light)", paddingTop: "20px" }}>
         <div style={{ ...monoLabel, marginBottom: "10px" }}>Where the score came from</div>
-        <p style={{ fontSize: "15px", fontWeight: 500, color: "var(--ink-primary)", margin: "0 0 4px" }}>
+        <p style={{ fontSize: "15px", fontWeight: 500, color: "var(--ink-primary)", margin: "0 0 8px" }}>
           {finding}
         </p>
         <p style={{ fontSize: "13px", lineHeight: 1.55, color: "var(--ink-muted)", margin: "0 0 18px", maxWidth: "660px" }}>
@@ -246,7 +246,7 @@ export default function VerdictMathPanel({ verdict, recorded = false }: VerdictM
           facts produced the lean. Only present when a clear structural signal fired. */}
       {wb.structural_nudge != null && wb.structural_nudge !== 0 && (wb.structural_drivers?.length ?? 0) > 0 && (
         <div style={{ borderTop: "1px solid var(--border-light)", paddingTop: "20px" }}>
-          <div style={{ ...monoLabel, marginBottom: "6px" }}>
+          <div style={{ ...monoLabel, marginBottom: "8px" }}>
             Structural direction from the facts ({fmtSigned(wb.structural_nudge, 2)} to the score)
           </div>
           <p style={{ fontSize: "13px", lineHeight: 1.55, color: "var(--ink-muted)", margin: "0 0 12px", maxWidth: "660px" }}>
@@ -300,7 +300,7 @@ export default function VerdictMathPanel({ verdict, recorded = false }: VerdictM
             {verdict.verdict}
           </span>
         </div>
-        <div style={{ color: "var(--ink-muted)", marginTop: "4px" }}>
+        <div style={{ color: "var(--ink-muted)", marginTop: "8px" }}>
           thresholds: buy ≥ {fmtNum(wb.thresholds.buy)} · hold ≥ {fmtNum(wb.thresholds.hold)} · wait ≥{" "}
           {fmtNum(wb.thresholds.wait)} · else sell · method {wb.method}
         </div>

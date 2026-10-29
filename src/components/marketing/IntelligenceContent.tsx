@@ -580,7 +580,7 @@ export default function IntelligenceContent() {
                         fontSize: "12px",
                         color: "var(--ink-muted)",
                         letterSpacing: "0.06em",
-                        marginTop: "4px",
+                        marginTop: "8px",
                       }}
                     >
                       {agent.inputs}
@@ -779,7 +779,7 @@ export default function IntelligenceContent() {
                   fontSize: "13px",
                   color: "var(--ink-muted)",
                   letterSpacing: "0.06em",
-                  marginBottom: "4px",
+                  marginBottom: "8px",
                 }}
               >
                 Confidence: {EXAMPLE_VERDICT.confidence} / 100 · {EXAMPLE_VERDICT_ADDRESS}
@@ -824,7 +824,7 @@ export default function IntelligenceContent() {
                     <div
                       key={item.agent}
                       className="reason-row"
-                      style={{ display: "flex", gap: "12px", fontSize: "13px" }}
+                      style={{ display: "flex", gap: "12px", rowGap: "8px", fontSize: "13px", lineHeight: 1.5 }}
                     >
                       <span
                         className="reason-agent"

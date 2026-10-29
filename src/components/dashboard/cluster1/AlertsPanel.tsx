@@ -211,7 +211,7 @@ export default function AlertsPanel({ detail, detailError, id, persona = "owner"
             return (
               <div key={n.id} style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
                 <span aria-hidden="true" style={{ width: "8px", height: "8px", borderRadius: "50%", background: NOTIF_COLOR[n.severity] ?? "var(--mid-blue)", marginTop: "6px", flexShrink: 0 }} />
-                <div style={{ display: "flex", flexDirection: "column", gap: "4px", flex: 1 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px", flex: 1 }}>
                   <span style={{ fontSize: "14px", fontWeight: 500, color: "var(--ink-primary)" }}>{n.title}</span>
                   <span style={{ fontSize: "13px", lineHeight: 1.5, color: "var(--ink-secondary)" }}>{n.body}</span>
                   {w.window_from && w.window_to && (
@@ -259,7 +259,7 @@ export default function AlertsPanel({ detail, detailError, id, persona = "owner"
                   flexShrink: 0,
                 }}
               />
-              <div style={{ display: "flex", flexDirection: "column", gap: "4px", flex: 1 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px", flex: 1 }}>
                 <span style={{ fontSize: "14px", lineHeight: 1.5, color: "var(--ink-secondary)" }}>
                   {a.text}
                 </span>
